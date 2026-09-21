@@ -72,7 +72,7 @@ const trustItems = [
   {
     icon: ShieldCheck,
     title: "Transparent pricing",
-    body: "Your USVC Processing Fee, Government / Agency Fee & Shipping bundle, and optional Rush Processing are itemized before one secure payment.",
+    body: "Your USVC Processing Fee and optional Rush Processing are itemized before payment. Agency and shipping fees are charged separately upon State Agency review and acceptance.",
   },
   {
     icon: Headphones,
