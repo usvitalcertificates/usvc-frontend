@@ -15,7 +15,6 @@ export interface AddressInput {
 }
 
 export interface CreateOrderPayload {
-  antiAbuse: { honeypot: string; formStartedAt: number };
   stateSlug: string;
   stateCode: string;
   stateName: string;
