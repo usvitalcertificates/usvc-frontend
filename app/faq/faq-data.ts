@@ -17,9 +17,9 @@ export const FAQ_ITEMS: FaqItem[] = [
       "If you have submitted incorrect information, please [Contact Us](/contact) as soon as possible.",
   },
   {
-    question: "What is included in my payment?",
+    question: "Why are there two fees?",
     answer:
-      "USVC collects one all-inclusive payment. Each copy includes the USVC Processing Fee and a fixed Government / Agency Fee & Shipping bundle based on domestic or international delivery. Optional Rush Processing is charged once per order. Your complete total is shown before payment, and no second customer payment is required for the order.",
+      "The online Vital Certificate Processing Fee is payable upon ordering and the relevant Vital Statistics Agency Fee and any other shipping fees are payable upon review and acceptance by the State Agency and will appear on your credit card statement separately.\n\nPlease note: All state certificate fees are subject to change without notice.",
   },
   {
     question: "How much does it cost to order a vital record and what type of payment is accepted?",
