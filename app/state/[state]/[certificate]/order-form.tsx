@@ -5,6 +5,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { createOrder, verifyOrderBeforePayment, type Certificate } from "@/lib/api";
 import {
+  COUNTY_UNAVAILABLE_MESSAGE,
+  isCountyTemporarilyUnavailable,
+} from "@/lib/county-availability";
+import {
   PROCESSING_CLARIFICATION_NOTE,
   resolveFormConfig,
   type CertificateSlug,
@@ -367,6 +371,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [unavailableCounty, setUnavailableCounty] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const startedAt = useRef<number>(Date.now());
   const noun = jurisdictionNoun(geo.counties.length ? geo : undefined);
@@ -399,6 +404,19 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const relationship = values.relationship ?? draft.relationship ?? "";
   const reason = values.reason ?? draft.reason ?? "";
 
+  function blockUnavailableCounty(county: string) {
+    setValues((current) => ({ ...current, county: "", city: "" }));
+    setFieldErrors((current) => ({ ...current, county: COUNTY_UNAVAILABLE_MESSAGE }));
+    setUnavailableCounty(county);
+    try {
+      const raw = sessionStorage.getItem(draftKey);
+      const stored = raw ? (JSON.parse(raw) as Record<string, string>) : {};
+      sessionStorage.setItem(draftKey, JSON.stringify({ ...stored, county: "", city: "" }));
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
   function syncForm() {
     const form = formRef.current;
     if (!form) return;
@@ -406,6 +424,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     const data = Object.fromEntries(
       [...new FormData(form).entries()].map(([k, v]) => [k, String(v)]),
     );
+    if (isCountyTemporarilyUnavailable(abbr, data.county ?? "")) {
+      data.county = "";
+      data.city = "";
+    }
     // Browser autofill and password managers often fill fields without firing
     // React change events, so merge instead of replacing: never blank a value
     // the user already entered just because one sync missed it.
@@ -648,9 +670,18 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               name="county"
               required
               value={values.county ?? draft.county ?? ""}
-              onChange={(event) =>
-                setValues((v) => ({ ...v, county: event.target.value, city: "" }))
-              }
+              onChange={(event) => {
+                const county = event.target.value;
+                if (isCountyTemporarilyUnavailable(abbr, county)) {
+                  blockUnavailableCounty(county);
+                  return;
+                }
+                setFieldErrors((current) => {
+                  const { county: _county, ...remaining } = current;
+                  return remaining;
+                });
+                setValues((v) => ({ ...v, county, city: "" }));
+              }}
             >
               <option value="">
                 Select {stateName} {noun}
@@ -662,7 +693,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               ))}
             </select>
             {fieldErrors.county ? (
-              <small className="application-error">{fieldErrors.county}</small>
+              <small className="application-error" role="alert">
+                {fieldErrors.county}
+              </small>
             ) : null}
           </label>
           <label className="application-field">
@@ -672,7 +705,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               required
               value={values.city ?? draft.city ?? ""}
               onChange={(event) => setValues((v) => ({ ...v, city: event.target.value }))}
-              disabled={!values.county && !draft.county}
+              disabled={Boolean(unavailableCounty) || (!values.county && !draft.county)}
             >
               <option value="">
                 {(values.county ?? draft.county) ? "Select city or town" : `Select ${noun} first`}
@@ -687,7 +720,12 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </label>
           <label className="application-field wide">
             Reason for requesting this certificate <span>*</span>
-            <select name="reason" required defaultValue={draft.reason ?? ""}>
+            <select
+              name="reason"
+              required
+              defaultValue={draft.reason ?? ""}
+              disabled={Boolean(unavailableCounty)}
+            >
               <option value="">Please select…</option>
               {config.reasons.map((item) => (
                 <option key={item}>{item}</option>
@@ -703,625 +741,642 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         </div>
       </FormSection>
 
-      <FormSection number={2} title="Information About the Requestor">
-        <div className="application-grid">
-          <label className="application-field wide">
-            Your relationship to the person named on the certificate <span>*</span>
-            <select name="relationship" required defaultValue={draft.relationship ?? ""}>
-              <option value="">Please select…</option>
-              {config.relationships.map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
-          </label>
-          {relationship === "Other" ? (
+      <fieldset className="county-blocked-fields" disabled={Boolean(unavailableCounty)}>
+        <FormSection number={2} title="Information About the Requestor">
+          <div className="application-grid">
             <label className="application-field wide">
-              Please describe your relationship <span>*</span>
-              <input
-                name="relationshipOther"
-                required
-                defaultValue={draft.relationshipOther ?? ""}
-              />
-              {fieldErrors["applicant.relationshipOther"] ? (
-                <small className="application-error">
-                  {fieldErrors["applicant.relationshipOther"]}
-                </small>
-              ) : null}
-            </label>
-          ) : null}
-          <label className="application-field">
-            Your first name <span>*</span>
-            <input
-              name="applicantFirstName"
-              required
-              defaultValue={draft.applicantFirstName ?? ""}
-            />
-          </label>
-          <label className="application-field">
-            Your middle name
-            <input name="applicantMiddleName" defaultValue={draft.applicantMiddleName ?? ""} />
-          </label>
-          <label className="application-field">
-            Your last name <span>*</span>
-            <input name="applicantLastName" required defaultValue={draft.applicantLastName ?? ""} />
-          </label>
-        </div>
-        {config.requestor.note ? (
-          <div className="group-note">
-            <strong>{config.requestor.note.title}</strong>
-            <em>{config.requestor.note.body}</em>
-          </div>
-        ) : null}
-        <div className="application-grid">
-          {config.requestor.showDateOfBirth ? (
-            <label className="application-field">
-              Your date of birth {config.requestor.dateOfBirthRequired ? <span>*</span> : null}
-              <input
-                name="applicantDob"
-                type="date"
-                required={config.requestor.dateOfBirthRequired}
-                defaultValue={draft.applicantDob ?? ""}
-              />
-              {fieldErrors["applicant.dateOfBirth"] ? (
-                <small className="application-error">{fieldErrors["applicant.dateOfBirth"]}</small>
-              ) : null}
-            </label>
-          ) : null}
-          {config.requestor.showSsn ? (
-            <label className="application-field">
-              Your Social Security Number {config.requestor.ssnRequired ? <span>*</span> : null}
-              <input
-                name="requestorSsn"
-                type="password"
-                autoComplete="off"
-                required={config.requestor.ssnRequired}
-                placeholder="XXX-XX-XXXX"
-              />
-              <small>Kept private and never shown again. Required as an identity safeguard.</small>
-              {fieldErrors.requestorSsn ? (
-                <small className="application-error">{fieldErrors.requestorSsn}</small>
-              ) : null}
-            </label>
-          ) : null}
-        </div>
-      </FormSection>
-
-      <FormSection number={3} title="Information About the Subject">
-        {certSlug === "birth-certificate" ? (
-          <p className="adoption-note">
-            <strong>ADOPTED?</strong> If the person named on the record was adopted, the record on
-            file may show the adoptive details or may be sealed. Please review our{" "}
-            <Link href="/faq">FAQ section</Link> for important information before completing this
-            section.
-          </p>
-        ) : null}
-        <p>
-          {config.personLegend}. {config.personNote ? <em>{config.personNote.body}</em> : null}
-        </p>
-        <div className="application-grid">
-          {config.person.map((field) => {
-            const requiredWhenFemale =
-              field.key === "subjectMaidenLastName" && (values.sex ?? draft.sex ?? "") === "Female";
-            return (
-              <Field
-                key={field.key}
-                def={requiredWhenFemale ? { ...field, required: true } : field}
-                defaultValue={draft[field.key]}
-              />
-            );
-          })}
-        </div>
-      </FormSection>
-
-      <FormSection number={4} title="Parent / Family Information">
-        <fieldset>
-          <legend>{config.familyLegend}</legend>
-          {config.familyNote ? (
-            <p>
-              <strong>{config.familyNote.title}</strong>
-            </p>
-          ) : null}
-          {config.familyNote ? <em>{config.familyNote.body}</em> : null}
-          <div className="application-grid">
-            {config.family.map((field) => (
-              <Field key={field.key} def={field} defaultValue={draft[field.key]} />
-            ))}
-          </div>
-        </fieldset>
-        {config.familySecondLegend ? (
-          <fieldset>
-            <legend>{config.familySecondLegend}</legend>
-            {config.familySecondNote ? (
-              <p>
-                <strong>{config.familySecondNote.title}</strong>
-              </p>
-            ) : null}
-            {config.familySecondNote ? <em>{config.familySecondNote.body}</em> : null}
-            {config.familySecondStatus ? (
-              <div className="application-grid">
-                <label className="application-field">
-                  {config.familySecondStatus.label}{" "}
-                  {config.familySecondStatus.required ? <span>*</span> : null}
-                  <select
-                    name={config.familySecondStatus.key}
-                    required={config.familySecondStatus.required}
-                    defaultValue={draft[config.familySecondStatus.key] ?? ""}
-                  >
-                    <option value="">Please select…</option>
-                    {config.familySecondStatus.options.map((option) => (
-                      <option key={option}>{option}</option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-            ) : null}
-            {fatherRequired || !config.familySecondStatus ? (
-              <div className="application-grid">
-                {(config.familySecond ?? []).map((field) => (
-                  <Field key={field.key} def={field} defaultValue={draft[field.key]} />
+              Your relationship to the person named on the certificate <span>*</span>
+              <select name="relationship" required defaultValue={draft.relationship ?? ""}>
+                <option value="">Please select…</option>
+                {config.relationships.map((item) => (
+                  <option key={item}>{item}</option>
                 ))}
-              </div>
+              </select>
+            </label>
+            {relationship === "Other" ? (
+              <label className="application-field wide">
+                Please describe your relationship <span>*</span>
+                <input
+                  name="relationshipOther"
+                  required
+                  defaultValue={draft.relationshipOther ?? ""}
+                />
+                {fieldErrors["applicant.relationshipOther"] ? (
+                  <small className="application-error">
+                    {fieldErrors["applicant.relationshipOther"]}
+                  </small>
+                ) : null}
+              </label>
             ) : null}
-          </fieldset>
-        ) : null}
-      </FormSection>
-
-      <FormSection number={5} title="Shipping & Contact Information">
-        <p className="hint">
-          <strong className="important-note">Requirements:</strong>{" "}
-          <em>The Shipping Address Name must match the Requestor Name.</em>
-        </p>
-        <AddressFields
-          prefix="home"
-          legend="Home Address"
-          draft={draft}
-          typeLabel={values.homeType ?? draft.homeType ?? ""}
-          requestorFirst={requestorFirst}
-          requestorLast={requestorLast}
-        />
-        <div className="same-address">
-          <strong>Is your Shipping Address the same as your Home Address?</strong>
-          <label>
-            <input
-              type="radio"
-              name="sameShipping"
-              value="yes"
-              onChange={() => {
-                copyAddress("home", "shipping");
-                syncForm();
-              }}
-            />{" "}
-            Yes
-          </label>
-          <label>
-            <input type="radio" name="sameShipping" value="no" defaultChecked /> No
-          </label>
-          <small>
-            Your Home Address will be copied below when you choose Yes. You can still edit it.
-          </small>
-        </div>
-        <AddressFields
-          prefix="shipping"
-          legend="Shipping Address"
-          draft={draft}
-          typeLabel={values.shippingType ?? draft.shippingType ?? ""}
-          requestorFirst={requestorFirst}
-          requestorLast={requestorLast}
-        />
-        <fieldset>
-          <legend>Contact information</legend>
-          <div className="application-grid">
             <label className="application-field">
-              Phone number <span>*</span>
-              <input name="phone" type="tel" required defaultValue={draft.phone ?? ""} />
-            </label>
-            <div />
-            <label className="application-field">
-              Email address <span>*</span>
-              <input name="email" type="email" required defaultValue={draft.email ?? ""} />
-              <small>Order confirmation, tracking, and updates are sent to this address.</small>
+              Your first name <span>*</span>
+              <input
+                name="applicantFirstName"
+                required
+                defaultValue={draft.applicantFirstName ?? ""}
+              />
             </label>
             <label className="application-field">
-              Confirm email address <span>*</span>
-              <input name="confirmEmail" type="email" required />
+              Your middle name
+              <input name="applicantMiddleName" defaultValue={draft.applicantMiddleName ?? ""} />
+            </label>
+            <label className="application-field">
+              Your last name <span>*</span>
+              <input
+                name="applicantLastName"
+                required
+                defaultValue={draft.applicantLastName ?? ""}
+              />
             </label>
           </div>
-        </fieldset>
-      </FormSection>
-
-      <FormSection number={6} title="Copies & Processing">
-        <label className="application-field wide">
-          Number of Copies <span>*</span>
-          <select
-            name="copies"
-            value={String(copies)}
-            onChange={(event) => setValues((v) => ({ ...v, copies: event.target.value }))}
-          >
-            {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
-              <option key={n} value={n}>
-                {n} {n === 1 ? "copy" : "copies"}
-              </option>
-            ))}
-          </select>
-          <small>Each copy includes the $125.00 USVC Processing Fee.</small>
-        </label>
-        <label className="application-field wide">
-          Delivery Method <span>*</span>
-          <select name="delivery" required defaultValue={draft.delivery ?? "Regular"}>
-            <option>Regular</option>
-            <option>UPS Air</option>
-            <option>UPS Worldwide Expedited, Up to 5 Business Days</option>
-          </select>
-        </label>
-        <p className="hint">
-          <strong className="important-note">Important:</strong>{" "}
-          <em>
-            The online Vital Certificate Processing Fee is payable upon ordering and the relevant
-            Vital Statistics Agency Fee and any other shipping fees are payable upon review and
-            acceptance by the State Agency and will appear on your credit card statement separately.
-          </em>
-        </p>
-        <p className="hint">
-          <em>
-            Regular mail delivery is available, however, we recommend you choose a more secure
-            shipping method that provides faster delivery and tracking of your order.
-          </em>
-        </p>
-        <fieldset className="processing-options">
-          <legend>Processing speed</legend>
-          <label className={rush ? "" : "selected"}>
-            <input
-              type="radio"
-              name="processing"
-              value="standard"
-              checked={!rush}
-              onChange={() => setValues((v) => ({ ...v, processing: "standard" }))}
-            />
-            <span>
-              <strong>Standard Processing</strong>
-              <small>
-                Your application is prepared and processed using our standard service workflow.
-                Processing typically takes 5–7 business days.
-              </small>
-            </span>
-            <b>Included</b>
-          </label>
-          <label className={rush ? "selected" : ""}>
-            <input
-              type="radio"
-              name="processing"
-              value="rush"
-              checked={rush}
-              onChange={() => setValues((v) => ({ ...v, processing: "rush" }))}
-            />
-            <span>
-              <strong>Rush Processing</strong>
-              <small>Your application will be processed the next day.</small>
-            </span>
-            <b>+$30.00 per order</b>
-          </label>
-        </fieldset>
-        <p className="hint">{PROCESSING_CLARIFICATION_NOTE}</p>
-      </FormSection>
-
-      <FormSection number={7} title="Billing Details">
-        <p className="hint">
-          <strong className="important-note">Requirements:</strong>{" "}
-          <em>The Billing Address Name must match the Requestor Name.</em>
-        </p>
-        <p>
-          Your billing address is used to verify your payment. Card details are collected in the
-          Credit Card Details section below.
-        </p>
-        <div className="same-address billing-choice">
-          <strong>Is your Billing Address the same as another address?</strong>
-          <label>
-            <input
-              type="radio"
-              name="billingSource"
-              value="home"
-              onChange={() => {
-                copyAddress("home", "billing");
-                syncForm();
-              }}
-            />{" "}
-            Same as Home Address
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="billingSource"
-              value="shipping"
-              defaultChecked
-              onChange={() => {
-                copyAddress("shipping", "billing");
-                syncForm();
-              }}
-            />{" "}
-            Same as Shipping Address
-          </label>
-          <label>
-            <input type="radio" name="billingSource" value="none" /> Neither — Enter Billing Address
-          </label>
-          <small>The selected address has been copied below. You can still edit it.</small>
-        </div>
-        <AddressFields
-          prefix="billing"
-          legend="Billing Address"
-          draft={draft}
-          typeLabel={values.billingType ?? draft.billingType ?? ""}
-          requestorFirst={requestorFirst}
-          requestorLast={requestorLast}
-        />
-      </FormSection>
-
-      <FormSection number={8} title="Credit Card Details">
-        <p className="hint">
-          <strong className="important-note">Important:</strong>{" "}
-          <em>
-            We currently accept Visa and Mastercard only. Other forms of payment, including American
-            Express, Discover and digital wallets, are not supported at this time.
-          </em>
-        </p>
-        <div className="application-grid">
-          <label className="application-field wide">
-            Credit Card Number <span>*</span>
-            <input
-              name="cardNumber"
-              required
-              inputMode="numeric"
-              autoComplete="cc-number"
-              placeholder="Credit Card Number"
-              defaultValue=""
-            />
-          </label>
-          <label className="application-field wide">
-            Credit Card Expiry Date (MM/YY) <span>*</span>
-            <input
-              name="cardExpiry"
-              required
-              inputMode="numeric"
-              autoComplete="cc-exp"
-              placeholder="Credit Card Expiry Date (MM/YY)"
-              defaultValue=""
-            />
-          </label>
-          <label className="application-field wide">
-            CVV <span>*</span>
-            <input
-              name="cardSecurityCode"
-              required
-              inputMode="numeric"
-              autoComplete="cc-csc"
-              placeholder="CVV"
-              defaultValue=""
-            />
-          </label>
-        </div>
-        <p className="hint">
-          <strong className="important-note">Important:</strong>{" "}
-          <em>This is a 3-digit code on the back for Visa and Mastercard.</em>
-        </p>
-        <div className="card-marks" aria-label="Accepted cards: Visa and Mastercard">
-          <img src="/assets/visa.svg" alt="Visa" width={48} height={30} />
-          <img src="/assets/mastercard.svg" alt="Mastercard" width={48} height={30} />
-        </div>
-        {fieldErrors["paymentCard.number"] ||
-        fieldErrors["paymentCard.expiry"] ||
-        fieldErrors["paymentCard.securityCode"] ? (
-          <div role="alert">
-            {["paymentCard.number", "paymentCard.expiry", "paymentCard.securityCode"].map((key) =>
-              fieldErrors[key] ? (
-                <p key={key} className="application-error">
-                  {fieldErrors[key]}
-                </p>
-              ) : null,
-            )}
-          </div>
-        ) : null}
-      </FormSection>
-
-      <FormSection number={9} title="Order Summary">
-        <div className="order-summary">
-          <h3>{certificateName}</h3>
-          <p>
-            Number of copies: {copies} certified {copies === 1 ? "copy" : "copies"}
-          </p>
-          <hr />
-          <div>
-            <span>
-              Online Processing Fee<small>$125.00 per copy × {copies}</small>
-            </span>
-            <b>${(125 * copies).toFixed(2)}</b>
-          </div>
-          {rush ? (
-            <div>
-              <span>
-                Rush Processing<small>Per order</small>
-              </span>
-              <b>$30.00</b>
+          {config.requestor.note ? (
+            <div className="group-note">
+              <strong>{config.requestor.note.title}</strong>
+              <em>{config.requestor.note.body}</em>
             </div>
           ) : null}
-          <div className="total">
-            <strong>TOTAL</strong>
-            <strong>${total.toFixed(2)}</strong>
+          <div className="application-grid">
+            {config.requestor.showDateOfBirth ? (
+              <label className="application-field">
+                Your date of birth {config.requestor.dateOfBirthRequired ? <span>*</span> : null}
+                <input
+                  name="applicantDob"
+                  type="date"
+                  required={config.requestor.dateOfBirthRequired}
+                  defaultValue={draft.applicantDob ?? ""}
+                />
+                {fieldErrors["applicant.dateOfBirth"] ? (
+                  <small className="application-error">
+                    {fieldErrors["applicant.dateOfBirth"]}
+                  </small>
+                ) : null}
+              </label>
+            ) : null}
+            {config.requestor.showSsn ? (
+              <label className="application-field">
+                Your Social Security Number {config.requestor.ssnRequired ? <span>*</span> : null}
+                <input
+                  name="requestorSsn"
+                  type="password"
+                  autoComplete="off"
+                  required={config.requestor.ssnRequired}
+                  placeholder="XXX-XX-XXXX"
+                />
+                <small>
+                  Kept private and never shown again. Required as an identity safeguard.
+                </small>
+                {fieldErrors.requestorSsn ? (
+                  <small className="application-error">{fieldErrors.requestorSsn}</small>
+                ) : null}
+              </label>
+            ) : null}
           </div>
+        </FormSection>
+
+        <FormSection number={3} title="Information About the Subject">
+          {certSlug === "birth-certificate" ? (
+            <p className="adoption-note">
+              <strong>ADOPTED?</strong> If the person named on the record was adopted, the record on
+              file may show the adoptive details or may be sealed. Please review our{" "}
+              <Link href="/faq">FAQ section</Link> for important information before completing this
+              section.
+            </p>
+          ) : null}
           <p>
-            This total includes the USVC Processing Fee and Rush Processing when selected. The
-            relevant Vital Statistics Agency Fee and any other shipping fees are payable upon review
-            and acceptance by the State Agency and will appear on your credit card statement
-            separately.
+            {config.personLegend}. {config.personNote ? <em>{config.personNote.body}</em> : null}
           </p>
-        </div>
-      </FormSection>
-
-      <FormSection number={10} title="Review & Certification">
-        <ReviewBlock title="Certificate" target={1}>
-          <ReviewRow label="Certificate" value={certificateName} />
-          <ReviewRow
-            label={noun.charAt(0).toUpperCase() + noun.slice(1)}
-            value={selectedCounty ? jurisdictionLabel(selectedCounty) : show(values.county)}
-          />
-          <ReviewRow label="City / town" value={show(values.city)} />
-          <ReviewRow label="Reason" value={reasonDisplay} />
-        </ReviewBlock>
-        <ReviewBlock title="Subject of the certificate" target={3}>
-          {config.person.map((field) => (
-            <ReviewRow key={field.key} label={field.label} value={show(values[field.key])} />
-          ))}
-        </ReviewBlock>
-        <ReviewBlock title="Requestor & contact" target={2}>
-          <ReviewRow label="Name" value={`${requestorFirst} ${requestorLast}`.trim() || "—"} />
-          <ReviewRow label="Relationship" value={relationshipDisplay} />
-          <ReviewRow label="Phone" value={show(values.phone)} />
-          <ReviewRow label="Email" value={show(values.email)} />
-          <ReviewRow label="Ship to" value={formatAddress(addressValues("shipping"))} />
-          <ReviewRow label="Bill to" value={formatAddress(addressValues("billing"))} />
-        </ReviewBlock>
-        <ReviewBlock title="Copies, processing & fees" target={6}>
-          <ReviewRow label="Number of copies" value={String(copies)} />
-          <ReviewRow
-            label="Processing speed"
-            value={rush ? "Rush Processing" : "Standard Processing"}
-          />
-          <ReviewRow label="Online Processing Fee" value={`$${serviceCents.toFixed(2)}`} />
-          <ReviewRow label="Rush processing" value={rush ? "$30.00" : "Not selected"} />
-          <ReviewRow
-            label="Payment card"
-            value={cardLast4Display ? `Card ending in ${cardLast4Display}` : "—"}
-          />
-          <ReviewRow label="Total" value={`$${total.toFixed(2)}`} />
-        </ReviewBlock>
-
-        <label className="application-field wide">
-          Electronic Signature <span>*</span>
-          <input name="signature" required defaultValue={draft.signature ?? ""} />
-          <small>Typing your name serves as your electronic signature for this order.</small>
-        </label>
-        <div className="agreements">
-          <label className="all-agreement">
-            <input
-              type="checkbox"
-              name="agreement"
-              checked={allConsents}
-              onChange={(event) => toggleAll(event.target.checked)}
-            />
-            <span>
-              <strong>I agree to all of the statements below.</strong> Selecting this checks every
-              item; you may also review and select them individually.
-            </span>
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="agreeAccurate"
-              required={!allConsents}
-              checked={consents.accurate}
-              onChange={(event) => setConsents((c) => ({ ...c, accurate: event.target.checked }))}
-            />{" "}
-            I certify that the information provided is accurate to the best of my knowledge and that
-            I am authorized to request this record.
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="agreeGovtId"
-              required={!allConsents}
-              checked={consents.govtId}
-              onChange={(event) => setConsents((c) => ({ ...c, govtId: event.target.checked }))}
-            />{" "}
-            I understand I will receive an email from the relevant government agency with
-            instructions on how to send a copy of my government issued picture ID for verification.
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="agreeTerms"
-              required={!allConsents}
-              checked={consents.terms}
-              onChange={(event) => setConsents((c) => ({ ...c, terms: event.target.checked }))}
-            />{" "}
-            I agree to the <Link href="/terms-of-service">Terms of Service</Link>.
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="agreePrivacy"
-              required={!allConsents}
-              checked={consents.privacy}
-              onChange={(event) => setConsents((c) => ({ ...c, privacy: event.target.checked }))}
-            />{" "}
-            I have read the <Link href="/privacy-policy">Privacy Policy</Link>.
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="agreeRefund"
-              required={!allConsents}
-              checked={consents.refund}
-              onChange={(event) => setConsents((c) => ({ ...c, refund: event.target.checked }))}
-            />{" "}
-            I accept the <Link href="/terms-of-service">Refund &amp; Cancellation terms</Link>.
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="agreeIndependent"
-              required={!allConsents}
-              checked={consents.independent}
-              onChange={(event) =>
-                setConsents((c) => ({ ...c, independent: event.target.checked }))
-              }
-            />{" "}
-            I understand USVC is an independent service, not a government agency, and that the Vital
-            Statistics Agency Fee and any other shipping fees are payable upon review and acceptance
-            by the State Agency and will appear on my credit card statement separately.
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              name="agreeProcessingPayment"
-              required={!allConsents}
-              checked={consents.processingPayment}
-              onChange={(event) =>
-                setConsents((c) => ({ ...c, processingPayment: event.target.checked }))
-              }
-            />{" "}
-            <span>
-              <strong>Authorization for the complete order payment.</strong>{" "}
-              {PROCESSING_PAYMENT_AUTHORIZATION_TEXT}
-            </span>
-          </label>
-        </div>
-        {Object.keys(fieldErrors).length ? (
-          <div role="alert">
-            {Object.entries(fieldErrors).map(([key, message]) => (
-              <p key={key} className="application-error">
-                {message}
-              </p>
-            ))}
+          <div className="application-grid">
+            {config.person.map((field) => {
+              const requiredWhenFemale =
+                field.key === "subjectMaidenLastName" &&
+                (values.sex ?? draft.sex ?? "") === "Female";
+              return (
+                <Field
+                  key={field.key}
+                  def={requiredWhenFemale ? { ...field, required: true } : field}
+                  defaultValue={draft[field.key]}
+                />
+              );
+            })}
           </div>
-        ) : null}
-      </FormSection>
+        </FormSection>
 
-      <FormSection number={11} title="Payment">
-        <p>
-          Continue to the secure payment step to complete your order. Card information is handled by
-          the payment provider&apos;s secure fields — USVC never receives or stores your full card
-          number, security code, or expiration date.
-        </p>
-        {error ? (
-          <p className="application-error" role="alert">
-            {error}
+        <FormSection number={4} title="Parent / Family Information">
+          <fieldset>
+            <legend>{config.familyLegend}</legend>
+            {config.familyNote ? (
+              <p>
+                <strong>{config.familyNote.title}</strong>
+              </p>
+            ) : null}
+            {config.familyNote ? <em>{config.familyNote.body}</em> : null}
+            <div className="application-grid">
+              {config.family.map((field) => (
+                <Field key={field.key} def={field} defaultValue={draft[field.key]} />
+              ))}
+            </div>
+          </fieldset>
+          {config.familySecondLegend ? (
+            <fieldset>
+              <legend>{config.familySecondLegend}</legend>
+              {config.familySecondNote ? (
+                <p>
+                  <strong>{config.familySecondNote.title}</strong>
+                </p>
+              ) : null}
+              {config.familySecondNote ? <em>{config.familySecondNote.body}</em> : null}
+              {config.familySecondStatus ? (
+                <div className="application-grid">
+                  <label className="application-field">
+                    {config.familySecondStatus.label}{" "}
+                    {config.familySecondStatus.required ? <span>*</span> : null}
+                    <select
+                      name={config.familySecondStatus.key}
+                      required={config.familySecondStatus.required}
+                      defaultValue={draft[config.familySecondStatus.key] ?? ""}
+                    >
+                      <option value="">Please select…</option>
+                      {config.familySecondStatus.options.map((option) => (
+                        <option key={option}>{option}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              ) : null}
+              {fatherRequired || !config.familySecondStatus ? (
+                <div className="application-grid">
+                  {(config.familySecond ?? []).map((field) => (
+                    <Field key={field.key} def={field} defaultValue={draft[field.key]} />
+                  ))}
+                </div>
+              ) : null}
+            </fieldset>
+          ) : null}
+        </FormSection>
+
+        <FormSection number={5} title="Shipping & Contact Information">
+          <p className="hint">
+            <strong className="important-note">Requirements:</strong>{" "}
+            <em>The Shipping Address Name must match the Requestor Name.</em>
           </p>
-        ) : null}
-        <div className="payment-action">
-          <button className="button button-primary" disabled={busy}>
-            {busy ? "Saving your application…" : "Continue to Secure Payment"}
-          </button>
-          <strong>Total ${total.toFixed(2)} — one all-inclusive payment</strong>
-        </div>
-      </FormSection>
+          <AddressFields
+            prefix="home"
+            legend="Home Address"
+            draft={draft}
+            typeLabel={values.homeType ?? draft.homeType ?? ""}
+            requestorFirst={requestorFirst}
+            requestorLast={requestorLast}
+          />
+          <div className="same-address">
+            <strong>Is your Shipping Address the same as your Home Address?</strong>
+            <label>
+              <input
+                type="radio"
+                name="sameShipping"
+                value="yes"
+                onChange={() => {
+                  copyAddress("home", "shipping");
+                  syncForm();
+                }}
+              />{" "}
+              Yes
+            </label>
+            <label>
+              <input type="radio" name="sameShipping" value="no" defaultChecked /> No
+            </label>
+            <small>
+              Your Home Address will be copied below when you choose Yes. You can still edit it.
+            </small>
+          </div>
+          <AddressFields
+            prefix="shipping"
+            legend="Shipping Address"
+            draft={draft}
+            typeLabel={values.shippingType ?? draft.shippingType ?? ""}
+            requestorFirst={requestorFirst}
+            requestorLast={requestorLast}
+          />
+          <fieldset>
+            <legend>Contact information</legend>
+            <div className="application-grid">
+              <label className="application-field">
+                Phone number <span>*</span>
+                <input name="phone" type="tel" required defaultValue={draft.phone ?? ""} />
+              </label>
+              <div />
+              <label className="application-field">
+                Email address <span>*</span>
+                <input name="email" type="email" required defaultValue={draft.email ?? ""} />
+                <small>Order confirmation, tracking, and updates are sent to this address.</small>
+              </label>
+              <label className="application-field">
+                Confirm email address <span>*</span>
+                <input name="confirmEmail" type="email" required />
+              </label>
+            </div>
+          </fieldset>
+        </FormSection>
+
+        <FormSection number={6} title="Copies & Processing">
+          <label className="application-field wide">
+            Number of Copies <span>*</span>
+            <select
+              name="copies"
+              value={String(copies)}
+              onChange={(event) => setValues((v) => ({ ...v, copies: event.target.value }))}
+            >
+              {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
+                <option key={n} value={n}>
+                  {n} {n === 1 ? "copy" : "copies"}
+                </option>
+              ))}
+            </select>
+            <small>Each copy includes the $125.00 USVC Processing Fee.</small>
+          </label>
+          <label className="application-field wide">
+            Delivery Method <span>*</span>
+            <select name="delivery" required defaultValue={draft.delivery ?? "Regular"}>
+              <option>Regular</option>
+              <option>UPS Air</option>
+              <option>UPS Worldwide Expedited, Up to 5 Business Days</option>
+            </select>
+          </label>
+          <p className="hint">
+            <strong className="important-note">Important:</strong>{" "}
+            <em>
+              The online Vital Certificate Processing Fee is payable upon ordering and the relevant
+              Vital Statistics Agency Fee and any other shipping fees are payable upon review and
+              acceptance by the State Agency and will appear on your credit card statement
+              separately.
+            </em>
+          </p>
+          <p className="hint">
+            <em>
+              Regular mail delivery is available, however, we recommend you choose a more secure
+              shipping method that provides faster delivery and tracking of your order.
+            </em>
+          </p>
+          <fieldset className="processing-options">
+            <legend>Processing speed</legend>
+            <label className={rush ? "" : "selected"}>
+              <input
+                type="radio"
+                name="processing"
+                value="standard"
+                checked={!rush}
+                onChange={() => setValues((v) => ({ ...v, processing: "standard" }))}
+              />
+              <span>
+                <strong>Standard Processing</strong>
+                <small>
+                  Your application is prepared and processed using our standard service workflow.
+                  Processing typically takes 5–7 business days.
+                </small>
+              </span>
+              <b>Included</b>
+            </label>
+            <label className={rush ? "selected" : ""}>
+              <input
+                type="radio"
+                name="processing"
+                value="rush"
+                checked={rush}
+                onChange={() => setValues((v) => ({ ...v, processing: "rush" }))}
+              />
+              <span>
+                <strong>Rush Processing</strong>
+                <small>Your application will be processed the next day.</small>
+              </span>
+              <b>+$30.00 per order</b>
+            </label>
+          </fieldset>
+          <p className="hint">{PROCESSING_CLARIFICATION_NOTE}</p>
+        </FormSection>
+
+        <FormSection number={7} title="Billing Details">
+          <p className="hint">
+            <strong className="important-note">Requirements:</strong>{" "}
+            <em>The Billing Address Name must match the Requestor Name.</em>
+          </p>
+          <p>
+            Your billing address is used to verify your payment. Card details are collected in the
+            Credit Card Details section below.
+          </p>
+          <div className="same-address billing-choice">
+            <strong>Is your Billing Address the same as another address?</strong>
+            <label>
+              <input
+                type="radio"
+                name="billingSource"
+                value="home"
+                onChange={() => {
+                  copyAddress("home", "billing");
+                  syncForm();
+                }}
+              />{" "}
+              Same as Home Address
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="billingSource"
+                value="shipping"
+                defaultChecked
+                onChange={() => {
+                  copyAddress("shipping", "billing");
+                  syncForm();
+                }}
+              />{" "}
+              Same as Shipping Address
+            </label>
+            <label>
+              <input type="radio" name="billingSource" value="none" /> Neither — Enter Billing
+              Address
+            </label>
+            <small>The selected address has been copied below. You can still edit it.</small>
+          </div>
+          <AddressFields
+            prefix="billing"
+            legend="Billing Address"
+            draft={draft}
+            typeLabel={values.billingType ?? draft.billingType ?? ""}
+            requestorFirst={requestorFirst}
+            requestorLast={requestorLast}
+          />
+        </FormSection>
+
+        <FormSection number={8} title="Credit Card Details">
+          <p className="hint">
+            <strong className="important-note">Important:</strong>{" "}
+            <em>
+              We currently accept Visa and Mastercard only. Other forms of payment, including
+              American Express, Discover and digital wallets, are not supported at this time.
+            </em>
+          </p>
+          <div className="application-grid">
+            <label className="application-field wide">
+              Credit Card Number <span>*</span>
+              <input
+                name="cardNumber"
+                required
+                inputMode="numeric"
+                autoComplete="cc-number"
+                placeholder="Credit Card Number"
+                defaultValue=""
+              />
+            </label>
+            <label className="application-field wide">
+              Credit Card Expiry Date (MM/YY) <span>*</span>
+              <input
+                name="cardExpiry"
+                required
+                inputMode="numeric"
+                autoComplete="cc-exp"
+                placeholder="Credit Card Expiry Date (MM/YY)"
+                defaultValue=""
+              />
+            </label>
+            <label className="application-field wide">
+              CVV <span>*</span>
+              <input
+                name="cardSecurityCode"
+                required
+                inputMode="numeric"
+                autoComplete="cc-csc"
+                placeholder="CVV"
+                defaultValue=""
+              />
+            </label>
+          </div>
+          <p className="hint">
+            <strong className="important-note">Important:</strong>{" "}
+            <em>This is a 3-digit code on the back for Visa and Mastercard.</em>
+          </p>
+          <div className="card-marks" aria-label="Accepted cards: Visa and Mastercard">
+            <img src="/assets/visa.svg" alt="Visa" width={48} height={30} />
+            <img src="/assets/mastercard.svg" alt="Mastercard" width={48} height={30} />
+          </div>
+          {fieldErrors["paymentCard.number"] ||
+          fieldErrors["paymentCard.expiry"] ||
+          fieldErrors["paymentCard.securityCode"] ? (
+            <div role="alert">
+              {["paymentCard.number", "paymentCard.expiry", "paymentCard.securityCode"].map(
+                (key) =>
+                  fieldErrors[key] ? (
+                    <p key={key} className="application-error">
+                      {fieldErrors[key]}
+                    </p>
+                  ) : null,
+              )}
+            </div>
+          ) : null}
+        </FormSection>
+
+        <FormSection number={9} title="Order Summary">
+          <div className="order-summary">
+            <h3>{certificateName}</h3>
+            <p>
+              Number of copies: {copies} certified {copies === 1 ? "copy" : "copies"}
+            </p>
+            <hr />
+            <div>
+              <span>
+                Online Processing Fee<small>$125.00 per copy × {copies}</small>
+              </span>
+              <b>${(125 * copies).toFixed(2)}</b>
+            </div>
+            {rush ? (
+              <div>
+                <span>
+                  Rush Processing<small>Per order</small>
+                </span>
+                <b>$30.00</b>
+              </div>
+            ) : null}
+            <div className="total">
+              <strong>TOTAL</strong>
+              <strong>${total.toFixed(2)}</strong>
+            </div>
+            <p>
+              This total includes the USVC Processing Fee and Rush Processing when selected. The
+              relevant Vital Statistics Agency Fee and any other shipping fees are payable upon
+              review and acceptance by the State Agency and will appear on your credit card
+              statement separately.
+            </p>
+          </div>
+        </FormSection>
+
+        <FormSection number={10} title="Review & Certification">
+          <ReviewBlock title="Certificate" target={1}>
+            <ReviewRow label="Certificate" value={certificateName} />
+            <ReviewRow
+              label={noun.charAt(0).toUpperCase() + noun.slice(1)}
+              value={selectedCounty ? jurisdictionLabel(selectedCounty) : show(values.county)}
+            />
+            <ReviewRow label="City / town" value={show(values.city)} />
+            <ReviewRow label="Reason" value={reasonDisplay} />
+          </ReviewBlock>
+          <ReviewBlock title="Subject of the certificate" target={3}>
+            {config.person.map((field) => (
+              <ReviewRow key={field.key} label={field.label} value={show(values[field.key])} />
+            ))}
+          </ReviewBlock>
+          <ReviewBlock title="Requestor & contact" target={2}>
+            <ReviewRow label="Name" value={`${requestorFirst} ${requestorLast}`.trim() || "—"} />
+            <ReviewRow label="Relationship" value={relationshipDisplay} />
+            <ReviewRow label="Phone" value={show(values.phone)} />
+            <ReviewRow label="Email" value={show(values.email)} />
+            <ReviewRow label="Ship to" value={formatAddress(addressValues("shipping"))} />
+            <ReviewRow label="Bill to" value={formatAddress(addressValues("billing"))} />
+          </ReviewBlock>
+          <ReviewBlock title="Copies, processing & fees" target={6}>
+            <ReviewRow label="Number of copies" value={String(copies)} />
+            <ReviewRow
+              label="Processing speed"
+              value={rush ? "Rush Processing" : "Standard Processing"}
+            />
+            <ReviewRow label="Online Processing Fee" value={`$${serviceCents.toFixed(2)}`} />
+            <ReviewRow label="Rush processing" value={rush ? "$30.00" : "Not selected"} />
+            <ReviewRow
+              label="Payment card"
+              value={cardLast4Display ? `Card ending in ${cardLast4Display}` : "—"}
+            />
+            <ReviewRow label="Total" value={`$${total.toFixed(2)}`} />
+          </ReviewBlock>
+
+          <label className="application-field wide">
+            Electronic Signature <span>*</span>
+            <input name="signature" required defaultValue={draft.signature ?? ""} />
+            <small>Typing your name serves as your electronic signature for this order.</small>
+          </label>
+          <div className="agreements">
+            <label className="all-agreement">
+              <input
+                type="checkbox"
+                name="agreement"
+                checked={allConsents}
+                onChange={(event) => toggleAll(event.target.checked)}
+              />
+              <span>
+                <strong>I agree to all of the statements below.</strong> Selecting this checks every
+                item; you may also review and select them individually.
+              </span>
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                name="agreeAccurate"
+                required={!allConsents}
+                checked={consents.accurate}
+                onChange={(event) => setConsents((c) => ({ ...c, accurate: event.target.checked }))}
+              />{" "}
+              I certify that the information provided is accurate to the best of my knowledge and
+              that I am authorized to request this record.
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                name="agreeGovtId"
+                required={!allConsents}
+                checked={consents.govtId}
+                onChange={(event) => setConsents((c) => ({ ...c, govtId: event.target.checked }))}
+              />{" "}
+              I understand I will receive an email from the relevant government agency with
+              instructions on how to send a copy of my government issued picture ID for
+              verification.
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                name="agreeTerms"
+                required={!allConsents}
+                checked={consents.terms}
+                onChange={(event) => setConsents((c) => ({ ...c, terms: event.target.checked }))}
+              />{" "}
+              I agree to the <Link href="/terms-of-service">Terms of Service</Link>.
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                name="agreePrivacy"
+                required={!allConsents}
+                checked={consents.privacy}
+                onChange={(event) => setConsents((c) => ({ ...c, privacy: event.target.checked }))}
+              />{" "}
+              I have read the <Link href="/privacy-policy">Privacy Policy</Link>.
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                name="agreeRefund"
+                required={!allConsents}
+                checked={consents.refund}
+                onChange={(event) => setConsents((c) => ({ ...c, refund: event.target.checked }))}
+              />{" "}
+              I accept the <Link href="/terms-of-service">Refund &amp; Cancellation terms</Link>.
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                name="agreeIndependent"
+                required={!allConsents}
+                checked={consents.independent}
+                onChange={(event) =>
+                  setConsents((c) => ({ ...c, independent: event.target.checked }))
+                }
+              />{" "}
+              I understand USVC is an independent service, not a government agency, and that the
+              Vital Statistics Agency Fee and any other shipping fees are payable upon review and
+              acceptance by the State Agency and will appear on my credit card statement separately.
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                name="agreeProcessingPayment"
+                required={!allConsents}
+                checked={consents.processingPayment}
+                onChange={(event) =>
+                  setConsents((c) => ({ ...c, processingPayment: event.target.checked }))
+                }
+              />{" "}
+              <span>
+                <strong>Authorization for the complete order payment.</strong>{" "}
+                {PROCESSING_PAYMENT_AUTHORIZATION_TEXT}
+              </span>
+            </label>
+          </div>
+          {Object.keys(fieldErrors).length ? (
+            <div role="alert">
+              {Object.entries(fieldErrors)
+                .filter(([key]) => key !== "county")
+                .map(([key, message]) => (
+                  <p key={key} className="application-error">
+                    {message}
+                  </p>
+                ))}
+            </div>
+          ) : null}
+        </FormSection>
+
+        <FormSection number={11} title="Payment">
+          <p>
+            Continue to the secure payment step to complete your order. Card information is handled
+            by the payment provider&apos;s secure fields — USVC never receives or stores your full
+            card number, security code, or expiration date.
+          </p>
+          {error ? (
+            <p className="application-error" role="alert">
+              {error}
+            </p>
+          ) : null}
+          <div className="payment-action">
+            <button className="button button-primary" disabled={busy}>
+              {busy ? "Saving your application…" : "Continue to Secure Payment"}
+            </button>
+            <strong>Total ${total.toFixed(2)} — one all-inclusive payment</strong>
+          </div>
+        </FormSection>
+      </fieldset>
     </form>
   );
 }

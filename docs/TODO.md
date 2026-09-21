@@ -22,6 +22,7 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [x] Updated processing-time copy (standard 5–7 business days; rush next day) and removed the order-tracking callout — done 2026-09-21
 - [x] Updated the homepage hero reference for the PNG replacement asset — done 2026-09-21
 - [x] Removed the requestor previous-last-name question and field from every certificate form and order payload — done 2026-09-21
+- [x] Removed public phone support and temporarily blocked nine California counties before order creation or payment — done 2026-09-22
 - [x] Real legal pages (privacy, terms, accessibility verbatim) — done 2026-09-21
 - [ ] Content remaining: real contact submit, per-state fee/rules data port- [ ] SEO: `app/sitemap.ts`, JSON-LD Organization, metadata per state/cert page
 - [ ] GA4: port ecommerce events, purchase fires only after paid confirmation

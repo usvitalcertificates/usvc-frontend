@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Mail, Phone } from "lucide-react";
+import { Clock, Mail } from "lucide-react";
 import { useState } from "react";
 import { Disclaimer, PageHeader } from "../usvc-ui";
 
@@ -83,9 +83,6 @@ export default function Contact() {
             <h2>Direct support</h2>
             <SupportRow icon={Mail} title="Email">
               <a href="mailto:support@usvitalcertificates.org">support@usvitalcertificates.org</a>
-            </SupportRow>
-            <SupportRow icon={Phone} title="Phone">
-              <a href="tel:0000000000">(000) 000-0000</a>
             </SupportRow>
             <SupportRow icon={Clock} title="Hours">
               Monday – Friday, 9:00 AM – 6:00 PM ET
