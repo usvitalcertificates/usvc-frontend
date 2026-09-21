@@ -153,7 +153,7 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                 <p className="type-description">{cert.description}</p>
                 <p className="fee-line">Online Processing Fee $125.00 per copy</p>
                 <p className="fee-note">
-                  Government / Agency Fee &amp; Shipping is included in your total.
+                  Agency fees are charged separately upon review and acceptance by the State Agency.
                 </p>
                 <Link href={`/state/${state}/order/${cert.slug}`} className="button button-primary">
                   Start This Request

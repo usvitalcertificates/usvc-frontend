@@ -32,7 +32,7 @@ interface Summary {
   copies: number;
   rush: boolean;
   destinationType: "domestic" | "international";
-  pricing: { serviceCents: number; bundleCents: number; rushCents: number; totalCents: number };
+  pricing: { serviceCents: number; rushCents: number; totalCents: number };
   amountCents: number;
   paymentStatus: string;
 }
@@ -174,12 +174,18 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
             </div>
             <div className="all-inclusive-note">
               <p>
-                <strong>One all-inclusive payment</strong>
+                <strong>Two separate payments</strong>
               </p>
               <p>
-                The total shown includes USVC processing, the Government / Agency Fee &amp; Shipping
-                bundle, and Rush Processing when selected. No second customer payment is required
-                for this order.
+                The online Vital Certificate Processing Fee is payable upon ordering and the
+                relevant Vital Statistics Agency Fee and any other shipping fees are payable upon
+                review and acceptance by the State Agency and will appear on your credit card
+                statement separately.
+              </p>
+              <p>
+                <em>
+                  Please note: All state certificate fees are subject to change without notice.
+                </em>
               </p>
             </div>
             {setupError ? (
@@ -233,18 +239,6 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
                   </div>
                 </li>
               ) : null}
-              <li>
-                <div>
-                  <span>Government / Agency Fee &amp; Shipping</span>
-                  <span>
-                    <strong>{formatUSD(order.pricing.bundleCents)}</strong>
-                  </span>
-                </div>
-                <p className="muted">
-                  {order.destinationType === "international" ? "International" : "Domestic"} bundle
-                  × {order.copies}
-                </p>
-              </li>
               <li className="total-row">
                 <div>
                   <span>
@@ -257,8 +251,10 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
               </li>
             </ul>
             <p className="disclosure">
-              This total includes the USVC Processing Fee, the Government / Agency Fee &amp;
-              Shipping bundle, and Rush Processing when selected.
+              This total includes the USVC Processing Fee and Rush Processing when selected. The
+              relevant Vital Statistics Agency Fee and any other shipping fees are payable upon
+              review and acceptance by the State Agency and will appear on your credit card
+              statement separately.
             </p>
           </div>
         </div>

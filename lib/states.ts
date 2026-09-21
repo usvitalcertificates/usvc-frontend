@@ -136,6 +136,4 @@ export const ADDRESS_SECTION_NOTES: Record<string, { title: string; body: string
 };
 
 export const PROCESSING_PAYMENT_AUTHORIZATION_TEXT =
-  "I authorize USVC to charge the complete total shown on my order. This single payment includes " +
-  "the USVC Processing Fee, the Government / Agency Fee & Shipping bundle, and Rush Processing " +
-  "when selected.";
+  "I authorize USVC to charge the Vital Certificate Processing Fee shown on my order. The relevant Vital Statistics Agency Fee and any other shipping fees are payable upon review and acceptance by the State Agency and will appear on my credit card statement separately.";
