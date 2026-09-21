@@ -131,7 +131,7 @@ export default function Home() {
           </div>
           <Image
             className="hero-image"
-            src="/assets/usvc-hero.jpg"
+            src="/assets/usvc-hero.png"
             alt="A secure navy document folder holding a vital certificate beside a laptop showing an application form"
             width={1024}
             height={768}
