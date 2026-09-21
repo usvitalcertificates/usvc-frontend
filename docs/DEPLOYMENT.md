@@ -4,11 +4,11 @@ Deploy `usvc-frontend/` to Vercel.
 
 ## Environment variable
 
-| Variable              | Value                                           |
-| --------------------- | ----------------------------------------------- |
-| `NEXT_PUBLIC_API_URL` | The deployed HTTPS URL of the USVC Express API. |
+| Variable  | Value                                                                                           |
+| --------- | ----------------------------------------------------------------------------------------------- |
+| `API_URL` | The deployed HTTPS URL of the USVC Express API. This is read only by the server-side API proxy. |
 
-Do not place MongoDB credentials, Stripe secret keys, Stripe webhook secrets, or JWT secrets in Vercel frontend variables. `NEXT_PUBLIC_*` values are exposed to every browser.
+Do not place MongoDB credentials, Stripe secret keys, Stripe webhook secrets, or JWT secrets in frontend environment variables. `API_URL` is used only on the server and is not exposed to browsers.
 
 ## Production checks
 

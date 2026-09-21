@@ -1,6 +1,6 @@
 # Current frontend status
 
-Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS).
+Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy).
 
 ## Implemented
 
@@ -19,6 +19,7 @@ Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; 
 - Secure Checkout rebuilt to reference UI (order eyebrow, trust badges, all-inclusive notice, tabbed Stripe payment, authorize checkbox, Pay button, sticky summary); confirmation page verifies `session_id` with the backend and prints a paid receipt.
 - API order creation before redirecting to Stripe checkout.
 - Stripe Elements checkout route and API-backed order tracking route.
+- Browser API calls now use the same-origin `/api/backend` proxy. Configure the Express upstream with server-only `API_URL`; no client-exposed environment variable is required.
 
 ## Important current limits
 

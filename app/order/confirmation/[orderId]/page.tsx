@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
-const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const api = "/api/backend";
 
 function formatUSD(cents: number): string {
   return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });

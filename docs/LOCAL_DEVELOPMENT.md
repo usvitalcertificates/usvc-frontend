@@ -9,7 +9,7 @@ cp .env.local.example .env.local
 Set:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:4000
+API_URL=http://localhost:4000
 ```
 
 ## 2. Run the app
