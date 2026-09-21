@@ -972,6 +972,19 @@ h3 {
   color: var(--red);
   font-weight: 700;
 }
+.contact-warning {
+  margin: 0;
+  color: #7a4b00;
+  font-weight: 700;
+}
+.contact-honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
 .county-blocked-fields {
   min-inline-size: 0;
   margin: 0;
