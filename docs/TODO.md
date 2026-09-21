@@ -15,6 +15,7 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [ ] Content remaining: real contact submit, per-state fee/rules data port
 - [x] Full FAQ accordion (29 items verbatim + JSON-LD) — done 2026-09-21
 - [x] Private frontend API configuration: browser requests use `/api/backend`; the upstream is configured with server-only `API_URL` — done 2026-09-21
+- [x] Vercel dependency cleanup: ESLint 9 is aligned with the Next.js lint-plugin peer range — done 2026-09-21
 - [x] Real legal pages (privacy, terms, accessibility verbatim) — done 2026-09-21
 - [ ] Content remaining: real contact submit, per-state fee/rules data port- [ ] SEO: `app/sitemap.ts`, JSON-LD Organization, metadata per state/cert page
 - [ ] GA4: port ecommerce events, purchase fires only after paid confirmation
