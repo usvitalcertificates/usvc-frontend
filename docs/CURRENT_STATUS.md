@@ -1,6 +1,6 @@
 # Current frontend status
 
-Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy).
+Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy; ESLint 9 compatibility).
 
 ## Implemented
 
@@ -20,6 +20,7 @@ Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; 
 - API order creation before redirecting to Stripe checkout.
 - Stripe Elements checkout route and API-backed order tracking route.
 - Browser API calls now use the same-origin `/api/backend` proxy. Configure the Express upstream with server-only `API_URL`; no client-exposed environment variable is required.
+- ESLint is pinned to the ESLint 9 compatibility line required by Next.js lint dependencies, avoiding Vercel peer-dependency warnings from ESLint 10.
 
 ## Important current limits
 
