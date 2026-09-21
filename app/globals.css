@@ -945,6 +945,15 @@ h3 {
   color: var(--red);
   font-weight: 700;
 }
+.county-blocked-fields {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.county-blocked-fields:disabled {
+  opacity: 0.55;
+}
 .payment-action {
   display: flex;
   flex-wrap: wrap;

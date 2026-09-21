@@ -26,8 +26,6 @@ export interface RequestorConfig {
   dateOfBirthRequired: boolean;
   showSsn: boolean;
   ssnRequired: boolean;
-  askPreviousLastName: boolean;
-  previousLastNameLabel: string;
   note?: GroupNote;
 }
 
@@ -96,8 +94,6 @@ const BASE_REQUESTOR: RequestorConfig = {
   dateOfBirthRequired: false,
   showSsn: false,
   ssnRequired: false,
-  askPreviousLastName: true,
-  previousLastNameLabel: "Previous / Maiden Last Name",
 };
 
 export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormConfig> = {

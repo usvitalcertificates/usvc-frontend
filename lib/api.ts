@@ -29,7 +29,6 @@ export interface CreateOrderPayload {
     relationshipOther?: string;
     firstName: string;
     lastName: string;
-    previousLastName?: string;
     dateOfBirth?: string;
     phone: string;
     email: string;
