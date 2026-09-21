@@ -1,6 +1,6 @@
 # Current frontend status
 
-Last updated: 2026-09-22 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy; ESLint 9 compatibility; birth-form requirements; temporary California county block; phone support removed).
+Last updated: 2026-09-22 (official USVC branding; two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy; ESLint 9 compatibility; birth-form requirements; temporary California county block; phone support removed).
 
 ## Implemented
 
@@ -13,6 +13,7 @@ Last updated: 2026-09-22 (two-fee model; review sync hardened; 11-section form; 
 - Legal pages (`/privacy-policy`, `/terms-of-service`, `/accessibility`) rebuilt to reference UI: Legal header, last-updated line, verbatim sections with tricolor rules + hanging bullets, per-page SEO, disclosure box.
 
 - Reference-style global header, navigation, footer, theme, public home page, certificate cards, state grid/search, trust section, FAQ callout, and legal/footer information.
+- The official site palette is Old Glory Red `#B22234` and Old Glory Blue `#3C3B6E`. All action buttons use the official red with white text, interaction feedback retains the official colors, and Times New Roman is applied throughout the website and form controls.
 - Certificates, Find Your State, Track Order, and Contact page layouts matching the reference structure.
 - State landing pages and full application route: `/state/[state]/order/[certificate]`.
 - Eleven application sections (Section 8 Credit Card Details with Visa/Mastercard logos, CVV label; copies 1–20; two-fee totals) with dynamic display total; card + SSN excluded from drafts; review shows card last-4 only. Review sync hardened against autofill (merge + input/blur listeners).
