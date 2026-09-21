@@ -398,7 +398,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
   const relationship = values.relationship ?? draft.relationship ?? "";
   const reason = values.reason ?? draft.reason ?? "";
-  const prevLastUsed = values.previousLastNameUsed ?? draft.previousLastNameUsed ?? "No";
 
   function syncForm() {
     const form = formRef.current;
@@ -524,7 +523,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           relationshipOther: get("relationshipOther"),
           firstName: get("applicantFirstName"),
           lastName: get("applicantLastName"),
-          previousLastName: get("previousLastName"),
           dateOfBirth: get("applicantDob"),
           phone: get("phone"),
           email: get("email"),
@@ -747,21 +745,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             Your last name <span>*</span>
             <input name="applicantLastName" required defaultValue={draft.applicantLastName ?? ""} />
           </label>
-          {config.requestor.askPreviousLastName ? (
-            <label className="application-field wide">
-              Have you ever used a different last name?
-              <select name="previousLastNameUsed" defaultValue={draft.previousLastNameUsed ?? "No"}>
-                <option>No</option>
-                <option>Yes</option>
-              </select>
-            </label>
-          ) : null}
-          {config.requestor.askPreviousLastName && prevLastUsed === "Yes" ? (
-            <label className="application-field wide">
-              {config.requestor.previousLastNameLabel} <span>*</span>
-              <input name="previousLastName" required defaultValue={draft.previousLastName ?? ""} />
-            </label>
-          ) : null}
         </div>
         {config.requestor.note ? (
           <div className="group-note">
