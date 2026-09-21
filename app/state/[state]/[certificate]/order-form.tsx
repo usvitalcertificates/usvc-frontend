@@ -398,8 +398,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
   const relationship = values.relationship ?? draft.relationship ?? "";
   const reason = values.reason ?? draft.reason ?? "";
-  const nameChanged = values.subjectNameChanged ?? draft.subjectNameChanged ?? "No";
-  const spellingDifferent = values.subjectSpelling ?? draft.subjectSpelling ?? "No";
   const prevLastUsed = values.previousLastNameUsed ?? draft.previousLastNameUsed ?? "No";
 
   function syncForm() {
@@ -489,17 +487,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     try {
       const subject: Record<string, string> = {};
       for (const field of config.person) subject[field.key] = get(field.key);
-      if (config.askNameHistory) {
-        subject.subjectNameChanged = get("subjectNameChanged");
-        subject.subjectSpelling = get("subjectSpelling");
-        if (get("subjectNameChanged") === "Yes") {
-          subject.previousFirstName = get("previousFirstName");
-          subject.previousMiddleName = get("previousMiddleName");
-          subject.previousLastName = get("previousLastName");
-          subject.nameChangeContext = get("nameChangeContext");
-        }
-        if (get("subjectSpelling") === "Yes") subject.alternateSpelling = get("alternateSpelling");
-      }
       const family: Record<string, string> = {};
       for (const field of [...config.family, ...(config.familySecond ?? [])])
         family[field.key] = get(field.key);
@@ -510,6 +497,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         const type = addressTypeOf(typeLabel);
         return {
           firstName: get("applicantFirstName"),
+          middleName: get("applicantMiddleName"),
           lastName: get("applicantLastName"),
           line1: get(`${prefix}Line1`),
           line2: get(`${prefix}Line2`),
@@ -752,6 +740,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             />
           </label>
           <label className="application-field">
+            Your middle name
+            <input name="applicantMiddleName" defaultValue={draft.applicantMiddleName ?? ""} />
+          </label>
+          <label className="application-field">
             Your last name <span>*</span>
             <input name="applicantLastName" required defaultValue={draft.applicantLastName ?? ""} />
           </label>
@@ -794,11 +786,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           ) : null}
           {config.requestor.showSsn ? (
             <label className="application-field">
-              Your Social Security Number{" "}
-              {config.requestor.ssnRequired ||
-              (stateSlug === "california" && certSlug === "birth-certificate") ? (
-                <span>*</span>
-              ) : null}
+              Your Social Security Number {config.requestor.ssnRequired ? <span>*</span> : null}
               <input
                 name="requestorSsn"
                 type="password"
@@ -828,60 +816,18 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           {config.personLegend}. {config.personNote ? <em>{config.personNote.body}</em> : null}
         </p>
         <div className="application-grid">
-          {config.person.map((field) => (
-            <Field key={field.key} def={field} defaultValue={draft[field.key]} />
-          ))}
+          {config.person.map((field) => {
+            const requiredWhenFemale =
+              field.key === "subjectMaidenLastName" && (values.sex ?? draft.sex ?? "") === "Female";
+            return (
+              <Field
+                key={field.key}
+                def={requiredWhenFemale ? { ...field, required: true } : field}
+                defaultValue={draft[field.key]}
+              />
+            );
+          })}
         </div>
-        {config.askNameHistory ? (
-          <>
-            <label className="application-field wide">
-              Has the name on the record ever been different?
-              <select name="subjectNameChanged" defaultValue={draft.subjectNameChanged ?? "No"}>
-                <option>No</option>
-                <option>Yes</option>
-              </select>
-            </label>
-            {nameChanged === "Yes" ? (
-              <div className="application-grid">
-                <label className="application-field">
-                  Previous first name
-                  <input name="previousFirstName" defaultValue={draft.previousFirstName ?? ""} />
-                </label>
-                <label className="application-field">
-                  Previous middle name
-                  <input name="previousMiddleName" defaultValue={draft.previousMiddleName ?? ""} />
-                </label>
-                <label className="application-field">
-                  Previous last name <span>*</span>
-                  <input
-                    name="previousLastName"
-                    required
-                    defaultValue={draft.previousLastName ?? ""}
-                  />
-                </label>
-                <label className="application-field">
-                  Name change context, if known
-                  <input name="nameChangeContext" defaultValue={draft.nameChangeContext ?? ""} />
-                </label>
-              </div>
-            ) : null}
-            <label className="application-field wide">
-              Was the record registered under a different spelling?
-              <select name="subjectSpelling" defaultValue={draft.subjectSpelling ?? "No"}>
-                <option>No</option>
-                <option>Yes</option>
-              </select>
-            </label>
-            {spellingDifferent === "Yes" ? (
-              <div className="application-grid">
-                <label className="application-field wide">
-                  Alternate spelling used on the record
-                  <input name="alternateSpelling" defaultValue={draft.alternateSpelling ?? ""} />
-                </label>
-              </div>
-            ) : null}
-          </>
-        ) : null}
       </FormSection>
 
       <FormSection number={4} title="Parent / Family Information">
@@ -938,6 +884,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       </FormSection>
 
       <FormSection number={5} title="Shipping & Contact Information">
+        <p className="hint">
+          <strong className="important-note">Requirements:</strong>{" "}
+          <em>The Shipping Address Name must match the Requestor Name.</em>
+        </p>
         <AddressFields
           prefix="home"
           legend="Home Address"
@@ -1048,7 +998,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               <strong>Standard Processing</strong>
               <small>
                 Your application is prepared and processed using our standard service workflow.
-                Processing typically takes 2–3 business days.
+                Processing typically takes 5–7 business days.
               </small>
             </span>
             <b>Included</b>
@@ -1063,19 +1013,19 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             />
             <span>
               <strong>Rush Processing</strong>
-              <small>Your application will be processed the same day.</small>
+              <small>Your application will be processed the next day.</small>
             </span>
             <b>+$30.00 per order</b>
           </label>
         </fieldset>
         <p className="hint">{PROCESSING_CLARIFICATION_NOTE}</p>
-        <div className="tracking-free">
-          <strong>Order Tracking — Free</strong>
-          <p>Track your order online at no additional charge.</p>
-        </div>
       </FormSection>
 
       <FormSection number={7} title="Billing Details">
+        <p className="hint">
+          <strong className="important-note">Requirements:</strong>{" "}
+          <em>The Billing Address Name must match the Requestor Name.</em>
+        </p>
         <p>
           Your billing address is used to verify your payment. Card details are collected in the
           Credit Card Details section below.
