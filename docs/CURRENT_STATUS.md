@@ -1,6 +1,6 @@
 # Current frontend status
 
-Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy; ESLint 9 compatibility; birth-form requirements; name-history fields removed; address-name notices; updated processing times; PNG hero asset).
+Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy; ESLint 9 compatibility; birth-form requirements; name-history fields removed; requestor previous-last-name field removed; address-name notices; updated processing times; PNG hero asset).
 
 ## Implemented
 
@@ -25,6 +25,7 @@ Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; 
 - Shipping and billing sections each begin with a requirement notice that the respective address name must match the requestor name.
 - Standard Processing displays a 5–7 business-day estimate; Rush Processing displays a next-day estimate. The Section 6 “Order Tracking — Free” callout has been removed without changing the tracking page or API.
 - Homepage hero image uses the committed PNG asset at `/assets/usvc-hero.png`.
+- The requestor previous-last-name question and conditional field have been removed from every certificate form and order payload.
 
 ## Important current limits
 
