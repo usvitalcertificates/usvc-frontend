@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { PageHeader } from "../../usvc-ui";
 import { STRIPE_APPEARANCE, StripeCheckoutForm } from "./stripe-checkout-form";
 
-const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const api = "/api/backend";
 const SUPPORT_EMAIL = "support@usvitalcertificates.org";
 
 function formatUSD(cents: number): string {

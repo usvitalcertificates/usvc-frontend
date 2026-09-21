@@ -1,6 +1,6 @@
 # USVC frontend
 
-The USVC frontend is a Next.js App Router site for public vital-certificate ordering, tracking, and support. It uses Stripe Elements only on the checkout route and calls the Express API through `NEXT_PUBLIC_API_URL`.
+The USVC frontend is a Next.js App Router site for public vital-certificate ordering, tracking, and support. It uses Stripe Elements only on the checkout route and calls the Express API through a server-side `/api/backend` proxy.
 
 ## Current public pages
 
@@ -25,7 +25,7 @@ npm install
 npm run dev
 ```
 
-Set `NEXT_PUBLIC_API_URL=http://localhost:4000` for local development, then open the URL printed by Next.js.
+Set `API_URL=http://localhost:4000` for local development, then open the URL printed by Next.js.
 
 Documentation:
 
