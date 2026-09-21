@@ -10,7 +10,7 @@ The Lovable export in the workspace is a behavioral and visual reference only. T
 
 ## API and payment boundary
 
-The frontend calls the Express API using `NEXT_PUBLIC_API_URL`. It creates an order through the API, then initializes Stripe Elements from a PaymentIntent endpoint. The frontend must never make itself the source of truth for totals or payment status.
+The frontend calls the Express API through a server-side `/api/backend` proxy configured by `API_URL`. It creates an order through the API, then initializes Stripe Elements from a PaymentIntent endpoint. The frontend must never make itself the source of truth for totals or payment status.
 
 ## Sensitive fields
 
@@ -20,5 +20,5 @@ The application form includes a masked Social Security Number field only to matc
 
 - Scope: Phase 1 = public funnel first. Phase 2 = full staff suite (deferred). See `docs/TODO.md`.
 - Payments: keep PaymentIntent + Stripe Elements (already built). Do not switch to Checkout Sessions — same UX, extra session-reuse complexity.
-- DB/Auth: backend stays Express + Mongo + JWT (no Supabase rewrite). Frontend stays API-driven via `NEXT_PUBLIC_API_URL`.
+- DB/Auth: backend stays Express + Mongo + JWT (no Supabase rewrite). Frontend stays API-driven via the private `API_URL` proxy configuration.
 - Do not port custody/vault/second-charge. Do not over-engineer: no extra plan/roadmap docs beyond `TODO.md`, `CURRENT_STATUS.md`, `DECISIONS.md`.

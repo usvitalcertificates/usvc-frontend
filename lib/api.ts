@@ -1,4 +1,4 @@
-const api = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const api = "/api/backend";
 
 export type Certificate = "BIRTH" | "DEATH" | "MARRIAGE" | "DIVORCE";
 
