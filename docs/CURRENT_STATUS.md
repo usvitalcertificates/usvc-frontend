@@ -1,10 +1,10 @@
 # Current frontend status
 
-Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy; ESLint 9 compatibility).
+Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy; ESLint 9 compatibility; birth-form requirements; name-history fields removed; address-name notices; updated processing times).
 
 ## Implemented
 
-- Order form rebuilt from reference `form-config.ts` (ported to `lib/form-config.ts`): per-cert subject/family fields, relationships, reasons, father-status conditional, name-history questions, CA-birth SSN+DOB override. County/city dropdowns from `lib/geo.ts` + `public/geo/` datasets; working home→shipping/billing copy; live review blocks with Edit scroll; sessionStorage draft excluding SSN/honeypot; honeypot + timing; verify-before-payment then create then checkout redirect.
+- Order form rebuilt from reference `form-config.ts` (ported to `lib/form-config.ts`): per-cert subject/family fields, relationships, reasons, father-status conditional, and CA-birth SSN+DOB override. The name-history and alternate-spelling questions (and their dependent inputs) have been removed from every certificate form and order payload. County/city dropdowns from `lib/geo.ts` + `public/geo/` datasets; working home→shipping/billing copy; live review blocks with Edit scroll; sessionStorage draft excluding SSN/honeypot; honeypot + timing; verify-before-payment then create then checkout redirect.
 - Section 9 matches reference exactly (dl rows: Certificate / Subject / Requestor & contact / Copies-fees with fee math); master consent auto-checks all 7 incl. payment authorization; address State is a 52-state dropdown (military APO/FPO, international region+country); conditional Other/previous-name/history fields for all 4 types. UI E2E passed 2026-09-21 (headless Chromium, all 4 types → checkout; Atlas rows + vault verified; fixed live address-copy sync + explicit radio values).
 - UI E2E passed 2026-09-21 (headless Chromium, real form → `/checkout/[id]` for all 4 types; Atlas rows + vault verified). Fixed: live address-copy sync (billing/shipping required fields), explicit "same as" radio values.
 
@@ -21,6 +21,9 @@ Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; 
 - Stripe Elements checkout route and API-backed order tracking route.
 - Browser API calls now use the same-origin `/api/backend` proxy. Configure the Express upstream with server-only `API_URL`; no client-exposed environment variable is required.
 - ESLint is pinned to the ESLint 9 compatibility line required by Next.js lint dependencies, avoiding Vercel peer-dependency warnings from ESLint 10.
+- Birth certificate applications require a requestor SSN and subject suffix. Requestor middle name remains optional, and a female subject requires a maiden last name.
+- Shipping and billing sections each begin with a requirement notice that the respective address name must match the requestor name.
+- Standard Processing displays a 5–7 business-day estimate; Rush Processing displays a next-day estimate. The Section 6 “Order Tracking — Free” callout has been removed without changing the tracking page or API.
 
 ## Important current limits
 

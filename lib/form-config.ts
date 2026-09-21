@@ -51,7 +51,6 @@ export interface CertificateFormConfig {
   familySecondNote?: GroupNote;
   familySecond?: FieldDef[];
   familySecondStatus?: GroupStatusConfig;
-  askNameHistory: boolean;
   relationships: string[];
   reasons: string[];
   eventLocationLabel: string;
@@ -103,7 +102,12 @@ const BASE_REQUESTOR: RequestorConfig = {
 
 export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormConfig> = {
   "birth-certificate": {
-    requestor: { ...BASE_REQUESTOR, showSsn: true, note: REQUESTOR_SECURITY_NOTE },
+    requestor: {
+      ...BASE_REQUESTOR,
+      showSsn: true,
+      ssnRequired: true,
+      note: REQUESTOR_SECURITY_NOTE,
+    },
     personLegend: "Person named on the birth record",
     personNote: {
       title: "Information About the Subject",
@@ -113,6 +117,7 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       { key: "firstName", label: "First Name on the Record", required: true },
       { key: "middleName", label: "Middle Name" },
       { key: "lastName", label: "Last Name on the Record", required: true },
+      { key: "suffix", label: "Suffix", type: "select", required: true, options: SUFFIX_OPTIONS },
       { key: "eventDate", label: "Date of Birth", type: "date", required: true },
       { key: "sex", label: "Sex / Gender as Recorded", type: "select", options: SEX_OPTIONS },
       {
@@ -151,9 +156,8 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       { key: "fatherLastName", label: "Last Name of Father", required: true },
       { key: "fatherSuffix", label: "Suffix", type: "select", options: SUFFIX_OPTIONS },
     ],
-    askNameHistory: true,
     relationships: [
-      "I am the person on the certificate",
+      "Self",
       "Parent",
       "Legal guardian",
       "Spouse",
@@ -189,7 +193,6 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
         wide: true,
       },
     ],
-    askNameHistory: false,
     relationships: [
       "Spouse",
       "Parent",
@@ -230,9 +233,8 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       { key: "spouseLastName", label: "Last name at the time of marriage", required: true },
       { key: "spouseCurrentLastName", label: "Current last name, if different" },
     ],
-    askNameHistory: true,
     relationships: [
-      "I am one of the parties on the certificate",
+      "Self",
       "Spouse",
       "Parent",
       "Child",
@@ -274,9 +276,8 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
         wide: true,
       },
     ],
-    askNameHistory: false,
     relationships: [
-      "I am one of the parties on the record",
+      "Self",
       "Former spouse",
       "Parent",
       "Child",
@@ -305,13 +306,13 @@ export const PROCESSING_OPTIONS = [
     name: "Standard Processing",
     priceLabel: "Included",
     description:
-      "Your application is prepared and processed using our standard service workflow. Processing typically takes 2–3 business days.",
+      "Your application is prepared and processed using our standard service workflow. Processing typically takes 5–7 business days.",
   },
   {
     id: "rush",
     name: "Rush Processing",
     priceLabel: "+$30.00",
-    description: "Your application will be processed the same day.",
+    description: "Your application will be processed the next day.",
   },
 ] as const;
 
