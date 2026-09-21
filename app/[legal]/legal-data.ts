@@ -13,7 +13,6 @@ export interface LegalDocument {
 
 const DOMAIN = "USVitalCertificates.org";
 const SUPPORT_EMAIL = "support@usvitalcertificates.org";
-const SUPPORT_PHONE = "(000) 000-0000";
 const DISCLAIMER_FULL =
   "USVC is an independent service that assists individuals with requesting vital records from government agencies. We are not a government agency and are not affiliated with or endorsed by any federal or state office. Official records may be available directly from the issuing agency, potentially at a lower cost. Our fees cover online ordering, guided assistance, application review, and related processing support.";
 const REVIEW_NOTE =
@@ -306,7 +305,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
       {
         heading: "Feedback",
         body: [
-          `If you encounter a barrier on this website, please contact us at ${SUPPORT_EMAIL} or ${SUPPORT_PHONE} and describe the page and the difficulty you experienced. We will work with you to provide the information you need.`,
+          `If you encounter a barrier on this website, please contact us at ${SUPPORT_EMAIL} and describe the page and the difficulty you experienced. We will work with you to provide the information you need.`,
         ],
       },
     ],
