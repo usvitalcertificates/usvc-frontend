@@ -1,6 +1,6 @@
 # Current frontend status
 
-Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy; ESLint 9 compatibility; birth-form requirements; name-history fields removed; address-name notices; updated processing times).
+Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy; ESLint 9 compatibility; birth-form requirements; name-history fields removed; address-name notices; updated processing times; PNG hero asset).
 
 ## Implemented
 
@@ -24,6 +24,7 @@ Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; 
 - Birth certificate applications require a requestor SSN and subject suffix. Requestor middle name remains optional, and a female subject requires a maiden last name.
 - Shipping and billing sections each begin with a requirement notice that the respective address name must match the requestor name.
 - Standard Processing displays a 5–7 business-day estimate; Rush Processing displays a next-day estimate. The Section 6 “Order Tracking — Free” callout has been removed without changing the tracking page or API.
+- Homepage hero image uses the committed PNG asset at `/assets/usvc-hero.png`.
 
 ## Important current limits
 
