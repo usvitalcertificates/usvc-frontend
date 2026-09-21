@@ -753,19 +753,6 @@ h3 {
   color: #000;
   white-space: nowrap;
 }
-.tracking-free {
-  padding: 16px;
-  border: 1px solid var(--navy);
-  border-radius: 6px;
-  background: var(--muted);
-}
-.tracking-free strong {
-  color: var(--navy);
-  font-size: 17px;
-}
-.tracking-free p {
-  margin-top: 4px;
-}
 .billing-choice {
   display: grid;
   justify-items: start;
