@@ -15,7 +15,7 @@ Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; 
 - Reference-style global header, navigation, footer, theme, public home page, certificate cards, state grid/search, trust section, FAQ callout, and legal/footer information.
 - Certificates, Find Your State, Track Order, and Contact page layouts matching the reference structure.
 - State landing pages and full application route: `/state/[state]/order/[certificate]`.
-- Eleven application sections (Section 8 Credit Card Details: Visa/MC/Discover/Amex, CVV label; copies 1–20; two-fee totals) with dynamic display total; card + SSN excluded from drafts; review shows card last-4 only. Review sync hardened against autofill (merge + input/blur listeners).
+- Eleven application sections (Section 8 Credit Card Details with Visa/Mastercard logos, CVV label; copies 1–20; two-fee totals) with dynamic display total; card + SSN excluded from drafts; review shows card last-4 only. Review sync hardened against autofill (merge + input/blur listeners).
 - Secure Checkout rebuilt to reference UI (order eyebrow, trust badges, all-inclusive notice, tabbed Stripe payment, authorize checkbox, Pay button, sticky summary); confirmation page verifies `session_id` with the backend and prints a paid receipt.
 - API order creation before redirecting to Stripe checkout.
 - Stripe Elements checkout route and API-backed order tracking route.

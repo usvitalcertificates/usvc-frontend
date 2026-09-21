@@ -1126,8 +1126,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         <p className="hint">
           <strong className="important-note">Important:</strong>{" "}
           <em>
-            We currently accept Visa, Mastercard, Discover, and American Express. Other forms of
-            payment, including digital wallets, are not supported at this time.
+            We currently accept Visa and Mastercard only. Other forms of payment, including American
+            Express, Discover and digital wallets, are not supported at this time.
           </em>
         </p>
         <div className="application-grid">
@@ -1167,16 +1167,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         </div>
         <p className="hint">
           <strong className="important-note">Important:</strong>{" "}
-          <em>This is a 3–4 digit code on the back of the card (4 digits for American Express).</em>
+          <em>This is a 3-digit code on the back for Visa and Mastercard.</em>
         </p>
-        <div
-          className="card-marks"
-          aria-label="Accepted cards: Visa, Mastercard, Discover, and American Express"
-        >
-          <span className="card-mark visa">VISA</span>
-          <span className="card-mark mastercard">MasterCard</span>
-          <span className="card-mark discover">Discover</span>
-          <span className="card-mark amex">AMEX</span>
+        <div className="card-marks" aria-label="Accepted cards: Visa and Mastercard">
+          <img src="/assets/visa.svg" alt="Visa" width={48} height={30} />
+          <img src="/assets/mastercard.svg" alt="Mastercard" width={48} height={30} />
         </div>
         {fieldErrors["paymentCard.number"] ||
         fieldErrors["paymentCard.expiry"] ||
