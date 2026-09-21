@@ -93,7 +93,6 @@ const stateCodes: Record<string, string> = {
 const DRAFT_EXCLUDED = new Set([
   "requestorSsn",
   "confirmEmail",
-  "order-website",
   "cardNumber",
   "cardExpiry",
   "cardSecurityCode",
@@ -373,11 +372,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [unavailableCounty, setUnavailableCounty] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const startedAt = useRef<number>(Date.now());
   const noun = jurisdictionNoun(geo.counties.length ? geo : undefined);
 
   useEffect(() => {
-    startedAt.current = Date.now();
     loadStateGeography(abbr)
       .then(setGeo)
       .catch(() => undefined);
@@ -484,8 +481,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    applyAddressCopies(event.currentTarget);
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    applyAddressCopies(form);
+    const formData = new FormData(form);
     const get = (key: string) => String(formData.get(key) ?? "").trim();
     if (get("email") !== get("confirmEmail")) {
       setError("Email addresses do not match.");
@@ -531,7 +529,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       };
       const acceptedAt = new Date().toISOString();
       const payload = {
-        antiAbuse: { honeypot: get("order-website"), formStartedAt: startedAt.current },
         stateSlug,
         stateCode: abbr,
         stateName,
@@ -640,14 +637,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           <em>Please note: All state certificate fees are subject to change without notice.</em>
         </p>
       </div>
-      <input
-        type="text"
-        name="order-website"
-        autoComplete="off"
-        tabIndex={-1}
-        aria-hidden="true"
-        style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }}
-      />
 
       <FormSection number={1} title="Information About the Certificate">
         <div className="application-grid">
