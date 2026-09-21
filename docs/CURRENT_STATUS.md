@@ -1,6 +1,6 @@
 # Current frontend status
 
-Last updated: 2026-09-21 (11-section form: card details added, copies 1–5).
+Last updated: 2026-09-21 (11-section form: card details added, copies 1–5; Node.js 24 LTS).
 
 ## Implemented
 

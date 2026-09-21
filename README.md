@@ -14,7 +14,7 @@ The order application currently has the reference-style ten-section UI and creat
 
 ## Requirements
 
-- Node.js 26.9.0 or later.
+- Node.js 24.x (LTS, as declared in `package.json`).
 - A running USVC backend, normally at `http://localhost:4000`.
 
 ## Run locally
