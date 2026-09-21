@@ -1,0 +1,1372 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import { createOrder, verifyOrderBeforePayment, type Certificate } from "@/lib/api";
+import {
+  PROCESSING_CLARIFICATION_NOTE,
+  resolveFormConfig,
+  type CertificateSlug,
+  type FieldDef,
+} from "@/lib/form-config";
+import {
+  jurisdictionLabel,
+  jurisdictionNoun,
+  loadStateGeography,
+  type StateGeography,
+} from "@/lib/geo";
+import {
+  ADDRESS_SECTION_NOTES,
+  ADDRESS_TYPE_OPTIONS,
+  APO_FPO_OPTIONS,
+  INTERNATIONAL_COUNTRIES,
+  PROCESSING_PAYMENT_AUTHORIZATION_TEXT,
+  STATES,
+} from "@/lib/states";
+
+const certificateMap: Record<string, Certificate> = {
+  "birth-certificate": "BIRTH",
+  "death-certificate": "DEATH",
+  "marriage-certificate": "MARRIAGE",
+  "divorce-certificate": "DIVORCE",
+};
+const stateCodes: Record<string, string> = {
+  alabama: "AL",
+  alaska: "AK",
+  arizona: "AZ",
+  arkansas: "AR",
+  california: "CA",
+  colorado: "CO",
+  connecticut: "CT",
+  delaware: "DE",
+  "district-of-columbia": "DC",
+  florida: "FL",
+  georgia: "GA",
+  hawaii: "HI",
+  idaho: "ID",
+  illinois: "IL",
+  indiana: "IN",
+  iowa: "IA",
+  kansas: "KS",
+  kentucky: "KY",
+  louisiana: "LA",
+  maine: "ME",
+  maryland: "MD",
+  massachusetts: "MA",
+  michigan: "MI",
+  minnesota: "MN",
+  mississippi: "MS",
+  missouri: "MO",
+  montana: "MT",
+  nebraska: "NE",
+  nevada: "NV",
+  "new-hampshire": "NH",
+  "new-jersey": "NJ",
+  "new-mexico": "NM",
+  "new-york": "NY",
+  "north-carolina": "NC",
+  "north-dakota": "ND",
+  ohio: "OH",
+  oklahoma: "OK",
+  oregon: "OR",
+  pennsylvania: "PA",
+  "puerto-rico": "PR",
+  "rhode-island": "RI",
+  "south-carolina": "SC",
+  "south-dakota": "SD",
+  tennessee: "TN",
+  texas: "TX",
+  utah: "UT",
+  vermont: "VT",
+  virginia: "VA",
+  washington: "WA",
+  "west-virginia": "WV",
+  wisconsin: "WI",
+  wyoming: "WY",
+};
+
+const DRAFT_EXCLUDED = new Set([
+  "requestorSsn",
+  "confirmEmail",
+  "order-website",
+  "cardNumber",
+  "cardExpiry",
+  "cardSecurityCode",
+]);
+
+function readable(value: string) {
+  return value
+    .split("-")
+    .map((part) => part[0]?.toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function addressTypeOf(label: string): "domestic" | "military" | "international" {
+  if (label.startsWith("US Military")) return "military";
+  if (label.startsWith("International")) return "international";
+  return "domestic";
+}
+
+function Field({ def, defaultValue }: { def: FieldDef; defaultValue?: string }) {
+  const id = `field-${def.key}`;
+  return (
+    <label className={`application-field${def.wide ? " wide" : ""}`} htmlFor={id}>
+      {def.label} {def.required ? <span>*</span> : null}
+      {def.type === "select" ? (
+        <select id={id} name={def.key} required={def.required} defaultValue={defaultValue ?? ""}>
+          <option value="">Please select…</option>
+          {(def.options ?? []).map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <input
+          id={id}
+          name={def.key}
+          type={def.type === "date" ? "date" : "text"}
+          required={def.required}
+          defaultValue={defaultValue ?? ""}
+        />
+      )}
+      {def.help ? <small>{def.help}</small> : null}
+    </label>
+  );
+}
+
+function FormSection({
+  number,
+  title,
+  children,
+}: {
+  number: number;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="application-section" id={`application-section-${number}`}>
+      <h2>
+        <span>{number}.</span> {title}
+      </h2>
+      <div className="patriotic-rule" aria-hidden="true" />
+      <div className="application-section-content">{children}</div>
+    </section>
+  );
+}
+
+function AddressFields({
+  prefix,
+  legend,
+  draft,
+  typeLabel,
+  requestorFirst,
+  requestorLast,
+}: {
+  prefix: string;
+  legend: string;
+  draft: Record<string, string>;
+  typeLabel: string;
+  requestorFirst: string;
+  requestorLast: string;
+}) {
+  const type = addressTypeOf(typeLabel);
+  const note = ADDRESS_SECTION_NOTES[prefix];
+  const get = (key: string) => draft[`${prefix}${key}`] ?? "";
+  return (
+    <fieldset className="address-fields">
+      <legend>{legend}</legend>
+      {note ? (
+        <p className="address-note">
+          <strong>{note.title}</strong> {note.body}
+        </p>
+      ) : null}
+      <div className="application-grid">
+        <label className="application-field wide">
+          {legend} Type <span>*</span>
+          <select
+            name={`${prefix}Type`}
+            required
+            defaultValue={draft[`${prefix}Type`] ?? ADDRESS_TYPE_OPTIONS[0].label}
+          >
+            {ADDRESS_TYPE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.label}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="application-field">
+          <span>First Name</span>
+          <p className="readonly-name">{requestorFirst.trim() || "—"}</p>
+        </div>
+        <div className="application-field">
+          <span>Last Name</span>
+          <p className="readonly-name">{requestorLast.trim() || "—"}</p>
+        </div>
+        <label className="application-field wide">
+          Address Line 1 <span>*</span>
+          <input name={`${prefix}Line1`} required defaultValue={get("Line1")} />
+        </label>
+        <label className="application-field wide">
+          Address Line 2 (optional)
+          <input name={`${prefix}Line2`} defaultValue={get("Line2")} />
+        </label>
+        <label className="application-field">
+          City <span>*</span>
+          <input name={`${prefix}City`} required defaultValue={get("City")} />
+        </label>
+        {type === "domestic" ? (
+          <label className="application-field">
+            State <span>*</span>
+            <select name={`${prefix}State`} required defaultValue={get("State")}>
+              <option value="">Select state…</option>
+              {STATES.map((state) => (
+                <option key={state.abbreviation} value={state.name}>
+                  {state.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : type === "military" ? (
+          <label className="application-field">
+            APO/FPO <span>*</span>
+            <select name={`${prefix}State`} required defaultValue={get("State")}>
+              <option value="">Select</option>
+              {APO_FPO_OPTIONS.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <label className="application-field">
+            International State/Province <span>*</span>
+            <input name={`${prefix}State`} required defaultValue={get("State")} />
+          </label>
+        )}
+        <label className="application-field">
+          Zip/Postal Code <span>*</span>
+          <input name={`${prefix}Zip`} required defaultValue={get("Zip")} />
+        </label>
+        {type === "international" ? (
+          <label className="application-field">
+            Country <span>*</span>
+            <select name={`${prefix}Country`} required defaultValue={get("Country")}>
+              <option value="">Select</option>
+              {INTERNATIONAL_COUNTRIES.map((country) => (
+                <option key={country}>{country}</option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+      </div>
+    </fieldset>
+  );
+}
+
+function ReviewBlock({
+  title,
+  target,
+  children,
+}: {
+  title: string;
+  target: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="review-block">
+      <div>
+        <h3>{title}</h3>
+        <button
+          type="button"
+          onClick={() =>
+            document
+              .getElementById(`application-section-${target}`)
+              ?.scrollIntoView({ behavior: "smooth", block: "center" })
+          }
+        >
+          Edit
+        </button>
+      </div>
+      <dl>{children}</dl>
+    </section>
+  );
+}
+
+function ReviewRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="review-row">
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  );
+}
+
+function formatAddress(parts: {
+  line1: string;
+  line2: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}) {
+  return (
+    [
+      parts.line1,
+      parts.line2,
+      `${parts.city}, ${parts.state} ${parts.postalCode}`.trim(),
+      parts.country,
+    ]
+      .filter((part) => part && part.trim() && part.trim() !== ",")
+      .join(" · ") || "—"
+  );
+}
+
+const show = (value: string | undefined) => (value && value.trim() ? value : "—");
+const CONSENT_KEYS = [
+  "accurate",
+  "govtId",
+  "terms",
+  "privacy",
+  "refund",
+  "independent",
+  "processingPayment",
+] as const;
+
+export function OrderForm({ stateCode, certificate }: { stateCode: string; certificate: string }) {
+  const stateSlug = stateCode.toLowerCase();
+  const certSlug = certificate as CertificateSlug;
+  const config = useMemo(() => resolveFormConfig(stateSlug, certSlug), [stateSlug, certSlug]);
+  const abbr = stateCodes[stateSlug] ?? stateSlug.slice(0, 2).toUpperCase();
+  const stateName = readable(stateSlug);
+  const short = certificate.replace("-certificate", "");
+  const certificateName = `${stateName} ${short.replace(/^./, (letter) => letter.toUpperCase())} Certificate`;
+  const draftKey = `usvc.orderDraft.v1:${stateSlug}:${certSlug}`;
+
+  const [draft] = useState<Record<string, string>>(() => {
+    try {
+      const raw = sessionStorage.getItem(draftKey);
+      return raw ? (JSON.parse(raw) as Record<string, string>) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [values, setValues] = useState<Record<string, string>>(() => draft);
+  const [consents, setConsents] = useState<Record<(typeof CONSENT_KEYS)[number], boolean>>({
+    accurate: false,
+    govtId: false,
+    terms: false,
+    privacy: false,
+    refund: false,
+    independent: false,
+    processingPayment: false,
+  });
+  const allConsents = CONSENT_KEYS.every((key) => consents[key]);
+  const [geo, setGeo] = useState<StateGeography>({ state: abbr, counties: [] });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const formRef = useRef<HTMLFormElement>(null);
+  const startedAt = useRef<number>(Date.now());
+  const noun = jurisdictionNoun(geo.counties.length ? geo : undefined);
+
+  useEffect(() => {
+    startedAt.current = Date.now();
+    loadStateGeography(abbr)
+      .then(setGeo)
+      .catch(() => undefined);
+  }, [abbr]);
+
+  const counties = geo.counties;
+  const cities = useMemo(
+    () => counties.find((c) => c.name === values.county)?.cities ?? [],
+    [counties, values.county],
+  );
+  const selectedCounty = counties.find((c) => c.name === (values.county ?? draft.county));
+
+  const copies = Math.min(5, Math.max(1, Number(values.copies ?? draft.copies ?? 1) || 1));
+  const rush = (values.processing ?? draft.processing ?? "standard") === "rush";
+  const shippingIntl =
+    addressTypeOf(values.shippingType ?? draft.shippingType ?? ADDRESS_TYPE_OPTIONS[0].label) ===
+    "international";
+  const total = copies * (125 + (shippingIntl ? 133 : 113)) + (rush ? 30 : 0);
+  const serviceCents = 125 * copies;
+  const bundleCents = (shippingIntl ? 133 : 113) * copies;
+
+  const requestorFirst = values.applicantFirstName ?? draft.applicantFirstName ?? "";
+  const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
+  const relationship = values.relationship ?? draft.relationship ?? "";
+  const reason = values.reason ?? draft.reason ?? "";
+  const nameChanged = values.subjectNameChanged ?? draft.subjectNameChanged ?? "No";
+  const spellingDifferent = values.subjectSpelling ?? draft.subjectSpelling ?? "No";
+  const prevLastUsed = values.previousLastNameUsed ?? draft.previousLastNameUsed ?? "No";
+
+  function syncForm() {
+    const form = formRef.current;
+    if (!form) return;
+    applyAddressCopies(form);
+    const data = Object.fromEntries(
+      [...new FormData(form).entries()].map(([k, v]) => [k, String(v)]),
+    );
+    setValues(data);
+    try {
+      const saveable = Object.fromEntries(
+        Object.entries(data).filter(([k]) => !DRAFT_EXCLUDED.has(k)),
+      );
+      sessionStorage.setItem(draftKey, JSON.stringify(saveable));
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
+  function copyAddress(from: string, to: string) {
+    const form = formRef.current;
+    if (!form) return;
+    const data = new FormData(form);
+    for (const key of ["Line1", "Line2", "City", "State", "Zip", "Type", "Country"]) {
+      const target = form.elements.namedItem(`${to}${key}`) as
+        HTMLInputElement | HTMLSelectElement | null;
+      if (target) target.value = String(data.get(`${from}${key}`) ?? "");
+    }
+  }
+
+  /** Keeps copied addresses in sync on every change so required billing/shipping
+   *  fields are never empty while a "same as" option is selected. */
+  function applyAddressCopies(form: HTMLFormElement) {
+    const checkedValue = (name: string) =>
+      (form.querySelector(`input[name="${name}"]:checked`) as HTMLInputElement | null)?.value ?? "";
+    if (checkedValue("sameShipping") === "yes") copyAddress("home", "shipping");
+    const billingSource = checkedValue("billingSource");
+    if (billingSource === "home") copyAddress("home", "billing");
+    else if (billingSource === "shipping") copyAddress("shipping", "billing");
+  }
+
+  function toggleAll(checked: boolean) {
+    setConsents({
+      accurate: checked,
+      govtId: checked,
+      terms: checked,
+      privacy: checked,
+      refund: checked,
+      independent: checked,
+      processingPayment: checked,
+    });
+  }
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    applyAddressCopies(event.currentTarget);
+    const formData = new FormData(event.currentTarget);
+    const get = (key: string) => String(formData.get(key) ?? "").trim();
+    if (get("email") !== get("confirmEmail")) {
+      setError("Email addresses do not match.");
+      setFieldErrors({ "applicant.email": "Email addresses do not match." });
+      document
+        .getElementById("application-section-5")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    if (!allConsents || !get("signature")) {
+      setError("Please sign and accept the required certification statements before continuing.");
+      document
+        .getElementById("application-section-10")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    setBusy(true);
+    setError("");
+    setFieldErrors({});
+    try {
+      const subject: Record<string, string> = {};
+      for (const field of config.person) subject[field.key] = get(field.key);
+      if (config.askNameHistory) {
+        subject.subjectNameChanged = get("subjectNameChanged");
+        subject.subjectSpelling = get("subjectSpelling");
+        if (get("subjectNameChanged") === "Yes") {
+          subject.previousFirstName = get("previousFirstName");
+          subject.previousMiddleName = get("previousMiddleName");
+          subject.previousLastName = get("previousLastName");
+          subject.nameChangeContext = get("nameChangeContext");
+        }
+        if (get("subjectSpelling") === "Yes") subject.alternateSpelling = get("alternateSpelling");
+      }
+      const family: Record<string, string> = {};
+      for (const field of [...config.family, ...(config.familySecond ?? [])])
+        family[field.key] = get(field.key);
+      if (config.familySecondStatus)
+        family[config.familySecondStatus.key] = get(config.familySecondStatus.key);
+      const address = (prefix: string) => {
+        const typeLabel = get(`${prefix}Type`) || ADDRESS_TYPE_OPTIONS[0].label;
+        const type = addressTypeOf(typeLabel);
+        return {
+          firstName: get("applicantFirstName"),
+          lastName: get("applicantLastName"),
+          line1: get(`${prefix}Line1`),
+          line2: get(`${prefix}Line2`),
+          city: get(`${prefix}City`),
+          state: get(`${prefix}State`),
+          postalCode: get(`${prefix}Zip`),
+          country: type === "international" ? get(`${prefix}Country`) : "United States",
+          addressType: type,
+        };
+      };
+      const acceptedAt = new Date().toISOString();
+      const payload = {
+        antiAbuse: { honeypot: get("order-website"), formStartedAt: startedAt.current },
+        stateSlug,
+        stateCode: abbr,
+        stateName,
+        certificate: certificateMap[certificate],
+        county: get("county"),
+        city: get("city"),
+        reason: get("reason"),
+        reasonOther: get("reasonOther"),
+        applicant: {
+          relationship: get("relationship"),
+          relationshipOther: get("relationshipOther"),
+          firstName: get("applicantFirstName"),
+          lastName: get("applicantLastName"),
+          previousLastName: get("previousLastName"),
+          dateOfBirth: get("applicantDob"),
+          phone: get("phone"),
+          email: get("email"),
+        },
+        requestorSsn: get("requestorSsn"),
+        subject,
+        family,
+        addresses: {
+          home: address("home"),
+          shipping: address("shipping"),
+          billing: address("billing"),
+        },
+        destinationType: shippingIntl ? ("international" as const) : ("domestic" as const),
+        copies,
+        rush,
+        deliveryMethod: get("delivery"),
+        consents: { ...consents },
+        processingAuthorization: {
+          accepted: true as const,
+          text: PROCESSING_PAYMENT_AUTHORIZATION_TEXT,
+          acceptedAt,
+        },
+        signature: get("signature"),
+        paymentCard: {
+          number: get("cardNumber"),
+          expiry: get("cardExpiry"),
+          securityCode: get("cardSecurityCode"),
+        },
+        totalCents: Math.round(total * 100),
+      };
+      await verifyOrderBeforePayment(payload);
+      const order = await createOrder(payload);
+      try {
+        sessionStorage.removeItem(draftKey);
+      } catch {
+        /* ignore */
+      }
+      window.location.assign(`/checkout/${order.id}`);
+    } catch (caught) {
+      const withErrors = caught as Error & { errors?: Record<string, string> };
+      if (withErrors.errors) setFieldErrors(withErrors.errors);
+      setError(caught instanceof Error ? caught.message : "Unable to continue to secure payment.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const fatherStatus = values[config.familySecondStatus?.key ?? ""] ?? "";
+  const fatherRequired = config.familySecondStatus?.requiredWhen.includes(fatherStatus) ?? false;
+  const reasonDisplay = reason === "Other" ? values.reasonOther?.trim() || "Other" : reason || "—";
+  const relationshipDisplay =
+    relationship === "Other" ? values.relationshipOther?.trim() || "Other" : relationship || "—";
+  const cardLast4Display = (values.cardNumber ?? "").replace(/[\s-]/g, "").slice(-4);
+
+  const addressValues = (prefix: string) => ({
+    line1: values[`${prefix}Line1`] ?? "",
+    line2: values[`${prefix}Line2`] ?? "",
+    city: values[`${prefix}City`] ?? "",
+    state: values[`${prefix}State`] ?? "",
+    postalCode: values[`${prefix}Zip`] ?? "",
+    country:
+      values[`${prefix}Country`] ??
+      (addressTypeOf(values[`${prefix}Type`] ?? "") === "international" ? "" : "United States"),
+  });
+
+  return (
+    <form ref={formRef} className="application-form" onSubmit={submit} onChange={syncForm}>
+      <p className="required-note">
+        Fields marked with <span>*</span> are required.
+      </p>
+      <input
+        type="text"
+        name="order-website"
+        autoComplete="off"
+        tabIndex={-1}
+        aria-hidden="true"
+        style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0 }}
+      />
+
+      <FormSection number={1} title="Information About the Certificate">
+        <div className="application-grid">
+          <label className="application-field">
+            Certificate Type <span>*</span>
+            <input
+              name="certificate"
+              defaultValue={certificateName.replace(`${stateName} `, "")}
+              disabled
+            />
+          </label>
+          <label className="application-field">
+            State / Territory <span>*</span>
+            <input name="state" defaultValue={stateName} disabled />
+          </label>
+          <label className="application-field">
+            {`${noun.charAt(0).toUpperCase()}${noun.slice(1)} where the ${config.eventLocationLabel} occurred`}{" "}
+            <span>*</span>
+            <select
+              name="county"
+              required
+              value={values.county ?? draft.county ?? ""}
+              onChange={(event) =>
+                setValues((v) => ({ ...v, county: event.target.value, city: "" }))
+              }
+            >
+              <option value="">
+                Select {stateName} {noun}
+              </option>
+              {counties.map((c) => (
+                <option key={c.id} value={c.name}>
+                  {jurisdictionLabel(c)}
+                </option>
+              ))}
+            </select>
+            {fieldErrors.county ? (
+              <small className="application-error">{fieldErrors.county}</small>
+            ) : null}
+          </label>
+          <label className="application-field">
+            {`City / town where the ${config.eventLocationLabel} occurred`} <span>*</span>
+            <select
+              name="city"
+              required
+              value={values.city ?? draft.city ?? ""}
+              onChange={(event) => setValues((v) => ({ ...v, city: event.target.value }))}
+              disabled={!values.county && !draft.county}
+            >
+              <option value="">
+                {(values.county ?? draft.county) ? "Select city or town" : `Select ${noun} first`}
+              </option>
+              {cities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+            <small>{config.eventLocationHelp}</small>
+          </label>
+          <label className="application-field wide">
+            Reason for requesting this certificate <span>*</span>
+            <select name="reason" required defaultValue={draft.reason ?? ""}>
+              <option value="">Please select…</option>
+              {config.reasons.map((item) => (
+                <option key={item}>{item}</option>
+              ))}
+            </select>
+          </label>
+          {reason === "Other" ? (
+            <label className="application-field wide">
+              Please describe your reason <span>*</span>
+              <input name="reasonOther" required defaultValue={draft.reasonOther ?? ""} />
+            </label>
+          ) : null}
+        </div>
+      </FormSection>
+
+      <FormSection number={2} title="Information About the Requestor">
+        <div className="application-grid">
+          <label className="application-field wide">
+            Your relationship to the person named on the certificate <span>*</span>
+            <select name="relationship" required defaultValue={draft.relationship ?? ""}>
+              <option value="">Please select…</option>
+              {config.relationships.map((item) => (
+                <option key={item}>{item}</option>
+              ))}
+            </select>
+          </label>
+          {relationship === "Other" ? (
+            <label className="application-field wide">
+              Please describe your relationship <span>*</span>
+              <input
+                name="relationshipOther"
+                required
+                defaultValue={draft.relationshipOther ?? ""}
+              />
+              {fieldErrors["applicant.relationshipOther"] ? (
+                <small className="application-error">
+                  {fieldErrors["applicant.relationshipOther"]}
+                </small>
+              ) : null}
+            </label>
+          ) : null}
+          <label className="application-field">
+            Your first name <span>*</span>
+            <input
+              name="applicantFirstName"
+              required
+              defaultValue={draft.applicantFirstName ?? ""}
+            />
+          </label>
+          <label className="application-field">
+            Your last name <span>*</span>
+            <input name="applicantLastName" required defaultValue={draft.applicantLastName ?? ""} />
+          </label>
+          {config.requestor.askPreviousLastName ? (
+            <label className="application-field wide">
+              Have you ever used a different last name?
+              <select name="previousLastNameUsed" defaultValue={draft.previousLastNameUsed ?? "No"}>
+                <option>No</option>
+                <option>Yes</option>
+              </select>
+            </label>
+          ) : null}
+          {config.requestor.askPreviousLastName && prevLastUsed === "Yes" ? (
+            <label className="application-field wide">
+              {config.requestor.previousLastNameLabel} <span>*</span>
+              <input name="previousLastName" required defaultValue={draft.previousLastName ?? ""} />
+            </label>
+          ) : null}
+        </div>
+        {config.requestor.note ? (
+          <div className="group-note">
+            <strong>{config.requestor.note.title}</strong>
+            <em>{config.requestor.note.body}</em>
+          </div>
+        ) : null}
+        <div className="application-grid">
+          {config.requestor.showDateOfBirth ? (
+            <label className="application-field">
+              Your date of birth {config.requestor.dateOfBirthRequired ? <span>*</span> : null}
+              <input
+                name="applicantDob"
+                type="date"
+                required={config.requestor.dateOfBirthRequired}
+                defaultValue={draft.applicantDob ?? ""}
+              />
+              {fieldErrors["applicant.dateOfBirth"] ? (
+                <small className="application-error">{fieldErrors["applicant.dateOfBirth"]}</small>
+              ) : null}
+            </label>
+          ) : null}
+          {config.requestor.showSsn ? (
+            <label className="application-field">
+              Your Social Security Number{" "}
+              {config.requestor.ssnRequired ||
+              (stateSlug === "california" && certSlug === "birth-certificate") ? (
+                <span>*</span>
+              ) : null}
+              <input
+                name="requestorSsn"
+                type="password"
+                autoComplete="off"
+                required={config.requestor.ssnRequired}
+                placeholder="XXX-XX-XXXX"
+              />
+              <small>Kept private and never shown again. Required as an identity safeguard.</small>
+              {fieldErrors.requestorSsn ? (
+                <small className="application-error">{fieldErrors.requestorSsn}</small>
+              ) : null}
+            </label>
+          ) : null}
+        </div>
+      </FormSection>
+
+      <FormSection number={3} title="Information About the Subject">
+        {certSlug === "birth-certificate" ? (
+          <p className="adoption-note">
+            <strong>ADOPTED?</strong> If the person named on the record was adopted, the record on
+            file may show the adoptive details or may be sealed. Please review our{" "}
+            <Link href="/faq">FAQ section</Link> for important information before completing this
+            section.
+          </p>
+        ) : null}
+        <p>
+          {config.personLegend}. {config.personNote ? <em>{config.personNote.body}</em> : null}
+        </p>
+        <div className="application-grid">
+          {config.person.map((field) => (
+            <Field key={field.key} def={field} defaultValue={draft[field.key]} />
+          ))}
+        </div>
+        {config.askNameHistory ? (
+          <>
+            <label className="application-field wide">
+              Has the name on the record ever been different?
+              <select name="subjectNameChanged" defaultValue={draft.subjectNameChanged ?? "No"}>
+                <option>No</option>
+                <option>Yes</option>
+              </select>
+            </label>
+            {nameChanged === "Yes" ? (
+              <div className="application-grid">
+                <label className="application-field">
+                  Previous first name
+                  <input name="previousFirstName" defaultValue={draft.previousFirstName ?? ""} />
+                </label>
+                <label className="application-field">
+                  Previous middle name
+                  <input name="previousMiddleName" defaultValue={draft.previousMiddleName ?? ""} />
+                </label>
+                <label className="application-field">
+                  Previous last name <span>*</span>
+                  <input
+                    name="previousLastName"
+                    required
+                    defaultValue={draft.previousLastName ?? ""}
+                  />
+                </label>
+                <label className="application-field">
+                  Name change context, if known
+                  <input name="nameChangeContext" defaultValue={draft.nameChangeContext ?? ""} />
+                </label>
+              </div>
+            ) : null}
+            <label className="application-field wide">
+              Was the record registered under a different spelling?
+              <select name="subjectSpelling" defaultValue={draft.subjectSpelling ?? "No"}>
+                <option>No</option>
+                <option>Yes</option>
+              </select>
+            </label>
+            {spellingDifferent === "Yes" ? (
+              <div className="application-grid">
+                <label className="application-field wide">
+                  Alternate spelling used on the record
+                  <input name="alternateSpelling" defaultValue={draft.alternateSpelling ?? ""} />
+                </label>
+              </div>
+            ) : null}
+          </>
+        ) : null}
+      </FormSection>
+
+      <FormSection number={4} title="Parent / Family Information">
+        <fieldset>
+          <legend>{config.familyLegend}</legend>
+          {config.familyNote ? (
+            <p>
+              <strong>{config.familyNote.title}</strong>
+            </p>
+          ) : null}
+          {config.familyNote ? <em>{config.familyNote.body}</em> : null}
+          <div className="application-grid">
+            {config.family.map((field) => (
+              <Field key={field.key} def={field} defaultValue={draft[field.key]} />
+            ))}
+          </div>
+        </fieldset>
+        {config.familySecondLegend ? (
+          <fieldset>
+            <legend>{config.familySecondLegend}</legend>
+            {config.familySecondNote ? (
+              <p>
+                <strong>{config.familySecondNote.title}</strong>
+              </p>
+            ) : null}
+            {config.familySecondNote ? <em>{config.familySecondNote.body}</em> : null}
+            {config.familySecondStatus ? (
+              <div className="application-grid">
+                <label className="application-field">
+                  {config.familySecondStatus.label}{" "}
+                  {config.familySecondStatus.required ? <span>*</span> : null}
+                  <select
+                    name={config.familySecondStatus.key}
+                    required={config.familySecondStatus.required}
+                    defaultValue={draft[config.familySecondStatus.key] ?? ""}
+                  >
+                    <option value="">Please select…</option>
+                    {config.familySecondStatus.options.map((option) => (
+                      <option key={option}>{option}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            ) : null}
+            {fatherRequired || !config.familySecondStatus ? (
+              <div className="application-grid">
+                {(config.familySecond ?? []).map((field) => (
+                  <Field key={field.key} def={field} defaultValue={draft[field.key]} />
+                ))}
+              </div>
+            ) : null}
+          </fieldset>
+        ) : null}
+      </FormSection>
+
+      <FormSection number={5} title="Shipping & Contact Information">
+        <AddressFields
+          prefix="home"
+          legend="Home Address"
+          draft={draft}
+          typeLabel={values.homeType ?? draft.homeType ?? ""}
+          requestorFirst={requestorFirst}
+          requestorLast={requestorLast}
+        />
+        <div className="same-address">
+          <strong>Is your Shipping Address the same as your Home Address?</strong>
+          <label>
+            <input
+              type="radio"
+              name="sameShipping"
+              value="yes"
+              onChange={() => {
+                copyAddress("home", "shipping");
+                syncForm();
+              }}
+            />{" "}
+            Yes
+          </label>
+          <label>
+            <input type="radio" name="sameShipping" value="no" defaultChecked /> No
+          </label>
+          <small>
+            Your Home Address will be copied below when you choose Yes. You can still edit it.
+          </small>
+        </div>
+        <AddressFields
+          prefix="shipping"
+          legend="Shipping Address"
+          draft={draft}
+          typeLabel={values.shippingType ?? draft.shippingType ?? ""}
+          requestorFirst={requestorFirst}
+          requestorLast={requestorLast}
+        />
+        <fieldset>
+          <legend>Contact information</legend>
+          <div className="application-grid">
+            <label className="application-field">
+              Phone number <span>*</span>
+              <input name="phone" type="tel" required defaultValue={draft.phone ?? ""} />
+            </label>
+            <div />
+            <label className="application-field">
+              Email address <span>*</span>
+              <input name="email" type="email" required defaultValue={draft.email ?? ""} />
+              <small>Order confirmation, tracking, and updates are sent to this address.</small>
+            </label>
+            <label className="application-field">
+              Confirm email address <span>*</span>
+              <input name="confirmEmail" type="email" required />
+            </label>
+          </div>
+        </fieldset>
+      </FormSection>
+
+      <FormSection number={6} title="Copies & Processing">
+        <label className="application-field wide">
+          Number of Copies <span>*</span>
+          <select
+            name="copies"
+            value={String(copies)}
+            onChange={(event) => setValues((v) => ({ ...v, copies: event.target.value }))}
+          >
+            {Array.from({ length: 5 }, (_, i) => i + 1).map((n) => (
+              <option key={n} value={n}>
+                {n} {n === 1 ? "copy" : "copies"}
+              </option>
+            ))}
+          </select>
+          <small>
+            Each copy includes the $125.00 USVC Processing Fee and the applicable destination
+            bundle.
+          </small>
+        </label>
+        <label className="application-field wide">
+          Delivery Method <span>*</span>
+          <select name="delivery" required defaultValue={draft.delivery ?? "Regular"}>
+            <option>Regular</option>
+            <option>UPS Air</option>
+            <option>UPS Worldwide Expedited, Up to 5 Business Days</option>
+          </select>
+        </label>
+        <p className="hint">
+          <strong>Important:</strong>{" "}
+          <em>
+            Your fixed {shippingIntl ? "international" : "domestic"} destination bundle is included
+            in the total shown below.
+          </em>
+        </p>
+        <p className="hint">
+          <em>
+            Regular mail delivery is available, however, we recommend you choose a more secure
+            shipping method that provides faster delivery and tracking of your order.
+          </em>
+        </p>
+        <fieldset className="processing-options">
+          <legend>Processing speed</legend>
+          <label className={rush ? "" : "selected"}>
+            <input
+              type="radio"
+              name="processing"
+              value="standard"
+              checked={!rush}
+              onChange={() => setValues((v) => ({ ...v, processing: "standard" }))}
+            />
+            <span>
+              <strong>Standard Processing</strong>
+              <small>
+                Your application is prepared and processed using our standard service workflow.
+                Processing typically takes 2–3 business days.
+              </small>
+            </span>
+            <b>Included</b>
+          </label>
+          <label className={rush ? "selected" : ""}>
+            <input
+              type="radio"
+              name="processing"
+              value="rush"
+              checked={rush}
+              onChange={() => setValues((v) => ({ ...v, processing: "rush" }))}
+            />
+            <span>
+              <strong>Rush Processing</strong>
+              <small>Your application will be processed the same day.</small>
+            </span>
+            <b>+$30.00 per order</b>
+          </label>
+        </fieldset>
+        <p className="hint">{PROCESSING_CLARIFICATION_NOTE}</p>
+        <div className="tracking-free">
+          <strong>Order Tracking — Free</strong>
+          <p>Track your order online at no additional charge.</p>
+        </div>
+      </FormSection>
+
+      <FormSection number={7} title="Billing Details">
+        <p>
+          Card details are entered on the next secure step and are never stored by USVC. Your
+          billing address is used to verify your payment.
+        </p>
+        <div className="same-address billing-choice">
+          <strong>Is your Billing Address the same as another address?</strong>
+          <label>
+            <input
+              type="radio"
+              name="billingSource"
+              value="home"
+              onChange={() => {
+                copyAddress("home", "billing");
+                syncForm();
+              }}
+            />{" "}
+            Same as Home Address
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="billingSource"
+              value="shipping"
+              defaultChecked
+              onChange={() => {
+                copyAddress("shipping", "billing");
+                syncForm();
+              }}
+            />{" "}
+            Same as Shipping Address
+          </label>
+          <label>
+            <input type="radio" name="billingSource" value="none" /> Neither — Enter Billing Address
+          </label>
+          <small>The selected address has been copied below. You can still edit it.</small>
+        </div>
+        <AddressFields
+          prefix="billing"
+          legend="Billing Address"
+          draft={draft}
+          typeLabel={values.billingType ?? draft.billingType ?? ""}
+          requestorFirst={requestorFirst}
+          requestorLast={requestorLast}
+        />
+      </FormSection>
+
+      <FormSection number={8} title="Credit Card Details">
+        <p className="hint">
+          <strong className="important-note">Important:</strong>{" "}
+          <em>
+            We currently accept Visa and Mastercard only. Other forms of payment, including American
+            Express, Discover and digital wallets, are not supported at this time.
+          </em>
+        </p>
+        <div className="application-grid">
+          <label className="application-field wide">
+            Credit Card Number <span>*</span>
+            <input
+              name="cardNumber"
+              required
+              inputMode="numeric"
+              autoComplete="cc-number"
+              placeholder="Credit Card Number"
+              defaultValue=""
+            />
+          </label>
+          <label className="application-field wide">
+            Credit Card Expiry Date (MM/YY) <span>*</span>
+            <input
+              name="cardExpiry"
+              required
+              inputMode="numeric"
+              autoComplete="cc-exp"
+              placeholder="Credit Card Expiry Date (MM/YY)"
+              defaultValue=""
+            />
+          </label>
+          <label className="application-field wide">
+            Credit Card Security Code <span>*</span>
+            <input
+              name="cardSecurityCode"
+              required
+              inputMode="numeric"
+              autoComplete="cc-csc"
+              placeholder="Credit Card Security Code"
+              defaultValue=""
+            />
+          </label>
+        </div>
+        <p className="hint">
+          <strong className="important-note">Important:</strong>{" "}
+          <em>This is a 3-digit code on the back for Visa and Mastercard.</em>
+        </p>
+        <div className="card-marks" aria-label="Accepted cards: Visa and Mastercard">
+          <span className="card-mark visa">VISA</span>
+          <span className="card-mark mastercard">MasterCard</span>
+        </div>
+        {fieldErrors["paymentCard.number"] ||
+        fieldErrors["paymentCard.expiry"] ||
+        fieldErrors["paymentCard.securityCode"] ? (
+          <div role="alert">
+            {["paymentCard.number", "paymentCard.expiry", "paymentCard.securityCode"].map((key) =>
+              fieldErrors[key] ? (
+                <p key={key} className="application-error">
+                  {fieldErrors[key]}
+                </p>
+              ) : null,
+            )}
+          </div>
+        ) : null}
+      </FormSection>
+
+      <FormSection number={9} title="Order Summary">
+        <div className="order-summary">
+          <h3>{certificateName}</h3>
+          <p>
+            Number of copies: {copies} certified {copies === 1 ? "copy" : "copies"}
+          </p>
+          <hr />
+          <div>
+            <span>
+              Online Processing Fee<small>$125.00 per copy × {copies}</small>
+            </span>
+            <b>${(125 * copies).toFixed(2)}</b>
+          </div>
+          <div>
+            <span>
+              Government / Agency Fee &amp; Shipping
+              <small>
+                {shippingIntl ? "International" : "Domestic"} bundle × {copies}
+              </small>
+            </span>
+            <b>${((shippingIntl ? 133 : 113) * copies).toFixed(2)}</b>
+          </div>
+          {rush ? (
+            <div>
+              <span>
+                Rush Processing<small>Per order</small>
+              </span>
+              <b>$30.00</b>
+            </div>
+          ) : null}
+          <div className="total">
+            <strong>TOTAL</strong>
+            <strong>${total.toFixed(2)}</strong>
+          </div>
+          <p>
+            This total includes the USVC Processing Fee, the Government / Agency Fee &amp; Shipping
+            bundle, and Rush Processing when selected.
+          </p>
+        </div>
+      </FormSection>
+
+      <FormSection number={10} title="Review & Certification">
+        <ReviewBlock title="Certificate" target={1}>
+          <ReviewRow label="Certificate" value={certificateName} />
+          <ReviewRow
+            label={noun.charAt(0).toUpperCase() + noun.slice(1)}
+            value={selectedCounty ? jurisdictionLabel(selectedCounty) : show(values.county)}
+          />
+          <ReviewRow label="City / town" value={show(values.city)} />
+          <ReviewRow label="Reason" value={reasonDisplay} />
+        </ReviewBlock>
+        <ReviewBlock title="Subject of the certificate" target={3}>
+          {config.person.map((field) => (
+            <ReviewRow key={field.key} label={field.label} value={show(values[field.key])} />
+          ))}
+        </ReviewBlock>
+        <ReviewBlock title="Requestor & contact" target={2}>
+          <ReviewRow label="Name" value={`${requestorFirst} ${requestorLast}`.trim() || "—"} />
+          <ReviewRow label="Relationship" value={relationshipDisplay} />
+          <ReviewRow label="Phone" value={show(values.phone)} />
+          <ReviewRow label="Email" value={show(values.email)} />
+          <ReviewRow label="Ship to" value={formatAddress(addressValues("shipping"))} />
+          <ReviewRow label="Bill to" value={formatAddress(addressValues("billing"))} />
+        </ReviewBlock>
+        <ReviewBlock title="Copies, processing & fees" target={6}>
+          <ReviewRow label="Number of copies" value={String(copies)} />
+          <ReviewRow
+            label="Processing speed"
+            value={rush ? "Rush Processing" : "Standard Processing"}
+          />
+          <ReviewRow label="Online Processing Fee" value={`$${serviceCents.toFixed(2)}`} />
+          <ReviewRow label="Rush processing" value={rush ? "$30.00" : "Not selected"} />
+          <ReviewRow
+            label="Government / Agency Fee & Shipping"
+            value={`$${bundleCents.toFixed(2)}`}
+          />
+          <ReviewRow
+            label="Payment card"
+            value={cardLast4Display ? `Card ending in ${cardLast4Display}` : "—"}
+          />
+          <ReviewRow label="Total" value={`$${total.toFixed(2)}`} />
+        </ReviewBlock>
+
+        <label className="application-field wide">
+          Electronic Signature <span>*</span>
+          <input name="signature" required defaultValue={draft.signature ?? ""} />
+          <small>Typing your name serves as your electronic signature for this order.</small>
+        </label>
+        <div className="agreements">
+          <label className="all-agreement">
+            <input
+              type="checkbox"
+              name="agreement"
+              checked={allConsents}
+              onChange={(event) => toggleAll(event.target.checked)}
+            />
+            <span>
+              <strong>I agree to all of the statements below.</strong> Selecting this checks every
+              item; you may also review and select them individually.
+            </span>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="agreeAccurate"
+              required={!allConsents}
+              checked={consents.accurate}
+              onChange={(event) => setConsents((c) => ({ ...c, accurate: event.target.checked }))}
+            />{" "}
+            I certify that the information provided is accurate to the best of my knowledge and that
+            I am authorized to request this record.
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="agreeGovtId"
+              required={!allConsents}
+              checked={consents.govtId}
+              onChange={(event) => setConsents((c) => ({ ...c, govtId: event.target.checked }))}
+            />{" "}
+            I understand I will receive an email from the relevant government agency with
+            instructions on how to send a copy of my government issued picture ID for verification.
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="agreeTerms"
+              required={!allConsents}
+              checked={consents.terms}
+              onChange={(event) => setConsents((c) => ({ ...c, terms: event.target.checked }))}
+            />{" "}
+            I agree to the <Link href="/terms-of-service">Terms of Service</Link>.
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="agreePrivacy"
+              required={!allConsents}
+              checked={consents.privacy}
+              onChange={(event) => setConsents((c) => ({ ...c, privacy: event.target.checked }))}
+            />{" "}
+            I have read the <Link href="/privacy-policy">Privacy Policy</Link>.
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="agreeRefund"
+              required={!allConsents}
+              checked={consents.refund}
+              onChange={(event) => setConsents((c) => ({ ...c, refund: event.target.checked }))}
+            />{" "}
+            I accept the <Link href="/terms-of-service">Refund &amp; Cancellation terms</Link>.
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="agreeIndependent"
+              required={!allConsents}
+              checked={consents.independent}
+              onChange={(event) =>
+                setConsents((c) => ({ ...c, independent: event.target.checked }))
+              }
+            />{" "}
+            I understand USVC is an independent service, not a government agency, and that the total
+            includes both USVC service fees and the Government / Agency Fee &amp; Shipping bundle.
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              name="agreeProcessingPayment"
+              required={!allConsents}
+              checked={consents.processingPayment}
+              onChange={(event) =>
+                setConsents((c) => ({ ...c, processingPayment: event.target.checked }))
+              }
+            />{" "}
+            <span>
+              <strong>Authorization for the complete order payment.</strong>{" "}
+              {PROCESSING_PAYMENT_AUTHORIZATION_TEXT}
+            </span>
+          </label>
+        </div>
+        {Object.keys(fieldErrors).length ? (
+          <div role="alert">
+            {Object.entries(fieldErrors).map(([key, message]) => (
+              <p key={key} className="application-error">
+                {message}
+              </p>
+            ))}
+          </div>
+        ) : null}
+      </FormSection>
+
+      <FormSection number={11} title="Payment">
+        <p>
+          Continue to the secure payment step to complete your order. Card information is handled by
+          the payment provider&apos;s secure fields — USVC never receives or stores your full card
+          number, security code, or expiration date.
+        </p>
+        {error ? (
+          <p className="application-error" role="alert">
+            {error}
+          </p>
+        ) : null}
+        <div className="payment-action">
+          <button className="button button-primary" disabled={busy}>
+            {busy ? "Saving your application…" : "Continue to Secure Payment"}
+          </button>
+          <strong>Total ${total.toFixed(2)} — one all-inclusive payment</strong>
+        </div>
+      </FormSection>
+    </form>
+  );
+}
