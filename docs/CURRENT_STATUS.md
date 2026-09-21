@@ -1,6 +1,6 @@
 # Current frontend status
 
-Last updated: 2026-09-21 (11-section form: card details added, copies 1–5; Node.js 24 LTS).
+Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS).
 
 ## Implemented
 
@@ -9,13 +9,13 @@ Last updated: 2026-09-21 (11-section form: card details added, copies 1–5; Nod
 - UI E2E passed 2026-09-21 (headless Chromium, real form → `/checkout/[id]` for all 4 types; Atlas rows + vault verified). Fixed: live address-copy sync (billing/shipping required fields), explicit "same as" radio values.
 
 - State detail page `/state/[state]` rebuilt to reference UI: breadcrumbs, Available Certificates header, 4 certificate cards ($125/copy + included-fees note), Start This Request + how-to links, instructions/eligibility panels, full disclosure, per-state metadata.
-- FAQ page `/faq` rebuilt to reference UI: Support header, numbered 29-item accordion (first open, single-toggle) with verbatim answers + markdown links/lists, FAQPage JSON-LD, Disclaimer box, Contact Support panel.
+- FAQ page `/faq` rebuilt to reference UI: Support header, numbered 29-item accordion (first open, single-toggle) with answers verbatim from usvitalrecords.org/alabama/faq.html + markdown links/lists, FAQPage JSON-LD, Disclaimer box, Contact Support panel.
 - Legal pages (`/privacy-policy`, `/terms-of-service`, `/accessibility`) rebuilt to reference UI: Legal header, last-updated line, verbatim sections with tricolor rules + hanging bullets, per-page SEO, disclosure box.
 
 - Reference-style global header, navigation, footer, theme, public home page, certificate cards, state grid/search, trust section, FAQ callout, and legal/footer information.
 - Certificates, Find Your State, Track Order, and Contact page layouts matching the reference structure.
 - State landing pages and full application route: `/state/[state]/order/[certificate]`.
-- Eleven application sections (Section 8 Credit Card Details added; copies capped 1–5) with dynamic display total; card + SSN excluded from drafts; review shows card last-4 only.
+- Eleven application sections (Section 8 Credit Card Details with Visa/Mastercard logos, CVV label; copies 1–20; two-fee totals) with dynamic display total; card + SSN excluded from drafts; review shows card last-4 only. Review sync hardened against autofill (merge + input/blur listeners).
 - Secure Checkout rebuilt to reference UI (order eyebrow, trust badges, all-inclusive notice, tabbed Stripe payment, authorize checkbox, Pay button, sticky summary); confirmation page verifies `session_id` with the backend and prints a paid receipt.
 - API order creation before redirecting to Stripe checkout.
 - Stripe Elements checkout route and API-backed order tracking route.

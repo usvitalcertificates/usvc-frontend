@@ -385,14 +385,14 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   );
   const selectedCounty = counties.find((c) => c.name === (values.county ?? draft.county));
 
-  const copies = Math.min(5, Math.max(1, Number(values.copies ?? draft.copies ?? 1) || 1));
+  const copies = Math.min(20, Math.max(1, Number(values.copies ?? draft.copies ?? 1) || 1));
   const rush = (values.processing ?? draft.processing ?? "standard") === "rush";
   const shippingIntl =
     addressTypeOf(values.shippingType ?? draft.shippingType ?? ADDRESS_TYPE_OPTIONS[0].label) ===
     "international";
-  const total = copies * (125 + (shippingIntl ? 133 : 113)) + (rush ? 30 : 0);
+  // Two-fee model: only the Online Processing Fee (+ rush) is charged now.
+  const total = copies * 125 + (rush ? 30 : 0);
   const serviceCents = 125 * copies;
-  const bundleCents = (shippingIntl ? 133 : 113) * copies;
 
   const requestorFirst = values.applicantFirstName ?? draft.applicantFirstName ?? "";
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
@@ -409,7 +409,16 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     const data = Object.fromEntries(
       [...new FormData(form).entries()].map(([k, v]) => [k, String(v)]),
     );
-    setValues(data);
+    // Browser autofill and password managers often fill fields without firing
+    // React change events, so merge instead of replacing: never blank a value
+    // the user already entered just because one sync missed it.
+    setValues((prev) => {
+      const merged = { ...data };
+      for (const [k, v] of Object.entries(prev)) {
+        if ((merged[k] === undefined || merged[k] === "") && v !== "") merged[k] = v;
+      }
+      return merged;
+    });
     try {
       const saveable = Object.fromEntries(
         Object.entries(data).filter(([k]) => !DRAFT_EXCLUDED.has(k)),
@@ -594,10 +603,35 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   });
 
   return (
-    <form ref={formRef} className="application-form" onSubmit={submit} onChange={syncForm}>
-      <p className="required-note">
-        Fields marked with <span>*</span> are required.
-      </p>
+    <form
+      ref={formRef}
+      className="application-form"
+      onSubmit={submit}
+      onChange={syncForm}
+      onInput={syncForm}
+      onBlur={syncForm}
+    >
+      <div className="form-head-notices">
+        <p>
+          <strong>ID Requirements must be met before certificate is issued.</strong> You will
+          receive an email with instructions on how to send your ID within one week of submitting
+          this application.
+        </p>
+        <p>
+          Items with an <span>*</span> asterisk are required fields.
+        </p>
+        <p className="hint">
+          <strong className="important-note">Important:</strong>{" "}
+          <em>
+            The online Vital Certificate Processing Fee is payable upon ordering and the relevant
+            Vital Statistics Agency Fee and any other shipping fees are payable upon review and
+            acceptance by the State Agency and will appear on your credit card statement separately.
+          </em>
+        </p>
+        <p className="hint">
+          <em>Please note: All state certificate fees are subject to change without notice.</em>
+        </p>
+      </div>
       <input
         type="text"
         name="order-website"
@@ -970,16 +1004,13 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             value={String(copies)}
             onChange={(event) => setValues((v) => ({ ...v, copies: event.target.value }))}
           >
-            {Array.from({ length: 5 }, (_, i) => i + 1).map((n) => (
+            {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
               <option key={n} value={n}>
                 {n} {n === 1 ? "copy" : "copies"}
               </option>
             ))}
           </select>
-          <small>
-            Each copy includes the $125.00 USVC Processing Fee and the applicable destination
-            bundle.
-          </small>
+          <small>Each copy includes the $125.00 USVC Processing Fee.</small>
         </label>
         <label className="application-field wide">
           Delivery Method <span>*</span>
@@ -990,10 +1021,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </select>
         </label>
         <p className="hint">
-          <strong>Important:</strong>{" "}
+          <strong className="important-note">Important:</strong>{" "}
           <em>
-            Your fixed {shippingIntl ? "international" : "domestic"} destination bundle is included
-            in the total shown below.
+            The online Vital Certificate Processing Fee is payable upon ordering and the relevant
+            Vital Statistics Agency Fee and any other shipping fees are payable upon review and
+            acceptance by the State Agency and will appear on your credit card statement separately.
           </em>
         </p>
         <p className="hint">
@@ -1045,8 +1077,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
 
       <FormSection number={7} title="Billing Details">
         <p>
-          Card details are entered on the next secure step and are never stored by USVC. Your
-          billing address is used to verify your payment.
+          Your billing address is used to verify your payment. Card details are collected in the
+          Credit Card Details section below.
         </p>
         <div className="same-address billing-choice">
           <strong>Is your Billing Address the same as another address?</strong>
@@ -1122,13 +1154,13 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             />
           </label>
           <label className="application-field wide">
-            Credit Card Security Code <span>*</span>
+            CVV <span>*</span>
             <input
               name="cardSecurityCode"
               required
               inputMode="numeric"
               autoComplete="cc-csc"
-              placeholder="Credit Card Security Code"
+              placeholder="CVV"
               defaultValue=""
             />
           </label>
@@ -1138,8 +1170,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           <em>This is a 3-digit code on the back for Visa and Mastercard.</em>
         </p>
         <div className="card-marks" aria-label="Accepted cards: Visa and Mastercard">
-          <span className="card-mark visa">VISA</span>
-          <span className="card-mark mastercard">MasterCard</span>
+          <img src="/assets/visa.svg" alt="Visa" width={48} height={30} />
+          <img src="/assets/mastercard.svg" alt="Mastercard" width={48} height={30} />
         </div>
         {fieldErrors["paymentCard.number"] ||
         fieldErrors["paymentCard.expiry"] ||
@@ -1169,15 +1201,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             </span>
             <b>${(125 * copies).toFixed(2)}</b>
           </div>
-          <div>
-            <span>
-              Government / Agency Fee &amp; Shipping
-              <small>
-                {shippingIntl ? "International" : "Domestic"} bundle × {copies}
-              </small>
-            </span>
-            <b>${((shippingIntl ? 133 : 113) * copies).toFixed(2)}</b>
-          </div>
           {rush ? (
             <div>
               <span>
@@ -1191,8 +1214,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <strong>${total.toFixed(2)}</strong>
           </div>
           <p>
-            This total includes the USVC Processing Fee, the Government / Agency Fee &amp; Shipping
-            bundle, and Rush Processing when selected.
+            This total includes the USVC Processing Fee and Rush Processing when selected. The
+            relevant Vital Statistics Agency Fee and any other shipping fees are payable upon review
+            and acceptance by the State Agency and will appear on your credit card statement
+            separately.
           </p>
         </div>
       </FormSection>
@@ -1228,10 +1253,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           />
           <ReviewRow label="Online Processing Fee" value={`$${serviceCents.toFixed(2)}`} />
           <ReviewRow label="Rush processing" value={rush ? "$30.00" : "Not selected"} />
-          <ReviewRow
-            label="Government / Agency Fee & Shipping"
-            value={`$${bundleCents.toFixed(2)}`}
-          />
           <ReviewRow
             label="Payment card"
             value={cardLast4Display ? `Card ending in ${cardLast4Display}` : "—"}
@@ -1319,8 +1340,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 setConsents((c) => ({ ...c, independent: event.target.checked }))
               }
             />{" "}
-            I understand USVC is an independent service, not a government agency, and that the total
-            includes both USVC service fees and the Government / Agency Fee &amp; Shipping bundle.
+            I understand USVC is an independent service, not a government agency, and that the Vital
+            Statistics Agency Fee and any other shipping fees are payable upon review and acceptance
+            by the State Agency and will appear on my credit card statement separately.
           </label>
           <label>
             <input
