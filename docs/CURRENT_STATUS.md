@@ -1,6 +1,6 @@
 # Current frontend status
 
-Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form).
+Last updated: 2026-09-21 (two-fee model; review sync hardened; 11-section form; Node.js 24 LTS).
 
 ## Implemented
 
