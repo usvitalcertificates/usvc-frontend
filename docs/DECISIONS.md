@@ -14,7 +14,11 @@ The frontend calls the Express API through a server-side `/api/backend` proxy co
 
 ## Sensitive fields
 
-The application form includes a masked Social Security Number field only to match the current reference UI. The field is intentionally excluded from the outgoing order request and must never enter local storage, telemetry, logs, MongoDB, or Stripe.
+The application form includes a masked Social Security Number field and Section 8
+card fields. Values are sent to the API, encrypted (AES-256-GCM
+`confidentialData`) before storage, and must never enter local storage,
+telemetry, logs, MongoDB plaintext, or Stripe. Review shows a generic
+placeholder, never digits; staff see `*********` until an audited reveal.
 
 ## Locked 2026-09-21: scope and boundaries
 
