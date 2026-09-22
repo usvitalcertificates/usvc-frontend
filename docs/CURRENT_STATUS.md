@@ -32,6 +32,7 @@ Last updated: 2026-09-23 (official USVC branding; two-fee model; review sync har
 - Contact Us is API-backed: it stores each inquiry through the backend, queues a support notification and customer receipt, shows sending/success/failure feedback, and warns (without blocking) likely SSN/card-number content.
 - Track Order shows a customer-safe, timestamped progress timeline instead of raw internal states. It includes payment confirmation, received, processing, government-agency submission, and completed milestones, plus neutral support notices for payment/order exceptions.
 - GA4 is production-only: public pages and core funnel actions are tracked in the browser, while a Purchase is sent only from the backend after a signed Stripe webhook confirms payment. No sensitive application or payment data is sent to GA4.
+- GTM container `GTM-KC8LVCXR` loads from the shared root layout on every production page, alongside direct GA4 `gtag.js`; both GTM snippets are absent when `ANALYTICS_ENABLED=false`.
 
 ## Important current limits
 

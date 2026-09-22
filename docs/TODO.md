@@ -26,6 +26,7 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [x] Real legal pages (privacy, terms, accessibility verbatim) — done 2026-09-21
 - [ ] Content remaining: real contact submit, per-state fee/rules data port- [ ] SEO: `app/sitemap.ts`, JSON-LD Organization, metadata per state/cert page
 - [x] GA4: production-only public funnel events plus server-verified Purchase delivery — done 2026-09-22
+- [x] GTM: install `GTM-KC8LVCXR` in the shared root layout on production pages alongside direct GA4 — done 2026-09-23
 - [ ] Email display: receipt UI matches backend email template (backend owns sending)
 - [x] Review shows a generic card placeholder ("Card provided (kept private)"), never digits; Section 11 + checkout copy state encrypted storage — done 2026-09-23
 - [x] Server-validation errors scroll to + focus + red-highlight the exact input, clear as the user fixes them, and the error summary links jump to each field — done 2026-09-23
