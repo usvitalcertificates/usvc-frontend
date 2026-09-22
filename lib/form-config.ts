@@ -113,7 +113,7 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       { key: "firstName", label: "First Name on the Record", required: true },
       { key: "middleName", label: "Middle Name" },
       { key: "lastName", label: "Last Name on the Record", required: true },
-      { key: "suffix", label: "Suffix", type: "select", required: true, options: SUFFIX_OPTIONS },
+      { key: "suffix", label: "Suffix", type: "select", options: SUFFIX_OPTIONS },
       { key: "eventDate", label: "Date of Birth", type: "date", required: true },
       { key: "sex", label: "Sex / Gender as Recorded", type: "select", options: SEX_OPTIONS },
       {
