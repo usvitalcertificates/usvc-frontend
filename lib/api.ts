@@ -52,7 +52,16 @@ export interface CreateOrderPayload {
   processingAuthorization: { accepted: true; text: string; acceptedAt: string };
   signature: string;
   paymentCard: { number: string; expiry: string; securityCode: string };
+  analytics?: { clientId?: string; sessionId?: string };
   totalCents: number;
+}
+
+export interface ContactMessagePayload {
+  fullName: string;
+  email: string;
+  orderNumber?: string;
+  message: string;
+  antiAbuse: { honeypot: string; formStartedAt: number };
 }
 
 async function post<T>(path: string, payload: unknown): Promise<T> {
@@ -80,6 +89,10 @@ export async function createOrder(payload: CreateOrderPayload) {
 
 export async function verifyOrderBeforePayment(payload: CreateOrderPayload) {
   return post<{ ok: boolean; amountCents: number }>("/orders/verify-before-payment", payload);
+}
+
+export async function submitContactMessage(payload: ContactMessagePayload) {
+  return post<{ id: string; received: true }>("/contact-messages", payload);
 }
 
 export async function trackOrder(publicNumber: string, email: string) {

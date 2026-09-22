@@ -95,6 +95,12 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
         ],
       },
       {
+        heading: "Website analytics and cookies",
+        body: [
+          `${DOMAIN} uses Google Analytics 4 cookies and measurement tools to understand public-page and order-funnel activity and improve the Service. Analytics records are limited to page and funnel events, certificate type, copies, rush-processing selection, public order number, and charged amount after payment is confirmed. We do not send names, email addresses, phone numbers, addresses, Social Security numbers, dates of birth, certificate-subject details, payment-card data, Stripe identifiers, or form values to Google Analytics.`,
+        ],
+      },
+      {
         heading: "How we ensure that personal information is accurate",
         body: [
           `${DOMAIN} is committed to ensuring that the personal information we collect, use and/or disclose is accurate and complete. Whenever possible, ${DOMAIN} obtains information directly from our clients and not from other sources such as public resources available online. ${DOMAIN} cannot be held accountable for inaccurate or incomplete information that has been provided to us directly by our clients.`,

@@ -25,7 +25,7 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [x] Removed public phone support and temporarily blocked nine California counties before order creation or payment — done 2026-09-22
 - [x] Real legal pages (privacy, terms, accessibility verbatim) — done 2026-09-21
 - [ ] Content remaining: real contact submit, per-state fee/rules data port- [ ] SEO: `app/sitemap.ts`, JSON-LD Organization, metadata per state/cert page
-- [ ] GA4: port ecommerce events, purchase fires only after paid confirmation
+- [x] GA4: production-only public funnel events plus server-verified Purchase delivery — done 2026-09-22
 - [ ] Email display: receipt UI matches backend email template (backend owns sending)
 - [ ] Proof: `npm run build` passes
 

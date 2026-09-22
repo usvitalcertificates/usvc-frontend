@@ -3,6 +3,7 @@
 import { ChevronRight, Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { trackAnalytics } from "./analytics";
 
 const states = [
   ["Alabama", "AL"],
@@ -103,7 +104,10 @@ export function StateSelector({ showHeading = true }: { showHeading?: boolean })
         <ul className="state-grid">
           {results.map(([name]) => (
             <li key={name}>
-              <Link href={`/state/${slugify(name)}`}>
+              <Link
+                href={`/state/${slugify(name)}`}
+                onClick={() => trackAnalytics("select_state", { state: name })}
+              >
                 <span>{name}</span>
                 <ChevronRight aria-hidden="true" />
               </Link>
