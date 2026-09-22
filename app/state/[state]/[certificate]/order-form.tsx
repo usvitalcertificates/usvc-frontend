@@ -112,7 +112,155 @@ function addressTypeOf(label: string): "domestic" | "military" | "international"
   return "domestic";
 }
 
-function Field({ def, defaultValue }: { def: FieldDef; defaultValue?: string }) {
+/** Backend error key -> form input name(s). Dynamic subject/family keys use the
+ *  config field key as the input name; address keys map to prefixed inputs. */
+function inputNamesForError(key: string): string[] {
+  switch (key) {
+    case "county":
+      return ["county"];
+    case "reasonOther":
+      return ["reasonOther"];
+    case "requestorSsn":
+      return ["requestorSsn"];
+    case "applicant.email":
+      return ["email"];
+    case "applicant.dateOfBirth":
+      return ["applicantDob"];
+    case "applicant.relationshipOther":
+      return ["relationshipOther"];
+    case "paymentCard.number":
+      return ["cardNumber"];
+    case "paymentCard.expiry":
+      return ["cardExpiry"];
+    case "paymentCard.securityCode":
+      return ["cardSecurityCode"];
+    case "signature":
+      return ["signature"];
+    default:
+      break;
+  }
+  if (key.startsWith("subject.") || key.startsWith("family."))
+    return [key.slice(key.indexOf(".") + 1)];
+  const address =
+    /^addresses\.(home|shipping|billing)\.(line1|line2|city|state|postalCode|country)$/.exec(key);
+  if (address) {
+    const suffix: Record<string, string> = {
+      line1: "Line1",
+      line2: "Line2",
+      city: "City",
+      state: "State",
+      postalCode: "Zip",
+      country: "Country",
+    };
+    return [`${address[1]}${suffix[address[2]]}`];
+  }
+  return [];
+}
+
+/** Backend error key -> owning section number (scroll fallback). */
+function sectionForError(key: string): number {
+  if (key === "county" || key === "reasonOther") return 1;
+  if (key === "requestorSsn" || key.startsWith("applicant.")) return 2;
+  if (key.startsWith("subject.")) return 3;
+  if (key.startsWith("family.")) return 4;
+  if (key.startsWith("addresses.home.") || key.startsWith("addresses.shipping.")) return 5;
+  if (key === "totalCents") return 6;
+  if (key.startsWith("addresses.billing.")) return 7;
+  if (key.startsWith("paymentCard.")) return 8;
+  if (key === "consents" || key === "signature") return 10;
+  return 11;
+}
+
+/** Rank for picking the first error in form order (lower = earlier). */
+function errorRank(key: string): number {
+  switch (key) {
+    case "county":
+      return 10;
+    case "reasonOther":
+      return 11;
+    case "applicant.relationshipOther":
+      return 20;
+    case "requestorSsn":
+      return 21;
+    case "applicant.dateOfBirth":
+      return 22;
+    case "applicant.email":
+      return 23;
+    case "totalCents":
+      return 60;
+    case "paymentCard.number":
+      return 81;
+    case "paymentCard.expiry":
+      return 82;
+    case "paymentCard.securityCode":
+      return 83;
+    case "consents":
+      return 100;
+    case "signature":
+      return 101;
+    default:
+      break;
+  }
+  if (key.startsWith("subject.")) return 30;
+  if (key.startsWith("family.")) return 40;
+  if (key.startsWith("addresses.")) return 50;
+  return 200;
+}
+
+/** Form input name -> backend error key(s) to clear once the user edits it.
+ *  `county` is excluded on purpose: the county select owns its error lifecycle
+ *  (blockUnavailableCounty sets it, the allowed-county path clears it), and the
+ *  bubbled form-level change would otherwise wipe the just-set block message. */
+function errorKeysForInput(name: string): string[] {
+  switch (name) {
+    case "county":
+      return [];
+    case "reasonOther":
+      return ["reasonOther"];
+    case "requestorSsn":
+      return ["requestorSsn"];
+    case "email":
+      return ["applicant.email"];
+    case "applicantDob":
+      return ["applicant.dateOfBirth"];
+    case "relationshipOther":
+      return ["applicant.relationshipOther"];
+    case "cardNumber":
+      return ["paymentCard.number"];
+    case "cardExpiry":
+      return ["paymentCard.expiry"];
+    case "cardSecurityCode":
+      return ["paymentCard.securityCode"];
+    case "signature":
+      return ["signature"];
+    default:
+      break;
+  }
+  const address = /^(home|shipping|billing)(Line1|Line2|City|State|Zip|Country)$/.exec(name);
+  if (address) {
+    const field: Record<string, string> = {
+      Line1: "line1",
+      Line2: "line2",
+      City: "city",
+      State: "state",
+      Zip: "postalCode",
+      Country: "country",
+    };
+    return [`addresses.${address[1]}.${field[address[2]]}`];
+  }
+  if (name) return [`subject.${name}`, `family.${name}`];
+  return [];
+}
+
+function Field({
+  def,
+  defaultValue,
+  error,
+}: {
+  def: FieldDef;
+  defaultValue?: string;
+  error?: string;
+}) {
   const id = `field-${def.key}`;
   return (
     <label className={`application-field${def.wide ? " wide" : ""}`} htmlFor={id}>
@@ -136,6 +284,11 @@ function Field({ def, defaultValue }: { def: FieldDef; defaultValue?: string }) 
         />
       )}
       {def.help ? <small>{def.help}</small> : null}
+      {error ? (
+        <small className="application-error" role="alert">
+          {error}
+        </small>
+      ) : null}
     </label>
   );
 }
@@ -167,6 +320,7 @@ function AddressFields({
   typeLabel,
   requestorFirst,
   requestorLast,
+  errors,
 }: {
   prefix: string;
   legend: string;
@@ -174,6 +328,7 @@ function AddressFields({
   typeLabel: string;
   requestorFirst: string;
   requestorLast: string;
+  errors: Record<string, string>;
 }) {
   const type = addressTypeOf(typeLabel);
   const note = ADDRESS_SECTION_NOTES[prefix];
@@ -212,6 +367,11 @@ function AddressFields({
         <label className="application-field wide">
           Address Line 1 <span>*</span>
           <input name={`${prefix}Line1`} required defaultValue={get("Line1")} />
+          {errors[`addresses.${prefix}.line1`] ? (
+            <small className="application-error" role="alert">
+              {errors[`addresses.${prefix}.line1`]}
+            </small>
+          ) : null}
         </label>
         <label className="application-field wide">
           Address Line 2 (optional)
@@ -220,6 +380,11 @@ function AddressFields({
         <label className="application-field">
           City <span>*</span>
           <input name={`${prefix}City`} required defaultValue={get("City")} />
+          {errors[`addresses.${prefix}.city`] ? (
+            <small className="application-error" role="alert">
+              {errors[`addresses.${prefix}.city`]}
+            </small>
+          ) : null}
         </label>
         {type === "domestic" ? (
           <label className="application-field">
@@ -252,6 +417,11 @@ function AddressFields({
         <label className="application-field">
           Zip/Postal Code <span>*</span>
           <input name={`${prefix}Zip`} required defaultValue={get("Zip")} />
+          {errors[`addresses.${prefix}.postalCode`] ? (
+            <small className="application-error" role="alert">
+              {errors[`addresses.${prefix}.postalCode`]}
+            </small>
+          ) : null}
         </label>
         {type === "international" ? (
           <label className="application-field">
@@ -373,6 +543,46 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [unavailableCounty, setUnavailableCounty] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  /** Scroll to and focus the input for an error key, falling back to its section. */
+  function scrollToErrorKey(key: string) {
+    const form = formRef.current;
+    for (const name of inputNamesForError(key)) {
+      const target = form?.querySelector(`[name="${CSS.escape(name)}"]`) as HTMLElement | null;
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+        (target as HTMLInputElement).focus?.({ preventScroll: true });
+        return;
+      }
+    }
+    document
+      .getElementById(`application-section-${sectionForError(key)}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function scrollToFirstError(errors: Record<string, string>) {
+    const first = Object.keys(errors).sort((a, b) => errorRank(a) - errorRank(b))[0];
+    if (first) scrollToErrorKey(first);
+  }
+
+  /** Toggle invalid styling on inputs whose backend error key is active. */
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+    const invalid = new Set<string>();
+    for (const key of Object.keys(fieldErrors))
+      for (const name of inputNamesForError(key)) invalid.add(name);
+    form.querySelectorAll("[name]").forEach((element) => {
+      const name = element.getAttribute("name") ?? "";
+      if (invalid.has(name)) {
+        element.setAttribute("data-invalid", "true");
+        element.setAttribute("aria-invalid", "true");
+      } else {
+        element.removeAttribute("data-invalid");
+        element.removeAttribute("aria-invalid");
+      }
+    });
+  }, [fieldErrors]);
   const noun = jurisdictionNoun(geo.counties.length ? geo : undefined);
 
   useEffect(() => {
@@ -419,7 +629,18 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     }
   }
 
-  function syncForm() {
+  function syncForm(event?: { target?: EventTarget | null }) {
+    const changed = (event?.target as HTMLElement | null)?.getAttribute("name");
+    if (changed) {
+      const keys = errorKeysForInput(changed);
+      if (keys.length)
+        setFieldErrors((current) => {
+          if (!keys.some((key) => key in current)) return current;
+          const next = { ...current };
+          for (const key of keys) delete next[key];
+          return next;
+        });
+    }
     const form = formRef.current;
     if (!form) return;
     applyAddressCopies(form);
@@ -496,6 +717,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       document
         .getElementById("application-section-5")
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      (formRef.current?.querySelector('[name="email"]') as HTMLInputElement | null)?.focus?.({
+        preventScroll: true,
+      });
       return;
     }
     if (!allConsents || !get("signature")) {
@@ -589,7 +813,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       window.location.assign(`/checkout/${order.id}`);
     } catch (caught) {
       const withErrors = caught as Error & { errors?: Record<string, string> };
-      if (withErrors.errors) setFieldErrors(withErrors.errors);
+      if (withErrors.errors) {
+        setFieldErrors(withErrors.errors);
+        scrollToFirstError(withErrors.errors);
+      }
       setError(caught instanceof Error ? caught.message : "Unable to continue to secure payment.");
     } finally {
       setBusy(false);
@@ -601,7 +828,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const reasonDisplay = reason === "Other" ? values.reasonOther?.trim() || "Other" : reason || "—";
   const relationshipDisplay =
     relationship === "Other" ? values.relationshipOther?.trim() || "Other" : relationship || "—";
-  const cardLast4Display = (values.cardNumber ?? "").replace(/[\s-]/g, "").slice(-4);
+  const cardProvided = Boolean((values.cardNumber ?? "").replace(/[\s-]/g, ""));
 
   const addressValues = (prefix: string) => ({
     line1: values[`${prefix}Line1`] ?? "",
@@ -732,6 +959,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <label className="application-field wide">
               Please describe your reason <span>*</span>
               <input name="reasonOther" required defaultValue={draft.reasonOther ?? ""} />
+              {fieldErrors.reasonOther ? (
+                <small className="application-error" role="alert">
+                  {fieldErrors.reasonOther}
+                </small>
+              ) : null}
             </label>
           ) : null}
         </div>
@@ -851,6 +1083,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                   key={field.key}
                   def={requiredWhenFemale ? { ...field, required: true } : field}
                   defaultValue={draft[field.key]}
+                  error={fieldErrors[`subject.${field.key}`]}
                 />
               );
             })}
@@ -868,7 +1101,12 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             {config.familyNote ? <em>{config.familyNote.body}</em> : null}
             <div className="application-grid">
               {config.family.map((field) => (
-                <Field key={field.key} def={field} defaultValue={draft[field.key]} />
+                <Field
+                  key={field.key}
+                  def={field}
+                  defaultValue={draft[field.key]}
+                  error={fieldErrors[`family.${field.key}`]}
+                />
               ))}
             </div>
           </fieldset>
@@ -896,13 +1134,23 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                         <option key={option}>{option}</option>
                       ))}
                     </select>
+                    {fieldErrors[`family.${config.familySecondStatus.key}`] ? (
+                      <small className="application-error" role="alert">
+                        {fieldErrors[`family.${config.familySecondStatus.key}`]}
+                      </small>
+                    ) : null}
                   </label>
                 </div>
               ) : null}
               {fatherRequired || !config.familySecondStatus ? (
                 <div className="application-grid">
                   {(config.familySecond ?? []).map((field) => (
-                    <Field key={field.key} def={field} defaultValue={draft[field.key]} />
+                    <Field
+                      key={field.key}
+                      def={field}
+                      defaultValue={draft[field.key]}
+                      error={fieldErrors[`family.${field.key}`]}
+                    />
                   ))}
                 </div>
               ) : null}
@@ -922,6 +1170,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             typeLabel={values.homeType ?? draft.homeType ?? ""}
             requestorFirst={requestorFirst}
             requestorLast={requestorLast}
+            errors={fieldErrors}
           />
           <div className="same-address">
             <strong>Is your Shipping Address the same as your Home Address?</strong>
@@ -951,6 +1200,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             typeLabel={values.shippingType ?? draft.shippingType ?? ""}
             requestorFirst={requestorFirst}
             requestorLast={requestorLast}
+            errors={fieldErrors}
           />
           <fieldset>
             <legend>Contact information</legend>
@@ -964,6 +1214,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 Email address <span>*</span>
                 <input name="email" type="email" required defaultValue={draft.email ?? ""} />
                 <small>Order confirmation, tracking, and updates are sent to this address.</small>
+                {fieldErrors["applicant.email"] ? (
+                  <small className="application-error" role="alert">
+                    {fieldErrors["applicant.email"]}
+                  </small>
+                ) : null}
               </label>
               <label className="application-field">
                 Confirm email address <span>*</span>
@@ -1098,6 +1353,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             typeLabel={values.billingType ?? draft.billingType ?? ""}
             requestorFirst={requestorFirst}
             requestorLast={requestorLast}
+            errors={fieldErrors}
           />
         </FormSection>
 
@@ -1120,6 +1376,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 placeholder="Credit Card Number"
                 defaultValue=""
               />
+              {fieldErrors["paymentCard.number"] ? (
+                <small className="application-error" role="alert">
+                  {fieldErrors["paymentCard.number"]}
+                </small>
+              ) : null}
             </label>
             <label className="application-field wide">
               Credit Card Expiry Date (MM/YY) <span>*</span>
@@ -1131,6 +1392,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 placeholder="Credit Card Expiry Date (MM/YY)"
                 defaultValue=""
               />
+              {fieldErrors["paymentCard.expiry"] ? (
+                <small className="application-error" role="alert">
+                  {fieldErrors["paymentCard.expiry"]}
+                </small>
+              ) : null}
             </label>
             <label className="application-field wide">
               CVV <span>*</span>
@@ -1142,6 +1408,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 placeholder="CVV"
                 defaultValue=""
               />
+              {fieldErrors["paymentCard.securityCode"] ? (
+                <small className="application-error" role="alert">
+                  {fieldErrors["paymentCard.securityCode"]}
+                </small>
+              ) : null}
             </label>
           </div>
           <p className="hint">
@@ -1152,20 +1423,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <img src="/assets/visa.svg" alt="Visa" width={48} height={30} />
             <img src="/assets/mastercard.svg" alt="Mastercard" width={48} height={30} />
           </div>
-          {fieldErrors["paymentCard.number"] ||
-          fieldErrors["paymentCard.expiry"] ||
-          fieldErrors["paymentCard.securityCode"] ? (
-            <div role="alert">
-              {["paymentCard.number", "paymentCard.expiry", "paymentCard.securityCode"].map(
-                (key) =>
-                  fieldErrors[key] ? (
-                    <p key={key} className="application-error">
-                      {fieldErrors[key]}
-                    </p>
-                  ) : null,
-              )}
-            </div>
-          ) : null}
         </FormSection>
 
         <FormSection number={9} title="Order Summary">
@@ -1235,7 +1492,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <ReviewRow label="Rush processing" value={rush ? "$30.00" : "Not selected"} />
             <ReviewRow
               label="Payment card"
-              value={cardLast4Display ? `Card ending in ${cardLast4Display}` : "—"}
+              value={cardProvided ? "Card provided (kept private)" : "—"}
             />
             <ReviewRow label="Total" value={`$${total.toFixed(2)}`} />
           </ReviewBlock>
@@ -1244,6 +1501,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             Electronic Signature <span>*</span>
             <input name="signature" required defaultValue={draft.signature ?? ""} />
             <small>Typing your name serves as your electronic signature for this order.</small>
+            {fieldErrors.signature ? (
+              <small className="application-error" role="alert">
+                {fieldErrors.signature}
+              </small>
+            ) : null}
           </label>
           <div className="agreements">
             <label className="all-agreement">
@@ -1341,13 +1603,24 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </span>
             </label>
           </div>
+          {fieldErrors.consents ? (
+            <small className="application-error" role="alert">
+              {fieldErrors.consents}
+            </small>
+          ) : null}
           {Object.keys(fieldErrors).length ? (
             <div role="alert">
               {Object.entries(fieldErrors)
                 .filter(([key]) => key !== "county")
                 .map(([key, message]) => (
-                  <p key={key} className="application-error">
-                    {message}
+                  <p key={key}>
+                    <button
+                      type="button"
+                      className="application-error error-link"
+                      onClick={() => scrollToErrorKey(key)}
+                    >
+                      {message}
+                    </button>
                   </p>
                 ))}
             </div>
@@ -1356,9 +1629,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
 
         <FormSection number={11} title="Payment">
           <p>
-            Continue to the secure payment step to complete your order. Card information is handled
-            by the payment provider&apos;s secure fields — USVC never receives or stores your full
-            card number, security code, or expiration date.
+            Continue to the secure payment step to complete your order. Your card details are
+            encrypted before storage and are visible only to authorized staff for government-agency
+            processing.
           </p>
           {error ? (
             <p className="application-error" role="alert">

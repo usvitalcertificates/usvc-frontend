@@ -1,6 +1,6 @@
 # Current frontend status
 
-Last updated: 2026-09-22 (official USVC branding; two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy; ESLint 9 compatibility; birth-form requirements; temporary California county block; phone support removed).
+Last updated: 2026-09-23 (official USVC branding; two-fee model; review sync hardened; 11-section form; Node.js 24 LTS; private API proxy; ESLint 9 compatibility; birth-form requirements; temporary California county block; phone support removed; confidentialData encryption; generic card review placeholder; server-error scroll-to-field + highlight).
 
 ## Implemented
 
@@ -16,7 +16,8 @@ Last updated: 2026-09-22 (official USVC branding; two-fee model; review sync har
 - The official site palette is Old Glory Red `#B22234` and Old Glory Blue `#3C3B6E`. All action buttons use the official red with white text, interaction feedback retains the official colors, and Times New Roman is applied throughout the website and form controls.
 - Certificates, Find Your State, Track Order, and Contact page layouts matching the reference structure.
 - State landing pages and full application route: `/state/[state]/order/[certificate]`.
-- Eleven application sections (Section 8 Credit Card Details with Visa/Mastercard logos, CVV label; copies 1–20; two-fee totals) with dynamic display total; card + SSN excluded from drafts; review shows card last-4 only. Review sync hardened against autofill (merge + input/blur listeners).
+- Eleven application sections (Section 8 Credit Card Details with Visa/Mastercard logos, CVV label; copies 1–20; two-fee totals) with dynamic display total; card + SSN excluded from drafts; review shows a generic "Card provided (kept private)" placeholder, never digits. Review sync hardened against autofill (merge + input/blur listeners).
+- Server-side validation failures scroll to the first invalid input in form order, focus it, and mark it with a red border (`data-invalid` + `aria-invalid`) plus an inline message next to the field; the highlight and message clear as the user edits (except `county`, which owns its error lifecycle so the temporarily-blocked-county message persists), and each error-summary message is a button that jumps to its field.
 - Secure Checkout rebuilt to reference UI (order eyebrow, trust badges, all-inclusive notice, tabbed Stripe payment, authorize checkbox, Pay button, sticky summary); confirmation page verifies `session_id` with the backend and prints a paid receipt.
 - API order creation before redirecting to Stripe checkout.
 - Stripe Elements checkout route and API-backed order tracking route.
@@ -36,7 +37,7 @@ Last updated: 2026-09-22 (official USVC branding; two-fee model; review sync har
 
 - Per-state geography, address copying, review-field synchronization, and conditional fields are implemented from the reference; per-state fee/rules data port remains.
 - Display totals remain non-authoritative; the backend always recalculates the charged amount.
-- Application SSN input is sent to the API and stored as plaintext on the order per owner requirement (never in drafts, logs, or tracking; masked at entry).
+- Application SSN and card input is sent to the API and encrypted (AES-256-GCM `confidentialData`) before storage; staff see `*********` until an audited reveal. Values never enter drafts, logs, or tracking; SSN masked at entry.
 - Staff/admin/fulfillment UI remains a future module.
 
 ## Required next work before production orders

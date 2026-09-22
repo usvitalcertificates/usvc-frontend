@@ -1039,6 +1039,39 @@ h3 {
   color: var(--red);
   font-weight: 700;
 }
+/* Inline field messages: beat `.application-field small` specificity so errors
+ * never render as plain gray hint text. */
+.application-field small.application-error,
+small.application-error {
+  display: block;
+  margin-top: 6px;
+  padding: 6px 10px;
+  border-left: 3px solid var(--red);
+  border-radius: 4px;
+  background: #fdf0f2;
+  color: var(--red);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.error-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.application-field input[data-invalid="true"],
+.application-field select[data-invalid="true"],
+.application-field textarea[data-invalid="true"] {
+  border-color: var(--red);
+  background: #fdf0f2;
+  outline: 2px solid rgb(178 34 52 / 25%);
+  outline-offset: 1px;
+}
 .contact-warning {
   margin: 0;
   color: #7a4b00;

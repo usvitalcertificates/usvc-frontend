@@ -182,7 +182,7 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
                 <Lock aria-hidden="true" /> Encrypted submission
               </span>
               <span>
-                <ShieldCheck aria-hidden="true" /> Card data is never stored by USVC
+                <ShieldCheck aria-hidden="true" /> Card data is stored encrypted
               </span>
             </div>
             <div className="all-inclusive-note">
