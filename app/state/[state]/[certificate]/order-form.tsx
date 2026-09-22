@@ -7,10 +7,7 @@ import "react-international-phone/style.css";
 
 import { createOrder, verifyOrderBeforePayment, type Certificate } from "@/lib/api";
 import { getAnalyticsAttribution, trackAnalytics } from "@/app/analytics";
-import {
-  COUNTY_UNAVAILABLE_MESSAGE,
-  isCountyTemporarilyUnavailable,
-} from "@/lib/county-availability";
+import { isCountyTemporarilyUnavailable } from "@/lib/county-availability";
 import {
   PROCESSING_CLARIFICATION_NOTE,
   resolveFormConfig,
@@ -271,9 +268,8 @@ function errorRank(key: string): number {
 }
 
 /** Form input name -> backend error key(s) to clear once the user edits it.
- *  `county` is excluded on purpose: the county select owns its error lifecycle
- *  (blockUnavailableCounty sets it, the allowed-county path clears it), and the
- *  bubbled form-level change would otherwise wipe the just-set block message. */
+ *  `county` is excluded: its select clears its own error, and the
+ *  blocked-county banner derives from the live selection. */
 function errorKeysForInput(name: string): string[] {
   switch (name) {
     case "county":
@@ -283,6 +279,8 @@ function errorKeysForInput(name: string): string[] {
     case "requestorSsn":
       return ["requestorSsn"];
     case "email":
+      return ["applicant.email"];
+    case "confirmEmail":
       return ["applicant.email"];
     case "applicantDob":
       return ["applicant.dateOfBirth"];
@@ -620,8 +618,13 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [unavailableCounty, setUnavailableCounty] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  /** Temporarily blocked county, derived from the live selection (selectable,
+   *  but blocks payment). Null when the selection is usable. */
+  const blockedCounty = (() => {
+    const county = values.county ?? draft.county ?? "";
+    return county && isCountyTemporarilyUnavailable(abbr, county) ? county : null;
+  })();
 
   /** Scroll to and focus the input for an error key, falling back to its section. */
   function scrollToErrorKey(key: string) {
@@ -651,6 +654,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     const invalid = new Set<string>();
     for (const key of Object.keys(fieldErrors))
       for (const name of inputNamesForError(key)) invalid.add(name);
+    if (blockedCounty) invalid.add("county");
     form.querySelectorAll("[name]").forEach((element) => {
       const name = element.getAttribute("name") ?? "";
       if (invalid.has(name)) {
@@ -672,7 +676,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         phoneInput.removeAttribute("aria-invalid");
       }
     }
-  }, [fieldErrors]);
+  }, [fieldErrors, blockedCounty]);
   const noun = jurisdictionNoun(geo.counties.length ? geo : undefined);
 
   useEffect(() => {
@@ -705,19 +709,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
   const relationship = values.relationship ?? draft.relationship ?? "";
   const reason = values.reason ?? draft.reason ?? "";
-
-  function blockUnavailableCounty(county: string) {
-    setValues((current) => ({ ...current, county: "", city: "" }));
-    setFieldErrors((current) => ({ ...current, county: COUNTY_UNAVAILABLE_MESSAGE }));
-    setUnavailableCounty(county);
-    try {
-      const raw = sessionStorage.getItem(draftKey);
-      const stored = raw ? (JSON.parse(raw) as Record<string, string>) : {};
-      sessionStorage.setItem(draftKey, JSON.stringify({ ...stored, county: "", city: "" }));
-    } catch {
-      /* storage unavailable */
-    }
-  }
 
   function syncForm(event?: { target?: EventTarget | null }) {
     const changed = (event?.target as HTMLElement | null)?.getAttribute("name");
@@ -801,6 +792,15 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     applyAddressCopies(form);
     const formData = new FormData(form);
     const get = (key: string) => String(formData.get(key) ?? "").trim();
+    if (blockedCounty) {
+      setError(
+        `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority. Please select a different ${noun}.`,
+      );
+      document
+        .getElementById("application-section-1")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     if (get("email") !== get("confirmEmail")) {
       setError("Email addresses do not match.");
       setFieldErrors({ "applicant.email": "Email addresses do not match." });
@@ -997,10 +997,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               value={values.county ?? draft.county ?? ""}
               onChange={(event) => {
                 const county = event.target.value;
-                if (isCountyTemporarilyUnavailable(abbr, county)) {
-                  blockUnavailableCounty(county);
-                  return;
-                }
                 setFieldErrors((current) => {
                   const { county: _county, ...remaining } = current;
                   return remaining;
@@ -1017,6 +1013,12 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </option>
               ))}
             </select>
+            {blockedCounty ? (
+              <div className="county-blocked-alert" role="alert">
+                <strong>Certificate issuance is currently unavailable</strong> through{" "}
+                {blockedCounty} {noun} authority. Please select a different {noun}.
+              </div>
+            ) : null}
             {fieldErrors.county ? (
               <small className="application-error" role="alert">
                 {fieldErrors.county}
@@ -1030,7 +1032,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               required
               value={values.city ?? draft.city ?? ""}
               onChange={(event) => setValues((v) => ({ ...v, city: event.target.value }))}
-              disabled={Boolean(unavailableCounty) || (!values.county && !draft.county)}
+              disabled={!values.county && !draft.county}
             >
               <option value="">
                 {(values.county ?? draft.county) ? "Select city or town" : `Select ${noun} first`}
@@ -1045,12 +1047,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </label>
           <label className="application-field wide">
             Reason for requesting this certificate <span>*</span>
-            <select
-              name="reason"
-              required
-              defaultValue={draft.reason ?? ""}
-              disabled={Boolean(unavailableCounty)}
-            >
+            <select name="reason" required defaultValue={draft.reason ?? ""}>
               <option value="">Please select…</option>
               {config.reasons.map((item) => (
                 <option key={item}>{item}</option>
@@ -1071,7 +1068,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         </div>
       </FormSection>
 
-      <fieldset className="county-blocked-fields" disabled={Boolean(unavailableCounty)}>
+      <fieldset className="county-blocked-fields">
         <FormSection number={2} title="Information About the Requestor">
           <div className="application-grid">
             <label className="application-field wide">
@@ -1147,7 +1144,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 Your Social Security Number {config.requestor.ssnRequired ? <span>*</span> : null}
                 <input
                   name="requestorSsn"
-                  type="password"
+                  type="text"
                   autoComplete="off"
                   inputMode="numeric"
                   maxLength={11}
@@ -1155,9 +1152,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                   required={config.requestor.ssnRequired}
                   onChange={(event) => applyMask(event, formatSsnInput)}
                 />
-                <small>
-                  Kept private and never shown again. Required as an identity safeguard.
-                </small>
+                <small>Shown only while you type. Never stored on this device.</small>
                 {ssnLiveError ? (
                   <small className="application-error" role="alert">
                     {ssnLiveError}
@@ -1351,7 +1346,21 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </label>
               <label className="application-field">
                 Confirm email address <span>*</span>
-                <input name="confirmEmail" type="email" required />
+                <input
+                  name="confirmEmail"
+                  type="email"
+                  required
+                  autoComplete="off"
+                  onPaste={(event) => event.preventDefault()}
+                  onDrop={(event) => event.preventDefault()}
+                />
+                {values.email &&
+                values.confirmEmail &&
+                values.email.trim() !== values.confirmEmail.trim() ? (
+                  <small className="application-error" role="alert">
+                    Email addresses do not match. Please type it again.
+                  </small>
+                ) : null}
               </label>
             </div>
           </fieldset>
@@ -1814,7 +1823,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             </p>
           ) : null}
           <div className="payment-action">
-            <button className="button button-primary" disabled={busy}>
+            <button className="button button-primary" disabled={busy || Boolean(blockedCounty)}>
               {busy ? "Saving your application…" : "Continue to Secure Payment"}
             </button>
             <strong>Total ${total.toFixed(2)} — one all-inclusive payment</strong>

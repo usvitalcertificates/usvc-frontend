@@ -2,7 +2,7 @@
 
 import { CheckoutElementsProvider } from "@stripe/react-stripe-js/checkout";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
-import { Lock, ShieldCheck } from "lucide-react";
+import { Lock } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -179,27 +179,9 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
           <div>
             <div className="trust-badges">
               <span>
-                <Lock aria-hidden="true" /> Encrypted submission
+                <Lock aria-hidden="true" /> Locked. Private. Protected.
               </span>
-              <span>
-                <ShieldCheck aria-hidden="true" /> Card data is stored encrypted
-              </span>
-            </div>
-            <div className="all-inclusive-note">
-              <p>
-                <strong>Two separate payments</strong>
-              </p>
-              <p>
-                The online Vital Certificate Processing Fee is payable upon ordering and the
-                relevant Vital Statistics Agency Fee and any other shipping fees are payable upon
-                review and acceptance by the State Agency and will appear on your credit card
-                statement separately.
-              </p>
-              <p>
-                <em>
-                  Please note: All state certificate fees are subject to change without notice.
-                </em>
-              </p>
+              <small>Details protected with 256-bit encryption.</small>
             </div>
             {setupError ? (
               <div role="alert" className="checkout-alert checkout-alert-spaced">
@@ -264,10 +246,9 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
               </li>
             </ul>
             <p className="disclosure">
-              This total includes the USVC Processing Fee and Rush Processing when selected. The
-              relevant Vital Statistics Agency Fee and any other shipping fees are payable upon
-              review and acceptance by the State Agency and will appear on your credit card
-              statement separately.
+              {order.pricing.rushCents > 0
+                ? "This covers your USVC Processing Fee and Rush Processing. State agency and shipping fees, if any, are charged separately later."
+                : "This covers your USVC Processing Fee only. State agency and shipping fees, if any, are charged separately later."}
             </p>
           </div>
         </div>
