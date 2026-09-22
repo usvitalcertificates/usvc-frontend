@@ -32,6 +32,15 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [x] Every invalid field shows its message inline next to the input (subject/family/address/email/reason/card/signature/consents) — done 2026-09-23
 - [x] Inline error messages styled prominent (red, bold, tinted box) so hint-text CSS can't mute them — done 2026-09-23
 - [x] Blocked-California-county message no longer wiped by clear-on-fix (`county` owns its error lifecycle) — done 2026-09-23
+- [x] Tracking example matches the sequential plate order-number format (`USCA-BT-20260922-00A001`) — done 2026-09-23
+- [x] Tracking shows 4 milestones ending at Submitted-to-Agency, dates only (no times), header unchanged — done 2026-09-23
+- [x] Review renamed to "Review To Submit" with a Parent/Family block (Edit → §4) plus Home and requestor-DOB rows so every entered detail is reviewable — done 2026-09-23
+- [x] Live input masks: SSN auto-hyphens + 9-digit cap + plausibility hint, card grouping + inline Visa/MC mark + MM/YY + 3-digit CVV — done 2026-09-23
+- [x] Country-code phone picker (`react-international-phone`, US default + US pinned, searchable, E.164 value) replacing the USA-only mask — done 2026-09-23
+- [x] Blocked-county alert rebuilt on dedicated state (banner names the county, unlocks on allowed pick; fixes permanent form lock) + SSN shown visibly with auto-dashes — done 2026-09-23
+- [x] Confirm-email blocks paste/drop with live mismatch hint; checkout shows "Locked. Private. Protected." badge and a single rush-aware fee line (left two-payments block removed) — done 2026-09-23
+- [x] Blocked counties stay selectable with a state-derived red banner; section locks removed (fixes permanent lockout) and the payment button + submit are gated instead — done 2026-09-23
+- [x] `state_code` on select_state/select_certificate/order_started/begin_checkout/add_payment_info; mount-event queue so select_certificate is never dropped — done 2026-09-23
 - [ ] Proof: `npm run build` passes
 
 ## Phase 2 (deferred)

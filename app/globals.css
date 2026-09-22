@@ -1072,6 +1072,52 @@ small.application-error {
   outline: 2px solid rgb(178 34 52 / 25%);
   outline-offset: 1px;
 }
+/* Blocked-county alert: state-driven banner, independent of field errors. */
+.county-blocked-alert {
+  display: block;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 2px solid var(--red);
+  border-radius: 6px;
+  background: #fdf0f2;
+  color: var(--red);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+/* Country-code phone picker (react-international-phone), themed to USVC. */
+.usvc-phone-input {
+  --react-international-phone-height: 40px;
+  --react-international-phone-border-radius: 5px;
+  --react-international-phone-border-color: #dedde3;
+  --react-international-phone-text-color: #000;
+  --react-international-phone-font-size: 16px;
+  margin-top: 8px;
+}
+.usvc-phone-input .react-international-phone-input {
+  width: 100%;
+  font-family: inherit;
+}
+.usvc-phone-input .react-international-phone-input[data-invalid="true"] {
+  border-color: var(--red);
+  background: #fdf0f2;
+  outline: 2px solid rgb(178 34 52 / 25%);
+  outline-offset: 1px;
+}
+.card-number-field {
+  position: relative;
+}
+.card-number-field input {
+  width: 100%;
+  padding-right: 52px;
+}
+.card-number-field img {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
 .contact-warning {
   margin: 0;
   color: #7a4b00;
@@ -1325,9 +1371,9 @@ small.application-error {
 }
 .trust-badges {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   padding: 16px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -1341,28 +1387,13 @@ small.application-error {
   font-size: 16px;
   font-weight: 700;
 }
+.trust-badges small {
+  color: var(--muted-text);
+  font-size: 13px;
+}
 .trust-badges svg {
   width: 20px;
   height: 20px;
-}
-.all-inclusive-note {
-  margin-top: 24px;
-  padding: 16px;
-  border-left: 4px solid rgb(60 59 110 / 30%);
-  border-radius: 6px;
-  background: var(--muted);
-}
-.all-inclusive-note p {
-  margin: 0;
-  color: #000;
-  font-size: 17px;
-  line-height: 1.65;
-}
-.all-inclusive-note p strong {
-  color: var(--navy);
-}
-.all-inclusive-note p + p {
-  margin-top: 8px;
 }
 .checkout-alert {
   padding: 16px;

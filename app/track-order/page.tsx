@@ -20,13 +20,11 @@ const MILESTONES = [
   "Order Received",
   "Order Processing",
   "Order Processed – Submitted to the Govt Agency",
-  "Order Completed",
 ];
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
-    timeStyle: "short",
   }).format(new Date(value));
 }
 
@@ -66,7 +64,7 @@ export default function TrackOrder() {
               <input
                 id="order-number"
                 name="orderNumber"
-                placeholder="USVC-BT-08242026-000008"
+                placeholder="USCA-BT-20260922-00A001"
                 required
               />
             </div>

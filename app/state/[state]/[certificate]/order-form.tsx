@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
 
 import { createOrder, verifyOrderBeforePayment, type Certificate } from "@/lib/api";
 import { getAnalyticsAttribution, trackAnalytics } from "@/app/analytics";
-import {
-  COUNTY_UNAVAILABLE_MESSAGE,
-  isCountyTemporarilyUnavailable,
-} from "@/lib/county-availability";
+import { isCountyTemporarilyUnavailable } from "@/lib/county-availability";
 import {
   PROCESSING_CLARIFICATION_NOTE,
   resolveFormConfig,
@@ -112,6 +111,63 @@ function addressTypeOf(label: string): "domestic" | "military" | "international"
   return "domestic";
 }
 
+const digitsOnly = (value: string) => value.replace(/\D/g, "");
+
+/** Live SSN mask: digits capped at 9, hyphens inserted as XXX-XX-XXXX. */
+function formatSsnInput(value: string): string {
+  const digits = digitsOnly(value).slice(0, 9);
+  const parts = [digits.slice(0, 3), digits.slice(3, 5), digits.slice(5, 9)].filter(
+    (part) => part !== "",
+  );
+  return parts.join("-");
+}
+
+/** Light SSN plausibility: 9 digits, area not 000/666/9xx, group not 00, serial not 0000. */
+function isPlausibleSsn(value: string): boolean {
+  const digits = digitsOnly(value);
+  if (!/^\d{9}$/.test(digits)) return false;
+  const area = digits.slice(0, 3);
+  if (area === "000" || area === "666" || area[0] === "9") return false;
+  if (digits.slice(3, 5) === "00" || digits.slice(5) === "0000") return false;
+  return true;
+}
+
+/** Live card mask: digits capped at 16, grouped XXXX XXXX XXXX XXXX. */
+function formatCardInput(value: string): string {
+  return digitsOnly(value)
+    .slice(0, 16)
+    .replace(/(\d{4})(?=\d)/g, "$1 ");
+}
+
+function cardBrandOf(value: string): "visa" | "mastercard" | null {
+  const digits = digitsOnly(value);
+  if (!digits) return null;
+  if (digits[0] === "4") return "visa";
+  if (digits[0] === "5") return "mastercard";
+  return null;
+}
+
+/** Live expiry mask: digits capped at 4, slash inserted as MM/YY. */
+function formatExpiryInput(value: string): string {
+  const digits = digitsOnly(value).slice(0, 4);
+  return digits.length <= 2 ? digits : `${digits.slice(0, 2)}/${digits.slice(2)}`;
+}
+
+function isPlausibleExpiryMonth(value: string): boolean {
+  const digits = digitsOnly(value);
+  if (digits.length < 2) return true;
+  const month = Number(digits.slice(0, 2));
+  return month >= 1 && month <= 12;
+}
+
+/** Rewrite an uncontrolled input in place (typing, paste, autofill). */
+function applyMask(event: { target?: EventTarget | null }, format: (value: string) => string) {
+  const input = event.target as HTMLInputElement | null;
+  if (!input || typeof input.value !== "string") return;
+  const next = format(input.value);
+  if (next !== input.value) input.value = next;
+}
+
 /** Backend error key -> form input name(s). Dynamic subject/family keys use the
  *  config field key as the input name; address keys map to prefixed inputs. */
 function inputNamesForError(key: string): string[] {
@@ -126,6 +182,8 @@ function inputNamesForError(key: string): string[] {
       return ["email"];
     case "applicant.dateOfBirth":
       return ["applicantDob"];
+    case "applicant.phone":
+      return ["phone"];
     case "applicant.relationshipOther":
       return ["relationshipOther"];
     case "paymentCard.number":
@@ -186,6 +244,8 @@ function errorRank(key: string): number {
       return 22;
     case "applicant.email":
       return 23;
+    case "applicant.phone":
+      return 24;
     case "totalCents":
       return 60;
     case "paymentCard.number":
@@ -208,9 +268,8 @@ function errorRank(key: string): number {
 }
 
 /** Form input name -> backend error key(s) to clear once the user edits it.
- *  `county` is excluded on purpose: the county select owns its error lifecycle
- *  (blockUnavailableCounty sets it, the allowed-county path clears it), and the
- *  bubbled form-level change would otherwise wipe the just-set block message. */
+ *  `county` is excluded: its select clears its own error, and the
+ *  blocked-county banner derives from the live selection. */
 function errorKeysForInput(name: string): string[] {
   switch (name) {
     case "county":
@@ -221,8 +280,13 @@ function errorKeysForInput(name: string): string[] {
       return ["requestorSsn"];
     case "email":
       return ["applicant.email"];
+    case "confirmEmail":
+      return ["applicant.email"];
     case "applicantDob":
       return ["applicant.dateOfBirth"];
+    case "phone":
+    case "phoneVisible":
+      return ["applicant.phone"];
     case "relationshipOther":
       return ["applicant.relationshipOther"];
     case "cardNumber":
@@ -527,6 +591,19 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     }
   });
   const [values, setValues] = useState<Record<string, string>>(() => draft);
+  // E.164 phone value. Old drafts may hold raw national digits; normalize those
+  // to +1 once so untouched restores still submit valid E.164.
+  const [phoneValue, setPhoneValue] = useState<string>(() => {
+    const saved = draft.phone ?? "";
+    if (!saved || saved.startsWith("+")) return saved;
+    const digits = saved.replace(/\D/g, "");
+    const ten = digits.length === 11 && digits[0] === "1" ? digits.slice(1) : digits;
+    return ten.length === 10 ? `+1${ten}` : saved;
+  });
+  function handlePhoneChange(value: string) {
+    setPhoneValue(value);
+    setValues((current) => ({ ...current, phone: value }));
+  }
   const [consents, setConsents] = useState<Record<(typeof CONSENT_KEYS)[number], boolean>>({
     accurate: false,
     govtId: false,
@@ -541,8 +618,13 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [unavailableCounty, setUnavailableCounty] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  /** Temporarily blocked county, derived from the live selection (selectable,
+   *  but blocks payment). Null when the selection is usable. */
+  const blockedCounty = (() => {
+    const county = values.county ?? draft.county ?? "";
+    return county && isCountyTemporarilyUnavailable(abbr, county) ? county : null;
+  })();
 
   /** Scroll to and focus the input for an error key, falling back to its section. */
   function scrollToErrorKey(key: string) {
@@ -572,6 +654,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     const invalid = new Set<string>();
     for (const key of Object.keys(fieldErrors))
       for (const name of inputNamesForError(key)) invalid.add(name);
+    if (blockedCounty) invalid.add("county");
     form.querySelectorAll("[name]").forEach((element) => {
       const name = element.getAttribute("name") ?? "";
       if (invalid.has(name)) {
@@ -582,7 +665,18 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         element.removeAttribute("aria-invalid");
       }
     });
-  }, [fieldErrors]);
+    // The phone picker renders its own inner input; mirror the phone state there.
+    const phoneInput = form.querySelector(".usvc-phone-input input");
+    if (phoneInput) {
+      if (invalid.has("phone")) {
+        phoneInput.setAttribute("data-invalid", "true");
+        phoneInput.setAttribute("aria-invalid", "true");
+      } else {
+        phoneInput.removeAttribute("data-invalid");
+        phoneInput.removeAttribute("aria-invalid");
+      }
+    }
+  }, [fieldErrors, blockedCounty]);
   const noun = jurisdictionNoun(geo.counties.length ? geo : undefined);
 
   useEffect(() => {
@@ -592,7 +686,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   }, [abbr]);
 
   useEffect(() => {
-    trackAnalytics("select_certificate", { certificate: certificateMap[certificate] });
+    trackAnalytics("select_certificate", {
+      certificate: certificateMap[certificate],
+      state_code: abbr,
+    });
   }, [certificate]);
 
   const counties = geo.counties;
@@ -615,19 +712,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
   const relationship = values.relationship ?? draft.relationship ?? "";
   const reason = values.reason ?? draft.reason ?? "";
-
-  function blockUnavailableCounty(county: string) {
-    setValues((current) => ({ ...current, county: "", city: "" }));
-    setFieldErrors((current) => ({ ...current, county: COUNTY_UNAVAILABLE_MESSAGE }));
-    setUnavailableCounty(county);
-    try {
-      const raw = sessionStorage.getItem(draftKey);
-      const stored = raw ? (JSON.parse(raw) as Record<string, string>) : {};
-      sessionStorage.setItem(draftKey, JSON.stringify({ ...stored, county: "", city: "" }));
-    } catch {
-      /* storage unavailable */
-    }
-  }
 
   function syncForm(event?: { target?: EventTarget | null }) {
     const changed = (event?.target as HTMLElement | null)?.getAttribute("name");
@@ -711,6 +795,15 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     applyAddressCopies(form);
     const formData = new FormData(form);
     const get = (key: string) => String(formData.get(key) ?? "").trim();
+    if (blockedCounty) {
+      setError(
+        `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority. Please select a different ${noun}.`,
+      );
+      document
+        .getElementById("application-section-1")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     if (get("email") !== get("confirmEmail")) {
       setError("Email addresses do not match.");
       setFieldErrors({ "applicant.email": "Email addresses do not match." });
@@ -730,7 +823,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       return;
     }
     setBusy(true);
-    trackAnalytics("order_started", { certificate: certificateMap[certificate] });
+    trackAnalytics("order_started", { certificate: certificateMap[certificate], state_code: abbr });
     setError("");
     setFieldErrors({});
     try {
@@ -829,6 +922,18 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const relationshipDisplay =
     relationship === "Other" ? values.relationshipOther?.trim() || "Other" : relationship || "—";
   const cardProvided = Boolean((values.cardNumber ?? "").replace(/[\s-]/g, ""));
+  const ssnDigits = digitsOnly(values.requestorSsn ?? "").length;
+  const ssnLiveError =
+    ssnDigits === 0
+      ? ""
+      : ssnDigits < 9
+        ? `Enter all 9 digits (${ssnDigits}/9).`
+        : isPlausibleSsn(values.requestorSsn ?? "")
+          ? ""
+          : "This Social Security Number doesn't look valid.";
+  const cardDigits = digitsOnly(values.cardNumber ?? "").length;
+  const cardBrand = cardBrandOf(values.cardNumber ?? "");
+  const expiryMonthOk = isPlausibleExpiryMonth(values.cardExpiry ?? "");
 
   const addressValues = (prefix: string) => ({
     line1: values[`${prefix}Line1`] ?? "",
@@ -895,10 +1000,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               value={values.county ?? draft.county ?? ""}
               onChange={(event) => {
                 const county = event.target.value;
-                if (isCountyTemporarilyUnavailable(abbr, county)) {
-                  blockUnavailableCounty(county);
-                  return;
-                }
                 setFieldErrors((current) => {
                   const { county: _county, ...remaining } = current;
                   return remaining;
@@ -915,6 +1016,12 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </option>
               ))}
             </select>
+            {blockedCounty ? (
+              <div className="county-blocked-alert" role="alert">
+                <strong>Certificate issuance is currently unavailable</strong> through{" "}
+                {blockedCounty} {noun} authority. Please select a different {noun}.
+              </div>
+            ) : null}
             {fieldErrors.county ? (
               <small className="application-error" role="alert">
                 {fieldErrors.county}
@@ -928,7 +1035,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               required
               value={values.city ?? draft.city ?? ""}
               onChange={(event) => setValues((v) => ({ ...v, city: event.target.value }))}
-              disabled={Boolean(unavailableCounty) || (!values.county && !draft.county)}
+              disabled={!values.county && !draft.county}
             >
               <option value="">
                 {(values.county ?? draft.county) ? "Select city or town" : `Select ${noun} first`}
@@ -943,12 +1050,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </label>
           <label className="application-field wide">
             Reason for requesting this certificate <span>*</span>
-            <select
-              name="reason"
-              required
-              defaultValue={draft.reason ?? ""}
-              disabled={Boolean(unavailableCounty)}
-            >
+            <select name="reason" required defaultValue={draft.reason ?? ""}>
               <option value="">Please select…</option>
               {config.reasons.map((item) => (
                 <option key={item}>{item}</option>
@@ -969,7 +1071,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         </div>
       </FormSection>
 
-      <fieldset className="county-blocked-fields" disabled={Boolean(unavailableCounty)}>
+      <fieldset className="county-blocked-fields">
         <FormSection number={2} title="Information About the Requestor">
           <div className="application-grid">
             <label className="application-field wide">
@@ -1045,14 +1147,20 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 Your Social Security Number {config.requestor.ssnRequired ? <span>*</span> : null}
                 <input
                   name="requestorSsn"
-                  type="password"
+                  type="text"
                   autoComplete="off"
-                  required={config.requestor.ssnRequired}
+                  inputMode="numeric"
+                  maxLength={11}
                   placeholder="XXX-XX-XXXX"
+                  required={config.requestor.ssnRequired}
+                  onChange={(event) => applyMask(event, formatSsnInput)}
                 />
-                <small>
-                  Kept private and never shown again. Required as an identity safeguard.
-                </small>
+                <small>Shown only while you type. Never stored on this device.</small>
+                {ssnLiveError ? (
+                  <small className="application-error" role="alert">
+                    {ssnLiveError}
+                  </small>
+                ) : null}
                 {fieldErrors.requestorSsn ? (
                   <small className="application-error">{fieldErrors.requestorSsn}</small>
                 ) : null}
@@ -1207,7 +1315,26 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <div className="application-grid">
               <label className="application-field">
                 Phone number <span>*</span>
-                <input name="phone" type="tel" required defaultValue={draft.phone ?? ""} />
+                <PhoneInput
+                  defaultCountry="us"
+                  preferredCountries={["us"]}
+                  disableCountryGuess
+                  value={phoneValue}
+                  onChange={handlePhoneChange}
+                  className="usvc-phone-input"
+                  inputProps={{
+                    name: "phoneVisible",
+                    required: true,
+                    autoComplete: "tel",
+                    placeholder: "Daytime Phone Number",
+                  }}
+                />
+                <input type="hidden" name="phone" value={phoneValue} />
+                {fieldErrors["applicant.phone"] ? (
+                  <small className="application-error" role="alert">
+                    {fieldErrors["applicant.phone"]}
+                  </small>
+                ) : null}
               </label>
               <div />
               <label className="application-field">
@@ -1222,7 +1349,21 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </label>
               <label className="application-field">
                 Confirm email address <span>*</span>
-                <input name="confirmEmail" type="email" required />
+                <input
+                  name="confirmEmail"
+                  type="email"
+                  required
+                  autoComplete="off"
+                  onPaste={(event) => event.preventDefault()}
+                  onDrop={(event) => event.preventDefault()}
+                />
+                {values.email &&
+                values.confirmEmail &&
+                values.email.trim() !== values.confirmEmail.trim() ? (
+                  <small className="application-error" role="alert">
+                    Email addresses do not match. Please type it again.
+                  </small>
+                ) : null}
               </label>
             </div>
           </fieldset>
@@ -1368,14 +1509,31 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           <div className="application-grid">
             <label className="application-field wide">
               Credit Card Number <span>*</span>
-              <input
-                name="cardNumber"
-                required
-                inputMode="numeric"
-                autoComplete="cc-number"
-                placeholder="Credit Card Number"
-                defaultValue=""
-              />
+              <div className="card-number-field">
+                <input
+                  name="cardNumber"
+                  required
+                  inputMode="numeric"
+                  autoComplete="cc-number"
+                  maxLength={19}
+                  placeholder="4111 1111 1111 1111"
+                  defaultValue=""
+                  onChange={(event) => applyMask(event, formatCardInput)}
+                />
+                {cardBrand ? (
+                  <img
+                    src={cardBrand === "visa" ? "/assets/visa.svg" : "/assets/mastercard.svg"}
+                    alt={cardBrand === "visa" ? "Visa" : "Mastercard"}
+                    width={36}
+                    height={22}
+                  />
+                ) : null}
+              </div>
+              {cardDigits > 0 && cardDigits < 16 ? (
+                <small className="application-error" role="alert">
+                  Enter all 16 digits ({cardDigits}/16).
+                </small>
+              ) : null}
               {fieldErrors["paymentCard.number"] ? (
                 <small className="application-error" role="alert">
                   {fieldErrors["paymentCard.number"]}
@@ -1389,9 +1547,16 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 required
                 inputMode="numeric"
                 autoComplete="cc-exp"
-                placeholder="Credit Card Expiry Date (MM/YY)"
+                maxLength={5}
+                placeholder="MM/YY"
                 defaultValue=""
+                onChange={(event) => applyMask(event, formatExpiryInput)}
               />
+              {!expiryMonthOk ? (
+                <small className="application-error" role="alert">
+                  Use MM/YY with a month from 01 to 12.
+                </small>
+              ) : null}
               {fieldErrors["paymentCard.expiry"] ? (
                 <small className="application-error" role="alert">
                   {fieldErrors["paymentCard.expiry"]}
@@ -1405,8 +1570,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 required
                 inputMode="numeric"
                 autoComplete="cc-csc"
+                maxLength={3}
                 placeholder="CVV"
                 defaultValue=""
+                onChange={(event) => applyMask(event, (value) => digitsOnly(value).slice(0, 3))}
               />
               {fieldErrors["paymentCard.securityCode"] ? (
                 <small className="application-error" role="alert">
@@ -1459,7 +1626,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </div>
         </FormSection>
 
-        <FormSection number={10} title="Review & Certification">
+        <FormSection number={10} title="Review To Submit">
           <ReviewBlock title="Certificate" target={1}>
             <ReviewRow label="Certificate" value={certificateName} />
             <ReviewRow
@@ -1474,11 +1641,31 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               <ReviewRow key={field.key} label={field.label} value={show(values[field.key])} />
             ))}
           </ReviewBlock>
+          <ReviewBlock title="Parent / Family Information" target={4}>
+            {config.family.map((field) => (
+              <ReviewRow key={field.key} label={field.label} value={show(values[field.key])} />
+            ))}
+            {config.familySecondStatus ? (
+              <ReviewRow
+                label={config.familySecondStatus.label}
+                value={show(values[config.familySecondStatus.key])}
+              />
+            ) : null}
+            {(fatherRequired || !config.familySecondStatus ? (config.familySecond ?? []) : []).map(
+              (field) => (
+                <ReviewRow key={field.key} label={field.label} value={show(values[field.key])} />
+              ),
+            )}
+          </ReviewBlock>
           <ReviewBlock title="Requestor & contact" target={2}>
             <ReviewRow label="Name" value={`${requestorFirst} ${requestorLast}`.trim() || "—"} />
             <ReviewRow label="Relationship" value={relationshipDisplay} />
+            {config.requestor.showDateOfBirth ? (
+              <ReviewRow label="Date of birth" value={show(values.applicantDob)} />
+            ) : null}
             <ReviewRow label="Phone" value={show(values.phone)} />
             <ReviewRow label="Email" value={show(values.email)} />
+            <ReviewRow label="Home" value={formatAddress(addressValues("home"))} />
             <ReviewRow label="Ship to" value={formatAddress(addressValues("shipping"))} />
             <ReviewRow label="Bill to" value={formatAddress(addressValues("billing"))} />
           </ReviewBlock>
@@ -1639,7 +1826,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             </p>
           ) : null}
           <div className="payment-action">
-            <button className="button button-primary" disabled={busy}>
+            <button className="button button-primary" disabled={busy || Boolean(blockedCounty)}>
               {busy ? "Saving your application…" : "Continue to Secure Payment"}
             </button>
             <strong>Total ${total.toFixed(2)} — one all-inclusive payment</strong>
