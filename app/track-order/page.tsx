@@ -66,7 +66,7 @@ export default function TrackOrder() {
               <input
                 id="order-number"
                 name="orderNumber"
-                placeholder="USVC-BT-08242026-000008"
+                placeholder="USCA-BT-20260922-00A001"
                 required
               />
             </div>
