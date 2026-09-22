@@ -33,9 +33,13 @@ function formatUSD(cents: number): string {
 
 export function StripeCheckoutForm({
   amountCents,
+  stateCode,
+  certificate,
   onPaid,
 }: {
   amountCents: number;
+  stateCode: string;
+  certificate: string;
   onPaid: (input: { sessionId: string }) => Promise<void>;
 }) {
   const checkout = useCheckout();
@@ -72,6 +76,8 @@ export function StripeCheckoutForm({
       currency: "USD",
       value: amountCents / 100,
       payment_type: "card",
+      state_code: stateCode,
+      certificate,
     });
     setError(null);
     try {

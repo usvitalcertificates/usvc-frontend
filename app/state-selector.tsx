@@ -102,11 +102,11 @@ export function StateSelector({ showHeading = true }: { showHeading?: boolean })
       </div>
       {results.length ? (
         <ul className="state-grid">
-          {results.map(([name]) => (
+          {results.map(([name, abbr]) => (
             <li key={name}>
               <Link
                 href={`/state/${slugify(name)}`}
-                onClick={() => trackAnalytics("select_state", { state: name })}
+                onClick={() => trackAnalytics("select_state", { state_code: abbr })}
               >
                 <span>{name}</span>
                 <ChevronRight aria-hidden="true" />
