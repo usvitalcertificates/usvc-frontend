@@ -98,9 +98,11 @@ export async function submitContactMessage(payload: ContactMessagePayload) {
 export async function trackOrder(publicNumber: string, email: string) {
   return post<{
     publicNumber: string;
-    status: string;
-    paymentStatus: string;
     certificate: string;
     stateCode: string;
+    currentStatus: string;
+    timeline: Array<{ label: string; occurredAt: string }>;
+    notice?: string;
+    lastUpdatedAt: string;
   }>("/orders/tracking", { publicNumber, email });
 }
