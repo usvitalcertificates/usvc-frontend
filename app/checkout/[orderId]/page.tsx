@@ -29,6 +29,7 @@ interface Summary {
   _id: string;
   publicNumber: string;
   stateName: string;
+  stateCode: string;
   certificate: string;
   copies: number;
   rush: boolean;
@@ -65,6 +66,8 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
         trackAnalytics("begin_checkout", {
           currency: "USD",
           value: summary.amountCents / 100,
+          state_code: summary.stateCode,
+          certificate: summary.certificate,
           items: [
             {
               item_id: `usvc-${summary.certificate.toLowerCase()}`,
@@ -196,7 +199,12 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
                 stripe={stripe}
                 options={{ clientSecret, elementsOptions: { appearance: STRIPE_APPEARANCE } }}
               >
-                <StripeCheckoutForm amountCents={order.amountCents} onPaid={handlePaid} />
+                <StripeCheckoutForm
+                  amountCents={order.amountCents}
+                  stateCode={order.stateCode}
+                  certificate={order.certificate}
+                  onPaid={handlePaid}
+                />
               </CheckoutElementsProvider>
             ) : null}
             {!setupError && !clientSecret ? (

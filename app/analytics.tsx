@@ -13,6 +13,17 @@ declare global {
 
 let analyticsActive = false;
 
+/** Events fired before activation (e.g. mount effects, which run before the
+ *  Analytics effect flips the flag) wait here and flush once active, so mount
+ *  events like select_certificate are never silently dropped. */
+const pendingEvents: Array<{ event: string; params: Record<string, unknown> }> = [];
+
+function sendEvent(event: string, params: Record<string, unknown>) {
+  window.dataLayer ??= [];
+  window.gtag ??= (...args: unknown[]) => window.dataLayer?.push(args);
+  window.gtag("event", event, params);
+}
+
 function isProductionHost(): boolean {
   return (
     typeof window !== "undefined" &&
@@ -21,10 +32,12 @@ function isProductionHost(): boolean {
 }
 
 export function trackAnalytics(event: string, params: Record<string, unknown> = {}) {
-  if (!analyticsActive || typeof window === "undefined") return;
-  window.dataLayer ??= [];
-  window.gtag ??= (...args: unknown[]) => window.dataLayer?.push(args);
-  window.gtag("event", event, params);
+  if (typeof window === "undefined") return;
+  if (!analyticsActive) {
+    if (pendingEvents.length < 20) pendingEvents.push({ event, params });
+    return;
+  }
+  sendEvent(event, params);
 }
 
 function readCookie(name: string): string | undefined {
@@ -64,8 +77,9 @@ export function Analytics({
 
   useEffect(() => {
     analyticsActive = active;
-    if (active && !pathname.startsWith("/staff")) {
-      trackAnalytics("page_view", { page_path: pathname });
+    if (active) {
+      for (const queued of pendingEvents.splice(0)) sendEvent(queued.event, queued.params);
+      if (!pathname.startsWith("/staff")) trackAnalytics("page_view", { page_path: pathname });
     }
     return () => {
       analyticsActive = false;

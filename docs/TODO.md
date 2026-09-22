@@ -40,6 +40,7 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [x] Blocked-county alert rebuilt on dedicated state (banner names the county, unlocks on allowed pick; fixes permanent form lock) + SSN shown visibly with auto-dashes — done 2026-09-23
 - [x] Confirm-email blocks paste/drop with live mismatch hint; checkout shows "Locked. Private. Protected." badge and a single rush-aware fee line (left two-payments block removed) — done 2026-09-23
 - [x] Blocked counties stay selectable with a state-derived red banner; section locks removed (fixes permanent lockout) and the payment button + submit are gated instead — done 2026-09-23
+- [x] `state_code` on select_state/select_certificate/order_started/begin_checkout/add_payment_info; mount-event queue so select_certificate is never dropped — done 2026-09-23
 - [ ] Proof: `npm run build` passes
 
 ## Phase 2 (deferred)

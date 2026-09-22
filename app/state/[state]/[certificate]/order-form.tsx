@@ -686,7 +686,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   }, [abbr]);
 
   useEffect(() => {
-    trackAnalytics("select_certificate", { certificate: certificateMap[certificate] });
+    trackAnalytics("select_certificate", {
+      certificate: certificateMap[certificate],
+      state_code: abbr,
+    });
   }, [certificate]);
 
   const counties = geo.counties;
@@ -820,7 +823,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       return;
     }
     setBusy(true);
-    trackAnalytics("order_started", { certificate: certificateMap[certificate] });
+    trackAnalytics("order_started", { certificate: certificateMap[certificate], state_code: abbr });
     setError("");
     setFieldErrors({});
     try {
