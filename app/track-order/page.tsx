@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { trackOrder } from "@/lib/api";
 import { PageHeader } from "../usvc-ui";
+import { trackAnalytics } from "../analytics";
 
 type TrackingResult = {
   publicNumber: string;
@@ -24,6 +25,7 @@ export default function TrackOrder() {
     setLoading(true);
     try {
       setResult(await trackOrder(String(form.get("orderNumber")), String(form.get("email"))));
+      trackAnalytics("track_order_submitted");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Unable to track order");
     } finally {

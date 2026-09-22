@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { PageHeader } from "../../usvc-ui";
 import { STRIPE_APPEARANCE, StripeCheckoutForm } from "./stripe-checkout-form";
+import { trackAnalytics } from "../../analytics";
 
 const api = "/api/backend";
 const SUPPORT_EMAIL = "support@usvitalcertificates.org";
@@ -61,6 +62,18 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
         const summary = (await res.json()) as Summary;
         if (cancelled) return;
         setOrder(summary);
+        trackAnalytics("begin_checkout", {
+          currency: "USD",
+          value: summary.amountCents / 100,
+          items: [
+            {
+              item_id: `usvc-${summary.certificate.toLowerCase()}`,
+              item_name: CERT_NAMES[summary.certificate],
+              quantity: summary.copies,
+              price: summary.amountCents / summary.copies / 100,
+            },
+          ],
+        });
         const [configRes, sessionRes] = await Promise.all([
           fetch(`${api}/orders/checkout-config`),
           fetch(`${api}/orders/${orderId}/checkout-session`, { method: "POST" }),

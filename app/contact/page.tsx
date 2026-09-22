@@ -4,6 +4,7 @@ import { Clock, Mail } from "lucide-react";
 import { FormEvent, useRef, useState } from "react";
 import { submitContactMessage } from "../../lib/api";
 import { Disclaimer, PageHeader } from "../usvc-ui";
+import { trackAnalytics } from "../analytics";
 
 const sensitiveContentPattern = /\b\d{3}[- ]?\d{2}[- ]?\d{4}\b|\b(?:\d[ -]?){12,18}\d\b/;
 
@@ -49,6 +50,7 @@ export default function Contact() {
           formStartedAt: formStartedAt.current,
         },
       });
+      trackAnalytics("contact_submitted");
       setSent(true);
       setForm({ fullName: "", email: "", orderNumber: "", message: "" });
     } catch (submitError) {
