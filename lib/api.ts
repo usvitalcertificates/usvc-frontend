@@ -52,6 +52,7 @@ export interface CreateOrderPayload {
   processingAuthorization: { accepted: true; text: string; acceptedAt: string };
   signature: string;
   paymentCard: { number: string; expiry: string; securityCode: string };
+  analytics?: { clientId?: string; sessionId?: string };
   totalCents: number;
 }
 

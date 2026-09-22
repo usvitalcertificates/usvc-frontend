@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { createOrder, verifyOrderBeforePayment, type Certificate } from "@/lib/api";
+import { getAnalyticsAttribution, trackAnalytics } from "@/app/analytics";
 import {
   COUNTY_UNAVAILABLE_MESSAGE,
   isCountyTemporarilyUnavailable,
@@ -380,6 +381,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       .catch(() => undefined);
   }, [abbr]);
 
+  useEffect(() => {
+    trackAnalytics("select_certificate", { certificate: certificateMap[certificate] });
+  }, [certificate]);
+
   const counties = geo.counties;
   const cities = useMemo(
     () => counties.find((c) => c.name === values.county)?.cities ?? [],
@@ -501,6 +506,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       return;
     }
     setBusy(true);
+    trackAnalytics("order_started", { certificate: certificateMap[certificate] });
     setError("");
     setFieldErrors({});
     try {
@@ -570,6 +576,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           expiry: get("cardExpiry"),
           securityCode: get("cardSecurityCode"),
         },
+        analytics: getAnalyticsAttribution(),
         totalCents: Math.round(total * 100),
       };
       await verifyOrderBeforePayment(payload);

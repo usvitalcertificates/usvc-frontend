@@ -4,6 +4,7 @@ import { PaymentElement, useCheckout } from "@stripe/react-stripe-js/checkout";
 import type { Appearance } from "@stripe/stripe-js";
 import Link from "next/link";
 import { useState } from "react";
+import { trackAnalytics } from "../../analytics";
 
 export const STRIPE_APPEARANCE: Appearance = {
   theme: "flat",
@@ -67,6 +68,11 @@ export function StripeCheckoutForm({
       return;
     }
     setProcessing(true);
+    trackAnalytics("add_payment_info", {
+      currency: "USD",
+      value: amountCents / 100,
+      payment_type: "card",
+    });
     setError(null);
     try {
       const validation = await checkout.checkout.validateElements();

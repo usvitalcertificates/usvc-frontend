@@ -29,6 +29,7 @@ Last updated: 2026-09-22 (official USVC branding; two-fee model; review sync har
 - The requestor previous-last-name question and conditional field have been removed from every certificate form and order payload.
 - Public phone-support references have been removed while the applicant contact phone field remains required. Selecting a temporarily unavailable California county shows a persistent inline error, clears the county/city selection, and disables all other form fields until an allowed county is selected.
 - Contact Us is API-backed: it stores each inquiry through the backend, queues a support notification and customer receipt, shows sending/success/failure feedback, and warns (without blocking) likely SSN/card-number content.
+- GA4 is production-only: public pages and core funnel actions are tracked in the browser, while a Purchase is sent only from the backend after a signed Stripe webhook confirms payment. No sensitive application or payment data is sent to GA4.
 
 ## Important current limits
 

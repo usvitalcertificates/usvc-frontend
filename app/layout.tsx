@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
+import { Analytics } from "./analytics";
 
 export const metadata: Metadata = {
   title: "USVC — Trusted Help for US Vital Certificates",
@@ -14,6 +15,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
+        <Analytics
+          enabled={process.env.ANALYTICS_ENABLED === "true"}
+          measurementId={process.env.GA_MEASUREMENT_ID}
+        />
         <SiteHeader />
         {children}
         <SiteFooter />
