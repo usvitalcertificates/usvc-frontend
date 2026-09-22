@@ -8,7 +8,7 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [ ] Order form upgrade: per-state rules, county/city validation, address same-as copy, sessionStorage draft (no SSN), Zod validation, working review + Edit scroll
 - [x] Checkout: Checkout Sessions embedded tabs (reference UI verbatim), summary sidebar, authorize + Pay flow, session-verified confirmation receipt — done 2026-09-21, real $238 test payment passed
 - [ ] Confirmation: replace static page with `GET /orders/:id/confirmation` verification + print receipt
-- [ ] Tracking: keep POST `/orders/tracking`, show sanitized timeline only
+- [x] Tracking: sanitized, customer-friendly progress timeline backed by `POST /orders/tracking` — done 2026-09-22
 - [x] State detail page UI (`/state/[state]`) — done 2026-09-21, matches reference
 - [x] Order form rebuild (config-driven 4 types, geo county/city dropdowns, per-cert fields/reasons/relationships, father conditional, working address copy, live review + Edit, SSN-safe draft, verify→create→checkout) — done 2026-09-21
 - [x] Geo datasets (`public/geo/`, lazy per-state) — done 2026-09-21

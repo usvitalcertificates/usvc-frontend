@@ -489,6 +489,73 @@ h3 {
 .track-card p {
   margin: 8px 0 0;
 }
+.track-current-status {
+  color: var(--navy);
+  font-size: 18px;
+}
+.track-updated {
+  color: var(--muted-text);
+  font-size: 14px;
+}
+.tracking-timeline {
+  display: grid;
+  gap: 0;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tracking-timeline li {
+  position: relative;
+  min-height: 64px;
+  padding: 0 0 20px 42px;
+  color: var(--muted-text);
+}
+.tracking-timeline li::before {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: #fff;
+  content: "";
+}
+.tracking-timeline li:not(:last-child)::after {
+  position: absolute;
+  top: 22px;
+  bottom: 0;
+  left: 9px;
+  width: 2px;
+  background: var(--border);
+  content: "";
+}
+.tracking-timeline li.is-complete {
+  color: var(--navy);
+}
+.tracking-timeline li.is-complete::before {
+  border-color: var(--red);
+  background: var(--red);
+  box-shadow: inset 0 0 0 4px #fff;
+}
+.tracking-timeline li.is-complete:not(:last-child)::after {
+  background: var(--red);
+}
+.tracking-timeline li strong,
+.tracking-timeline li span {
+  display: block;
+}
+.tracking-timeline li span {
+  margin-top: 4px;
+  color: var(--muted-text);
+  font-size: 14px;
+}
+.track-notice {
+  margin-top: 20px !important;
+  padding: 14px 16px;
+  border-left: 4px solid var(--red);
+  background: #f8f8fa;
+}
 .track-error {
   padding: 12px 16px;
   border-left: 4px solid var(--red);

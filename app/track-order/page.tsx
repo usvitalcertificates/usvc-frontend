@@ -7,11 +7,28 @@ import { trackAnalytics } from "../analytics";
 
 type TrackingResult = {
   publicNumber: string;
-  status: string;
-  paymentStatus: string;
   certificate: string;
   stateCode: string;
+  currentStatus: string;
+  timeline: Array<{ label: string; occurredAt: string }>;
+  notice?: string;
+  lastUpdatedAt: string;
 };
+
+const MILESTONES = [
+  "Payment Successful",
+  "Order Received",
+  "Order Processing",
+  "Order Processed – Submitted to the Govt Agency",
+  "Order Completed",
+];
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
 
 export default function TrackOrder() {
   const [result, setResult] = useState<TrackingResult | null>(null);
@@ -79,10 +96,30 @@ export default function TrackOrder() {
                 <p>
                   {result.certificate} certificate · {result.stateCode}
                 </p>
-                <p>
-                  <strong>Current Status: {result.status.replaceAll("_", " ")}</strong>
+                <p className="track-current-status">
+                  <strong>Current Status: {result.currentStatus}</strong>
                 </p>
-                <p>Payment: {result.paymentStatus}</p>
+                <p className="track-updated">Last updated: {formatDate(result.lastUpdatedAt)}</p>
+                {result.timeline.length ? (
+                  <ol className="tracking-timeline" aria-label="Order progress">
+                    {MILESTONES.map((label) => {
+                      const milestone = result.timeline.find((entry) => entry.label === label);
+                      const completed = Boolean(milestone);
+                      const current = label === result.currentStatus;
+                      return (
+                        <li
+                          key={label}
+                          className={completed ? "is-complete" : ""}
+                          aria-current={current ? "step" : undefined}
+                        >
+                          <strong>{label}</strong>
+                          {milestone ? <span>{formatDate(milestone.occurredAt)}</span> : null}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                ) : null}
+                {result.notice ? <p className="track-notice">{result.notice}</p> : null}
               </div>
             ) : null}
             {!result && !error ? (
