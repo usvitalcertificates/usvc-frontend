@@ -34,6 +34,9 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [x] Blocked-California-county message no longer wiped by clear-on-fix (`county` owns its error lifecycle) — done 2026-09-23
 - [x] Tracking example matches the sequential plate order-number format (`USCA-BT-20260922-00A001`) — done 2026-09-23
 - [x] Tracking shows 4 milestones ending at Submitted-to-Agency, dates only (no times), header unchanged — done 2026-09-23
+- [x] Review renamed to "Review To Submit" with a Parent/Family block (Edit → §4) plus Home and requestor-DOB rows so every entered detail is reviewable — done 2026-09-23
+- [x] Live input masks: SSN auto-hyphens + 9-digit cap + plausibility hint, card grouping + inline Visa/MC mark + MM/YY + 3-digit CVV — done 2026-09-23
+- [x] Country-code phone picker (`react-international-phone`, US default + US pinned, searchable, E.164 value) replacing the USA-only mask — done 2026-09-23
 - [ ] Proof: `npm run build` passes
 
 ## Phase 2 (deferred)
