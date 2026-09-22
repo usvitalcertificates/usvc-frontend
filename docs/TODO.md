@@ -33,6 +33,7 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [x] Inline error messages styled prominent (red, bold, tinted box) so hint-text CSS can't mute them — done 2026-09-23
 - [x] Blocked-California-county message no longer wiped by clear-on-fix (`county` owns its error lifecycle) — done 2026-09-23
 - [x] Tracking example matches the sequential plate order-number format (`USCA-BT-20260922-00A001`) — done 2026-09-23
+- [x] Tracking shows 4 milestones ending at Submitted-to-Agency, dates only (no times), header unchanged — done 2026-09-23
 - [ ] Proof: `npm run build` passes
 
 ## Phase 2 (deferred)
