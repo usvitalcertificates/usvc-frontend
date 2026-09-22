@@ -207,11 +207,14 @@ function errorRank(key: string): number {
   return 200;
 }
 
-/** Form input name -> backend error key(s) to clear once the user edits it. */
+/** Form input name -> backend error key(s) to clear once the user edits it.
+ *  `county` is excluded on purpose: the county select owns its error lifecycle
+ *  (blockUnavailableCounty sets it, the allowed-county path clears it), and the
+ *  bubbled form-level change would otherwise wipe the just-set block message. */
 function errorKeysForInput(name: string): string[] {
   switch (name) {
     case "county":
-      return ["county"];
+      return [];
     case "reasonOther":
       return ["reasonOther"];
     case "requestorSsn":

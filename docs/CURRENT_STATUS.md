@@ -17,7 +17,7 @@ Last updated: 2026-09-23 (official USVC branding; two-fee model; review sync har
 - Certificates, Find Your State, Track Order, and Contact page layouts matching the reference structure.
 - State landing pages and full application route: `/state/[state]/order/[certificate]`.
 - Eleven application sections (Section 8 Credit Card Details with Visa/Mastercard logos, CVV label; copies 1–20; two-fee totals) with dynamic display total; card + SSN excluded from drafts; review shows a generic "Card provided (kept private)" placeholder, never digits. Review sync hardened against autofill (merge + input/blur listeners).
-- Server-side validation failures scroll to the first invalid input in form order, focus it, and mark it with a red border (`data-invalid` + `aria-invalid`) plus an inline message next to the field; the highlight and message clear as the user edits, and each error-summary message is a button that jumps to its field.
+- Server-side validation failures scroll to the first invalid input in form order, focus it, and mark it with a red border (`data-invalid` + `aria-invalid`) plus an inline message next to the field; the highlight and message clear as the user edits (except `county`, which owns its error lifecycle so the temporarily-blocked-county message persists), and each error-summary message is a button that jumps to its field.
 - Secure Checkout rebuilt to reference UI (order eyebrow, trust badges, all-inclusive notice, tabbed Stripe payment, authorize checkbox, Pay button, sticky summary); confirmation page verifies `session_id` with the backend and prints a paid receipt.
 - API order creation before redirecting to Stripe checkout.
 - Stripe Elements checkout route and API-backed order tracking route.
