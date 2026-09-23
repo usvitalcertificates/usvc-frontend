@@ -285,6 +285,10 @@
   white-space: nowrap;
   font-size: 0.8rem;
 }
+.staff-userchip-role {
+  font-size: 0.78rem;
+  color: rgb(255 255 255 / 60%);
+}
 .staff-userchip-meta .staff-role-pill {
   margin-top: 0;
 }
@@ -293,11 +297,16 @@
   border: 1px solid rgb(255 255 255 / 28%);
   color: #fff;
   border-radius: 8px;
-  padding: 7px 12px;
+  padding: 9px 12px;
   cursor: pointer;
-  margin-top: 8px;
+  margin-top: 10px;
   font-size: 0.85rem;
   font-weight: 600;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 .staff-userbox button:hover {
   background: rgb(255 255 255 / 8%);
@@ -942,17 +951,27 @@ table.staff-table {
   scroll-margin-top: 220px;
 }
 
-/* Definition list for read-only summaries (no copy actions here). */
+/* Definition list rendered as a modern striped table. */
 dl.staff-deflist {
   margin: 0 0 6px;
   padding: 0;
+  border: 1px solid var(--flow-border);
+  border-radius: 10px;
+  overflow: hidden;
 }
 .staff-deflist > div {
   display: grid;
-  grid-template-columns: 130px minmax(0, 1fr);
+  grid-template-columns: 150px minmax(0, 1fr);
   gap: 12px;
-  padding: 7px 0;
+  padding: 10px 16px;
   border-bottom: 1px solid var(--flow-border);
+  align-items: baseline;
+}
+.staff-deflist > div:nth-child(odd) {
+  background: var(--flow-bg);
+}
+.staff-deflist > div:nth-child(even) {
+  background: var(--flow-surface);
 }
 .staff-deflist > div:last-child {
   border-bottom: none;
@@ -965,7 +984,7 @@ dl.staff-deflist {
 }
 .staff-deflist dd {
   margin: 0;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--flow-ink);
   overflow-wrap: anywhere;
 }
