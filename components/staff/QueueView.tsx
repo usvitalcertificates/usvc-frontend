@@ -36,6 +36,7 @@ export interface QueuePreset {
   openOnly?: boolean;
   attentionFirst?: boolean;
   hideAssignment?: boolean;
+  hideStatus?: boolean;
 }
 
 export interface QueueEmpty {
@@ -204,9 +205,9 @@ export function QueueView({
               autoComplete="off"
             />
           </label>
-          {!preset.status ? (
+          {!preset.status && !preset.hideStatus ? (
             <label>
-              Substatus
+              Order status
               <select
                 value={status}
                 onChange={(e) => {
@@ -214,8 +215,8 @@ export function QueueView({
                   resetPage();
                 }}
               >
-                <option value="">All Substatuses</option>
-                <option value="PAID">Payment Successful</option>
+                <option value="">All statuses</option>
+                <option value="PAID">Paid</option>
                 <option value="IN_REVIEW">Order Processing</option>
                 <option value="ON_HOLD">On Hold</option>
                 <option value="NEED_INFO">Need Customer Information</option>
@@ -224,7 +225,7 @@ export function QueueView({
             </label>
           ) : null}
           <label>
-            Order Type
+            Certificate type
             <select
               value={certificate}
               onChange={(e) => {
@@ -232,7 +233,7 @@ export function QueueView({
                 resetPage();
               }}
             >
-              <option value="">All Order Types</option>
+              <option value="">All certificate types</option>
               <option value="BIRTH">Birth</option>
               <option value="DEATH">Death</option>
               <option value="MARRIAGE">Marriage</option>
@@ -321,7 +322,7 @@ export function QueueView({
                   <th>Submit Time</th>
                   <th>Order #</th>
                   <th>Certificate</th>
-                  <th>Substatus</th>
+                  <th>Status</th>
                   <th>Owner</th>
                   <th>Requestor</th>
                   <th>Action</th>

@@ -70,9 +70,13 @@
 .staff-auth-wrap p {
   margin: 0 0 10px;
 }
-.staff-shell a,
-.staff-auth-wrap a {
+.staff-shell a:not(.staff-btn),
+.staff-auth-wrap a:not(.staff-btn) {
   color: var(--flow-primary);
+}
+.staff-shell a.staff-btn,
+.staff-auth-wrap a.staff-btn {
+  text-decoration: none;
 }
 .staff-shell form,
 .staff-auth-wrap form {

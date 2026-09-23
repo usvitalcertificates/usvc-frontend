@@ -88,9 +88,9 @@ function SearchView() {
             />
           </label>
           <label>
-            Order Type
+            Certificate type
             <select value={certificate} onChange={(e) => setCertificate(e.target.value)}>
-              <option value="">All Order Types</option>
+              <option value="">All certificate types</option>
               <option value="BIRTH">Birth</option>
               <option value="DEATH">Death</option>
               <option value="MARRIAGE">Marriage</option>
@@ -116,7 +116,7 @@ function SearchView() {
                 <tr>
                   <th>Order #</th>
                   <th>Certificate</th>
-                  <th>Substatus</th>
+                  <th>Status</th>
                   <th>Owner</th>
                   <th>Requestor</th>
                   <th>Action</th>
