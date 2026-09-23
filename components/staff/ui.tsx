@@ -192,7 +192,7 @@ export function Pagination({
  * ON_HOLD / NEED_INFO park as a red branch off Processing.
  */
 const AGENT_STEPS = [
-  { key: "claimed", label: "Claimed", caption: "Order is yours, work not started." },
+  { key: "claimed", label: "Took Ownership", caption: "Order is yours, work not started." },
   { key: "processing", label: "Order Processing", caption: "You're working this order now." },
   { key: "submitted", label: "Submitted", caption: "Sent to the government agency." },
 ];
@@ -227,22 +227,28 @@ export function Stepper({
         className="staff-stepper"
         aria-label={`Order status: ${STATUS_LABELS[status] ?? status}`}
       >
-        {AGENT_STEPS.map((step, i) => (
-          <span key={step.key} style={{ display: "contents" }}>
-            {i > 0 ? <span className="staff-step-link" aria-hidden /> : null}
-            <span
-              className={`staff-step ${i < index || done ? "done" : ""} ${i === index && !done ? "now" : ""}`}
-            >
-              <span className="dot" aria-hidden>
-                {i < index || done ? "✓" : i + 1}
-              </span>
-              <span>
-                {step.label}
-                <span className="staff-step-caption">{step.caption}</span>
+        {AGENT_STEPS.map((step, i) => {
+          const isDone = i < index || done;
+          const isNow = i === index && !done;
+          const isNext = i === index + 1 && !done;
+          return (
+            <span key={step.key} style={{ display: "contents" }}>
+              {i > 0 ? <span className="staff-step-link" aria-hidden /> : null}
+              <span
+                className={`staff-step${isDone ? " done" : ""}${isNow ? " now" : ""}${isNext ? " next" : ""}`}
+              >
+                <span className="dot" aria-hidden>
+                  {isDone || isNow ? "✓" : i + 1}
+                </span>
+                <span>
+                  {step.label}
+                  {isNext ? <span className="staff-upnext">Up next</span> : null}
+                  <span className="staff-step-caption">{step.caption}</span>
+                </span>
               </span>
             </span>
-          </span>
-        ))}
+          );
+        })}
       </div>
       {isException ? (
         <p style={{ margin: "8px 0 0" }}>

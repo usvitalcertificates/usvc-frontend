@@ -637,19 +637,40 @@ table.staff-table {
   font-weight: 700;
 }
 .staff-step.done {
-  color: var(--flow-ink);
+  color: var(--flow-secondary);
 }
 .staff-step.done .dot {
-  background: var(--flow-primary);
-  border-color: var(--flow-primary);
-  color: #fff;
+  background: var(--flow-bg);
+  border-color: var(--flow-muted);
+  color: var(--flow-secondary);
 }
 .staff-step.now {
   color: var(--flow-primary-dark);
 }
 .staff-step.now .dot {
+  background: var(--flow-primary);
+  border-color: var(--flow-primary);
+  color: #fff;
+}
+.staff-step.next {
+  color: var(--flow-primary-dark);
+}
+.staff-step.next .dot {
   border-color: var(--flow-primary);
   color: var(--flow-primary);
+}
+.staff-upnext {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--flow-tint);
+  color: var(--flow-primary-dark);
+  border-radius: 999px;
+  padding: 1px 9px;
+  vertical-align: 1px;
 }
 .staff-step-link {
   flex: 1 1 24px;

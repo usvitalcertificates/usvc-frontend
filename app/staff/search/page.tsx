@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { staffFetch } from "@/lib/staff-client";
+import { staffData } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { EmptyState, PageBand, SkeletonRows, StatusPill } from "@/components/staff/ui";
 
@@ -41,8 +41,9 @@ function SearchView() {
       const search = new URLSearchParams({ page: "1", assigned: "all" });
       if (query.trim()) search.set("search", query.trim());
       if (cert) search.set("certificate", cert);
-      const response = await staffFetch(`/staff/orders?${search.toString()}`);
-      const data = await response.json();
+      const { response, data } = await staffData<{ orders: Result[]; message?: string }>(
+        `/staff/orders?${search.toString()}`,
+      );
       if (!response.ok) throw new Error(data.message || "Search failed");
       setResults(data.orders);
     } catch (e) {

@@ -2,7 +2,7 @@
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { CopyButton } from "@/components/staff/CopyButton";
-import { staffFetch, staffJson, staffRole } from "@/lib/staff-client";
+import { staffData, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { BackLink, STATUS_LABELS, StatusPill, Stepper, Toast, dayKey } from "@/components/staff/ui";
 
@@ -928,9 +928,8 @@ function ReassignControl({
   const [staff, setStaff] = useState<{ id: string; fullName: string; email: string }[]>([]);
   const [busy, setBusy] = useState(false);
   useEffect(() => {
-    staffFetch("/admin/staff")
-      .then((r) => r.json())
-      .then((data) => setStaff(data.staff ?? []))
+    staffData<{ staff?: { id: string; fullName: string; email: string }[] }>("/admin/staff")
+      .then(({ data }) => setStaff(data.staff ?? []))
       .catch(() => setStaff([]));
   }, []);
   return (

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Clock, Inbox, UserCheck, UserPlus, Zap } from "lucide-react";
-import { staffFetch } from "@/lib/staff-client";
+import { staffData } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
   EmptyState,
@@ -93,8 +93,12 @@ export function QueueView({
       if (status) params.set("status", status);
       if (certificate) params.set("certificate", certificate);
       if (rushOnly) params.set("rushOnly", "true");
-      const response = await staffFetch(`/staff/orders?${params.toString()}`);
-      const data = await response.json();
+      const { response, data } = await staffData<{
+        orders: QueueOrder[];
+        total: number;
+        pages: number;
+        message?: string;
+      }>(`/staff/orders?${params.toString()}`);
       if (!response.ok) throw new Error(data.message || "Could not load the queue");
       setOrders(data.orders);
       setTotal(data.total);
@@ -127,15 +131,19 @@ export function QueueView({
     (async () => {
       try {
         const [unassigned, mine] = await Promise.all([
-          (await staffFetch("/staff/orders?openOnly=true&assigned=unassigned")).json(),
-          (await staffFetch("/staff/orders?openOnly=true&assigned=mine")).json(),
+          staffData<{ orders?: QueueOrder[]; total?: number }>(
+            `/staff/orders?openOnly=true&assigned=unassigned`,
+          ),
+          staffData<{ orders?: QueueOrder[]; total?: number }>(
+            `/staff/orders?openOnly=true&assigned=mine`,
+          ),
         ]);
         if (cancelled) return;
-        const u = unassigned.orders as QueueOrder[];
-        const m = mine.orders as QueueOrder[];
+        const u = (unassigned.data.orders ?? []) as QueueOrder[];
+        const m = (mine.data.orders ?? []) as QueueOrder[];
         setKpis({
-          unassigned: unassigned.total as number,
-          mine: mine.total as number,
+          unassigned: (unassigned.data.total ?? 0) as number,
+          mine: (mine.data.total ?? 0) as number,
           attention: [...u, ...m].filter((o) => o.status === "ON_HOLD" || o.status === "NEED_INFO")
             .length,
           rush: [...u, ...m].filter((o) => o.rush).length,
@@ -152,8 +160,10 @@ export function QueueView({
   const claim = async (id: string, publicNumber: string) => {
     setError("");
     try {
-      const response = await staffFetch(`/staff/orders/${id}/claim`, { method: "POST" });
-      const data = await response.json();
+      const { response, data } = await staffData<{ message?: string }>(
+        `/staff/orders/${id}/claim`,
+        { method: "POST" },
+      );
       if (!response.ok) throw new Error(data.message || "Could not take ownership of this order");
       setToast(`You took ownership of order ${publicNumber} — it is now in My Work.`);
       await load();
@@ -315,7 +325,7 @@ export function QueueView({
         ) : orders.length === 0 ? (
           <EmptyState
             title={empty?.title ?? "No orders match these filters."}
-            hint={empty?.hint ?? "Try widening the search or substatus."}
+            hint={empty?.hint ?? "Try widening the search or status."}
             action={
               empty?.actionLabel && empty?.actionHref ? (
                 <Link className="staff-btn" href={empty.actionHref} style={{ marginTop: "12px" }}>
