@@ -1421,3 +1421,35 @@ dl.staff-lines {
 .staff-timeline li.cat-security::before {
   background: var(--flow-danger);
 }
+
+/* Roster staff cell: avatar + name/pill row + truncated email. */
+.staff-staffcell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.staff-staffcell .staff-avatar {
+  margin-right: 0;
+  flex-shrink: 0;
+}
+.staff-staffmeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.staff-staffname {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--flow-ink);
+}
+.staff-staffemail {
+  font-size: 0.82rem;
+  color: var(--flow-secondary);
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

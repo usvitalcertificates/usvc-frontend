@@ -234,16 +234,21 @@ export default function StaffAdmin() {
                 {staff.map((member) => (
                   <tr key={member.id}>
                     <td>
-                      <span className="staff-avatar" aria-hidden>
-                        {initials(member.fullName, member.email)}
-                      </span>
-                      <strong>{member.fullName || "—"}</strong>
-                      {member.role === "ADMIN" ? (
-                        <span className="staff-pill navy">ADMIN</span>
-                      ) : null}
-                      <br />
-                      <span style={{ fontSize: "0.85rem", color: "var(--muted-text)" }}>
-                        {member.email}
+                      <span className="staff-staffcell">
+                        <span className="staff-avatar" aria-hidden>
+                          {initials(member.fullName, member.email)}
+                        </span>
+                        <span className="staff-staffmeta">
+                          <span className="staff-staffname">
+                            <strong>{member.fullName || "—"}</strong>
+                            {member.role === "ADMIN" ? (
+                              <span className="staff-pill navy">ADMIN</span>
+                            ) : null}
+                          </span>
+                          <span className="staff-staffemail" title={member.email || undefined}>
+                            {member.email}
+                          </span>
+                        </span>
                       </span>
                     </td>
                     <td>
@@ -256,9 +261,26 @@ export default function StaffAdmin() {
                     <td>{member.mfaEnabled ? "Enrolled" : "Not enrolled"}</td>
                     <td className="num">{member.activeOrders}</td>
                     <td style={{ whiteSpace: "nowrap" }}>
-                      {member.lastActivityAt
-                        ? new Date(member.lastActivityAt).toLocaleString("en-US")
-                        : "—"}
+                      {member.lastActivityAt ? (
+                        <>
+                          <span className="staff-date">
+                            {new Date(member.lastActivityAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </span>
+                          <br />
+                          <span className="staff-pill gray staff-time-badge">
+                            {new Date(member.lastActivityAt).toLocaleTimeString("en-US", {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                        </>
+                      ) : (
+                        "—"
+                      )}
                     </td>
                     <td>
                       {member.role === "ADMIN" ? (
