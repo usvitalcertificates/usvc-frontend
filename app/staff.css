@@ -249,6 +249,8 @@
   padding: 14px 10px 4px;
   font-size: 0.85rem;
   color: rgb(255 255 255 / 72%);
+  min-width: 0;
+  overflow: hidden;
 }
 .staff-userchip {
   display: flex;
@@ -966,6 +968,12 @@ dl.staff-deflist {
   font-weight: 500;
   color: var(--flow-ink);
   overflow-wrap: anywhere;
+}
+/* Separated definition groups: each h3 after a list starts a new block. */
+.staff-deflist + h3 {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--flow-border);
 }
 @media (max-width: 560px) {
   .staff-deflist > div {
