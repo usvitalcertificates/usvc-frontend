@@ -99,7 +99,12 @@ export function StaffShell({ children }: { children: ReactNode }) {
               <span className="staff-userchip-email" title={email}>
                 {email}
               </span>
-              <span className="staff-role-pill">{role === "ADMIN" ? "Super Admin" : "Agent"}</span>
+              <span className="staff-userchip-role">
+                Role:{" "}
+                <span className="staff-role-pill">
+                  {role === "ADMIN" ? "Super Admin" : "Agent"}
+                </span>
+              </span>
             </span>
           </div>
           <button
