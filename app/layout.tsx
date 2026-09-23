@@ -1,11 +1,25 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { Inter } from "next/font/google";
 
 import "./globals.css";
+import "./staff.css";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 import { Analytics } from "./analytics";
+import { StaffShell } from "@/components/staff/StaffShell";
 
 const GTM_ID = "GTM-KC8LVCXR";
+
+/**
+ * Modern sans for the staff portal only. The variable is referenced solely by
+ * staff.css selectors, so public pages keep Times New Roman.
+ */
+const flowFont = Inter({
+  subsets: ["latin"],
+  variable: "--font-flow",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "USVC — Trusted Help for US Vital Certificates",
@@ -13,11 +27,14 @@ export const metadata: Metadata = {
     "USVC helps Americans apply for birth, death, marriage, and divorce certificates with clear instructions, secure handling, and order tracking. Independent service, not a government agency.",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const analyticsEnabled = process.env.ANALYTICS_ENABLED === "true";
+  // Set by middleware for /auth + /staff/* on every host: staff pages use the
+  // internal chrome instead of the public header/footer.
+  const staffArea = (await headers()).get("x-staff-area") === "1";
 
   return (
-    <html lang="en">
+    <html lang="en" className={flowFont.variable}>
       {analyticsEnabled ? (
         <head>
           <script
@@ -41,9 +58,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </noscript>
         ) : null}
         <Analytics enabled={analyticsEnabled} measurementId={process.env.GA_MEASUREMENT_ID} />
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+        {staffArea ? (
+          <StaffShell>{children}</StaffShell>
+        ) : (
+          <>
+            <SiteHeader />
+            {children}
+            <SiteFooter />
+          </>
+        )}
       </body>
     </html>
   );
