@@ -66,8 +66,8 @@
   font-size: 1rem;
   font-weight: 700;
 }
-.staff-shell p,
-.staff-auth-wrap p {
+.staff-shell p:not([class]),
+.staff-auth-wrap p:not([class]) {
   margin: 0 0 10px;
 }
 .staff-content a:not(.staff-btn),
@@ -78,7 +78,7 @@
 .staff-auth-wrap a.staff-btn {
   text-decoration: none;
 }
-.staff-shell form,
+.staff-shell form:not(.staff-filters):not(.staff-lookup),
 .staff-auth-wrap form {
   padding: 0;
   border: none;
@@ -333,7 +333,10 @@
 }
 .staff-lookup {
   display: flex;
-  margin-left: auto;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: none;
+  background: transparent;
   max-width: 360px;
   flex-grow: 1;
 }
