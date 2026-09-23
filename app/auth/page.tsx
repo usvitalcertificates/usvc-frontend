@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Inbox, ShieldCheck, Users } from "lucide-react";
 import { saveStaffTokens } from "@/lib/staff-client";
 
 type Step =
@@ -87,123 +88,153 @@ function AuthForm() {
     }
   };
 
-  const stage = step.name === "login" ? 1 : 2;
-
   return (
-    <div className="staff-auth-wrap">
-      <div className="staff-auth-card">
-        <p className="staff-eyebrow">Internal — Authorized staff only</p>
-        <h1 style={{ marginTop: "4px" }}>{setupToken ? "Set up your account" : "Staff sign in"}</h1>
-        <div className="staff-steps" aria-label={`Step ${stage} of 2`}>
-          <span className={stage === 1 ? "on" : ""}>1 Credentials</span>
-          <span aria-hidden>→</span>
-          <span className={stage === 2 ? "on" : ""}>2 Authenticator</span>
+    <div className="staff-auth-split">
+      <aside className="staff-auth-brand" aria-label="USVC Flow Fulfillment Center">
+        <div className="staff-auth-brandlock">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/assets/usvc-logo-light.png" alt="USVC" width={52} height={52} />
+          <span>
+            <strong>USVC</strong>
+            <span>USVitalCertificates.org</span>
+          </span>
+          <span className="staff-auth-divider" aria-hidden />
+          <span>
+            <strong>Flow</strong>
+            <span>Fulfillment Center</span>
+          </span>
         </div>
-        {params.get("reason") === "inactivity" ? (
-          <p role="status">You were signed out after 30 minutes of inactivity.</p>
-        ) : null}
-
-        {step.name === "login" ? (
-          <form onSubmit={submitLogin} style={{ marginTop: 0, maxWidth: "none" }}>
-            {setupToken ? (
-              <p>
-                Create your own password (12+ characters). You will pair your authenticator app
-                next.
-              </p>
-            ) : (
-              <>
-                <label htmlFor="staff-email">Work email</label>
-                <input
-                  id="staff-email"
-                  type="email"
-                  autoComplete="username"
-                  spellCheck={false}
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </>
-            )}
-            <label htmlFor="staff-password">{setupToken ? "Create password" : "Password"}</label>
-            <input
-              id="staff-password"
-              type="password"
-              autoComplete={setupToken ? "new-password" : "current-password"}
-              required
-              minLength={12}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            {error ? (
-              <p role="alert" className="staff-alert error">
-                {error}
-              </p>
-            ) : null}
-            <button
-              type="submit"
-              className="staff-btn"
-              disabled={busy}
-              style={{ marginTop: "1rem", width: "100%" }}
-            >
-              {busy ? "Please wait…" : "Continue"}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={submitCode} style={{ marginTop: 0, maxWidth: "none" }}>
-            {step.name === "enroll" ? (
-              <>
-                <p>
-                  Scan this code with Google Authenticator, Microsoft Authenticator, or any
-                  compatible app, then enter the 6-digit code below.
-                </p>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={step.qr}
-                  alt="Authenticator app setup QR code"
-                  width={200}
-                  height={200}
-                  style={{ border: "1px solid var(--border)", borderRadius: "8px" }}
-                />
-                <p style={{ fontSize: "0.9rem" }}>
-                  Can&apos;t scan? Enter this key manually: <code>{step.secret}</code>
-                </p>
-              </>
-            ) : (
-              <p>Enter the current 6-digit code from your authenticator app.</p>
-            )}
-            <label htmlFor="staff-code">6-digit code</label>
-            <input
-              id="staff-code"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              spellCheck={false}
-              required
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            />
-            {error ? (
-              <p role="alert" className="staff-alert error">
-                {error}
-              </p>
-            ) : null}
-            <button
-              type="submit"
-              className="staff-btn"
-              disabled={busy || code.length !== 6}
-              style={{ marginTop: "1rem", width: "100%" }}
-            >
-              {busy
-                ? "Verifying…"
-                : step.name === "enroll"
-                  ? "Complete setup"
-                  : "Verify and continue"}
-            </button>
-          </form>
-        )}
-        <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", marginBottom: 0 }}>
-          Lost your authenticator device? Contact the super-admin — only they can reset your
-          pairing.
+        <p className="staff-auth-kicker">Processing today for brighter tomorrows</p>
+        <h1>
+          From Requests <span>to Real Records</span>
+        </h1>
+        <p className="staff-auth-sub">
+          Supporting vital record requests with care, accuracy and speed.
         </p>
+        <ul className="staff-auth-values">
+          <li>
+            <Inbox aria-hidden /> Process Orders
+          </li>
+          <li>
+            <ShieldCheck aria-hidden /> Ensure Accuracy
+          </li>
+          <li>
+            <Users aria-hidden /> Serve People
+          </li>
+        </ul>
+      </aside>
+      <div className="staff-auth-wrap">
+        <div className="staff-auth-card">
+          <p className="staff-eyebrow">Internal — Authorized staff only</p>
+          <h1 style={{ marginTop: "4px" }}>
+            {setupToken ? "Set up your account" : "Staff sign in"}
+          </h1>
+          {params.get("reason") === "inactivity" ? (
+            <p role="status">You were signed out after 30 minutes of inactivity.</p>
+          ) : null}
+
+          {step.name === "login" ? (
+            <form onSubmit={submitLogin} style={{ marginTop: 0, maxWidth: "none" }}>
+              {setupToken ? (
+                <p>
+                  Create your own password (12+ characters). You will pair your authenticator app
+                  next.
+                </p>
+              ) : (
+                <>
+                  <label htmlFor="staff-email">Work email</label>
+                  <input
+                    id="staff-email"
+                    type="email"
+                    autoComplete="username"
+                    spellCheck={false}
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </>
+              )}
+              <label htmlFor="staff-password">{setupToken ? "Create password" : "Password"}</label>
+              <input
+                id="staff-password"
+                type="password"
+                autoComplete={setupToken ? "new-password" : "current-password"}
+                required
+                minLength={12}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              {error ? (
+                <p role="alert" className="staff-alert error">
+                  {error}
+                </p>
+              ) : null}
+              <button
+                type="submit"
+                className="staff-btn"
+                disabled={busy}
+                style={{ marginTop: "1rem", width: "100%" }}
+              >
+                {busy ? "Please wait…" : "Continue"}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={submitCode} style={{ marginTop: 0, maxWidth: "none" }}>
+              {step.name === "enroll" ? (
+                <>
+                  <p>
+                    Scan this code with Google Authenticator, Microsoft Authenticator, or any
+                    compatible app, then enter the 6-digit code below.
+                  </p>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={step.qr}
+                    alt="Authenticator app setup QR code"
+                    width={200}
+                    height={200}
+                    style={{ border: "1px solid var(--border)", borderRadius: "8px" }}
+                  />
+                  <p style={{ fontSize: "0.9rem" }}>
+                    Can&apos;t scan? Enter this key manually: <code>{step.secret}</code>
+                  </p>
+                </>
+              ) : (
+                <p>Enter the current 6-digit code from your authenticator app.</p>
+              )}
+              <label htmlFor="staff-code">6-digit code</label>
+              <input
+                id="staff-code"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                spellCheck={false}
+                required
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              />
+              {error ? (
+                <p role="alert" className="staff-alert error">
+                  {error}
+                </p>
+              ) : null}
+              <button
+                type="submit"
+                className="staff-btn"
+                disabled={busy || code.length !== 6}
+                style={{ marginTop: "1rem", width: "100%" }}
+              >
+                {busy
+                  ? "Verifying…"
+                  : step.name === "enroll"
+                    ? "Complete setup"
+                    : "Verify and continue"}
+              </button>
+            </form>
+          )}
+          <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", marginBottom: 0 }}>
+            Lost your authenticator device? Contact the super-admin — only they can reset your
+            pairing.
+          </p>
+        </div>
       </div>
     </div>
   );
