@@ -3,7 +3,15 @@
 import { useState } from "react";
 import { Check, Copy, RotateCcw } from "lucide-react";
 
-export function CopyButton({ value, label }: { value: string; label: string }) {
+export function CopyButton({
+  value,
+  label,
+  position = "right",
+}: {
+  value: string;
+  label: string;
+  position?: "left" | "right";
+}) {
   const [copied, setCopied] = useState(false);
   if (!value) return null;
 
@@ -18,7 +26,14 @@ export function CopyButton({ value, label }: { value: string; label: string }) {
 
   return (
     <span
-      style={{ display: "inline-flex", alignItems: "center", gap: "4px", marginLeft: "0.5rem" }}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "4px",
+        marginLeft: position === "right" ? "0.5rem" : undefined,
+        marginRight: position === "left" ? "0.6rem" : undefined,
+        flexShrink: 0,
+      }}
     >
       <button
         type="button"

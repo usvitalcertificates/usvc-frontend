@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
+import { CreditCard as CreditCardIcon } from "lucide-react";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffFetch, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
@@ -104,8 +105,8 @@ function FieldSection({ title, entries }: { title: string; entries: [string, unk
             <div key={key}>
               <dt>{label}</dt>
               <dd>
-                {text}
-                <CopyButton value={text} label={label} />
+                <CopyButton value={text} label={label} position="left" />
+                <span>{text}</span>
               </dd>
             </div>
           );
@@ -113,6 +114,21 @@ function FieldSection({ title, entries }: { title: string; entries: [string, unk
       </dl>
     </section>
   );
+}
+
+const SENSITIVE_NOTICE: Record<"ssn" | "card", string> = {
+  ssn: "Sensitive — handle with care. Use this Social Security number only where the agency form requires it for this order. Never paste it into chats, emails, notes, or any other website. Every reveal is logged under your name.",
+  card: "Sensitive — handle with care. Use these card details only on this order's official government payment page. Never paste them into chats, emails, notes, or any other website. Every reveal is logged under your name.",
+};
+
+function cardBrand(number: string): string {
+  if (number.startsWith("4")) return "Visa";
+  if (number.startsWith("5")) return "Mastercard";
+  return "Card";
+}
+
+function groupCardNumber(number: string): string {
+  return number.replace(/(\d{4})(?=\d)/g, "$1 ");
 }
 
 function RevealCard({
@@ -128,7 +144,10 @@ function RevealCard({
 }) {
   const [reason, setReason] = useState("Govt submission");
   const [other, setOther] = useState("");
-  const [value, setValue] = useState<string | null>(null);
+  const [ssn, setSsn] = useState<string | null>(null);
+  const [card, setCard] = useState<{ number: string; expiry: string; securityCode: string } | null>(
+    null,
+  );
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -137,7 +156,8 @@ function RevealCard({
   const wipe = useCallback(() => {
     if (timer.current) clearInterval(timer.current);
     timer.current = null;
-    setValue(null);
+    setSsn(null);
+    setCard(null);
     setSeconds(0);
   }, []);
 
@@ -165,13 +185,13 @@ function RevealCard({
         method: "POST",
         body: JSON.stringify({ field, reason: finalReason }),
       });
-      const shown =
-        field === "ssn"
-          ? (data.ssn ?? "")
-          : [data.card?.number, data.card?.expiry, data.card?.securityCode]
-              .filter(Boolean)
-              .join(" · ");
-      setValue(shown);
+      if (field === "ssn") setSsn(data.ssn ?? "");
+      else
+        setCard({
+          number: data.card?.number ?? "",
+          expiry: data.card?.expiry ?? "",
+          securityCode: data.card?.securityCode ?? "",
+        });
       setSeconds(30);
       if (timer.current) clearInterval(timer.current);
       timer.current = setInterval(() => {
@@ -191,20 +211,55 @@ function RevealCard({
     }
   };
 
+  const revealed = field === "ssn" ? ssn !== null : card !== null;
+
   return (
     <div className="staff-panel">
       <h3>{title}</h3>
       <div className="staff-panel-body">
-        {value ? (
+        <p role="note" className="staff-alert warning">
+          {SENSITIVE_NOTICE[field]}
+        </p>
+        {revealed ? (
           <>
-            <p style={{ fontSize: "1.2rem", fontWeight: 700, letterSpacing: "0.04em" }}>
-              {value}
-              <CopyButton value={value} label={title} />
-            </p>
+            {field === "ssn" && ssn !== null ? (
+              <p style={{ fontSize: "1.4rem", fontWeight: 800, letterSpacing: "0.06em" }}>
+                <CopyButton value={ssn} label="SSN" position="left" />
+                <span>{ssn}</span>
+              </p>
+            ) : null}
+            {field === "card" && card !== null ? (
+              <div className="staff-paycard" aria-label="Revealed payment card">
+                <div className="staff-paycard-top">
+                  <CreditCardIcon aria-hidden />
+                  <span className="staff-paycard-brand">{cardBrand(card.number)}</span>
+                </div>
+                <p className="staff-paycard-number">
+                  <CopyButton value={card.number} label="Card number" position="left" />
+                  <span>{groupCardNumber(card.number)}</span>
+                </p>
+                <div className="staff-paycard-row">
+                  <span>
+                    <span className="staff-paycard-caption">Expiry</span>
+                    <span className="staff-paycard-value">
+                      <CopyButton value={card.expiry} label="Card expiry" position="left" />
+                      <span>{card.expiry}</span>
+                    </span>
+                  </span>
+                  <span>
+                    <span className="staff-paycard-caption">CVC</span>
+                    <span className="staff-paycard-value">
+                      <CopyButton value={card.securityCode} label="Card CVC" position="left" />
+                      <span>{card.securityCode}</span>
+                    </span>
+                  </span>
+                </div>
+              </div>
+            ) : null}
             <div className="staff-countdown" aria-hidden>
               <div style={{ width: `${(seconds / 30) * 100}%` }} />
             </div>
-            <p role="status" style={{ color: "var(--red)", fontWeight: 700, marginBottom: "8px" }}>
+            <p role="status" style={{ color: "#b91c1c", fontWeight: 700, marginBottom: "8px" }}>
               Auto-masks in {seconds}s. Do not store or photograph this value.
             </p>
             <button type="button" className="staff-btn secondary" onClick={wipe}>
@@ -239,7 +294,7 @@ function RevealCard({
             ) : null}
             <button
               type="button"
-              className="staff-btn"
+              className="staff-btn danger"
               disabled={busy}
               onClick={() => void reveal()}
             >

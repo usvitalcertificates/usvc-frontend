@@ -1098,3 +1098,82 @@ dl.staff-lines {
 .staff-secthead + .staff-deflist {
   margin-bottom: 22px;
 }
+
+/* Application rows: copy control leads, value follows. */
+.staff-deflist dd {
+  display: flex;
+  align-items: center;
+}
+
+/* Amber trust/warning notice for sensitive sections. */
+.staff-alert.warning {
+  background: var(--flow-warning-bg);
+  border: 1px solid #eed3a7;
+  color: #92400e;
+  font-weight: 500;
+}
+
+/* Payment-card visual: restrained ink card, tabular white type. */
+.staff-paycard {
+  background: var(--flow-ink);
+  color: #fff;
+  border-radius: 14px;
+  padding: 22px 24px;
+  margin: 4px 0 14px;
+  box-shadow: var(--flow-shadow);
+  max-width: 560px;
+}
+.staff-paycard-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.staff-paycard-top svg {
+  width: 30px;
+  height: 30px;
+  color: var(--flow-muted);
+}
+.staff-paycard-brand {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 85%);
+}
+.staff-paycard-number {
+  display: flex;
+  align-items: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  margin: 0 0 16px;
+}
+.staff-paycard-number span:last-child {
+  overflow-wrap: anywhere;
+}
+.staff-paycard-row {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.staff-paycard-caption {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--flow-muted);
+  margin-bottom: 2px;
+}
+.staff-paycard-value {
+  display: flex;
+  align-items: center;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.staff-paycard .staff-countdown {
+  background: rgb(255 255 255 / 18%);
+}

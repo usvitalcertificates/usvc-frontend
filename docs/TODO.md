@@ -57,6 +57,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Sidebar + detail polish 2026-09-23: brand hierarchy (USVC / Fulfillment Center / user chip with avatar + role pill), white active-link indicator bar, action-only sticky strip with single dark identity + Copy, ownership avatar card with role caption, products as right-aligned line items with emphasized total
 - [x] Unified sticky order command bar 2026-09-23: band + strip merged into one dark sticky bar (identity, pills, Update status, Drop Ownership); translucent pills + light outline button on dark
 - [x] Application tab tables 2026-09-23: striped-table sections (Requestor, Subject, Family, each address) with human labels, per-section Copy-all, two-state Copy (green Copied + recopy icon)
+- [x] Reveal redesign 2026-09-23: red Reveal buttons, always-visible trust notices, credit-card visual (brand label, grouped number, per-part number/expiry/CVC copy), copy controls lead row text
 
 ## Phase 3 (remaining + proposed backlog)
 
