@@ -39,10 +39,10 @@ Last updated: 2026-09-23 (official USVC branding; two-fee model; staff fulfillme
 - Per-state geography, address copying, review-field synchronization, and conditional fields are implemented from the reference; per-state fee/rules data port remains.
 - Display totals remain non-authoritative; the backend always recalculates the charged amount.
 - Application SSN and card input is sent to the API and encrypted (AES-256-GCM `confidentialData`) before storage; staff see `*********` until an audited reveal. Values never enter drafts, logs, or tracking; SSN masked at entry.
-- Staff portal (`/auth`, `/staff`, `/staff/admin`) is served from the same Next.js project with host-split middleware: `flow.*` allows staff paths only, the public host blocks them, previews/localhost use paths. Staff sessions use short-lived Bearer tokens in sessionStorage (never cookies/URLs); invitation emails are not yet sent (setup link shown in admin UI).
+- Staff portal (`/auth`, `/staff/*`) is served from the same Next.js project with host-split middleware: `flow.*` allows staff paths only, the public host blocks them, previews/localhost use paths. Staff sessions use short-lived Bearer tokens in sessionStorage (never cookies/URLs); invitations send via the Resend outbox when the backend has email enabled, otherwise the admin UI shows a manual setup link.
 
 ## Required next work before production orders
 
-- Complete server-side application validation and state/certificate-specific rule configuration.
-- Implement API-backed order confirmation, email notifications, staff workflows, audit views, MFA, and role permissions.
-- Add end-to-end tests for application completion, Stripe test payment, webhook retry, and public tracking.
+- Per-state fee/rules data port, confirmation-receipt verification page, SEO (sitemap, JSON-LD, per-page metadata).
+- Staff Phase 3 modules (gov-fee UI, sales/revenue, attendance, tasks, documents) per `docs/TODO.md`.
+- Staging pass on `develop`, then pre-launch wipe + production seed + go-live.

@@ -1,18 +1,18 @@
-# Frontend TODO — public funnel first
+# Frontend TODO
 
-Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = full staff suite (deferred, not started).
+Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfillment-mvp` → `develop` is open. Phase 3 below is the remaining + proposed backlog.
 
 ## Phase 1 (do first)
 
 - [ ] Port reference data verbatim: states, certificates, government-fees, faq, legal, pricing, form-config, address → `lib/data/*`
 - [ ] Order form upgrade: per-state rules, county/city validation, address same-as copy, sessionStorage draft (no SSN), Zod validation, working review + Edit scroll
 - [x] Checkout: Checkout Sessions embedded tabs (reference UI verbatim), summary sidebar, authorize + Pay flow, session-verified confirmation receipt — done 2026-09-21, real $238 test payment passed
-- [ ] Confirmation: replace static page with `GET /orders/:id/confirmation` verification + print receipt
+- [ ] Confirmation (→ Phase 3): replace static page with `GET /orders/:id/confirmation` verification + print receipt
 - [x] Tracking: sanitized, customer-friendly progress timeline backed by `POST /orders/tracking` — done 2026-09-22
 - [x] State detail page UI (`/state/[state]`) — done 2026-09-21, matches reference
 - [x] Order form rebuild (config-driven 4 types, geo county/city dropdowns, per-cert fields/reasons/relationships, father conditional, working address copy, live review + Edit, SSN-safe draft, verify→create→checkout) — done 2026-09-21
 - [x] Geo datasets (`public/geo/`, lazy per-state) — done 2026-09-21
-- [ ] Content remaining: real contact submit, per-state fee/rules data port
+- [x] Contact Us is API-backed (stores inquiry, queues support + receipt emails) — done 2026-09-21; per-state fee/rules data port remains below
 - [x] Full FAQ accordion (29 items verbatim + JSON-LD) — done 2026-09-21
 - [x] Private frontend API configuration: browser requests use `/api/backend`; the upstream is configured with server-only `API_URL` — done 2026-09-21
 - [x] Vercel dependency cleanup: ESLint 9 is aligned with the Next.js lint-plugin peer range — done 2026-09-21
@@ -24,10 +24,11 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [x] Removed the requestor previous-last-name question and field from every certificate form and order payload — done 2026-09-21
 - [x] Removed public phone support and temporarily blocked nine California counties before order creation or payment — done 2026-09-22
 - [x] Real legal pages (privacy, terms, accessibility verbatim) — done 2026-09-21
-- [ ] Content remaining: real contact submit, per-state fee/rules data port- [ ] SEO: `app/sitemap.ts`, JSON-LD Organization, metadata per state/cert page
+- [ ] Content remaining: per-state fee/rules data port
+- [ ] SEO: `app/sitemap.ts`, JSON-LD Organization, metadata per state/cert page
 - [x] GA4: production-only public funnel events plus server-verified Purchase delivery — done 2026-09-22
 - [x] GTM: install `GTM-KC8LVCXR` in the shared root layout on production pages alongside direct GA4 — done 2026-09-23
-- [ ] Email display: receipt UI matches backend email template (backend owns sending)
+- [ ] Email display (→ Phase 3): receipt UI matches backend email template (backend owns sending)
 - [x] Review shows a generic card placeholder ("Card provided (kept private)"), never digits; Section 11 + checkout copy state encrypted storage — done 2026-09-23
 - [x] Server-validation errors scroll to + focus + red-highlight the exact input, clear as the user fixes them, and the error summary links jump to each field — done 2026-09-23
 - [x] Every invalid field shows its message inline next to the input (subject/family/address/email/reason/card/signature/consents) — done 2026-09-23
@@ -42,7 +43,7 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [x] Confirm-email blocks paste/drop with live mismatch hint; checkout shows "Locked. Private. Protected." badge and a single rush-aware fee line (left two-payments block removed) — done 2026-09-23
 - [x] Blocked counties stay selectable with a state-derived red banner; section locks removed (fixes permanent lockout) and the payment button + submit are gated instead — done 2026-09-23
 - [x] `state_code` on select_state/select_certificate/order_started/begin_checkout/add_payment_info; mount-event queue so select_certificate is never dropped — done 2026-09-23
-- [ ] Proof: `npm run build` passes
+- [x] Proof: `npm run build` passes — green 2026-09-23 (19 routes)
 
 ## Phase 2 (staff MVP — built 2026-09-23 on `feat/fulfillment-mvp`)
 
@@ -52,8 +53,21 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [x] Admin dashboard (`/staff/admin`): invite modal (emailed-confirmation or manual setup link) + re-send, roster with avatars/pills, disable/revoke/MFA-reset, stat cards, filterable day-grouped activity timeline
 - [x] Sidebar shell (`StaffShell`: Open/My Work/Closed/Search/Admin/Settings, global order lookup, role pill) + dashboard kit (bands, stat cards, pills, sticky tables, numbered pagination, stepper, timeline, toasts, skeletons) in USVC tokens
 - [x] MILES deltas: global lookup (`/staff/search`), Closed Orders view, Order Search page, Settings page (session info + security controls), certificate-type filter, numbered pagination, success toasts, day-grouped history, owner dropdown with Drop Ownership + admin reassign, products card with fees, notes sensitive-content warning, tabs (Summary / Application owners-only / Notes & History)
-- [ ] Remaining: gov-fee UI, sales/revenue charts, attendance port
-- [ ] Do NOT port custody/vault/second-charge
+
+## Phase 3 (remaining + proposed backlog)
+
+- [ ] Confirmation: replace static page with `GET /orders/:id/confirmation` verification + print receipt (needs backend endpoint)
+- [ ] Email display: receipt UI matches backend email template (backend owns sending)
+- [ ] Content: per-state fee/rules data port
+- [ ] SEO: `app/sitemap.ts`, JSON-LD Organization, metadata per state/cert page
+- [ ] Gov-fee UI, sales/revenue charts, attendance port
+- [ ] Tasks system, Documents tab (backend designs still open)
+
+Proposed — awaiting owner decision:
+
+- [ ] SLA/age escalation surfacing for rush + stale unassigned orders
+- [ ] Saved queue filters, CSV export for accounting, print-friendly order sheet
+- [ ] Agency-payment confirmation display per order (needs backend field)
 
 ## Doc rule
 

@@ -1,6 +1,6 @@
 # USVC design system
 
-Last updated: 2026-09-22.
+Last updated: 2026-09-23.
 
 ## Theme
 
@@ -26,5 +26,15 @@ Use `Times New Roman`, then `Times`, `Liberation Serif`, and `serif` as fallback
 - Structural controls such as the mobile menu and FAQ accordion retain their functional layouts and use the official brand colors for accents.
 - Application sections: white bordered cards, numbered navy headings with red number, then the tricolor rule.
 - Form controls: white, 48px minimum height where appropriate, subtle gray border, navy focus state.
+
+## Staff dashboard patterns (internal portal only)
+
+Same tokens as above, plus:
+
+- Navy sidebar shell (264px, role pill, active-link red indicator) collapsing to a top bar under 900px; content on a soft-gray background, 1280px max.
+- Navy band page headers with white title; red-left-accent stat cards.
+- Status pills (navy = in progress, red = exceptions/rush, green = submitted/closed, gray = neutral) with text labels, never color alone.
+- Sticky-header data tables with row hover, falling back to stacked cards under 760px; numbered pagination with ellipsis.
+- Fulfillment stepper (Payment Successful → Order Processing → Submitted) with red exception branch; day-grouped timelines for audit/activity; success toast banners; skeleton loading rows; red countdown bar for sensitive-data reveal windows.
 
 The canonical implementation is [app/globals.css](../app/globals.css).

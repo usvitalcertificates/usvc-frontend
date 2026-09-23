@@ -25,8 +25,8 @@ placeholder, never digits; staff see `*********` until an audited reveal.
 Single Next.js project with host-split `middleware.ts`: `flow.*` serves only
 `/auth` + `/staff/*` (root `/` rewrites to the queue) while the public host
 404s staff paths; staff responses carry `x-robots-tag: noindex, nofollow` and
-the root layout swaps the public header/footer for `StaffTopBar` via the
-`x-staff-area` request header. Localhost and `*.vercel.app` previews allow all
+the root layout swaps the public header/footer for the `StaffShell` sidebar
+via the `x-staff-area` request header. Localhost and `*.vercel.app` previews allow all
 paths for development. Staff JWTs live in sessionStorage and are attached by
 `lib/staff-client.ts` through the same-origin `/api/backend` proxy (which
 forwards `authorization`); 401s trigger one refresh attempt, then redirect to
@@ -47,9 +47,9 @@ toasts, skeletons) plus a `/* Staff dashboard */` CSS section. Detail uses tabs
 system are deferred to Phase 3. Notes warn (without blocking) on SSN/card-like
 content.
 
-## Locked 2026-09-21: scope and boundaries
+## Locked 2026-09-21: scope and boundaries (refreshed 2026-09-23)
 
-- Scope: Phase 1 = public funnel first. Phase 2 = full staff suite (deferred). See `docs/TODO.md`.
-- Payments: keep PaymentIntent + Stripe Elements (already built). Do not switch to Checkout Sessions — same UX, extra session-reuse complexity.
+- Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built. See `docs/TODO.md` Phase 3 for the remaining backlog.
+- Payments: Stripe Checkout Sessions (`ui_mode: elements`, embedded tabs) — one charge path only.
 - DB/Auth: backend stays Express + Mongo + JWT (no Supabase rewrite). Frontend stays API-driven via the private `API_URL` proxy configuration.
 - Do not port custody/vault/second-charge. Do not over-engineer: no extra plan/roadmap docs beyond `TODO.md`, `CURRENT_STATUS.md`, `DECISIONS.md`.
