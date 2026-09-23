@@ -4,15 +4,7 @@ import { use, useCallback, useEffect, useRef, useState } from "react";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffFetch, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
-import {
-  BackLink,
-  PageBand,
-  STATUS_LABELS,
-  StatusPill,
-  Stepper,
-  Toast,
-  dayKey,
-} from "@/components/staff/ui";
+import { BackLink, STATUS_LABELS, StatusPill, Stepper, Toast, dayKey } from "@/components/staff/ui";
 
 const NEXT_STATUS: Record<string, string[]> = {
   PAID: ["IN_REVIEW"],
@@ -342,36 +334,26 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   return (
     <>
       <BackLink href="/staff">← Back to Open Orders</BackLink>
-      <PageBand
-        eyebrow={closed ? "Closed order — read only" : "Internal order record — access is logged"}
-        title={
-          <>
+      <div className="staff-orderbar">
+        <div className="staff-orderbar-id">
+          <p className="staff-orderbar-eyebrow">
+            {closed ? "Closed order — read only" : "Internal order record — access is logged"}
+          </p>
+          <h1>
             Order #{order.publicNumber}{" "}
             <CopyButton value={order.publicNumber} label="Order number" />
-          </>
-        }
-        subtitle={`${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} · ${order.stateName} (${order.geo.county}, ${order.geo.city}) · Submitted ${new Date(order.createdAt).toLocaleString("en-US")}`}
-        actions={
-          <>
+          </h1>
+          <p className="staff-orderbar-sub">
+            {`${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} · ${order.stateName} (${order.geo.county}, ${order.geo.city}) · Submitted ${new Date(order.createdAt).toLocaleString("en-US")}`}
+          </p>
+          <p className="staff-orderbar-pills">
             <StatusPill status={order.status} />
             {order.rush ? <span className="staff-pill red">RUSH</span> : null}
-          </>
-        }
-      />
-      {toast ? <Toast message={toast} onDone={() => setToast("")} /> : null}
-      {error ? (
-        <p role="alert" className="staff-alert error">
-          {error}
-        </p>
-      ) : null}
-
-      <div className="staff-stickybar" aria-label="Order actions">
-        <StatusPill status={order.status} />
-        {order.rush ? <span className="staff-pill red">RUSH</span> : null}
-        <span className="staff-stickybar-spacer" />
+          </p>
+        </div>
         {!closed ? (
-          <>
-            <button type="button" className="staff-btn secondary" onClick={goWorkflow}>
+          <div className="staff-orderbar-actions">
+            <button type="button" className="staff-btn light" onClick={goWorkflow}>
               Update status
             </button>
             <button
@@ -382,13 +364,15 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             >
               Drop Ownership
             </button>
-          </>
-        ) : (
-          <span style={{ fontSize: "0.85rem", color: "var(--flow-secondary)" }}>
-            Closed — read only
-          </span>
-        )}
+          </div>
+        ) : null}
       </div>
+      {toast ? <Toast message={toast} onDone={() => setToast("")} /> : null}
+      {error ? (
+        <p role="alert" className="staff-alert error">
+          {error}
+        </p>
+      ) : null}
 
       <div className="staff-tabs" role="tablist" aria-label="Order sections">
         {(

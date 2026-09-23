@@ -557,6 +557,15 @@ table.staff-table {
   background: #132e57;
   color: #fff;
 }
+.staff-btn.light {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgb(255 255 255 / 45%);
+}
+.staff-btn.light:hover {
+  background: rgb(255 255 255 / 12%);
+  color: #fff;
+}
 .staff-btn.danger {
   background: var(--flow-danger);
 }
@@ -874,27 +883,61 @@ table.staff-table {
   }
 }
 
-/* Sticky order action strip (detail page). Sits below the shell top strip. */
-.staff-stickybar {
+/* Unified sticky order command bar (detail page). Identity + actions in one. */
+.staff-orderbar {
   position: sticky;
   top: 66px;
   z-index: 10;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
   flex-wrap: wrap;
-  background: var(--flow-surface);
-  border: 1px solid var(--flow-border);
+  background: var(--flow-ink);
+  color: #fff;
   border-radius: var(--flow-radius);
   box-shadow: var(--flow-shadow);
-  padding: 10px 16px;
+  padding: 20px 24px;
   margin-bottom: 20px;
 }
-.staff-stickybar-spacer {
-  flex-grow: 1;
+.staff-orderbar-id {
+  min-width: 0;
+}
+.staff-orderbar-eyebrow {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--flow-muted);
+  margin: 0 0 2px;
+}
+.staff-orderbar h1 {
+  color: #fff;
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+.staff-orderbar-sub {
+  color: rgb(255 255 255 / 75%);
+  font-size: 0.9rem;
+  margin: 2px 0 0;
+}
+.staff-orderbar-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 10px 0 0;
+}
+.staff-orderbar .staff-pill {
+  background: rgb(255 255 255 / 14%);
+  color: #fff;
+}
+.staff-orderbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 4px;
 }
 #workflow {
-  scroll-margin-top: 140px;
+  scroll-margin-top: 220px;
 }
 
 /* Definition list for read-only summaries (no copy actions here). */
