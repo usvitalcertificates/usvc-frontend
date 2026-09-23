@@ -19,7 +19,7 @@ The root layout installs GTM container `GTM-KC8LVCXR` on every production page. 
 Attach `flow.usvitalcertificates.org` to the **same** Vercel project (plus the existing apex/`www` domains). No separate project, no wildcard:
 
 - `flow.*` serves only `/auth` + `/staff/*` (root `/` rewrites to the queue); all other paths 404 there. The public host 404s `/auth` and `/staff/*`. Staff responses carry `x-robots-tag: noindex, nofollow`.
-- Localhost and `*.vercel.app` previews allow all paths, so staff work is tested by path (`/staff`, `/auth`) without the subdomain.
+- Localhost, `*.vercel.app` previews, and `staging.usvitalcertificates.org` allow all paths, so staff work is tested by path (`/staff`, `/auth`) without the subdomain.
 - No extra frontend env vars are needed for staff; the backend origin of invitation links is the backend's `STAFF_PORTAL_URL`.
 
 ## Production checks
