@@ -352,7 +352,20 @@ export function QueueView({
                 {orders.map((order) => (
                   <tr key={order.id}>
                     <td style={{ whiteSpace: "nowrap" }}>
-                      {new Date(order.createdAt).toLocaleString("en-US")}
+                      <span className="staff-date">
+                        {new Date(order.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                      <br />
+                      <span className="staff-pill gray staff-time-badge">
+                        {new Date(order.createdAt).toLocaleTimeString("en-US", {
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </span>
                     </td>
                     <td>
                       <strong>{order.publicNumber}</strong>{" "}

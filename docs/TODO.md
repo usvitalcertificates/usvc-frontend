@@ -63,6 +63,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Agent stepper + focused queues 2026-09-23: Claimed → Processing → Submitted stepper with Paid precondition chip, per-step captions, parked-note excerpt, submitted timestamp; My Work shows open claimed only with attention-first order + quick-filter chips + guided empty state; Closed Orders drops irrelevant filters
 - [x] Queue correctness pass 2026-09-23: nav link-color specificity fix (button text visible), Order status / Certificate type terminology with customer-consistent options, chips-only My Work (`hideStatus`), dropdown↔chip mutual exclusion, Take Ownership / Open Order actions; 10-case backend matrix + render sweep green
 - [x] Queue table + search polish 2026-09-23: date-time without age captions, green Open Order with icon, search split into form + results panels with count, query chip, match highlight, tailored empty states
+- [x] Submit-time cell + form fixes 2026-09-23: two-line date + time-badge cell; form reset scoped so filter panels keep padding (`form.staff-filters` wins fairly)
 - [x] Error-proof client + stepper language 2026-09-23: `staffData` safe body reader (text fallback, no SyntaxError on any staff page), Took Ownership step, muted-done / ticked-current / blue Up-next stepper states
 
 ## Phase 3 (remaining + proposed backlog)

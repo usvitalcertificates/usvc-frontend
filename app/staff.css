@@ -78,7 +78,7 @@
 .staff-auth-wrap a.staff-btn {
   text-decoration: none;
 }
-.staff-shell form:not(.staff-filters):not(.staff-lookup),
+.staff-shell form,
 .staff-auth-wrap form {
   padding: 0;
   border: none;
@@ -331,6 +331,7 @@
   top: 0;
   z-index: 20;
 }
+form.staff-lookup,
 .staff-lookup {
   display: flex;
   margin: 0 0 0 auto;
@@ -438,6 +439,7 @@
 .staff-panel-body {
   padding: 14px 20px 20px;
 }
+form.staff-filters,
 .staff-filters {
   display: flex;
   flex-wrap: wrap;
@@ -1366,4 +1368,16 @@ dl.staff-lines {
   background: #fef08a;
   border-radius: 3px;
   padding: 0 1px;
+}
+
+/* Submit-time cell: semibold date line, muted time badge below. */
+.staff-date {
+  font-weight: 600;
+  color: var(--flow-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.staff-time-badge {
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
 }
