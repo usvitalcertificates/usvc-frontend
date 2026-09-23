@@ -74,11 +74,20 @@ export function StatCard({
   );
 }
 
-export function EmptyState({ title, hint }: { title: string; hint?: string }) {
+export function EmptyState({
+  title,
+  hint,
+  action,
+}: {
+  title: string;
+  hint?: string;
+  action?: ReactNode;
+}) {
   return (
     <div className="staff-panel-body" style={{ textAlign: "center", padding: "36px 20px" }}>
-      <p style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--navy)" }}>{title}</p>
-      {hint ? <p style={{ color: "var(--muted-text)" }}>{hint}</p> : null}
+      <p style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--flow-ink)" }}>{title}</p>
+      {hint ? <p style={{ color: "var(--flow-secondary)" }}>{hint}</p> : null}
+      {action}
     </div>
   );
 }
@@ -177,27 +186,60 @@ export function Pagination({
   );
 }
 
-/** Fulfillment stepper: PAID → IN_REVIEW → SUBMITTED, exceptions as red branch. */
-const STEP_ORDER = ["PAID", "IN_REVIEW", "SUBMITTED"];
-const STEP_SHORT = ["Payment Successful", "Order Processing", "Submitted"];
+/**
+ * Agent-centric stepper: Claimed → Order Processing → Submitted.
+ * Payment is a precondition chip (only paid orders reach agents), and
+ * ON_HOLD / NEED_INFO park as a red branch off Processing.
+ */
+const AGENT_STEPS = [
+  { key: "claimed", label: "Claimed", caption: "Order is yours, work not started." },
+  { key: "processing", label: "Order Processing", caption: "You're working this order now." },
+  { key: "submitted", label: "Submitted", caption: "Sent to the government agency." },
+];
 
-export function Stepper({ status }: { status: string }) {
+function agentStepIndex(status: string): number {
+  if (status === "SUBMITTED") return 2;
+  if (status === "IN_REVIEW" || status === "ON_HOLD" || status === "NEED_INFO") return 1;
+  return 0;
+}
+
+export function Stepper({
+  status,
+  submittedAt,
+  parkedNote,
+}: {
+  status: string;
+  submittedAt?: string | null;
+  parkedNote?: string | null;
+}) {
   const isException = status === "ON_HOLD" || status === "NEED_INFO";
-  const index = isException ? 1 : Math.max(0, STEP_ORDER.indexOf(status));
+  const index = agentStepIndex(status);
+  const done = status === "SUBMITTED";
   return (
     <div>
+      <p style={{ margin: "0 0 10px" }}>
+        <span className="staff-pill gray">Paid ✓</span>{" "}
+        <span style={{ fontSize: "0.85rem", color: "var(--flow-secondary)" }}>
+          Processing fee collected — this order is ready for fulfillment.
+        </span>
+      </p>
       <div
         className="staff-stepper"
         aria-label={`Order status: ${STATUS_LABELS[status] ?? status}`}
       >
-        {STEP_ORDER.map((step, i) => (
-          <span key={step} style={{ display: "contents" }}>
+        {AGENT_STEPS.map((step, i) => (
+          <span key={step.key} style={{ display: "contents" }}>
             {i > 0 ? <span className="staff-step-link" aria-hidden /> : null}
-            <span className={`staff-step ${i < index ? "done" : ""} ${i === index ? "now" : ""}`}>
+            <span
+              className={`staff-step ${i < index || done ? "done" : ""} ${i === index && !done ? "now" : ""}`}
+            >
               <span className="dot" aria-hidden>
-                {i < index ? "✓" : i + 1}
+                {i < index || done ? "✓" : i + 1}
               </span>
-              {STEP_SHORT[i]}
+              <span>
+                {step.label}
+                <span className="staff-step-caption">{step.caption}</span>
+              </span>
             </span>
           </span>
         ))}
@@ -205,9 +247,15 @@ export function Stepper({ status }: { status: string }) {
       {isException ? (
         <p style={{ margin: "8px 0 0" }}>
           <StatusPill status={status} />{" "}
-          <span style={{ fontSize: "0.9rem", color: "var(--muted-text)" }}>
+          <span style={{ fontSize: "0.9rem", color: "var(--flow-secondary)" }}>
             Parked — resume to Order Processing to continue.
+            {parkedNote ? ` Latest note: “${parkedNote}”` : ""}
           </span>
+        </p>
+      ) : null}
+      {done && submittedAt ? (
+        <p style={{ margin: "8px 0 0", fontSize: "0.9rem", color: "var(--flow-secondary)" }}>
+          Submitted {new Date(submittedAt).toLocaleString("en-US")}.
         </p>
       ) : null}
     </div>

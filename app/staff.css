@@ -1261,3 +1261,39 @@ dl.staff-lines {
   border-radius: 10px;
   padding: 12px 14px;
 }
+
+/* Quick-filter chips under the filter bar. */
+.staff-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--flow-border);
+  background: var(--flow-surface);
+}
+.staff-chips button {
+  border: 1px solid var(--flow-border);
+  background: var(--flow-surface);
+  color: var(--flow-text);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.staff-chips button:hover {
+  border-color: var(--flow-muted);
+}
+.staff-chips button[aria-pressed="true"] {
+  background: var(--flow-ink);
+  border-color: var(--flow-ink);
+  color: #fff;
+}
+
+/* Stepper captions under each step label. */
+.staff-step-caption {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 400;
+  color: var(--flow-secondary);
+}

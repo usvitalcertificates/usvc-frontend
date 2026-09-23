@@ -557,7 +557,23 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <div className="staff-panel" id="workflow">
             <h2>Workflow</h2>
             <div className="staff-panel-body">
-              <Stepper status={order.status} />
+              <Stepper
+                status={order.status}
+                submittedAt={
+                  [...audit]
+                    .reverse()
+                    .find(
+                      (e) =>
+                        e.action === "fulfillment_status_updated" &&
+                        (e.metadata as { status?: string } | undefined)?.status === "SUBMITTED",
+                    )?.createdAt ?? null
+                }
+                parkedNote={
+                  order.status === "ON_HOLD" || order.status === "NEED_INFO"
+                    ? ((order.notes ?? []).at(-1)?.body.slice(0, 140) ?? null)
+                    : null
+                }
+              />
               {!closed ? (
                 <div style={{ marginTop: "16px" }}>
                   <label>

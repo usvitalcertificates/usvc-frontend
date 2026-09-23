@@ -34,6 +34,15 @@ export interface QueuePreset {
   status?: string;
   assigned?: string;
   openOnly?: boolean;
+  attentionFirst?: boolean;
+  hideAssignment?: boolean;
+}
+
+export interface QueueEmpty {
+  title: string;
+  hint?: string;
+  actionLabel?: string;
+  actionHref?: string;
 }
 
 function ageLabel(createdAt: string): string {
@@ -48,11 +57,13 @@ export function QueueView({
   subtitle,
   preset,
   showKpis,
+  empty,
 }: {
   title: string;
   subtitle: string;
   preset: QueuePreset;
   showKpis?: boolean;
+  empty?: QueueEmpty;
 }) {
   useRequireStaffAuth();
   useInactivitySignout();
@@ -64,6 +75,7 @@ export function QueueView({
   const [status, setStatus] = useState(preset.status ?? "");
   const [certificate, setCertificate] = useState("");
   const [assigned, setAssigned] = useState(preset.assigned ?? "all");
+  const [rushOnly, setRushOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
@@ -75,9 +87,11 @@ export function QueueView({
     try {
       const params = new URLSearchParams({ page: String(page), assigned });
       if (preset.openOnly) params.set("openOnly", "true");
+      if (preset.attentionFirst) params.set("attentionFirst", "true");
       if (search.trim()) params.set("search", search.trim());
       if (status) params.set("status", status);
       if (certificate) params.set("certificate", certificate);
+      if (rushOnly) params.set("rushOnly", "true");
       const response = await staffFetch(`/staff/orders?${params.toString()}`);
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Could not load the queue");
@@ -89,7 +103,16 @@ export function QueueView({
     } finally {
       setLoading(false);
     }
-  }, [page, assigned, search, status, certificate, preset.openOnly]);
+  }, [
+    page,
+    assigned,
+    search,
+    status,
+    certificate,
+    rushOnly,
+    preset.openOnly,
+    preset.attentionFirst,
+  ]);
 
   useEffect(() => {
     void load();
@@ -216,7 +239,7 @@ export function QueueView({
               <option value="DIVORCE">Divorce</option>
             </select>
           </label>
-          {!preset.assigned ? (
+          {!preset.assigned && !preset.hideAssignment ? (
             <label>
               Assignment
               <select
@@ -234,12 +257,61 @@ export function QueueView({
           ) : null}
         </div>
 
+        {!preset.status ? (
+          <div className="staff-chips" role="group" aria-label="Quick filters">
+            {(
+              [
+                ["all", "All"],
+                ["ON_HOLD", "On Hold"],
+                ["NEED_INFO", "Need Info"],
+                ["rush", "Rush"],
+              ] as const
+            ).map(([value, label]) => {
+              const active =
+                value === "all"
+                  ? status === "" && !rushOnly
+                  : value === "rush"
+                    ? rushOnly
+                    : status === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => {
+                    if (value === "all") {
+                      setStatus("");
+                      setRushOnly(false);
+                    } else if (value === "rush") {
+                      setStatus("");
+                      setRushOnly(true);
+                    } else {
+                      setStatus(value);
+                      setRushOnly(false);
+                    }
+                    resetPage();
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+
         {loading ? (
           <SkeletonRows rows={6} />
         ) : orders.length === 0 ? (
           <EmptyState
-            title="No orders match these filters."
-            hint="Try widening the search or substatus."
+            title={empty?.title ?? "No orders match these filters."}
+            hint={empty?.hint ?? "Try widening the search or substatus."}
+            action={
+              empty?.actionLabel && empty?.actionHref ? (
+                <Link className="staff-btn" href={empty.actionHref} style={{ marginTop: "12px" }}>
+                  {empty.actionLabel}
+                </Link>
+              ) : undefined
+            }
           />
         ) : (
           <div className="staff-tablewrap">

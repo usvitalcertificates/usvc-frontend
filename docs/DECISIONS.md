@@ -48,11 +48,13 @@ information architecture — not a visual clone. Shared kit in
 `components/staff/ui.tsx` (bands, stat cards, status pills, sticky tables with
 card fallback under 760px, numbered pagination, stepper, day-grouped timeline,
 toasts, skeletons) plus destructive-action confirmations. Detail uses tabs
-(Summary / Application owners-only / Notes & History) with a sticky action
-strip (identity, pills, Copy Order ID, status anchor, Drop Ownership),
-progressive note disclosure (note field appears only for exception statuses),
-and a copy-free definition-list Order Summary; Documents tab and Tasks
-system are deferred to Phase 3. Notes warn (without blocking) on SSN/card-like
+(Summary / Application owners-only / Notes & History) with a unified sticky
+dark order bar (single identity + Copy Order ID, pills, Update-status anchor,
+Drop Ownership), progressive note disclosure (note field appears only for
+exception statuses), and a copy-free definition-list Order Summary; the
+workflow stepper speaks agent language (Claimed → Processing → Submitted
+with Paid as a precondition chip, exceptions as a parked branch with the
+latest note excerpt); Documents tab and Tasks system are deferred to Phase 3. Notes warn (without blocking) on SSN/card-like
 content.
 
 ## Locked 2026-09-21: scope and boundaries (refreshed 2026-09-23)

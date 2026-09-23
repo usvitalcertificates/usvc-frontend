@@ -60,6 +60,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Reveal redesign 2026-09-23: red Reveal buttons, always-visible trust notices, credit-card visual (brand label, grouped number, per-part number/expiry/CVC copy), copy controls lead row text
 - [x] Reveal v2 2026-09-23: SSN titled Social Security Number (SSN), card visual with chip + brand pill + footer row, rhythm-spaced reveal forms
 - [x] Notes & History 2026-09-23: latest-10 paging with Show more/less + counts, day-grouped history preserved, category-colored dots, relative timestamps, note bubble cards
+- [x] Agent stepper + focused queues 2026-09-23: Claimed → Processing → Submitted stepper with Paid precondition chip, per-step captions, parked-note excerpt, submitted timestamp; My Work shows open claimed only with attention-first order + quick-filter chips + guided empty state; Closed Orders drops irrelevant filters
 
 ## Phase 3 (remaining + proposed backlog)
 

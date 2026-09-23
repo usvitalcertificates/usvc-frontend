@@ -6,8 +6,12 @@ export default function ClosedOrders() {
   return (
     <QueueView
       title="Closed Orders"
-      subtitle="Submitted to the government agency. Read-only history — reopen from the queue only by release and re-claim."
-      preset={{ status: "SUBMITTED" }}
+      subtitle="Submitted to the government agency — read-only history."
+      preset={{ status: "SUBMITTED", hideAssignment: true }}
+      empty={{
+        title: "No submitted orders yet.",
+        hint: "Closed orders appear here after submission to the agency.",
+      }}
     />
   );
 }
