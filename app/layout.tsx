@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 
 import "./globals.css";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 import { Analytics } from "./analytics";
+import { StaffShell } from "@/components/staff/StaffShell";
 
 const GTM_ID = "GTM-KC8LVCXR";
 
@@ -13,8 +15,11 @@ export const metadata: Metadata = {
     "USVC helps Americans apply for birth, death, marriage, and divorce certificates with clear instructions, secure handling, and order tracking. Independent service, not a government agency.",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const analyticsEnabled = process.env.ANALYTICS_ENABLED === "true";
+  // Set by middleware for /auth + /staff/* on every host: staff pages use the
+  // internal chrome instead of the public header/footer.
+  const staffArea = (await headers()).get("x-staff-area") === "1";
 
   return (
     <html lang="en">
@@ -41,9 +46,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </noscript>
         ) : null}
         <Analytics enabled={analyticsEnabled} measurementId={process.env.GA_MEASUREMENT_ID} />
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+        {staffArea ? (
+          <StaffShell>{children}</StaffShell>
+        ) : (
+          <>
+            <SiteHeader />
+            {children}
+            <SiteFooter />
+          </>
+        )}
       </body>
     </html>
   );

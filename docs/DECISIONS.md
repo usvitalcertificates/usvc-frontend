@@ -20,6 +20,33 @@ card fields. Values are sent to the API, encrypted (AES-256-GCM
 telemetry, logs, MongoDB plaintext, or Stripe. Review shows a generic
 placeholder, never digits; staff see `*********` until an audited reveal.
 
+## Staff portal hosting and sessions (locked 2026-09-23)
+
+Single Next.js project with host-split `middleware.ts`: `flow.*` serves only
+`/auth` + `/staff/*` (root `/` rewrites to the queue) while the public host
+404s staff paths; staff responses carry `x-robots-tag: noindex, nofollow` and
+the root layout swaps the public header/footer for `StaffTopBar` via the
+`x-staff-area` request header. Localhost and `*.vercel.app` previews allow all
+paths for development. Staff JWTs live in sessionStorage and are attached by
+`lib/staff-client.ts` through the same-origin `/api/backend` proxy (which
+forwards `authorization`); 401s trigger one refresh attempt, then redirect to
+`/auth`. No staff secret ever touches cookies, URLs, or analytics (GA already
+skips `/staff` page views and only runs on public production hosts).
+
+## Staff dashboard design (locked 2026-09-23)
+
+Sidebar shell (`StaffShell`: navy sidebar with Open Orders / My Work / Closed
+Orders / Order Search / Administration (admin) / Settings, top strip with global
+order-number lookup, role pill, sign-out) adapted from the MILES reference
+information architecture but rebuilt in USVC tokens (Times, navy/red, soft gray,
+white cards, 6–8px radius) — not a visual clone. Shared kit in
+`components/staff/ui.tsx` (bands, stat cards, status pills, sticky tables with
+card fallback under 760px, numbered pagination, stepper, day-grouped timeline,
+toasts, skeletons) plus a `/* Staff dashboard */` CSS section. Detail uses tabs
+(Summary / Application owners-only / Notes & History); Documents tab and Tasks
+system are deferred to Phase 3. Notes warn (without blocking) on SSN/card-like
+content.
+
 ## Locked 2026-09-21: scope and boundaries
 
 - Scope: Phase 1 = public funnel first. Phase 2 = full staff suite (deferred). See `docs/TODO.md`.

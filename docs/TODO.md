@@ -44,12 +44,15 @@ Scope locked 2026-09-21: Phase 1 = public funnel to Lovable parity. Phase 2 = fu
 - [x] `state_code` on select_state/select_certificate/order_started/begin_checkout/add_payment_info; mount-event queue so select_certificate is never dropped — done 2026-09-23
 - [ ] Proof: `npm run build` passes
 
-## Phase 2 (deferred)
+## Phase 2 (staff MVP — built 2026-09-23 on `feat/fulfillment-mvp`)
 
-- [ ] Staff login + TOTP gate + inactivity signout
-- [ ] Fulfillment queue/detail/notes/audit/status (API-backed)
-- [ ] Admin gov-fee UI, sales/revenue charts
-- [ ] Attendance: port only if needed (original was isolated preview-only)
+- [x] Middleware host split (`middleware.ts`): `flow.*` serves `/auth` + `/staff/*` only (root rewrites to queue, staff area gets `noindex` + internal chrome); main host 404s staff paths; localhost/previews allow all by path
+- [x] Staff login + TOTP enroll (QR)/verify + invite-setup (`/auth?setup=`) + 30-min inactivity signout + session token store (`lib/staff-client.ts`, proxy forwards `authorization` + PATCH/PUT/DELETE)
+- [x] Fulfillment queue/detail/notes/audit/status (`/staff`, `/staff/[id]`): masked rows, claim, per-field reveal with reason + 30-sec auto-mask + copy buttons, exception statuses with note, release
+- [x] Admin dashboard (`/staff/admin`): invite modal (emailed-confirmation or manual setup link) + re-send, roster with avatars/pills, disable/revoke/MFA-reset, stat cards, filterable day-grouped activity timeline
+- [x] Sidebar shell (`StaffShell`: Open/My Work/Closed/Search/Admin/Settings, global order lookup, role pill) + dashboard kit (bands, stat cards, pills, sticky tables, numbered pagination, stepper, timeline, toasts, skeletons) in USVC tokens
+- [x] MILES deltas: global lookup (`/staff/search`), Closed Orders view, Order Search page, Settings page (session info + security controls), certificate-type filter, numbered pagination, success toasts, day-grouped history, owner dropdown with Drop Ownership + admin reassign, products card with fees, notes sensitive-content warning, tabs (Summary / Application owners-only / Notes & History)
+- [ ] Remaining: gov-fee UI, sales/revenue charts, attendance port
 - [ ] Do NOT port custody/vault/second-charge
 
 ## Doc rule
