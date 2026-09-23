@@ -1,7 +1,6 @@
 "use client";
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
-import { CreditCard as CreditCardIcon } from "lucide-react";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffFetch, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
@@ -135,11 +134,13 @@ function RevealCard({
   orderId,
   field,
   title,
+  shortTitle,
   onReveal,
 }: {
   orderId: string;
   field: "ssn" | "card";
   title: string;
+  shortTitle?: string;
   onReveal: () => void;
 }) {
   const [reason, setReason] = useState("Govt submission");
@@ -231,7 +232,10 @@ function RevealCard({
             {field === "card" && card !== null ? (
               <div className="staff-paycard" aria-label="Revealed payment card">
                 <div className="staff-paycard-top">
-                  <CreditCardIcon aria-hidden />
+                  <span className="staff-paycard-chip" aria-hidden>
+                    <span />
+                    <span />
+                  </span>
                   <span className="staff-paycard-brand">{cardBrand(card.number)}</span>
                 </div>
                 <p className="staff-paycard-number">
@@ -254,20 +258,35 @@ function RevealCard({
                     </span>
                   </span>
                 </div>
+                <div className="staff-paycard-foot">
+                  <div className="staff-countdown" aria-hidden>
+                    <div style={{ width: `${(seconds / 30) * 100}%` }} />
+                  </div>
+                  <p role="status">
+                    Auto-masks in {seconds}s. Do not store or photograph this value.
+                  </p>
+                  <button type="button" className="staff-btn light" onClick={wipe}>
+                    Mask now
+                  </button>
+                </div>
               </div>
             ) : null}
-            <div className="staff-countdown" aria-hidden>
-              <div style={{ width: `${(seconds / 30) * 100}%` }} />
-            </div>
-            <p role="status" style={{ color: "#b91c1c", fontWeight: 700, marginBottom: "8px" }}>
-              Auto-masks in {seconds}s. Do not store or photograph this value.
-            </p>
-            <button type="button" className="staff-btn secondary" onClick={wipe}>
-              Mask now
-            </button>
+            {field === "ssn" ? (
+              <>
+                <div className="staff-countdown" aria-hidden>
+                  <div style={{ width: `${(seconds / 30) * 100}%` }} />
+                </div>
+                <p role="status" style={{ color: "#b91c1c", fontWeight: 700, marginBottom: "8px" }}>
+                  Auto-masks in {seconds}s. Do not store or photograph this value.
+                </p>
+                <button type="button" className="staff-btn secondary" onClick={wipe}>
+                  Mask now
+                </button>
+              </>
+            ) : null}
           </>
         ) : (
-          <>
+          <div className="staff-reveal-form">
             <p>
               <code>*********</code>
             </p>
@@ -292,15 +311,17 @@ function RevealCard({
                 {error}
               </p>
             ) : null}
-            <button
-              type="button"
-              className="staff-btn danger"
-              disabled={busy}
-              onClick={() => void reveal()}
-            >
-              {busy ? "Revealing…" : `Reveal ${title}`}
-            </button>
-          </>
+            <div>
+              <button
+                type="button"
+                className="staff-btn danger"
+                disabled={busy}
+                onClick={() => void reveal()}
+              >
+                {busy ? "Revealing…" : `Reveal ${shortTitle ?? title}`}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -692,7 +713,13 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               ))}
             </div>
           </div>
-          <RevealCard orderId={id} field="ssn" title="SSN" onReveal={() => void load()} />
+          <RevealCard
+            orderId={id}
+            field="ssn"
+            title="Social Security Number (SSN)"
+            shortTitle="SSN"
+            onReveal={() => void load()}
+          />
           <RevealCard orderId={id} field="card" title="Payment card" onReveal={() => void load()} />
         </>
       ) : null}

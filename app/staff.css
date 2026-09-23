@@ -1129,18 +1129,6 @@ dl.staff-lines {
   justify-content: space-between;
   margin-bottom: 18px;
 }
-.staff-paycard-top svg {
-  width: 30px;
-  height: 30px;
-  color: var(--flow-muted);
-}
-.staff-paycard-brand {
-  font-size: 0.85rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgb(255 255 255 / 85%);
-}
 .staff-paycard-number {
   display: flex;
   align-items: center;
@@ -1176,4 +1164,75 @@ dl.staff-lines {
 }
 .staff-paycard .staff-countdown {
   background: rgb(255 255 255 / 18%);
+}
+
+/* Reveal form rhythm: uniform spacing that can never collapse. */
+.staff-reveal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+}
+.staff-reveal-form p,
+.staff-reveal-form label {
+  margin: 0;
+  width: 100%;
+}
+.staff-reveal-form .staff-alert {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+/* Payment-card visual v2: chip, brand pill, footer row. */
+.staff-paycard-chip {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  width: 44px;
+  height: 32px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #c9d4e8 0%, #8da9c4 55%, #c9d4e8 100%);
+  border: 1px solid rgb(255 255 255 / 35%);
+  overflow: hidden;
+}
+.staff-paycard-number {
+  font-size: 1.55rem;
+}
+.staff-paycard-chip > span {
+  border-right: 1px solid rgb(11 37 69 / 35%);
+  border-bottom: 1px solid rgb(11 37 69 / 35%);
+}
+.staff-paycard-chip > span:nth-child(2n) {
+  border-right: none;
+}
+.staff-paycard-brand {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgb(255 255 255 / 14%);
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 999px;
+  padding: 4px 14px;
+}
+.staff-paycard-number {
+  font-size: 1.55rem;
+}
+.staff-paycard-foot {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgb(255 255 255 / 16%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+.staff-paycard-foot .staff-countdown {
+  width: 100%;
+}
+.staff-paycard-foot p {
+  margin: 0;
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: #f3c2c2;
 }

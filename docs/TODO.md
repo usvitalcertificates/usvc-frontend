@@ -58,6 +58,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Unified sticky order command bar 2026-09-23: band + strip merged into one dark sticky bar (identity, pills, Update status, Drop Ownership); translucent pills + light outline button on dark
 - [x] Application tab tables 2026-09-23: striped-table sections (Requestor, Subject, Family, each address) with human labels, per-section Copy-all, two-state Copy (green Copied + recopy icon)
 - [x] Reveal redesign 2026-09-23: red Reveal buttons, always-visible trust notices, credit-card visual (brand label, grouped number, per-part number/expiry/CVC copy), copy controls lead row text
+- [x] Reveal v2 2026-09-23: SSN titled Social Security Number (SSN), card visual with chip + brand pill + footer row, rhythm-spaced reveal forms
 
 ## Phase 3 (remaining + proposed backlog)
 
