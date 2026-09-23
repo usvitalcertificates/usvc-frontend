@@ -588,6 +588,13 @@ table.staff-table {
   background: #b91c1c;
   color: #fff;
 }
+.staff-btn.green {
+  background: var(--flow-success);
+}
+.staff-btn.green:hover {
+  background: #15803d;
+  color: #fff;
+}
 
 /* Alerts name the outcome; errors add the fix. */
 .staff-alert {
@@ -1321,4 +1328,39 @@ dl.staff-lines {
   font-size: 0.76rem;
   font-weight: 400;
   color: var(--flow-secondary);
+}
+
+/* Results panel header with removable query chip. */
+.staff-results-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px 20px 0;
+}
+.staff-results-head h2 {
+  margin: 0;
+}
+.staff-query-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--flow-border);
+  background: var(--flow-bg);
+  color: var(--flow-ink);
+  border-radius: 999px;
+  padding: 5px 8px 5px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  max-width: 100%;
+}
+.staff-query-chip:hover {
+  border-color: var(--flow-muted);
+}
+.staff-table mark {
+  background: #fef08a;
+  border-radius: 3px;
+  padding: 0 1px;
 }

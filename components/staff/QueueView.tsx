@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Clock, Inbox, UserCheck, UserPlus, Zap } from "lucide-react";
+import { Clock, FolderOpen, Inbox, UserCheck, UserPlus, Zap } from "lucide-react";
 import { staffData } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
@@ -353,10 +353,6 @@ export function QueueView({
                   <tr key={order.id}>
                     <td style={{ whiteSpace: "nowrap" }}>
                       {new Date(order.createdAt).toLocaleString("en-US")}
-                      <br />
-                      <span style={{ fontSize: "0.82rem", color: "var(--muted-text)" }}>
-                        {ageLabel(order.createdAt)} old
-                      </span>
                     </td>
                     <td>
                       <strong>{order.publicNumber}</strong>{" "}
@@ -381,8 +377,8 @@ export function QueueView({
                     <td>{order.requestor}</td>
                     <td style={{ whiteSpace: "nowrap" }}>
                       {order.assignedToMe || order.assignedName ? (
-                        <Link className="staff-btn secondary" href={`/staff/${order.id}`}>
-                          Open Order
+                        <Link className="staff-btn green" href={`/staff/${order.id}`}>
+                          <FolderOpen aria-hidden style={{ width: 15, height: 15 }} /> Open Order
                         </Link>
                       ) : (
                         <button

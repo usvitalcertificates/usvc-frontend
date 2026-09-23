@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { FolderOpen, Search as SearchIcon, X } from "lucide-react";
 import { staffData } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { EmptyState, PageBand, SkeletonRows, StatusPill } from "@/components/staff/ui";
@@ -19,6 +20,21 @@ interface Result {
   assignedToMe: boolean;
 }
 
+/** Bold-highlights a case-insensitive match inside text. */
+function Highlight({ text, term }: { text: string; term: string }) {
+  const query = term.trim();
+  if (!query) return <>{text}</>;
+  const index = text.toLowerCase().indexOf(query.toLowerCase());
+  if (index < 0) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark>{text.slice(index, index + query.length)}</mark>
+      {text.slice(index + query.length)}
+    </>
+  );
+}
+
 function SearchView() {
   useRequireStaffAuth();
   useInactivitySignout();
@@ -26,6 +42,7 @@ function SearchView() {
   const initial = params.get("q") ?? "";
   const [term, setTerm] = useState(initial);
   const [certificate, setCertificate] = useState("");
+  const [activeQuery, setActiveQuery] = useState("");
   const [results, setResults] = useState<Result[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -33,6 +50,7 @@ function SearchView() {
   const run = useCallback(async (query: string, cert: string) => {
     if (!query.trim() && !cert) {
       setResults(null);
+      setActiveQuery("");
       return;
     }
     setLoading(true);
@@ -46,6 +64,7 @@ function SearchView() {
       );
       if (!response.ok) throw new Error(data.message || "Search failed");
       setResults(data.orders);
+      setActiveQuery(query.trim());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Search failed");
     } finally {
@@ -56,6 +75,14 @@ function SearchView() {
   useEffect(() => {
     if (initial) void run(initial, "");
   }, [initial, run]);
+
+  const clear = () => {
+    setTerm("");
+    setCertificate("");
+    setResults(null);
+    setActiveQuery("");
+    setError("");
+  };
 
   return (
     <>
@@ -98,62 +125,107 @@ function SearchView() {
               <option value="DIVORCE">Divorce</option>
             </select>
           </label>
-          <div style={{ display: "flex", alignItems: "flex-end" }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: "8px" }}>
             <button type="submit" className="staff-btn navy">
-              Search
+              <SearchIcon aria-hidden style={{ width: 16, height: 16 }} /> Search
             </button>
+            {results !== null || term || certificate ? (
+              <button type="button" className="staff-btn secondary" onClick={clear}>
+                Clear
+              </button>
+            ) : null}
           </div>
         </form>
+      </div>
+
+      <div className="staff-panel">
         {loading ? (
           <SkeletonRows rows={4} />
         ) : results === null ? (
-          <EmptyState title="Enter a search above." />
-        ) : results.length === 0 ? (
-          <EmptyState title="No orders found." hint="Check the number or widen the search." />
+          <EmptyState
+            title="Search for an order to begin."
+            hint="Enter an order number, requestor name, or email above."
+          />
         ) : (
-          <div className="staff-tablewrap">
-            <table className="staff-table staff-cards-fallback">
-              <thead>
-                <tr>
-                  <th>Order #</th>
-                  <th>Certificate</th>
-                  <th>Status</th>
-                  <th>Owner</th>
-                  <th>Requestor</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((order) => (
-                  <tr key={order.id}>
-                    <td>
-                      <strong>{order.publicNumber}</strong>
-                    </td>
-                    <td>
-                      {order.stateCode}{" "}
-                      {order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()}
-                    </td>
-                    <td>
-                      <StatusPill status={order.status} />
-                    </td>
-                    <td>{order.assignedName ?? "Unassigned"}</td>
-                    <td>{order.requestor}</td>
-                    <td>
-                      {order.assignedToMe || order.assignedName ? (
-                        <Link className="staff-btn secondary" href={`/staff/${order.id}`}>
-                          Open Order
-                        </Link>
-                      ) : (
-                        <Link className="staff-btn secondary" href="/staff">
-                          Take Ownership from queue
-                        </Link>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <>
+            <div className="staff-results-head">
+              <h2>Results ({results.length})</h2>
+              {activeQuery ? (
+                <button
+                  type="button"
+                  className="staff-query-chip"
+                  onClick={clear}
+                  aria-label="Clear search"
+                  title="Clear search"
+                >
+                  “{activeQuery}” <X aria-hidden style={{ width: 13, height: 13 }} />
+                </button>
+              ) : null}
+            </div>
+            {results.length === 0 ? (
+              <EmptyState
+                title={activeQuery ? `No orders found for “${activeQuery}”.` : "No orders found."}
+                hint="Check the number or widen the search."
+                action={
+                  <button
+                    type="button"
+                    className="staff-btn secondary"
+                    onClick={clear}
+                    style={{ marginTop: "12px" }}
+                  >
+                    Clear search
+                  </button>
+                }
+              />
+            ) : (
+              <div className="staff-tablewrap">
+                <table className="staff-table staff-cards-fallback">
+                  <thead>
+                    <tr>
+                      <th>Order #</th>
+                      <th>Certificate</th>
+                      <th>Status</th>
+                      <th>Owner</th>
+                      <th>Requestor</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {results.map((order) => (
+                      <tr key={order.id}>
+                        <td>
+                          <strong>
+                            <Highlight text={order.publicNumber} term={activeQuery} />
+                          </strong>
+                        </td>
+                        <td>
+                          {order.stateCode}{" "}
+                          {order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()}
+                        </td>
+                        <td>
+                          <StatusPill status={order.status} />
+                        </td>
+                        <td>{order.assignedName ?? "Unassigned"}</td>
+                        <td>{order.requestor}</td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          {order.assignedToMe || order.assignedName ? (
+                            <Link className="staff-btn green" href={`/staff/${order.id}`}>
+                              <FolderOpen aria-hidden style={{ width: 15, height: 15 }} /> Open
+                              Order
+                            </Link>
+                          ) : (
+                            <Link className="staff-btn secondary" href="/staff">
+                              Take Ownership from queue
+                            </Link>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
         )}
       </div>
     </>
