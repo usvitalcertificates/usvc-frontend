@@ -19,10 +19,18 @@ function isLocalOrPreview(host: string): boolean {
   );
 }
 
+/** Staging serves both the public site and the staff portal by path
+ *  (production keeps them host-separated: main site vs flow.*). */
+function isStagingHost(host: string): boolean {
+  const name = host.split(":")[0].toLowerCase();
+  return name === "staging.usvitalcertificates.org" || name.startsWith("staging.");
+}
+
 /**
  * Host split for the single-project setup. `flow.*` serves only the staff
  * portal (/auth, /staff); the public site serves everything except staff.
- * Localhost and Vercel previews allow all paths for development.
+ * Staging, localhost, and Vercel previews allow all paths for development
+ * and testing.
  */
 export function middleware(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
@@ -38,8 +46,8 @@ export function middleware(request: NextRequest) {
     return response;
   };
 
-  if (isLocalOrPreview(host)) {
-    // Localhost and Vercel previews allow all paths for development.
+  if (isLocalOrPreview(host) || isStagingHost(host)) {
+    // Localhost, previews, and staging allow all paths.
     if (pathname === "/" && host.split(":")[0].toLowerCase() === "flow.localtest") {
       return NextResponse.rewrite(new URL("/staff", request.url));
     }
