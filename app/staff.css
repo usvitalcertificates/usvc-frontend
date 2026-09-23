@@ -70,7 +70,7 @@
 .staff-auth-wrap p {
   margin: 0 0 10px;
 }
-.staff-shell a:not(.staff-btn),
+.staff-content a:not(.staff-btn),
 .staff-auth-wrap a:not(.staff-btn) {
   color: var(--flow-primary);
 }

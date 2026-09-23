@@ -140,11 +140,11 @@ function SearchView() {
                     <td>
                       {order.assignedToMe || order.assignedName ? (
                         <Link className="staff-btn secondary" href={`/staff/${order.id}`}>
-                          Open
+                          Open Order
                         </Link>
                       ) : (
                         <Link className="staff-btn secondary" href="/staff">
-                          Claim from queue
+                          Take Ownership from queue
                         </Link>
                       )}
                     </td>

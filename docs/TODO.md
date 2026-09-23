@@ -61,6 +61,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Reveal v2 2026-09-23: SSN titled Social Security Number (SSN), card visual with chip + brand pill + footer row, rhythm-spaced reveal forms
 - [x] Notes & History 2026-09-23: latest-10 paging with Show more/less + counts, day-grouped history preserved, category-colored dots, relative timestamps, note bubble cards
 - [x] Agent stepper + focused queues 2026-09-23: Claimed → Processing → Submitted stepper with Paid precondition chip, per-step captions, parked-note excerpt, submitted timestamp; My Work shows open claimed only with attention-first order + quick-filter chips + guided empty state; Closed Orders drops irrelevant filters
+- [x] Queue correctness pass 2026-09-23: nav link-color specificity fix (button text visible), Order status / Certificate type terminology with customer-consistent options, chips-only My Work (`hideStatus`), dropdown↔chip mutual exclusion, Take Ownership / Open Order actions; 10-case backend matrix + render sweep green
 
 ## Phase 3 (remaining + proposed backlog)
 

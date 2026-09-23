@@ -154,11 +154,11 @@ export function QueueView({
     try {
       const response = await staffFetch(`/staff/orders/${id}/claim`, { method: "POST" });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Could not claim this order");
-      setToast(`Order ${publicNumber} claimed — it is now in My Work.`);
+      if (!response.ok) throw new Error(data.message || "Could not take ownership of this order");
+      setToast(`You took ownership of order ${publicNumber} — it is now in My Work.`);
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not claim this order");
+      setError(e instanceof Error ? e.message : "Could not take ownership of this order");
     }
   };
 
@@ -209,18 +209,28 @@ export function QueueView({
             <label>
               Order status
               <select
-                value={status}
+                value={rushOnly ? "__rush" : status}
                 onChange={(e) => {
-                  setStatus(e.target.value);
+                  // Dropdown and quick chips are mutually exclusive: picking
+                  // one always clears the other so filters can never AND
+                  // into a confusing empty result.
+                  if (e.target.value === "__rush") {
+                    setStatus("");
+                    setRushOnly(true);
+                  } else {
+                    setStatus(e.target.value);
+                    setRushOnly(false);
+                  }
                   resetPage();
                 }}
               >
                 <option value="">All statuses</option>
-                <option value="PAID">Paid</option>
+                <option value="PAID">Payment Successful</option>
                 <option value="IN_REVIEW">Order Processing</option>
                 <option value="ON_HOLD">On Hold</option>
                 <option value="NEED_INFO">Need Customer Information</option>
                 <option value="SUBMITTED">Submitted to Govt Agency</option>
+                <option value="__rush">Rush only</option>
               </select>
             </label>
           ) : null}
@@ -362,7 +372,7 @@ export function QueueView({
                     <td style={{ whiteSpace: "nowrap" }}>
                       {order.assignedToMe || order.assignedName ? (
                         <Link className="staff-btn secondary" href={`/staff/${order.id}`}>
-                          Open
+                          Open Order
                         </Link>
                       ) : (
                         <button
@@ -370,7 +380,7 @@ export function QueueView({
                           className="staff-btn"
                           onClick={() => void claim(order.id, order.publicNumber)}
                         >
-                          <UserPlus aria-hidden style={{ width: 15, height: 15 }} /> Claim
+                          <UserPlus aria-hidden style={{ width: 15, height: 15 }} /> Take Ownership
                         </button>
                       )}
                     </td>
