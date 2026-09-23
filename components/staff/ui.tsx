@@ -231,11 +231,12 @@ export function Stepper({
           const isDone = i < index || done;
           const isNow = i === index && !done;
           const isNext = i === index + 1 && !done;
+          const isTerminal = done && i === AGENT_STEPS.length - 1;
           return (
             <span key={step.key} style={{ display: "contents" }}>
               {i > 0 ? <span className="staff-step-link" aria-hidden /> : null}
               <span
-                className={`staff-step${isDone ? " done" : ""}${isNow ? " now" : ""}${isNext ? " next" : ""}`}
+                className={`staff-step${isDone ? " done" : ""}${isNow ? " now" : ""}${isNext ? " next" : ""}${isTerminal ? " terminal" : ""}`}
               >
                 <span className="dot" aria-hidden>
                   {isDone || isNow ? "✓" : i + 1}
@@ -259,10 +260,17 @@ export function Stepper({
           </span>
         </p>
       ) : null}
-      {done && submittedAt ? (
-        <p style={{ margin: "8px 0 0", fontSize: "0.9rem", color: "var(--flow-secondary)" }}>
-          Submitted {new Date(submittedAt).toLocaleString("en-US")}.
-        </p>
+      {done ? (
+        <div className="staff-closed-panel" role="status">
+          <p className="staff-closed-title">
+            <span aria-hidden>✓ </span>This order is closed — submitted to the government agency.
+          </p>
+          {submittedAt ? (
+            <p className="staff-closed-sub">
+              Submitted {new Date(submittedAt).toLocaleString("en-US")}.
+            </p>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );

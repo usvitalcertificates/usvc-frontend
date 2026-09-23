@@ -624,7 +624,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   </div>
                 </div>
               ) : (
-                <p>This order is closed (submitted to the government agency).</p>
+                <p style={{ color: "var(--flow-secondary)", marginBottom: 0 }}>
+                  No further actions — the submission record above is final.
+                </p>
               )}
             </div>
           </div>

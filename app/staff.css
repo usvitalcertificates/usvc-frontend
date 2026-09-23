@@ -1381,3 +1381,35 @@ dl.staff-lines {
   margin-top: 4px;
   font-variant-numeric: tabular-nums;
 }
+
+/* Terminal step: green completed tick. */
+.staff-step.terminal .dot {
+  background: var(--flow-success);
+  border-color: var(--flow-success);
+  color: #fff;
+}
+.staff-step.terminal {
+  color: var(--flow-success);
+}
+
+/* Closed-order success panel: centered, bold, green. */
+.staff-closed-panel {
+  margin-top: 16px;
+  background: var(--flow-success-bg);
+  border: 1px solid #bfe6c9;
+  border-radius: var(--flow-radius);
+  padding: 18px 20px;
+  text-align: center;
+}
+.staff-closed-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #166534;
+}
+.staff-closed-sub {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #166534;
+}
