@@ -53,7 +53,8 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Admin dashboard (`/staff/admin`): invite modal (emailed-confirmation or manual setup link) + re-send, roster with avatars/pills, disable/revoke/MFA-reset, stat cards, filterable day-grouped activity timeline
 - [x] Sidebar shell (`StaffShell`: Open/My Work/Closed/Search/Admin/Settings, global order lookup, role pill) + dashboard kit (bands, stat cards, pills, sticky tables, numbered pagination, stepper, timeline, toasts, skeletons) in USVC tokens
 - [x] MILES deltas: global lookup (`/staff/search`), Closed Orders view, Order Search page, Settings page (session info + security controls), certificate-type filter, numbered pagination, success toasts, day-grouped history, owner dropdown with Drop Ownership + admin reassign, products card with fees, notes sensitive-content warning, tabs (Summary / Application owners-only / Notes & History)
-- [x] Summary redesign 2026-09-23: sticky action strip (identity + pills + Copy Order ID + Update-status anchor + Drop Ownership), progressive note disclosure (note field only for exceptions), Order Summary as copy-free definition list grouped Order/Requestor/Fulfillment
+- [x] Summary redesign 2026-09-23: action-only sticky strip (status pills + Update-status anchor + Drop Ownership; single dark identity + Copy Order ID in the band), progressive note disclosure (note field only for exceptions), Order Summary as copy-free definition list grouped Order/Requestor/Fulfillment
+- [x] Sidebar + detail polish 2026-09-23: brand hierarchy (USVC / Fulfillment Center / user chip with avatar + role pill), white active-link indicator bar, action-only sticky strip with single dark identity + Copy, ownership avatar card with role caption, products as right-aligned line items with emphasized total
 
 ## Phase 3 (remaining + proposed backlog)
 

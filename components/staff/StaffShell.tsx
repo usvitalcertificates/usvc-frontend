@@ -69,6 +69,8 @@ export function StaffShell({ children }: { children: ReactNode }) {
     </Link>
   );
 
+  const initial = (email.trim()[0] ?? "?").toUpperCase();
+
   return (
     <div className="staff-shell">
       <aside className="staff-sidebar" aria-label="Fulfillment navigation">
@@ -76,12 +78,8 @@ export function StaffShell({ children }: { children: ReactNode }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/usvc-logo-light.png" alt="USVC" width={36} height={36} />
           <div>
-            <strong>
-              USVC
-              <br />
-              FULFILLMENT
-            </strong>
-            <span className="staff-role-pill">{role === "ADMIN" ? "Super Admin" : "Agent"}</span>
+            <span className="staff-brand-name">USVC</span>
+            <span className="staff-brand-sub">Fulfillment Center</span>
           </div>
         </div>
         <nav className="staff-nav">
@@ -93,7 +91,15 @@ export function StaffShell({ children }: { children: ReactNode }) {
           {link("/staff/settings", "Settings", Settings)}
         </nav>
         <div className="staff-userbox">
-          <div style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{email}</div>
+          <div className="staff-userchip">
+            <span className="staff-userchip-avatar" aria-hidden>
+              {initial}
+            </span>
+            <span className="staff-userchip-meta">
+              <span className="staff-userchip-email">{email}</span>
+              <span className="staff-role-pill">{role === "ADMIN" ? "Super Admin" : "Agent"}</span>
+            </span>
+          </div>
           <button
             type="button"
             onClick={async () => {

@@ -366,11 +366,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       ) : null}
 
       <div className="staff-stickybar" aria-label="Order actions">
-        <strong className="staff-stickybar-id">{order.publicNumber}</strong>
         <StatusPill status={order.status} />
         {order.rush ? <span className="staff-pill red">RUSH</span> : null}
         <span className="staff-stickybar-spacer" />
-        <CopyButton value={order.publicNumber} label="Order number" />
         {!closed ? (
           <>
             <button type="button" className="staff-btn secondary" onClick={goWorkflow}>
@@ -385,7 +383,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               Drop Ownership
             </button>
           </>
-        ) : null}
+        ) : (
+          <span style={{ fontSize: "0.85rem", color: "var(--flow-secondary)" }}>
+            Closed — read only
+          </span>
+        )}
       </div>
 
       <div className="staff-tabs" role="tablist" aria-label="Order sections">
@@ -530,9 +532,19 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               <div className="staff-panel">
                 <h3>Ownership</h3>
                 <div className="staff-panel-body">
-                  <p style={{ marginTop: 0 }}>
-                    <strong>{order.assignedName ?? "Unassigned"}</strong>
-                  </p>
+                  <div className="staff-owner">
+                    <span className="staff-owner-avatar" aria-hidden>
+                      {(order.assignedName?.trim()[0] ?? "?").toUpperCase()}
+                    </span>
+                    <span>
+                      <strong className="staff-owner-name">
+                        {order.assignedName ?? "Unassigned"}
+                      </strong>
+                      <span className="staff-owner-role">
+                        {order.assignedName ? "Assigned agent" : "Waiting in queue"}
+                      </span>
+                    </span>
+                  </div>
                   {!closed && isAdmin ? (
                     <ReassignControl
                       orderId={id}
@@ -548,31 +560,30 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               <div className="staff-panel">
                 <h3>Products</h3>
                 <div className="staff-panel-body">
-                  <p>
-                    <strong>
-                      Certified copy of{" "}
-                      {order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()}{" "}
-                      Certificate
-                    </strong>
-                    <br />
-                    Qty: {order.copies} Certificate(s)
-                  </p>
-                  <p>
-                    <strong>Online Processing Fee</strong>
-                    <br />
-                    {money(order.pricing.serviceCents)}
+                  <dl className="staff-lines">
+                    <div>
+                      <dt>
+                        Certified copy of{" "}
+                        {order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()}{" "}
+                        Certificate
+                        <span className="staff-lines-sub">
+                          Online Processing Fee · Qty: {order.copies} Certificate(s)
+                        </span>
+                      </dt>
+                      <dd>{money(order.pricing.serviceCents)}</dd>
+                    </div>
                     {order.pricing.rushCents > 0 ? (
-                      <>
-                        <br />
-                        <strong>Rush Processing</strong>
-                        <br />
-                        {money(order.pricing.rushCents)}
-                      </>
+                      <div>
+                        <dt>Rush Processing</dt>
+                        <dd>{money(order.pricing.rushCents)}</dd>
+                      </div>
                     ) : null}
-                  </p>
-                  <p style={{ fontSize: "1.1rem" }}>
-                    <strong>Total Paid: {money(order.amountCents)}</strong>
-                  </p>
+                    <div className="staff-lines-total">
+                      <dt>Total Paid</dt>
+                      <dd>{money(order.amountCents)}</dd>
+                    </div>
+                  </dl>
+                  <p className="staff-lines-note">Processing fee collected at checkout.</p>
                 </div>
               </div>
             </div>

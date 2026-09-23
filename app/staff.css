@@ -173,6 +173,21 @@
   letter-spacing: 0.06em;
   line-height: 1.35;
 }
+.staff-brand-name {
+  display: block;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+}
+.staff-brand-sub {
+  display: block;
+  color: var(--flow-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
 .staff-role-pill {
   display: inline-block;
   margin-top: 5px;
@@ -190,11 +205,12 @@
   flex-grow: 1;
 }
 .staff-nav a {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
   color: rgb(255 255 255 / 72%);
-  padding: 9px 12px;
+  padding: 9px 12px 9px 15px;
   border-radius: 8px;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -211,9 +227,19 @@
   text-decoration: none;
 }
 .staff-nav a[aria-current="page"] {
-  background: rgb(29 78 216 / 32%);
+  background: rgb(29 78 216 / 45%);
   color: #fff;
   font-weight: 700;
+}
+.staff-nav a[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  border-radius: 999px;
+  background: #fff;
 }
 .staff-nav a[aria-current="page"] svg {
   color: #fff;
@@ -223,6 +249,42 @@
   padding: 14px 10px 4px;
   font-size: 0.85rem;
   color: rgb(255 255 255 / 72%);
+}
+.staff-userchip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.staff-userchip-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--flow-primary);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+.staff-userchip-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+.staff-userchip-email {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+.staff-userchip-meta .staff-role-pill {
+  margin-top: 0;
 }
 .staff-userbox button {
   background: transparent;
@@ -828,12 +890,6 @@ table.staff-table {
   padding: 10px 16px;
   margin-bottom: 20px;
 }
-.staff-stickybar-id {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--flow-ink);
-  font-variant-numeric: tabular-nums;
-}
 .staff-stickybar-spacer {
   flex-grow: 1;
 }
@@ -873,4 +929,86 @@ dl.staff-deflist {
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
   }
+}
+
+/* Ownership identity row. */
+.staff-owner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.staff-owner-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--flow-ink);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1rem;
+}
+.staff-owner-name {
+  display: block;
+  color: var(--flow-ink);
+  font-size: 1rem;
+  line-height: 1.3;
+}
+.staff-owner-role {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--flow-secondary);
+}
+
+/* Line-item list for money (right-aligned tabular numerals). */
+dl.staff-lines {
+  margin: 0;
+  padding: 0;
+}
+.staff-lines > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--flow-border);
+}
+.staff-lines > div:last-of-type {
+  border-bottom: none;
+}
+.staff-lines dt {
+  font-weight: 500;
+  color: var(--flow-text);
+}
+.staff-lines-sub {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--flow-secondary);
+}
+.staff-lines dd {
+  margin: 0;
+  font-weight: 700;
+  color: var(--flow-ink);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.staff-lines-total {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 2px solid var(--flow-ink);
+}
+.staff-lines-total dt,
+.staff-lines-total dd {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--flow-ink);
+}
+.staff-lines-note {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  color: var(--flow-secondary);
 }
