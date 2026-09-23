@@ -1082,3 +1082,19 @@ dl.staff-lines {
   font-size: 0.8rem;
   color: var(--flow-secondary);
 }
+
+/* Application section header with section-level copy action. */
+.staff-secthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 10px;
+}
+.staff-secthead h3 {
+  margin: 0;
+}
+.staff-secthead + .staff-deflist {
+  margin-bottom: 22px;
+}

@@ -67,13 +67,51 @@ function auditLabel(entry: AuditEntry): string {
   return base;
 }
 
-function Field({ label, value }: { label: string; value: string }) {
-  if (!value) return null;
+/** firstName → First name, dateOfBirth → Date of birth. */
+function prettyLabel(key: string): string {
+  const spaced = key
+    .replace(/([A-Z])/g, " $1")
+    .replace(/[_-]+/g, " ")
+    .trim();
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1).toLowerCase();
+}
+
+function sectionText(entries: [string, unknown][]): string {
+  return entries
+    .filter(([, val]) => val !== "" && val !== undefined && val !== null)
+    .map(([key, val]) => `${prettyLabel(key)}: ${String(val)}`)
+    .join("\n");
+}
+
+/**
+ * One striped-table section (Requestor, Subject, address…) with a header
+ * Copy-all button for pasting the whole block onto government forms.
+ */
+function FieldSection({ title, entries }: { title: string; entries: [string, unknown][] }) {
+  const visible = entries.filter(([, val]) => val !== "" && val !== undefined && val !== null);
+  if (visible.length === 0) return null;
   return (
-    <p style={{ margin: "0.25rem 0" }}>
-      <strong>{label}:</strong> {value}
-      <CopyButton value={value} label={label} />
-    </p>
+    <section aria-label={title} style={{ marginBottom: "6px" }}>
+      <div className="staff-secthead">
+        <h3>{title}</h3>
+        <CopyButton value={sectionText(visible)} label={`${title} section`} />
+      </div>
+      <dl className="staff-deflist">
+        {visible.map(([key, val]) => {
+          const label = prettyLabel(key);
+          const text = String(val);
+          return (
+            <div key={key}>
+              <dt>{label}</dt>
+              <dd>
+                {text}
+                <CopyButton value={text} label={label} />
+              </dd>
+            </div>
+          );
+        })}
+      </dl>
+    </section>
   );
 }
 
@@ -580,33 +618,22 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <div className="staff-panel">
             <h2>Application</h2>
             <div className="staff-panel-body">
-              <h3>Requestor &amp; contact</h3>
-              {Object.entries(order.applicant ?? {}).map(([key, val]) => (
-                <Field key={key} label={key} value={String(val)} />
-              ))}
+              <FieldSection
+                title="Requestor & contact"
+                entries={Object.entries(order.applicant ?? {})}
+              />
               {Object.keys(order.subject ?? {}).length > 0 ? (
-                <>
-                  <h3>Subject</h3>
-                  {Object.entries(order.subject).map(([key, val]) => (
-                    <Field key={key} label={key} value={String(val)} />
-                  ))}
-                </>
+                <FieldSection title="Subject" entries={Object.entries(order.subject)} />
               ) : null}
               {Object.keys(order.family ?? {}).length > 0 ? (
-                <>
-                  <h3>Family</h3>
-                  {Object.entries(order.family).map(([key, val]) => (
-                    <Field key={key} label={key} value={String(val)} />
-                  ))}
-                </>
+                <FieldSection title="Family" entries={Object.entries(order.family)} />
               ) : null}
               {Object.entries(order.addresses ?? {}).map(([kind, addr]) => (
-                <div key={kind}>
-                  <h3>{kind} address</h3>
-                  {Object.entries(addr ?? {}).map(([key, val]) => (
-                    <Field key={`${kind}-${key}`} label={key} value={String(val)} />
-                  ))}
-                </div>
+                <FieldSection
+                  key={kind}
+                  title={`${kind.charAt(0).toUpperCase() + kind.slice(1)} address`}
+                  entries={Object.entries(addr ?? {})}
+                />
               ))}
             </div>
           </div>
