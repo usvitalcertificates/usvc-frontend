@@ -293,8 +293,8 @@
   margin-top: 0;
 }
 .staff-userbox button {
-  background: transparent;
-  border: 1px solid rgb(255 255 255 / 28%);
+  background: var(--flow-danger);
+  border: 1px solid var(--flow-danger);
   color: #fff;
   border-radius: 8px;
   padding: 9px 12px;
@@ -309,7 +309,7 @@
   gap: 8px;
 }
 .staff-userbox button:hover {
-  background: rgb(255 255 255 / 8%);
+  background: #b91c1c;
 }
 .staff-main {
   min-width: 0;
