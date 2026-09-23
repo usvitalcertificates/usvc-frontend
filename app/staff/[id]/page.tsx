@@ -234,6 +234,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [toast, setToast] = useState("");
   const [note, setNote] = useState("");
   const [statusNote, setStatusNote] = useState("");
+  const [moveTo, setMoveTo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<Tab>("summary");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -272,6 +273,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       await staffJson(path, { method, body: JSON.stringify(body ?? {}) });
       setNote("");
       setStatusNote("");
+      setMoveTo(null);
       setToast(success);
       await load();
     } catch (e) {
@@ -279,6 +281,23 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     } finally {
       setBusy(false);
     }
+  };
+
+  const releaseOrder = () => {
+    if (!window.confirm("Release this order back to the queue? You will lose ownership.")) return;
+    void postAction(
+      `/staff/orders/${id}/release`,
+      {},
+      "POST",
+      "You have dropped ownership of this order.",
+    );
+  };
+
+  const goWorkflow = () => {
+    setTab("summary");
+    window.setTimeout(() => {
+      document.getElementById("workflow")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
   };
 
   if (error && !order) {
@@ -302,6 +321,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const next = NEXT_STATUS[order.status] ?? [];
   const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
   const closed = order.status === "SUBMITTED";
+  const effectiveMoveTo = moveTo ?? next[0] ?? "";
+  const exceptionMove = effectiveMoveTo === "ON_HOLD" || effectiveMoveTo === "NEED_INFO";
+  const requestorName =
+    `${order.applicant.firstName ?? ""} ${order.applicant.lastName ?? ""}`.trim() || "—";
+  const certName = `${order.stateCode} ${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} Certificate`;
 
   const days: { day: string; entries: AuditEntry[] }[] = [];
   for (const entry of [...audit].reverse()) {
@@ -341,6 +365,29 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         </p>
       ) : null}
 
+      <div className="staff-stickybar" aria-label="Order actions">
+        <strong className="staff-stickybar-id">{order.publicNumber}</strong>
+        <StatusPill status={order.status} />
+        {order.rush ? <span className="staff-pill red">RUSH</span> : null}
+        <span className="staff-stickybar-spacer" />
+        <CopyButton value={order.publicNumber} label="Order number" />
+        {!closed ? (
+          <>
+            <button type="button" className="staff-btn secondary" onClick={goWorkflow}>
+              Update status
+            </button>
+            <button
+              type="button"
+              className="staff-btn danger"
+              disabled={busy}
+              onClick={releaseOrder}
+            >
+              Drop Ownership
+            </button>
+          </>
+        ) : null}
+      </div>
+
       <div className="staff-tabs" role="tablist" aria-label="Order sections">
         {(
           [
@@ -363,7 +410,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
       {tab === "summary" ? (
         <>
-          <div className="staff-panel">
+          <div className="staff-panel" id="workflow">
             <h2>Workflow</h2>
             <div className="staff-panel-body">
               <Stepper status={order.status} />
@@ -371,7 +418,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 <div style={{ marginTop: "16px" }}>
                   <label>
                     Move to
-                    <select id="next-status" defaultValue={next[0]}>
+                    <select value={effectiveMoveTo} onChange={(e) => setMoveTo(e.target.value)}>
                       {next.map((s) => (
                         <option key={s} value={s}>
                           {STATUS_LABELS[s] ?? s}
@@ -379,14 +426,18 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                       ))}
                     </select>
                   </label>
-                  <label>
-                    Internal note (required for On Hold / Need Customer Information)
-                    <input
-                      value={statusNote}
-                      onChange={(e) => setStatusNote(e.target.value)}
-                      maxLength={2000}
-                    />
-                  </label>
+                  {exceptionMove ? (
+                    <label>
+                      Internal note (required for On Hold / Need Customer Information)
+                      <input
+                        value={statusNote}
+                        onChange={(e) => setStatusNote(e.target.value)}
+                        maxLength={2000}
+                        placeholder="What does this order need before it can continue?…"
+                        autoComplete="off"
+                      />
+                    </label>
+                  ) : null}
                   <div
                     style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}
                   >
@@ -395,12 +446,13 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                       className="staff-btn"
                       disabled={busy}
                       onClick={() => {
-                        const select = document.getElementById("next-status") as HTMLSelectElement;
                         void postAction(
                           `/orders/${id}/status`,
                           {
-                            status: select.value,
-                            ...(statusNote.trim() ? { note: statusNote.trim() } : {}),
+                            status: effectiveMoveTo,
+                            ...(exceptionMove && statusNote.trim()
+                              ? { note: statusNote.trim() }
+                              : {}),
                           },
                           "PATCH",
                           "The order status has been changed for this order.",
@@ -408,27 +460,6 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                       }}
                     >
                       Update status
-                    </button>
-                    <button
-                      type="button"
-                      className="staff-btn danger"
-                      disabled={busy}
-                      onClick={() => {
-                        if (
-                          !window.confirm(
-                            "Release this order back to the queue? You will lose ownership.",
-                          )
-                        )
-                          return;
-                        void postAction(
-                          `/staff/orders/${id}/release`,
-                          {},
-                          "POST",
-                          "You have dropped ownership of this order.",
-                        );
-                      }}
-                    >
-                      Drop Ownership
                     </button>
                   </div>
                 </div>
@@ -442,21 +473,57 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <div className="staff-panel">
               <h2>Order Summary</h2>
               <div className="staff-panel-body">
-                <Field
-                  label="Requestor"
-                  value={`${order.applicant.firstName ?? ""} ${order.applicant.lastName ?? ""}`.trim()}
-                />
-                <Field
-                  label="Type"
-                  value={`${order.stateCode} ${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} Certificate`}
-                />
-                <Field
-                  label="Reason"
-                  value={order.reason === "Other" ? (order.reasonOther ?? "Other") : order.reason}
-                />
-                <Field label="Copies" value={String(order.copies)} />
-                <Field label="Rush" value={order.rush ? "Yes" : "No"} />
-                <Field label="Delivery" value={order.deliveryMethod} />
+                <h3>Order</h3>
+                <dl className="staff-deflist">
+                  <div>
+                    <dt>Type</dt>
+                    <dd>{certName}</dd>
+                  </div>
+                  <div>
+                    <dt>Reason</dt>
+                    <dd>
+                      {order.reason === "Other" ? (order.reasonOther ?? "Other") : order.reason}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Submitted</dt>
+                    <dd>{new Date(order.createdAt).toLocaleString("en-US")}</dd>
+                  </div>
+                </dl>
+                <h3>Requestor</h3>
+                <dl className="staff-deflist">
+                  <div>
+                    <dt>Name</dt>
+                    <dd>{requestorName}</dd>
+                  </div>
+                  {order.applicant.email ? (
+                    <div>
+                      <dt>Email</dt>
+                      <dd>{order.applicant.email}</dd>
+                    </div>
+                  ) : null}
+                  {order.applicant.phone ? (
+                    <div>
+                      <dt>Phone</dt>
+                      <dd>{order.applicant.phone}</dd>
+                    </div>
+                  ) : null}
+                </dl>
+                <h3>Fulfillment</h3>
+                <dl className="staff-deflist">
+                  <div>
+                    <dt>Copies</dt>
+                    <dd>{order.copies}</dd>
+                  </div>
+                  <div>
+                    <dt>Rush</dt>
+                    <dd>{order.rush ? "Yes" : "No"}</dd>
+                  </div>
+                  <div>
+                    <dt>Delivery</dt>
+                    <dd>{order.deliveryMethod}</dd>
+                  </div>
+                </dl>
               </div>
             </div>
             <div className="staff-rail">
