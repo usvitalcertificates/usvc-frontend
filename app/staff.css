@@ -1236,3 +1236,28 @@ dl.staff-lines {
   font-weight: 600;
   color: #f3c2c2;
 }
+
+/* Timeline category dots: meaning rides on text; color reinforces. */
+.staff-timeline li.cat-claim::before {
+  background: var(--flow-primary);
+}
+.staff-timeline li.cat-status::before {
+  background: var(--flow-ink);
+}
+.staff-timeline li.cat-reveal::before {
+  background: var(--flow-danger);
+}
+.staff-timeline li.cat-note::before {
+  background: var(--flow-muted);
+}
+.staff-timeline li.cat-other::before {
+  background: var(--flow-border);
+}
+
+/* Note bubble cards. */
+.staff-note-card {
+  background: var(--flow-bg);
+  border: 1px solid var(--flow-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+}

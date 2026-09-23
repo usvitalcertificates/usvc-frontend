@@ -67,6 +67,35 @@ function auditLabel(entry: AuditEntry): string {
   return base;
 }
 
+/** Timeline dot category per audit action. */
+function auditCategory(action?: string): string {
+  if (action === "sensitive_reveal") return "reveal";
+  if (action === "fulfillment_status_updated") return "status";
+  if (action === "internal_note_added") return "note";
+  if (action === "order_claimed" || action === "order_reassigned" || action === "order_released")
+    return "claim";
+  return "other";
+}
+
+/** "2h ago" with full timestamp available via title attribute. */
+function relTime(value?: string): string {
+  if (!value) return "";
+  const diff = Date.now() - new Date(value).getTime();
+  if (diff < 0) return "just now";
+  const minutes = Math.floor(diff / 60_000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(value).toLocaleDateString("en-US");
+}
+
+function fullTime(value?: string): string {
+  return value ? new Date(value).toLocaleString("en-US") : "";
+}
+
 /** firstName → First name, dateOfBirth → Date of birth. */
 function prettyLabel(key: string): string {
   const spaced = key
@@ -344,6 +373,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<Tab>("summary");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [histLimit, setHistLimit] = useState(10);
+  const [noteLimit, setNoteLimit] = useState(10);
 
   useEffect(() => {
     setIsAdmin(staffRole() === "ADMIN");
@@ -440,6 +471,19 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     if (group) group.entries.push(entry);
     else days.push({ day, entries: [entry] });
   }
+  // Newest-first flat list for paging; day headers regrouped on render.
+  const flatHist: { day: string; entry: AuditEntry }[] = [];
+  for (const group of days)
+    for (const entry of group.entries) flatHist.push({ day: group.day, entry });
+  const shownHist = flatHist.slice(0, histLimit);
+  const shownHistDays: { day: string; entries: AuditEntry[] }[] = [];
+  for (const { day, entry } of shownHist) {
+    const group = shownHistDays.find((g) => g.day === day);
+    if (group) group.entries.push(entry);
+    else shownHistDays.push({ day, entries: [entry] });
+  }
+  const notesNewest = [...(order.notes ?? [])].reverse();
+  const shownNotes = notesNewest.slice(0, noteLimit);
 
   const sensitiveWarning =
     /(\b\d{3}[- ]?\d{2}[- ]?\d{4}\b|\b\d{13,19}\b)/.test(note) &&
@@ -765,38 +809,63 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 </>
               ) : null}
               <ul className="staff-timeline" style={{ marginTop: "18px" }}>
-                {(order.notes ?? []).map((n, i) => (
-                  <li key={i}>
-                    <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{n.body}</p>
-                    <p className="t-date" style={{ margin: 0 }}>
-                      {n.createdAt ? new Date(n.createdAt).toLocaleString("en-US") : ""}
-                    </p>
+                {shownNotes.map((n, i) => (
+                  <li key={i} className="cat-note">
+                    <div className="staff-note-card">
+                      <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{n.body}</p>
+                      <p
+                        className="t-date"
+                        style={{ margin: "6px 0 0" }}
+                        title={fullTime(n.createdAt)}
+                      >
+                        {relTime(n.createdAt)}
+                      </p>
+                    </div>
                   </li>
                 ))}
-                {(order.notes ?? []).length === 0 ? <li>No notes yet.</li> : null}
               </ul>
+              {(order.notes ?? []).length === 0 ? (
+                <p style={{ color: "var(--flow-secondary)" }}>
+                  No notes yet — add the first one above.
+                </p>
+              ) : null}
+              {(order.notes ?? []).length > shownNotes.length ? (
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  onClick={() => setNoteLimit((n) => n + 10)}
+                >
+                  Show more ({(order.notes ?? []).length - shownNotes.length} older)
+                </button>
+              ) : null}
+              {noteLimit > 10 && (order.notes ?? []).length <= shownNotes.length ? (
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  onClick={() => setNoteLimit(10)}
+                >
+                  Show less
+                </button>
+              ) : null}
             </div>
           </div>
           <div className="staff-panel">
             <h2>Order History</h2>
             <div className="staff-panel-body">
               <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", marginTop: 0 }}>
-                Who accessed or changed this order. Values are never stored in the log.
+                Who accessed or changed this order. Values are never stored in the log. Showing{" "}
+                {shownHist.length} of {flatHist.length}.
               </p>
-              {days.map((group) => (
+              {shownHistDays.map((group) => (
                 <div key={group.day}>
                   <p className="staff-day">{group.day}</p>
                   <ul className="staff-timeline">
                     {group.entries.map((entry, i) => (
-                      <li key={i}>
+                      <li key={i} className={`cat-${auditCategory(entry.action)}`}>
                         <p style={{ margin: 0 }}>
-                          {entry.createdAt
-                            ? new Date(entry.createdAt).toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                                second: "2-digit",
-                              })
-                            : ""}
+                          <span className="t-date" title={fullTime(entry.createdAt)}>
+                            {relTime(entry.createdAt)}
+                          </span>
                           : <strong>{auditLabel(entry)}</strong>
                         </p>
                       </li>
@@ -805,6 +874,24 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 </div>
               ))}
               {audit.length === 0 ? <p>No activity recorded yet.</p> : null}
+              {flatHist.length > shownHist.length ? (
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  onClick={() => setHistLimit((n) => n + 10)}
+                >
+                  Show more ({flatHist.length - shownHist.length} older)
+                </button>
+              ) : null}
+              {histLimit > 10 && flatHist.length <= shownHist.length && flatHist.length > 0 ? (
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  onClick={() => setHistLimit(10)}
+                >
+                  Show less
+                </button>
+              ) : null}
             </div>
           </div>
         </>
