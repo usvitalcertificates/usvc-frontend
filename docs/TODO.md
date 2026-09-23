@@ -61,7 +61,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Reveal v2 2026-09-23: SSN titled Social Security Number (SSN), card visual with chip + brand pill + footer row, rhythm-spaced reveal forms
 - [x] Notes & History 2026-09-23: latest-10 paging with Show more/less + counts, day-grouped history preserved, category-colored dots, relative timestamps, note bubble cards
 - [x] Shared activity module 2026-09-23: `components/staff/activity.tsx` (human labels incl. staff actions, dot categories incl. access/security, relTime) used by order history + admin feed; admin activity paged (20 + more) with human filter options
-- [x] Branded sign-in 2026-09-23: split-screen navy brand panel (USVC/Flow lockup, headline, value props) + sign-in card, stepper line removed, responsive collapse
+- [x] Branded sign-in 2026-09-23: centered card with USVC Flow brandmark + "Processing today for brighter tomorrows" slogan, stepper line removed
 - [x] Roster polish 2026-09-23: avatar + name/pill flex row with gap, truncated email with hover title, two-line Last-activity date + time badge
 - [x] Agent stepper + focused queues 2026-09-23: Claimed → Processing → Submitted stepper with Paid precondition chip, per-step captions, parked-note excerpt, submitted timestamp; My Work shows open claimed only with attention-first order + quick-filter chips + guided empty state; Closed Orders drops irrelevant filters
 - [x] Queue correctness pass 2026-09-23: nav link-color specificity fix (button text visible), Order status / Certificate type terminology with customer-consistent options, chips-only My Work (`hideStatus`), dropdown↔chip mutual exclusion, Take Ownership / Open Order actions; 10-case backend matrix + render sweep green
