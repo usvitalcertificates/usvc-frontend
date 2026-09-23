@@ -1413,3 +1413,11 @@ dl.staff-lines {
   font-weight: 600;
   color: #166534;
 }
+
+/* Admin activity categories share the order-history dot language. */
+.staff-timeline li.cat-access::before {
+  background: var(--flow-ink);
+}
+.staff-timeline li.cat-security::before {
+  background: var(--flow-danger);
+}

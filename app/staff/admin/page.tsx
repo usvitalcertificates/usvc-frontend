@@ -4,7 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
-import { BackLink, EmptyState, PageBand, StatCard, Toast, dayKey } from "@/components/staff/ui";
+import { BackLink, EmptyState, PageBand, StatCard, Toast } from "@/components/staff/ui";
+import {
+  activityCategory,
+  dayKey,
+  fullTime,
+  humanizeActivity,
+  relTime,
+} from "@/components/staff/activity";
 
 interface StaffMember {
   id: string;
@@ -23,6 +30,7 @@ interface ActivityEntry {
   actorEmail: string;
   action: string;
   orderNumber?: string;
+  detail?: Record<string, unknown>;
 }
 
 function initials(name: string, email: string): string {
@@ -46,6 +54,7 @@ export default function StaffAdmin() {
   const [inviteLink, setInviteLink] = useState("");
   const [inviteEmailed, setInviteEmailed] = useState(false);
   const [activityFilter, setActivityFilter] = useState("");
+  const [activityLimit, setActivityLimit] = useState(20);
 
   const load = useCallback(async () => {
     setError("");
@@ -152,9 +161,10 @@ export default function StaffAdmin() {
     ? activity.filter((a) => a.action === activityFilter)
     : activity;
   const actionOptions = [...new Set(activity.map((a) => a.action))].sort();
+  const shownActivity = filteredActivity.slice(0, activityLimit);
 
   const days: { day: string; entries: ActivityEntry[] }[] = [];
-  for (const entry of filteredActivity) {
+  for (const entry of shownActivity) {
     const day = dayKey(entry.at);
     const group = days.find((g) => g.day === day);
     if (group) group.entries.push(entry);
@@ -331,13 +341,16 @@ export default function StaffAdmin() {
                 <option value="">All events</option>
                 {actionOptions.map((a) => (
                   <option key={a} value={a}>
-                    {a}
+                    {humanizeActivity({ action: a })}
                   </option>
                 ))}
               </select>
             </label>
           </div>
           <div className="staff-panel-body">
+            <p style={{ fontSize: "0.9rem", color: "var(--flow-secondary)", marginTop: 0 }}>
+              Showing {shownActivity.length} of {filteredActivity.length}.
+            </p>
             {filteredActivity.length === 0 ? (
               <EmptyState title="No activity recorded yet." />
             ) : (
@@ -346,14 +359,12 @@ export default function StaffAdmin() {
                   <p className="staff-day">{group.day}</p>
                   <ul className="staff-timeline">
                     {group.entries.map((entry, i) => (
-                      <li key={i}>
+                      <li key={i} className={`cat-${activityCategory(entry.action)}`}>
                         <p style={{ margin: 0 }}>
-                          {new Date(entry.at).toLocaleTimeString("en-US", {
-                            hour: "numeric",
-                            minute: "2-digit",
-                            second: "2-digit",
-                          })}
-                          : <strong>{entry.action}</strong> — {entry.actorEmail}
+                          <span className="t-date" title={fullTime(entry.at)}>
+                            {relTime(entry.at)}
+                          </span>
+                          : <strong>{humanizeActivity(entry)}</strong> — {entry.actorEmail}
                           {entry.orderNumber ? ` · ${entry.orderNumber}` : ""}
                         </p>
                       </li>
@@ -362,6 +373,26 @@ export default function StaffAdmin() {
                 </div>
               ))
             )}
+            {filteredActivity.length > shownActivity.length ? (
+              <button
+                type="button"
+                className="staff-btn secondary"
+                onClick={() => setActivityLimit((n) => n + 20)}
+              >
+                Show more ({filteredActivity.length - shownActivity.length} older)
+              </button>
+            ) : null}
+            {activityLimit > 20 &&
+            filteredActivity.length <= shownActivity.length &&
+            filteredActivity.length > 0 ? (
+              <button
+                type="button"
+                className="staff-btn secondary"
+                onClick={() => setActivityLimit(20)}
+              >
+                Show less
+              </button>
+            ) : null}
           </div>
         </div>
       )}

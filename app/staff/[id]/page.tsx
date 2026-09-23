@@ -4,7 +4,14 @@ import { use, useCallback, useEffect, useRef, useState } from "react";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffData, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
-import { BackLink, STATUS_LABELS, StatusPill, Stepper, Toast, dayKey } from "@/components/staff/ui";
+import { BackLink, STATUS_LABELS, StatusPill, Stepper, Toast } from "@/components/staff/ui";
+import {
+  activityCategory,
+  dayKey,
+  fullTime,
+  humanizeActivity,
+  relTime,
+} from "@/components/staff/activity";
 
 const NEXT_STATUS: Record<string, string[]> = {
   PAID: ["IN_REVIEW"],
@@ -46,54 +53,8 @@ interface AuditEntry {
   createdAt?: string;
 }
 
-const AUDIT_LABELS: Record<string, string> = {
-  order_created: "Order created",
-  payment_confirmed: "Payment confirmed",
-  order_claimed: "Order claimed",
-  order_released: "Ownership released",
-  order_reassigned: "Order reassigned",
-  fulfillment_status_updated: "Status updated",
-  internal_note_added: "Internal note added",
-  sensitive_reveal: "Sensitive data revealed",
-  confirmation_email_sent: "Confirmation email sent",
-};
-
 function auditLabel(entry: AuditEntry): string {
-  const base = AUDIT_LABELS[entry.action ?? ""] ?? entry.action ?? "Activity";
-  const status = (entry.metadata as { status?: string } | undefined)?.status;
-  const field = (entry.metadata as { field?: string } | undefined)?.field;
-  if (status) return `${base} → ${STATUS_LABELS[status] ?? status}`;
-  if (field) return `${base} (${field === "ssn" ? "SSN" : "card"})`;
-  return base;
-}
-
-/** Timeline dot category per audit action. */
-function auditCategory(action?: string): string {
-  if (action === "sensitive_reveal") return "reveal";
-  if (action === "fulfillment_status_updated") return "status";
-  if (action === "internal_note_added") return "note";
-  if (action === "order_claimed" || action === "order_reassigned" || action === "order_released")
-    return "claim";
-  return "other";
-}
-
-/** "2h ago" with full timestamp available via title attribute. */
-function relTime(value?: string): string {
-  if (!value) return "";
-  const diff = Date.now() - new Date(value).getTime();
-  if (diff < 0) return "just now";
-  const minutes = Math.floor(diff / 60_000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return new Date(value).toLocaleDateString("en-US");
-}
-
-function fullTime(value?: string): string {
-  return value ? new Date(value).toLocaleString("en-US") : "";
+  return humanizeActivity(entry);
 }
 
 /** firstName → First name, dateOfBirth → Date of birth. */
@@ -879,7 +840,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   <p className="staff-day">{group.day}</p>
                   <ul className="staff-timeline">
                     {group.entries.map((entry, i) => (
-                      <li key={i} className={`cat-${auditCategory(entry.action)}`}>
+                      <li key={i} className={`cat-${activityCategory(entry.action)}`}>
                         <p style={{ margin: 0 }}>
                           <span className="t-date" title={fullTime(entry.createdAt)}>
                             {relTime(entry.createdAt)}
