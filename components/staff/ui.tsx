@@ -54,11 +54,22 @@ export function PageBand({
   );
 }
 
-export function StatCard({ value, label }: { value: ReactNode; label: string }) {
+export function StatCard({
+  value,
+  label,
+  icon,
+}: {
+  value: ReactNode;
+  label: string;
+  icon?: ReactNode;
+}) {
   return (
     <div className="staff-stat">
-      <strong>{value}</strong>
-      <span>{label}</span>
+      {icon}
+      <div>
+        <strong>{value}</strong>
+        <span>{label}</span>
+      </div>
     </div>
   );
 }

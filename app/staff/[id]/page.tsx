@@ -411,16 +411,22 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     </button>
                     <button
                       type="button"
-                      className="staff-btn secondary"
+                      className="staff-btn danger"
                       disabled={busy}
-                      onClick={() =>
+                      onClick={() => {
+                        if (
+                          !window.confirm(
+                            "Release this order back to the queue? You will lose ownership.",
+                          )
+                        )
+                          return;
                         void postAction(
                           `/staff/orders/${id}/release`,
                           {},
                           "POST",
                           "You have dropped ownership of this order.",
-                        )
-                      }
+                        );
+                      }}
                     >
                       Drop Ownership
                     </button>

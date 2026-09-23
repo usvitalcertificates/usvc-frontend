@@ -79,7 +79,13 @@ function SearchView() {
         >
           <label className="search">
             Order number, name, or email
-            <input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="USCA-BT-…" />
+            <input
+              value={term}
+              onChange={(e) => setTerm(e.target.value)}
+              placeholder="USCA-BT-…"
+              autoComplete="off"
+              spellCheck={false}
+            />
           </label>
           <label>
             Order Type

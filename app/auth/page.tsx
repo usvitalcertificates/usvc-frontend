@@ -117,6 +117,7 @@ function AuthForm() {
                   id="staff-email"
                   type="email"
                   autoComplete="username"
+                  spellCheck={false}
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -175,6 +176,7 @@ function AuthForm() {
               id="staff-code"
               inputMode="numeric"
               autoComplete="one-time-code"
+              spellCheck={false}
               required
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 import { staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { BackLink, EmptyState, PageBand, StatCard, Toast, dayKey } from "@/components/staff/ui";
@@ -168,7 +169,7 @@ export default function StaffAdmin() {
         subtitle="Staff accounts, invitations, sessions, and the complete audit history. Every change is recorded."
         actions={
           <button type="button" className="staff-btn" onClick={() => setInviteOpen(true)}>
-            + Invite staff member
+            <Plus aria-hidden style={{ width: 16, height: 16 }} /> Invite staff member
           </button>
         }
       />
@@ -290,7 +291,7 @@ export default function StaffAdmin() {
                           {member.accountStatus === "active" ? (
                             <button
                               type="button"
-                              className="staff-btn secondary"
+                              className="staff-btn danger"
                               onClick={() =>
                                 void act(
                                   member.id,

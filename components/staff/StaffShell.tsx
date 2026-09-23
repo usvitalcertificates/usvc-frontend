@@ -3,6 +3,16 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import {
+  Archive,
+  Inbox,
+  LogOut,
+  Search,
+  Settings,
+  ShieldCheck,
+  UserCheck,
+  type LucideIcon,
+} from "lucide-react";
 import { staffLogout, staffRole } from "@/lib/staff-client";
 
 function OrderLookup() {
@@ -24,9 +34,11 @@ function OrderLookup() {
         onChange={(e) => setValue(e.target.value)}
         placeholder="Order Lookup by #"
         aria-label="Order Lookup by number"
+        autoComplete="off"
+        spellCheck={false}
       />
       <button type="submit" className="staff-btn navy">
-        Search
+        <Search aria-hidden style={{ width: 16, height: 16 }} /> Search
       </button>
     </form>
   );
@@ -50,8 +62,9 @@ export function StaffShell({ children }: { children: ReactNode }) {
   const isAuth = pathname === "/auth" || pathname.startsWith("/auth?");
   if (isAuth) return <>{children}</>;
 
-  const link = (href: string, label: string) => (
+  const link = (href: string, label: string, Icon: LucideIcon) => (
     <Link key={href} href={href} aria-current={pathname === href ? "page" : undefined}>
+      <Icon aria-hidden />
       {label}
     </Link>
   );
@@ -61,7 +74,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
       <aside className="staff-sidebar" aria-label="Fulfillment navigation">
         <div className="staff-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/usvc-logo-light.png" alt="USVC" />
+          <img src="/assets/usvc-logo-light.png" alt="USVC" width={36} height={36} />
           <div>
             <strong>
               USVC
@@ -72,12 +85,12 @@ export function StaffShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <nav className="staff-nav">
-          {link("/staff", "Open Orders")}
-          {link("/staff/my", "My Work")}
-          {link("/staff/closed", "Closed Orders")}
-          {link("/staff/search", "Order Search")}
-          {role === "ADMIN" ? link("/staff/admin", "Administration") : null}
-          {link("/staff/settings", "Settings")}
+          {link("/staff", "Open Orders", Inbox)}
+          {link("/staff/my", "My Work", UserCheck)}
+          {link("/staff/closed", "Closed Orders", Archive)}
+          {link("/staff/search", "Order Search", Search)}
+          {role === "ADMIN" ? link("/staff/admin", "Administration", ShieldCheck) : null}
+          {link("/staff/settings", "Settings", Settings)}
         </nav>
         <div className="staff-userbox">
           <div style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{email}</div>
@@ -88,7 +101,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
               router.replace("/auth");
             }}
           >
-            Sign out
+            <LogOut aria-hidden style={{ width: 15, height: 15, verticalAlign: "-2px" }} /> Sign out
           </button>
         </div>
       </aside>

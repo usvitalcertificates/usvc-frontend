@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { Clock, Inbox, UserCheck, UserPlus, Zap } from "lucide-react";
 import { staffFetch } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
@@ -155,10 +156,14 @@ export function QueueView({
 
       {showKpis ? (
         <div className="staff-stats">
-          <StatCard value={kpis.unassigned} label="Unassigned open" />
-          <StatCard value={kpis.mine} label="Assigned to me" />
-          <StatCard value={kpis.attention} label="On hold / need info" />
-          <StatCard value={kpis.rush} label="Rush open" />
+          <StatCard value={kpis.unassigned} label="Unassigned open" icon={<Inbox aria-hidden />} />
+          <StatCard value={kpis.mine} label="Assigned to me" icon={<UserCheck aria-hidden />} />
+          <StatCard
+            value={kpis.attention}
+            label="On hold / need info"
+            icon={<Clock aria-hidden />}
+          />
+          <StatCard value={kpis.rush} label="Rush open" icon={<Zap aria-hidden />} />
         </div>
       ) : null}
 
@@ -172,7 +177,8 @@ export function QueueView({
                 setSearch(e.target.value);
                 resetPage();
               }}
-              placeholder="Order number, name, or email"
+              placeholder="Order number, name, or email…"
+              autoComplete="off"
             />
           </label>
           {!preset.status ? (
@@ -291,7 +297,7 @@ export function QueueView({
                           className="staff-btn"
                           onClick={() => void claim(order.id, order.publicNumber)}
                         >
-                          Claim
+                          <UserPlus aria-hidden style={{ width: 15, height: 15 }} /> Claim
                         </button>
                       )}
                     </td>

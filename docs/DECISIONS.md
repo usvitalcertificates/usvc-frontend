@@ -33,16 +33,21 @@ forwards `authorization`); 401s trigger one refresh attempt, then redirect to
 `/auth`. No staff secret ever touches cookies, URLs, or analytics (GA already
 skips `/staff` page views and only runs on public production hosts).
 
-## Staff dashboard design (locked 2026-09-23)
+## Staff dashboard design (locked 2026-09-23, rethemed same day)
 
+Flow branding is fully decoupled from the public site: own stylesheet
+(`app/staff.css`, namespaced selectors only), own palette (#F7F9FC / #0B2545 /
+#1D4ED8 / #8DA9C4 + semantic sets), Inter via `next/font` scoped to staff
+selectors (public pages keep Times). Bootstrap-style components are
+hand-rolled (a Bootstrap global import would leak into the public site under
+App Router CSS rules); icons are `lucide-react`, always paired with text.
 Sidebar shell (`StaffShell`: navy sidebar with Open Orders / My Work / Closed
 Orders / Order Search / Administration (admin) / Settings, top strip with global
 order-number lookup, role pill, sign-out) adapted from the MILES reference
-information architecture but rebuilt in USVC tokens (Times, navy/red, soft gray,
-white cards, 6–8px radius) — not a visual clone. Shared kit in
+information architecture — not a visual clone. Shared kit in
 `components/staff/ui.tsx` (bands, stat cards, status pills, sticky tables with
 card fallback under 760px, numbered pagination, stepper, day-grouped timeline,
-toasts, skeletons) plus a `/* Staff dashboard */` CSS section. Detail uses tabs
+toasts, skeletons) plus destructive-action confirmations. Detail uses tabs
 (Summary / Application owners-only / Notes & History); Documents tab and Tasks
 system are deferred to Phase 3. Notes warn (without blocking) on SSN/card-like
 content.
