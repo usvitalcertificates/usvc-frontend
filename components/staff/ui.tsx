@@ -215,7 +215,8 @@ export function TimedActionModal({
       >
         <h2 style={{ color: "#15803d" }}>{title}</h2>
         <p style={{ fontSize: "0.95rem" }}>
-          You have taken ownership of order number <strong>{orderNumber}</strong>.
+          You have taken ownership of order number <br />
+          <strong className="py-1">{orderNumber}</strong>.
         </p>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "14px" }}>
           <Link
