@@ -16,7 +16,8 @@ import {
 const NEXT_STATUS: Record<string, string[]> = {
   PAID: ["IN_REVIEW"],
   IN_REVIEW: ["SUBMITTED", "TO_CS"],
-  TO_CS: ["IN_REVIEW"],
+  TO_CS: ["GTG"],
+  GTG: ["IN_REVIEW"],
   SUBMITTED: [],
 };
 
@@ -432,6 +433,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const closed = order.status === "SUBMITTED";
   const effectiveMoveTo = moveTo ?? next[0] ?? "";
   const exceptionMove = effectiveMoveTo === "TO_CS";
+  const gtgMove = effectiveMoveTo === "GTG";
+  // TO_CS is locked: only CS/ADMIN (canCorrect) may move it — and only to GTG.
+  const toCsLocked = order.status === "TO_CS" && !canCorrect;
   const requestorName =
     `${order.applicant.firstName ?? ""} ${order.applicant.lastName ?? ""}`.trim() || "—";
   const certName = `${order.stateCode} ${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} Certificate`;
@@ -547,54 +551,75 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 }
               />
               {!closed ? (
-                <div style={{ marginTop: "16px" }}>
-                  <label>
-                    Move to
-                    <select value={effectiveMoveTo} onChange={(e) => setMoveTo(e.target.value)}>
-                      {next.map((s) => (
-                        <option key={s} value={s}>
-                          {STATUS_LABELS[s] ?? s}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  {exceptionMove ? (
+                toCsLocked ? (
+                  <p role="status" style={{ color: "#b91c1c", fontWeight: 700, marginBottom: 0 }}>
+                    CS is looking into it — only CS or ADMIN can mark this order GTG. Submit is
+                    blocked until then.
+                  </p>
+                ) : (
+                  <div style={{ marginTop: "16px" }}>
                     <label>
-                      Internal note (required for To CS)
-                      <input
-                        value={statusNote}
-                        onChange={(e) => setStatusNote(e.target.value)}
-                        maxLength={2000}
-                        placeholder="What does this order need before it can continue?…"
-                        autoComplete="off"
-                      />
+                      Move to
+                      <select value={effectiveMoveTo} onChange={(e) => setMoveTo(e.target.value)}>
+                        {next.map((s) => (
+                          <option key={s} value={s}>
+                            {STATUS_LABELS[s] ?? s}
+                          </option>
+                        ))}
+                      </select>
                     </label>
-                  ) : null}
-                  <div
-                    style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}
-                  >
-                    <button
-                      type="button"
-                      className="staff-btn"
-                      disabled={busy}
-                      onClick={() => {
-                        void postAction(
-                          `/orders/${id}/status`,
-                          {
-                            status: effectiveMoveTo,
-                            ...(exceptionMove && statusNote.trim()
-                              ? { note: statusNote.trim() }
-                              : {}),
-                          },
-                          "PATCH",
-                          "The order status has been changed for this order.",
-                        );
-                      }}
+                    {exceptionMove ? (
+                      <label>
+                        Internal note (required for To CS)
+                        <input
+                          value={statusNote}
+                          onChange={(e) => setStatusNote(e.target.value)}
+                          maxLength={2000}
+                          placeholder="What does this order need before it can continue?…"
+                          autoComplete="off"
+                        />
+                      </label>
+                    ) : null}
+                    {gtgMove ? (
+                      <label>
+                        Completion note (optional)
+                        <input
+                          value={statusNote}
+                          onChange={(e) => setStatusNote(e.target.value)}
+                          maxLength={2000}
+                          placeholder="What was fixed?…"
+                          autoComplete="off"
+                        />
+                      </label>
+                    ) : null}
+                    <div
+                      style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}
                     >
-                      Update status
-                    </button>
+                      <button
+                        type="button"
+                        className="staff-btn"
+                        disabled={busy || (exceptionMove && !statusNote.trim())}
+                        onClick={() => {
+                          void postAction(
+                            `/orders/${id}/status`,
+                            {
+                              status: effectiveMoveTo,
+                              ...(exceptionMove || gtgMove
+                                ? statusNote.trim()
+                                  ? { note: statusNote.trim() }
+                                  : {}
+                                : {}),
+                            },
+                            "PATCH",
+                            "The order status has been changed for this order.",
+                          );
+                        }}
+                      >
+                        Update status
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )
               ) : (
                 <p style={{ color: "var(--flow-secondary)", marginBottom: 0 }}>
                   No further actions — the submission record above is final.
@@ -765,6 +790,21 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   Fix application details without taking ownership. Only EDIT — leave a field blank
                   to keep its current value.
                 </p>
+                {order.status === "TO_CS" && (order.notes ?? []).length > 0 ? (
+                  <p
+                    role="note"
+                    style={{
+                      background: "#fef2f2",
+                      border: "1px solid #fecaca",
+                      borderRadius: "8px",
+                      padding: "10px 12px",
+                      fontSize: "0.9rem",
+                    }}
+                  >
+                    <strong style={{ color: "#b91c1c" }}>Fulfillment flagged: </strong>
+                    {(order.notes ?? []).at(-1)?.body}
+                  </p>
+                ) : null}
                 <div style={{ display: "grid", gap: "10px", maxWidth: "520px" }}>
                   <label>
                     Requestor first name (now: {order.applicant.firstName || "—"})
@@ -894,13 +934,16 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                       onClick={() =>
                         void postAction(
                           `/orders/${id}/status`,
-                          { status: "IN_REVIEW" },
+                          {
+                            status: "GTG",
+                            ...(corrNote.trim() ? { note: corrNote.trim() } : {}),
+                          },
                           "PATCH",
-                          "Order resumed to fulfillment.",
+                          "Order marked GTG — fulfillment can continue.",
                         )
                       }
                     >
-                      Resume to fulfillment (→ In Review)
+                      Mark GTG
                     </button>
                   ) : null}
                 </div>

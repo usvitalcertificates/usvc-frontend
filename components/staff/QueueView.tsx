@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Clock, FolderOpen, Inbox, UserCheck, UserPlus, Zap } from "lucide-react";
+import { CheckCircle2, Clock, FolderOpen, Inbox, UserCheck, UserPlus, Zap } from "lucide-react";
 import { staffData } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
@@ -80,7 +80,7 @@ export function QueueView({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
-  const [kpis, setKpis] = useState({ unassigned: 0, mine: 0, attention: 0, rush: 0 });
+  const [kpis, setKpis] = useState({ unassigned: 0, mine: 0, attention: 0, ready: 0, rush: 0 });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -145,6 +145,7 @@ export function QueueView({
           unassigned: (unassigned.data.total ?? 0) as number,
           mine: (mine.data.total ?? 0) as number,
           attention: [...u, ...m].filter((o) => o.status === "TO_CS").length,
+          ready: [...u, ...m].filter((o) => o.status === "GTG").length,
           rush: [...u, ...m].filter((o) => o.rush).length,
         });
       } catch {
@@ -192,6 +193,7 @@ export function QueueView({
           <StatCard value={kpis.unassigned} label="Unassigned open" icon={<Inbox aria-hidden />} />
           <StatCard value={kpis.mine} label="Assigned to me" icon={<UserCheck aria-hidden />} />
           <StatCard value={kpis.attention} label="To CS" icon={<Clock aria-hidden />} />
+          <StatCard value={kpis.ready} label="GTG ready" icon={<CheckCircle2 aria-hidden />} />
           <StatCard value={kpis.rush} label="Rush open" icon={<Zap aria-hidden />} />
         </div>
       ) : null}
@@ -233,6 +235,7 @@ export function QueueView({
                 <option value="PAID">Payment Successful</option>
                 <option value="IN_REVIEW">Order Processing</option>
                 <option value="TO_CS">To CS</option>
+                <option value="GTG">GTG</option>
                 <option value="__rush">Rush only</option>
               </select>
             </label>
@@ -277,6 +280,7 @@ export function QueueView({
               [
                 ["all", "All"],
                 ["TO_CS", "To CS"],
+                ["GTG", "GTG"],
                 ["rush", "Rush"],
               ] as const
             ).map(([value, label]) => {

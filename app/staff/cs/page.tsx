@@ -64,7 +64,7 @@ export default function CsCorrections() {
       <PageBand
         eyebrow="CS — form corrections"
         title="Corrections inbox"
-        subtitle="Orders sent To CS with a problem note. Open one, fix the form without taking ownership, then resume it to fulfillment."
+        subtitle="Orders sent To CS with a problem note. Open one, fix the form without taking ownership, then mark it GTG so fulfillment can continue."
       />
       {error ? (
         <p role="alert" className="staff-alert error">

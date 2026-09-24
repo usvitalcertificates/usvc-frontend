@@ -7,6 +7,7 @@ export const STATUS_LABELS: Record<string, string> = {
   PAID: "Payment Successful",
   IN_REVIEW: "Order Processing",
   TO_CS: "To CS",
+  GTG: "GTG",
   SUBMITTED: "Submitted to Govt Agency",
   CANCELLED: "Cancelled",
 };
@@ -15,6 +16,7 @@ const STATUS_TONE: Record<string, "navy" | "red" | "gray" | "green"> = {
   PAID: "navy",
   IN_REVIEW: "navy",
   TO_CS: "red",
+  GTG: "green",
   SUBMITTED: "green",
   CANCELLED: "gray",
 };
@@ -197,7 +199,7 @@ const AGENT_STEPS = [
 
 function agentStepIndex(status: string): number {
   if (status === "SUBMITTED") return 2;
-  if (status === "IN_REVIEW" || status === "TO_CS") return 1;
+  if (status === "IN_REVIEW" || status === "TO_CS" || status === "GTG") return 1;
   return 0;
 }
 
@@ -210,7 +212,8 @@ export function Stepper({
   submittedAt?: string | null;
   parkedNote?: string | null;
 }) {
-  const isException = status === "TO_CS";
+  const isParked = status === "TO_CS";
+  const isReady = status === "GTG";
   const index = agentStepIndex(status);
   const done = status === "SUBMITTED";
   return (
@@ -249,12 +252,20 @@ export function Stepper({
           );
         })}
       </div>
-      {isException ? (
+      {isParked ? (
         <p style={{ margin: "8px 0 0" }}>
           <StatusPill status={status} />{" "}
-          <span style={{ fontSize: "0.9rem", color: "var(--flow-secondary)" }}>
-            Parked — resume to Order Processing to continue.
+          <span style={{ fontSize: "0.9rem", color: "#b91c1c", fontWeight: 700 }}>
+            CS is looking into it — submit is blocked until CS marks GTG.
             {parkedNote ? ` Latest note: “${parkedNote}”` : ""}
+          </span>
+        </p>
+      ) : null}
+      {isReady ? (
+        <p style={{ margin: "8px 0 0" }}>
+          <StatusPill status={status} />{" "}
+          <span style={{ fontSize: "0.9rem", color: "#15803d", fontWeight: 700 }}>
+            This form is now correct and can continue — move it back to Order Processing.
           </span>
         </p>
       ) : null}
