@@ -1141,7 +1141,7 @@ dl.staff-lines {
 .staff-appsect {
   border: 1px solid var(--flow-border);
   border-radius: 12px;
-  background: #fff;
+  background: #f2f5fc;
   padding: 14px 16px;
   margin-bottom: 16px;
 }
