@@ -483,9 +483,9 @@ table.staff-table {
   white-space: nowrap;
 }
 .staff-table tbody td {
-  padding: 12px 14px;
+  padding: 14px;
   border-bottom: 1px solid var(--flow-border);
-  vertical-align: top;
+  vertical-align: middle;
 }
 .staff-table tbody tr:last-child td {
   border-bottom: none;
@@ -497,6 +497,19 @@ table.staff-table {
   text-align: right;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+}
+/* Queue action cells: identical button box, whatever the label.
+   Anchors and buttons ship different font/line-height defaults, so lock
+   every metric here — fixed (not minimum) width keeps long and short
+   labels in the exact same rectangle. */
+.staff-table td .staff-btn {
+  width: 176px;
+  height: 36px;
+  padding: 0 12px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 /* Pills carry text labels — color is never the only signal. */
