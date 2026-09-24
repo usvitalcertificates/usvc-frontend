@@ -12,7 +12,7 @@ import {
   SkeletonRows,
   StatCard,
   StatusPill,
-  Toast,
+  TimedActionModal,
 } from "@/components/staff/ui";
 
 interface QueueOrder {
@@ -79,7 +79,7 @@ export function QueueView({
   const [rushOnly, setRushOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [toast, setToast] = useState<{ text: string; href: string } | null>(null);
+  const [claimed, setClaimed] = useState<{ number: string; id: string } | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [kpis, setKpis] = useState({ unassigned: 0, mine: 0, attention: 0, ready: 0, rush: 0 });
 
@@ -170,7 +170,7 @@ export function QueueView({
         { method: "POST" },
       );
       if (!response.ok) throw new Error(data.message || "Could not take ownership of this order");
-      setToast({ text: `You took ownership of order ${publicNumber}.`, href: `/staff/${id}` });
+      setClaimed({ number: publicNumber, id });
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not take ownership of this order");
@@ -186,11 +186,15 @@ export function QueueView({
         title={title}
         subtitle={`${subtitle} Showing ${orders.length} of ${total}.`}
       />
-      {toast ? (
-        <Toast
-          message={toast.text}
-          action={<Link href={toast.href}>Open order →</Link>}
-          onDone={() => setToast(null)}
+      {claimed ? (
+        <TimedActionModal
+          key={claimed.id}
+          title="Ownership taken"
+          orderNumber={claimed.number}
+          primaryLabel="Open Order"
+          primaryHref={`/staff/${claimed.id}`}
+          seconds={10}
+          onClose={() => setClaimed(null)}
         />
       ) : null}
       {error ? (

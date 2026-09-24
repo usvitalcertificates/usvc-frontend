@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
-import { BackLink, EmptyState, PageBand, Toast } from "@/components/staff/ui";
+import { BackLink, EmptyState, PageBand, TimedActionModal } from "@/components/staff/ui";
 
 interface CsOrder {
   id: string;
@@ -26,7 +26,7 @@ export default function CsCorrections() {
   const [allowed, setAllowed] = useState(false);
   const [orders, setOrders] = useState<CsOrder[]>([]);
   const [error, setError] = useState("");
-  const [toast, setToast] = useState<{ text: string; href: string } | null>(null);
+  const [claimed, setClaimed] = useState<{ number: string; id: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -46,7 +46,7 @@ export default function CsCorrections() {
     setError("");
     try {
       await staffJson(`/staff/orders/${id}/claim`, { method: "POST", body: "{}" });
-      setToast({ text: `You took ownership of ${publicNumber}.`, href: `/staff/cs/edit/${id}` });
+      setClaimed({ number: publicNumber, id });
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not take ownership");
@@ -78,11 +78,15 @@ export default function CsCorrections() {
         title="Corrections inbox"
         subtitle="Orders sent To CS with a problem note. Take ownership, open the form, fix it, then mark it GTG so fulfillment can continue."
       />
-      {toast ? (
-        <Toast
-          message={toast.text}
-          action={<Link href={toast.href}>Open editor →</Link>}
-          onDone={() => setToast(null)}
+      {claimed ? (
+        <TimedActionModal
+          key={claimed.id}
+          title="Ownership taken"
+          orderNumber={claimed.number}
+          primaryLabel="Open Order"
+          primaryHref={`/staff/cs/edit/${claimed.id}`}
+          seconds={10}
+          onClose={() => setClaimed(null)}
         />
       ) : null}
       {error ? (
