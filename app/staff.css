@@ -975,6 +975,7 @@ table.staff-table {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  flex-basis: 100%;
   margin: 10px 0 0;
 }
 .staff-orderbar .staff-pill.navy {
