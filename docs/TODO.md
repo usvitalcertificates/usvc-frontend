@@ -62,6 +62,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Notes & History 2026-09-23: latest-10 paging with Show more/less + counts, day-grouped history preserved, category-colored dots, relative timestamps, note bubble cards
 - [x] Shared activity module 2026-09-23: `components/staff/activity.tsx` (human labels incl. staff actions, dot categories incl. access/security, relTime) used by order history + admin feed; admin activity paged (20 + more) with human filter options
 - [x] Branded sign-in 2026-09-23: centered card with USVC Flow brandmark + "Processing today for brighter tomorrows" slogan, stepper line removed
+- [x] Staff auth slogan removed 2026-09-24: deleted `staff-auth-slogan` line from `/auth` (brandmark + eyebrow + H1 kept)
 - [x] Staging host access 2026-09-23: `staging.*` allows staff paths by path (verified 200 + noindex on staging pattern, 404 preserved on www/flow patterns)
 - [x] Roster polish 2026-09-23: avatar + name/pill flex row with gap, truncated email with hover title, two-line Last-activity date + time badge
 - [x] Agent stepper + focused queues 2026-09-23: Claimed → Processing → Submitted stepper with Paid precondition chip, per-step captions, parked-note excerpt, submitted timestamp; My Work shows open claimed only with attention-first order + quick-filter chips + guided empty state; Closed Orders drops irrelevant filters

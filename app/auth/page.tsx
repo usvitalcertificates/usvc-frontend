@@ -98,7 +98,6 @@ function AuthForm() {
             <span>Fulfillment Center</span>
           </span>
         </div>
-        <p className="staff-auth-slogan">Processing today for brighter tomorrows</p>
         <p className="staff-eyebrow">Internal — Authorized staff only</p>
         <h1 style={{ marginTop: "4px" }}>{setupToken ? "Set up your account" : "Staff sign in"}</h1>
         {params.get("reason") === "inactivity" ? (

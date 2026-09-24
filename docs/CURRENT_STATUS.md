@@ -1,6 +1,6 @@
 # Current frontend status
 
-Last updated: 2026-09-23 (official USVC branding; two-fee model; staff fulfillment MVP: sidebar dashboard shell, /auth TOTP, KPIs + masked queue/my/closed/search, tabbed detail with stepper + reveal + copy, admin with invite modal + activity timeline, settings).
+Last updated: 2026-09-24 (official USVC branding; two-fee model; staff fulfillment MVP: sidebar dashboard shell, /auth TOTP without slogan, KPIs + masked queue/my/closed/search, tabbed detail with stepper + reveal + copy, admin with invite modal + activity timeline, settings).
 
 ## Implemented
 
