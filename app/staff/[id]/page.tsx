@@ -397,14 +397,18 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     }
   };
 
-  const releaseOrder = () => {
+  const releaseOrder = async () => {
     setReleaseOpen(false);
-    void postAction(
-      `/staff/orders/${id}/release`,
-      {},
-      "POST",
-      "You have dropped ownership of this order.",
-    );
+    setBusy(true);
+    setError("");
+    try {
+      await staffJson(`/staff/orders/${id}/release`, { method: "POST", body: "{}" });
+      router.replace("/staff");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not release this order");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const confirmToCs = async () => {
@@ -1015,7 +1019,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           danger
           busy={busy}
           onCancel={() => setReleaseOpen(false)}
-          onConfirm={() => releaseOrder()}
+          onConfirm={() => void releaseOrder()}
         />
       ) : null}
     </>
