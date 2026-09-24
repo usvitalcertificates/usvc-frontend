@@ -386,6 +386,28 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
     }
   };
 
+  const saveNote = async () => {
+    if (!form.note.trim()) return;
+    setBusy(true);
+    setError("");
+    try {
+      const { response, data } = await staffData<{ message?: string }>(
+        `/staff/orders/${id}/notes`,
+        { method: "POST", body: JSON.stringify({ body: form.note.trim() }) },
+      );
+      if (!response.ok) throw new Error(data.message || "Could not save note");
+      setTop("note", "");
+      setToast("Note added.");
+      // Refresh order context (flagged note, rail) without touching form edits.
+      const detail = await staffJson<EditOrder>(`/staff/orders/${id}`);
+      setOrder(detail);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not save note");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
   const subjectKeys = Object.keys(form.subject);
   const familyKeys = Object.keys(form.family);
@@ -770,18 +792,37 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
                   />
                 </Field>
               </div>
-              <Field
-                label="Correction note (optional, added to internal notes)"
-                error={errors["note"]}
-              >
-                <input
-                  style={inputStyle}
+            </div>
+          </div>
+
+          <div className="staff-panel">
+            <h2>9 · Internal note</h2>
+            <div className="staff-panel-body" style={{ display: "grid", gap: "10px" }}>
+              <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", margin: 0 }}>
+                Staff only — never shown to the customer. Save it on its own, or leave it filled and
+                it rides along with Save corrections / Mark GTG below.
+              </p>
+              <Field label="Note" error={errors["note"]}>
+                <textarea
+                  style={{ ...inputStyle, minHeight: "72px", resize: "vertical" }}
+                  rows={3}
                   value={form.note}
                   onChange={(e) => setTop("note", e.target.value)}
                   maxLength={2000}
                   autoComplete="off"
+                  placeholder="What was checked or fixed?…"
                 />
               </Field>
+              <div>
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  disabled={busy || closed || !form.note.trim()}
+                  onClick={() => void saveNote()}
+                >
+                  {busy ? "Saving…" : "Save Note"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
