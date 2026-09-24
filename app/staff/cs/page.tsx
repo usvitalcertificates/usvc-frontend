@@ -109,7 +109,7 @@ export default function CsCorrections() {
                       <td>{o.requestor}</td>
                       <td>{o.assignedName ?? "Unassigned"}</td>
                       <td>
-                        <Link href={`/staff/${o.id}?from=cs`}>Open</Link>
+                        <Link href={`/staff/cs/edit/${o.id}`}>Open</Link>
                       </td>
                     </tr>
                   ))}
