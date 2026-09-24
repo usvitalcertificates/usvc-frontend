@@ -83,6 +83,10 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Submit-time cell + form fixes 2026-09-23: two-line date + time-badge cell; form reset scoped so filter panels keep padding (`form.staff-filters` wins fairly)
 - [x] Closed celebration 2026-09-23: green tick on Submitted, centered bold-green closed panel with timestamp
 - [x] Error-proof client + stepper language 2026-09-23: `staffData` safe body reader (text fallback, no SyntaxError on any staff page), Took Ownership step, muted-done / ticked-current / blue Up-next stepper states
+- [x] CS inbox refresh 2026-09-24: full-width Open Orders queue treatment, mobile card fallback, red correction-needed callout, and audit-derived sent-to-CS date; fixed To-CS status column removed
+- [x] Compact Open Orders header 2026-09-24: on-demand order lookup, condensed page band, and five one-row semantic pastel KPI mini-cards (two columns on tablet, one on narrow mobile) move queue rows above the fold
+- [x] Order Search polish 2026-09-24: wider order-number column, county context, fixed-width actions, and role-aware unavailable/open-queue actions prevent overflow and dead-end links
+- [x] Order-detail header compactness 2026-09-24: shorter back link, command bar, and tabs; status/Rush pills now share the identity block instead of consuming a dedicated header row
 
 ## Phase 3 (remaining + proposed backlog)
 

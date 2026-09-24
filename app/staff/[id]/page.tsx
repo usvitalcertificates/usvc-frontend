@@ -506,6 +506,10 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <p className="staff-orderbar-sub">
             {`${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} · ${order.stateName} (${order.geo.county}, ${order.geo.city}) · Submitted ${new Date(order.createdAt).toLocaleString("en-US")}`}
           </p>
+          <div className="staff-orderbar-statuses">
+            <StatusPill status={order.status} />
+            {order.rush ? <span className="staff-pill amber">RUSH</span> : null}
+          </div>
         </div>
         {!closed ? (
           <div className="staff-orderbar-actions">
@@ -522,14 +526,6 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </button>
           </div>
         ) : null}
-        <p className="staff-orderbar-pills">
-          <StatusPill status={order.status} />
-          {order.rush ? (
-            <span style={{ marginLeft: "auto" }}>
-              <span className="staff-pill amber">RUSH</span>
-            </span>
-          ) : null}
-        </p>
       </div>
       {toast ? <Toast message={toast} onDone={() => setToast("")} /> : null}
       {error ? (

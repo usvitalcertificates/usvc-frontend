@@ -58,13 +58,15 @@ export function StatCard({
   value,
   label,
   icon,
+  tone = "blue",
 }: {
   value: ReactNode;
   label: string;
   icon?: ReactNode;
+  tone?: "blue" | "lavender" | "rose" | "green" | "amber";
 }) {
   return (
-    <div className="staff-stat">
+    <div className={`staff-stat staff-stat-${tone}`}>
       {icon}
       <div>
         <strong>{value}</strong>
@@ -439,10 +441,8 @@ export function dayKey(value: string | Date): string {
 
 export function BackLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <p style={{ margin: "0 0 14px" }}>
-      <Link href={href} style={{ color: "var(--navy)", fontWeight: 700 }}>
-        {children}
-      </Link>
+    <p className="staff-backlink">
+      <Link href={href}>{children}</Link>
     </p>
   );
 }

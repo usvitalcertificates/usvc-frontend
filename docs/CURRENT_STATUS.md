@@ -1,6 +1,6 @@
 # Current frontend status
 
-Last updated: 2026-09-24 (official USVC branding; two-fee model; staff roles ADMIN/FULFILLMENT/CS with raw labels; pricing gated to ADMIN+CS; /staff/cs corrections inbox).
+Last updated: 2026-09-24 (official USVC branding; two-fee model; staff roles ADMIN/FULFILLMENT/CS with raw labels; pricing gated to ADMIN+CS; compact staff queue and order-detail headers, polished Order Search, and refreshed /staff/cs corrections inbox).
 
 ## Implemented
 

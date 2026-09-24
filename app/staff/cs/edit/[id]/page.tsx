@@ -2,6 +2,7 @@
 
 import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { staffData, staffId, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { BackLink, PageBand, StatusPill, Toast } from "@/components/staff/ui";
@@ -242,6 +243,46 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
   const [toast, setToast] = useState("");
   const [busy, setBusy] = useState(false);
   const [gtgOpen, setGtgOpen] = useState(false);
+  const [revealedSsn, setRevealedSsn] = useState<string | null>(null);
+  const [revealedCard, setRevealedCard] = useState<{
+    number: string;
+    expiry: string;
+    securityCode: string;
+  } | null>(null);
+  const [revealFor, setRevealFor] = useState<"ssn" | "card" | null>(null);
+  const [revealReason, setRevealReason] = useState("CS correction compare");
+  const [revealBusy, setRevealBusy] = useState(false);
+  const [revealError, setRevealError] = useState("");
+
+  // Revealed secrets auto-hide after 30s and are never logged or stored.
+  useEffect(() => {
+    if (!revealedSsn && !revealedCard) return;
+    const timer = window.setTimeout(() => {
+      setRevealedSsn(null);
+      setRevealedCard(null);
+    }, 30000);
+    return () => window.clearTimeout(timer);
+  }, [revealedSsn, revealedCard]);
+
+  const doReveal = async (field: "ssn" | "card") => {
+    const reason = revealReason.trim() || "CS correction compare";
+    setRevealBusy(true);
+    setRevealError("");
+    try {
+      const data = await staffJson<{
+        field: string;
+        ssn?: string;
+        card?: { number: string; expiry: string; securityCode: string };
+      }>(`/orders/${id}/reveal`, { method: "POST", body: JSON.stringify({ field, reason }) });
+      if (field === "ssn") setRevealedSsn(data.ssn ?? "");
+      else setRevealedCard(data.card ?? null);
+      setRevealFor(null);
+    } catch (e) {
+      setRevealError(e instanceof Error ? e.message : "Could not reveal value");
+    } finally {
+      setRevealBusy(false);
+    }
+  };
 
   const load = useCallback(async () => {
     setError("");
@@ -461,6 +502,8 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
         throw new Error(data.message || "Could not save corrections");
       }
       setToast("Corrections saved.");
+      setRevealedSsn(null);
+      setRevealedCard(null);
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save corrections");
@@ -851,9 +894,139 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
             <h2 style={{ color: "#78350f" }}>8 · SSN &amp; payment card</h2>
             <div className="staff-panel-body" style={{ display: "grid", gap: "12px" }}>
               <p style={{ fontSize: "0.9rem", color: "#92400e", margin: 0 }}>
-                Confidential — stored values are encrypted and never shown. Leave blank to keep them
-                — fill to replace. Replacements are encrypted before storage and never logged.
+                Stored values are encrypted and never shown. Blank keeps them — fill to replace.
               </p>
+              <div
+                style={{
+                  display: "grid",
+                  gap: "8px",
+                  background: "#fff",
+                  border: "1px solid #fde68a",
+                  borderRadius: "8px",
+                  padding: "10px 12px",
+                }}
+              >
+                <p style={{ fontSize: "0.85rem", color: "#92400e", margin: 0 }}>
+                  Compare before replacing. Reveals are logged and auto-hide in 30 seconds.
+                </p>
+                <div
+                  style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}
+                >
+                  {revealedSsn ? (
+                    <>
+                      <code style={{ fontSize: "0.95rem", fontWeight: 700 }}>{revealedSsn}</code>
+                      <button
+                        type="button"
+                        className="staff-btn secondary"
+                        style={{ minWidth: "150px", height: "36px" }}
+                        onClick={() => setRevealedSsn(null)}
+                      >
+                        <EyeOff aria-hidden style={{ width: 15, height: 15 }} /> Hide SSN
+                      </button>
+                    </>
+                  ) : revealFor === "ssn" ? (
+                    <>
+                      <input
+                        style={{ ...inputStyle, background: "#fff", maxWidth: "280px" }}
+                        value={revealReason}
+                        onChange={(e) => setRevealReason(e.target.value)}
+                        maxLength={500}
+                        autoComplete="off"
+                        placeholder="Reason (required, logged)"
+                        aria-label="Reason for revealing SSN"
+                      />
+                      <button
+                        type="button"
+                        className="staff-btn secondary"
+                        disabled={revealBusy}
+                        onClick={() => void doReveal("ssn")}
+                      >
+                        {revealBusy ? "Revealing…" : "Confirm reveal"}
+                      </button>
+                      <button
+                        type="button"
+                        className="staff-btn secondary"
+                        onClick={() => setRevealFor(null)}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      className="staff-btn secondary"
+                      onClick={() => {
+                        setRevealError("");
+                        setRevealFor("ssn");
+                      }}
+                    >
+                      <Eye aria-hidden style={{ width: 15, height: 15 }} /> Reveal stored SSN
+                    </button>
+                  )}
+                </div>
+                <div
+                  style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}
+                >
+                  {revealedCard ? (
+                    <>
+                      <code style={{ fontSize: "0.95rem", fontWeight: 700 }}>
+                        {revealedCard.number} · {revealedCard.expiry} · {revealedCard.securityCode}
+                      </code>
+                      <button
+                        type="button"
+                        className="staff-btn secondary"
+                        style={{ minWidth: "150px", height: "36px" }}
+                        onClick={() => setRevealedCard(null)}
+                      >
+                        <EyeOff aria-hidden style={{ width: 15, height: 15 }} /> Hide card
+                      </button>
+                    </>
+                  ) : revealFor === "card" ? (
+                    <>
+                      <input
+                        style={{ ...inputStyle, background: "#fff", maxWidth: "280px" }}
+                        value={revealReason}
+                        onChange={(e) => setRevealReason(e.target.value)}
+                        maxLength={500}
+                        autoComplete="off"
+                        placeholder="Reason (required, logged)"
+                        aria-label="Reason for revealing card"
+                      />
+                      <button
+                        type="button"
+                        className="staff-btn secondary"
+                        disabled={revealBusy}
+                        onClick={() => void doReveal("card")}
+                      >
+                        {revealBusy ? "Revealing…" : "Confirm reveal"}
+                      </button>
+                      <button
+                        type="button"
+                        className="staff-btn secondary"
+                        onClick={() => setRevealFor(null)}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      className="staff-btn secondary"
+                      onClick={() => {
+                        setRevealError("");
+                        setRevealFor("card");
+                      }}
+                    >
+                      <Eye aria-hidden style={{ width: 15, height: 15 }} /> Reveal stored card
+                    </button>
+                  )}
+                </div>
+                {revealError ? (
+                  <p role="alert" className="staff-alert error" style={{ margin: 0 }}>
+                    {revealError}
+                  </p>
+                ) : null}
+              </div>
               <Field label="SSN (stored: •••••, encrypted)" error={errors["requestorSsn"]}>
                 <input
                   style={{ ...inputStyle, background: "#fff" }}
@@ -1022,8 +1195,8 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
               </ol>
             </div>
           </div>
-          <div className="staff-panel">
-            <h3>Recent notes</h3>
+          <div className="staff-panel" style={{ background: "#fffbeb", borderColor: "#fde68a" }}>
+            <h3 style={{ color: "#78350f" }}>Recent notes</h3>
             <div className="staff-panel-body">
               {(order.notes ?? []).length === 0 ? (
                 <p style={{ color: "var(--muted-text)" }}>No internal notes yet.</p>
@@ -1063,6 +1236,7 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
         <button
           type="button"
           className="staff-btn"
+          style={{ minWidth: "220px", height: "48px", fontSize: "1rem" }}
           disabled={busy || !dirty || closed}
           onClick={() => void save()}
         >
@@ -1084,22 +1258,23 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
               marginLeft: "auto",
               display: "inline-flex",
               flexDirection: "column",
-              alignItems: "flex-end",
-              gap: "2px",
+              alignItems: "center",
+              gap: "4px",
             }}
           >
+            <span style={{ fontSize: "0.78rem", color: "var(--muted-text)", textAlign: "center" }}>
+              Updates status → GTG
+            </span>
             <button
               type="button"
               className="staff-btn green"
+              style={{ minWidth: "200px", height: "38px" }}
               disabled={busy}
               onClick={() => setGtgOpen(true)}
               title="Updates order status to GTG"
             >
               Mark GTG
             </button>
-            <span style={{ fontSize: "0.75rem", color: "var(--muted-text)" }}>
-              Updates status → GTG
-            </span>
           </span>
         ) : null}
       </div>
@@ -1121,6 +1296,7 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
               <button
                 type="button"
                 className="staff-btn green"
+                style={{ minWidth: "170px", height: "38px" }}
                 disabled={busy}
                 onClick={() => {
                   setGtgOpen(false);
@@ -1132,6 +1308,7 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
               <button
                 type="button"
                 className="staff-btn secondary"
+                style={{ minWidth: "170px", height: "38px" }}
                 onClick={() => setGtgOpen(false)}
               >
                 Cancel

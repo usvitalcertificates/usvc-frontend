@@ -205,11 +205,26 @@ export function QueueView({
 
       {showKpis ? (
         <div className="staff-stats">
-          <StatCard value={kpis.unassigned} label="Unassigned open" icon={<Inbox aria-hidden />} />
-          <StatCard value={kpis.mine} label="Assigned to me" icon={<UserCheck aria-hidden />} />
-          <StatCard value={kpis.attention} label="To CS" icon={<Clock aria-hidden />} />
-          <StatCard value={kpis.ready} label="GTG ready" icon={<CheckCircle2 aria-hidden />} />
-          <StatCard value={kpis.rush} label="Rush open" icon={<Zap aria-hidden />} />
+          <StatCard
+            value={kpis.unassigned}
+            label="Unassigned open"
+            icon={<Inbox aria-hidden />}
+            tone="blue"
+          />
+          <StatCard
+            value={kpis.mine}
+            label="Assigned to me"
+            icon={<UserCheck aria-hidden />}
+            tone="lavender"
+          />
+          <StatCard value={kpis.attention} label="To CS" icon={<Clock aria-hidden />} tone="rose" />
+          <StatCard
+            value={kpis.ready}
+            label="GTG ready"
+            icon={<CheckCircle2 aria-hidden />}
+            tone="green"
+          />
+          <StatCard value={kpis.rush} label="Rush open" icon={<Zap aria-hidden />} tone="amber" />
         </div>
       ) : null}
 
