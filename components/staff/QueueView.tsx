@@ -413,9 +413,14 @@ export function QueueView({
                           <FolderOpen aria-hidden style={{ width: 15, height: 15 }} /> Open Order
                         </Link>
                       ) : (
-                        <span style={{ fontSize: "0.85rem", color: "var(--muted-text)" }}>
-                          Claimed by {order.assignedName}
-                        </span>
+                        <button
+                          type="button"
+                          className="staff-btn green"
+                          disabled
+                          title={`Claimed by ${order.assignedName} — only the owner can open it`}
+                        >
+                          <FolderOpen aria-hidden style={{ width: 15, height: 15 }} /> Open Order
+                        </button>
                       )}
                     </td>
                   </tr>
