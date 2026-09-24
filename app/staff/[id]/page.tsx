@@ -508,7 +508,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           </p>
           <p className="staff-orderbar-pills">
             <StatusPill status={order.status} />
-            {order.rush ? <span className="staff-pill amber">RUSH</span> : null}
+            {order.rush ? (
+              <span style={{ marginLeft: "auto" }}>
+                <span className="staff-pill amber">RUSH</span>
+              </span>
+            ) : null}
           </p>
         </div>
         {!closed ? (

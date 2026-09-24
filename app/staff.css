@@ -977,7 +977,7 @@ table.staff-table {
   flex-wrap: wrap;
   margin: 10px 0 0;
 }
-.staff-orderbar .staff-pill {
+.staff-orderbar .staff-pill.navy {
   background: rgb(255 255 255 / 14%);
   color: #fff;
 }
