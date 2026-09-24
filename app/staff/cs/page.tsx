@@ -26,7 +26,7 @@ export default function CsCorrections() {
   const [allowed, setAllowed] = useState(false);
   const [orders, setOrders] = useState<CsOrder[]>([]);
   const [error, setError] = useState("");
-  const [toast, setToast] = useState("");
+  const [toast, setToast] = useState<{ text: string; href: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -46,7 +46,7 @@ export default function CsCorrections() {
     setError("");
     try {
       await staffJson(`/staff/orders/${id}/claim`, { method: "POST", body: "{}" });
-      setToast(`You took ownership of ${publicNumber} — open it to correct the form.`);
+      setToast({ text: `You took ownership of ${publicNumber}.`, href: `/staff/cs/edit/${id}` });
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not take ownership");
@@ -78,7 +78,13 @@ export default function CsCorrections() {
         title="Corrections inbox"
         subtitle="Orders sent To CS with a problem note. Take ownership, open the form, fix it, then mark it GTG so fulfillment can continue."
       />
-      {toast ? <Toast message={toast} onDone={() => setToast("")} /> : null}
+      {toast ? (
+        <Toast
+          message={toast.text}
+          action={<Link href={toast.href}>Open editor →</Link>}
+          onDone={() => setToast(null)}
+        />
+      ) : null}
       {error ? (
         <p role="alert" className="staff-alert error">
           {error}

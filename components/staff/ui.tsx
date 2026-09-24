@@ -106,7 +106,15 @@ export function SkeletonRows({ rows = 5 }: { rows?: number }) {
 }
 
 /** Success toast banner (MILES-style). Auto-dismisses after 6s. */
-export function Toast({ message, onDone }: { message: string; onDone: () => void }) {
+export function Toast({
+  message,
+  action,
+  onDone,
+}: {
+  message: string;
+  action?: ReactNode;
+  onDone: () => void;
+}) {
   useEffect(() => {
     const timer = setTimeout(onDone, 6000);
     return () => clearTimeout(timer);
@@ -114,6 +122,7 @@ export function Toast({ message, onDone }: { message: string; onDone: () => void
   return (
     <p role="status" className="staff-alert success">
       {message}
+      {action ? <span style={{ marginLeft: "12px" }}>{action}</span> : null}
     </p>
   );
 }
