@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffData, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
@@ -322,6 +323,7 @@ type Tab = "summary" | "application" | "notes";
 
 export default function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   useRequireStaffAuth();
   useInactivitySignout();
   const [order, setOrder] = useState<OrderDetail | null>(null);
@@ -332,6 +334,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [statusNote, setStatusNote] = useState("");
   const [moveTo, setMoveTo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [toCsOpen, setToCsOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("summary");
   const [isAdmin, setIsAdmin] = useState(false);
   const [canSeePricing, setCanSeePricing] = useState(false);
@@ -394,6 +397,24 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       "POST",
       "You have dropped ownership of this order.",
     );
+  };
+
+  const confirmToCs = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      await staffJson(`/orders/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "TO_CS", note: statusNote.trim() }),
+      });
+      setToCsOpen(false);
+      router.replace("/staff");
+    } catch (e) {
+      setToCsOpen(false);
+      setError(e instanceof Error ? e.message : "Could not send to CS");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const goWorkflow = () => {
@@ -475,7 +496,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           </p>
           <p className="staff-orderbar-pills">
             <StatusPill status={order.status} />
-            {order.rush ? <span className="staff-pill red">RUSH</span> : null}
+            {order.rush ? <span className="staff-pill amber">RUSH</span> : null}
           </p>
         </div>
         {!closed ? (
@@ -564,12 +585,14 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     {exceptionMove ? (
                       <label>
                         Internal note (required for To CS)
-                        <input
+                        <textarea
                           value={statusNote}
                           onChange={(e) => setStatusNote(e.target.value)}
+                          rows={4}
                           maxLength={2000}
                           placeholder="What does this order need before it can continue?…"
                           autoComplete="off"
+                          style={{ width: "100%", minHeight: "88px", resize: "vertical" }}
                         />
                       </label>
                     ) : null}
@@ -593,15 +616,15 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                         className="staff-btn"
                         disabled={busy || (exceptionMove && !statusNote.trim())}
                         onClick={() => {
+                          if (exceptionMove) {
+                            setToCsOpen(true);
+                            return;
+                          }
                           void postAction(
                             `/orders/${id}/status`,
                             {
                               status: effectiveMoveTo,
-                              ...(exceptionMove || gtgMove
-                                ? statusNote.trim()
-                                  ? { note: statusNote.trim() }
-                                  : {}
-                                : {}),
+                              ...(gtgMove && statusNote.trim() ? { note: statusNote.trim() } : {}),
                             },
                             "PATCH",
                             "The order status has been changed for this order.",
@@ -911,6 +934,55 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
         </>
+      ) : null}
+
+      {toCsOpen && order ? (
+        <div className="staff-modal-backdrop" onClick={() => setToCsOpen(false)}>
+          <div
+            className="staff-modal"
+            role="dialog"
+            aria-label="Confirm send To CS"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2>Send To CS?</h2>
+            <p style={{ color: "var(--muted-text)" }}>
+              This will send order to CS for review and your ownership will drop automatically.
+            </p>
+            <p
+              role="note"
+              style={{
+                background: "#fef2f2",
+                border: "1px solid #fecaca",
+                borderRadius: "8px",
+                padding: "10px 12px",
+                fontSize: "0.9rem",
+                whiteSpace: "pre-wrap",
+                maxHeight: "180px",
+                overflowY: "auto",
+              }}
+            >
+              <strong style={{ color: "#b91c1c" }}>Note to CS: </strong>
+              {statusNote.trim()}
+            </p>
+            <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
+              <button
+                type="button"
+                className="staff-btn"
+                disabled={busy}
+                onClick={() => void confirmToCs()}
+              >
+                {busy ? "Sending…" : "Send To CS"}
+              </button>
+              <button
+                type="button"
+                className="staff-btn secondary"
+                onClick={() => setToCsOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
     </>
   );

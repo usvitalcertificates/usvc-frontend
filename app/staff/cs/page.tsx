@@ -110,11 +110,11 @@ export default function CsCorrections() {
                   {orders.map((o) => (
                     <tr key={o.id}>
                       <td>
-                        <strong>{o.publicNumber}</strong>
+                        <strong>{o.publicNumber}</strong>{" "}
+                        {o.rush ? <span className="staff-pill amber">RUSH</span> : null}
                         <br />
                         <span style={{ color: "var(--muted-text)" }}>
                           {o.stateCode} {o.certificate}
-                          {o.rush ? " · RUSH" : ""}
                         </span>
                       </td>
                       <td>{o.status}</td>

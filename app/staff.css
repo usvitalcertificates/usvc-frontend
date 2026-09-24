@@ -518,6 +518,10 @@ table.staff-table {
   background: var(--flow-danger-bg);
   color: var(--flow-danger);
 }
+.staff-pill.amber {
+  background: var(--flow-warning-bg);
+  color: var(--flow-warning);
+}
 .staff-pill.gray {
   background: var(--flow-bg);
   color: var(--flow-secondary);

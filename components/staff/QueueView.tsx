@@ -370,7 +370,7 @@ export function QueueView({
                     </td>
                     <td>
                       <strong>{order.publicNumber}</strong>{" "}
-                      {order.rush ? <span className="staff-pill red">RUSH</span> : null}
+                      {order.rush ? <span className="staff-pill amber">RUSH</span> : null}
                       <br />
                       <span style={{ fontSize: "0.82rem", color: "var(--muted-text)" }}>
                         {order.copies} {order.copies === 1 ? "copy" : "copies"}
