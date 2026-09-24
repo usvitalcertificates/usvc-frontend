@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { CheckCircle2, Clock, FolderOpen, Inbox, UserCheck, UserPlus, Zap } from "lucide-react";
-import { staffData } from "@/lib/staff-client";
+import { staffData, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
   EmptyState,
@@ -80,7 +80,12 @@ export function QueueView({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
+  const [role, setRole] = useState<string | null>(null);
   const [kpis, setKpis] = useState({ unassigned: 0, mine: 0, attention: 0, ready: 0, rush: 0 });
+
+  useEffect(() => {
+    setRole(staffRole());
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -385,11 +390,7 @@ export function QueueView({
                     <td>{order.assignedName ?? "Unassigned"}</td>
                     <td>{order.requestor}</td>
                     <td style={{ whiteSpace: "nowrap" }}>
-                      {order.assignedToMe || order.assignedName ? (
-                        <Link className="staff-btn green" href={`/staff/${order.id}`}>
-                          <FolderOpen aria-hidden style={{ width: 15, height: 15 }} /> Open Order
-                        </Link>
-                      ) : (
+                      {!order.assignedName ? (
                         <button
                           type="button"
                           className="staff-btn"
@@ -397,6 +398,14 @@ export function QueueView({
                         >
                           <UserPlus aria-hidden style={{ width: 15, height: 15 }} /> Take Ownership
                         </button>
+                      ) : order.assignedToMe || role === "ADMIN" || role === "CS" ? (
+                        <Link className="staff-btn green" href={`/staff/${order.id}`}>
+                          <FolderOpen aria-hidden style={{ width: 15, height: 15 }} /> Open Order
+                        </Link>
+                      ) : (
+                        <span style={{ fontSize: "0.85rem", color: "var(--muted-text)" }}>
+                          Claimed by {order.assignedName}
+                        </span>
                       )}
                     </td>
                   </tr>

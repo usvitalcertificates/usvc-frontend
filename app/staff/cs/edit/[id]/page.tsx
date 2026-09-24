@@ -2,7 +2,7 @@
 
 import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { staffData, staffJson, staffRole } from "@/lib/staff-client";
+import { staffData, staffId, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { BackLink, PageBand, StatusPill, Toast } from "@/components/staff/ui";
 import { CopyButton } from "@/components/staff/CopyButton";
@@ -25,6 +25,7 @@ interface EditOrder {
   deliveryMethod: string;
   destinationType?: string;
   status: string;
+  assignedTo: string | null;
   assignedName: string | null;
   pricing?: { serviceCents: number; rushCents: number; totalCents: number };
   amountCents?: number;
@@ -231,6 +232,8 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
   useRequireStaffAuth();
   useInactivitySignout();
   const [allowed, setAllowed] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [myId, setMyId] = useState<string | null>(null);
   const [order, setOrder] = useState<EditOrder | null>(null);
   const [form, setForm] = useState<EditForm | null>(null);
   const [initial, setInitial] = useState("");
@@ -238,6 +241,7 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
   const [busy, setBusy] = useState(false);
+  const [gtgOpen, setGtgOpen] = useState(false);
 
   const load = useCallback(async () => {
     setError("");
@@ -259,6 +263,8 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
     const role = staffRole();
     const ok = role === "ADMIN" || role === "CS";
     setAllowed(ok);
+    setIsAdmin(role === "ADMIN");
+    setMyId(staffId());
     if (ok) void load();
   }, [load]);
 
@@ -294,6 +300,64 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
       <div className="staff-panel">
         <div className="staff-panel-body">Loading the order form…</div>
       </div>
+    );
+  }
+
+  const mine = !!order.assignedTo && order.assignedTo === myId;
+  const canEdit = isAdmin || mine;
+
+  const claimHere = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      await staffJson(`/staff/orders/${id}/claim`, { method: "POST", body: "{}" });
+      setToast("You took ownership — correct the form below.");
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not take ownership");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!canEdit) {
+    return (
+      <>
+        <BackLink href="/staff/cs">← Back to Corrections inbox</BackLink>
+        <PageBand
+          eyebrow={`CS correction — ${order.publicNumber}`}
+          title="Edit order form"
+          subtitle={<StatusPill status={order.status} />}
+        />
+        {toast ? <Toast message={toast} onDone={() => setToast("")} /> : null}
+        {error ? (
+          <p role="alert" className="staff-alert error">
+            {error}
+          </p>
+        ) : null}
+        <div className="staff-panel">
+          <div className="staff-panel-body">
+            {order.assignedTo ? (
+              <p style={{ marginBottom: 0 }}>
+                Claimed by <strong>{order.assignedName ?? "another agent"}</strong> — editing is
+                limited to the owner. Ask an ADMIN to reassign it if you need to take over.
+              </p>
+            ) : (
+              <>
+                <p>Take ownership of this order to correct its form.</p>
+                <button
+                  type="button"
+                  className="staff-btn"
+                  disabled={busy}
+                  onClick={() => void claimHere()}
+                >
+                  {busy ? "Please wait…" : "Take Ownership"}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </>
     );
   }
 
@@ -1028,7 +1092,7 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
               type="button"
               className="staff-btn green"
               disabled={busy}
-              onClick={() => void markGtg()}
+              onClick={() => setGtgOpen(true)}
               title="Updates order status to GTG"
             >
               Mark GTG
@@ -1039,6 +1103,43 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
           </span>
         ) : null}
       </div>
+
+      {gtgOpen ? (
+        <div className="staff-modal-backdrop" onClick={() => setGtgOpen(false)}>
+          <div
+            className="staff-modal"
+            role="dialog"
+            aria-label="Confirm Mark GTG"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2>Mark GTG?</h2>
+            <p style={{ color: "var(--muted-text)" }}>
+              This will change order status to GTG and fulfillment will continue and also your
+              ownership will be dropped.
+            </p>
+            <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
+              <button
+                type="button"
+                className="staff-btn green"
+                disabled={busy}
+                onClick={() => {
+                  setGtgOpen(false);
+                  void markGtg();
+                }}
+              >
+                {busy ? "Please wait…" : "Mark GTG"}
+              </button>
+              <button
+                type="button"
+                className="staff-btn secondary"
+                onClick={() => setGtgOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

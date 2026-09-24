@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
-import { BackLink, EmptyState, PageBand } from "@/components/staff/ui";
+import { BackLink, EmptyState, PageBand, Toast } from "@/components/staff/ui";
 
 interface CsOrder {
   id: string;
@@ -26,6 +26,7 @@ export default function CsCorrections() {
   const [allowed, setAllowed] = useState(false);
   const [orders, setOrders] = useState<CsOrder[]>([]);
   const [error, setError] = useState("");
+  const [toast, setToast] = useState("");
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -40,6 +41,17 @@ export default function CsCorrections() {
       setLoading(false);
     }
   }, []);
+
+  const claim = async (id: string, publicNumber: string) => {
+    setError("");
+    try {
+      await staffJson(`/staff/orders/${id}/claim`, { method: "POST", body: "{}" });
+      setToast(`You took ownership of ${publicNumber} — open it to correct the form.`);
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not take ownership");
+    }
+  };
 
   useEffect(() => {
     const role = staffRole();
@@ -64,8 +76,9 @@ export default function CsCorrections() {
       <PageBand
         eyebrow="CS — form corrections"
         title="Corrections inbox"
-        subtitle="Orders sent To CS with a problem note. Open one, fix the form without taking ownership, then mark it GTG so fulfillment can continue."
+        subtitle="Orders sent To CS with a problem note. Take ownership, open the form, fix it, then mark it GTG so fulfillment can continue."
       />
+      {toast ? <Toast message={toast} onDone={() => setToast("")} /> : null}
       {error ? (
         <p role="alert" className="staff-alert error">
           {error}
@@ -108,8 +121,18 @@ export default function CsCorrections() {
                       <td>{o.county || "—"}</td>
                       <td>{o.requestor}</td>
                       <td>{o.assignedName ?? "Unassigned"}</td>
-                      <td>
-                        <Link href={`/staff/cs/edit/${o.id}`}>Open</Link>
+                      <td style={{ whiteSpace: "nowrap" }}>
+                        {!o.assignedName ? (
+                          <button
+                            type="button"
+                            className="staff-btn"
+                            onClick={() => void claim(o.id, o.publicNumber)}
+                          >
+                            Take Ownership
+                          </button>
+                        ) : (
+                          <Link href={`/staff/cs/edit/${o.id}`}>Open</Link>
+                        )}
                       </td>
                     </tr>
                   ))}
