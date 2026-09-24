@@ -40,8 +40,8 @@ interface OrderDetail {
   status: string;
   paymentStatus: string;
   assignedName: string | null;
-  pricing: { serviceCents: number; rushCents: number; totalCents: number };
-  amountCents: number;
+  pricing?: { serviceCents: number; rushCents: number; totalCents: number };
+  amountCents?: number;
   notes: { authorId?: string; body: string; createdAt?: string }[];
   createdAt: string;
 }
@@ -334,11 +334,23 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<Tab>("summary");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [canSeePricing, setCanSeePricing] = useState(false);
+  const [canCorrect, setCanCorrect] = useState(false);
+  const [corrFirst, setCorrFirst] = useState("");
+  const [corrLast, setCorrLast] = useState("");
+  const [corrEmail, setCorrEmail] = useState("");
+  const [corrPhone, setCorrPhone] = useState("");
+  const [corrCounty, setCorrCounty] = useState("");
+  const [corrCity, setCorrCity] = useState("");
+  const [corrNote, setCorrNote] = useState("");
   const [histLimit, setHistLimit] = useState(10);
   const [noteLimit, setNoteLimit] = useState(10);
 
   useEffect(() => {
-    setIsAdmin(staffRole() === "ADMIN");
+    const role = staffRole();
+    setIsAdmin(role === "ADMIN");
+    setCanSeePricing(role === "ADMIN" || role === "CS");
+    setCanCorrect(role === "ADMIN" || role === "CS");
   }, []);
 
   const load = useCallback(async () => {
@@ -678,35 +690,37 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   ) : null}
                 </div>
               </div>
-              <div className="staff-panel">
-                <h3>Products</h3>
-                <div className="staff-panel-body">
-                  <dl className="staff-lines">
-                    <div>
-                      <dt>
-                        Certified copy of{" "}
-                        {order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()}{" "}
-                        Certificate
-                        <span className="staff-lines-sub">
-                          Online Processing Fee · Qty: {order.copies} Certificate(s)
-                        </span>
-                      </dt>
-                      <dd>{money(order.pricing.serviceCents)}</dd>
-                    </div>
-                    {order.pricing.rushCents > 0 ? (
+              {canSeePricing && order.pricing && order.amountCents !== undefined ? (
+                <div className="staff-panel">
+                  <h3>Products</h3>
+                  <div className="staff-panel-body">
+                    <dl className="staff-lines">
                       <div>
-                        <dt>Rush Processing</dt>
-                        <dd>{money(order.pricing.rushCents)}</dd>
+                        <dt>
+                          Certified copy of{" "}
+                          {order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()}{" "}
+                          Certificate
+                          <span className="staff-lines-sub">
+                            Online Processing Fee · Qty: {order.copies} Certificate(s)
+                          </span>
+                        </dt>
+                        <dd>{money(order.pricing.serviceCents)}</dd>
                       </div>
-                    ) : null}
-                    <div className="staff-lines-total">
-                      <dt>Total Paid</dt>
-                      <dd>{money(order.amountCents)}</dd>
-                    </div>
-                  </dl>
-                  <p className="staff-lines-note">Processing fee collected at checkout.</p>
+                      {order.pricing.rushCents > 0 ? (
+                        <div>
+                          <dt>Rush Processing</dt>
+                          <dd>{money(order.pricing.rushCents)}</dd>
+                        </div>
+                      ) : null}
+                      <div className="staff-lines-total">
+                        <dt>Total Paid</dt>
+                        <dd>{money(order.amountCents)}</dd>
+                      </div>
+                    </dl>
+                    <p className="staff-lines-note">Processing fee collected at checkout.</p>
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
           </div>
         </>
@@ -744,6 +758,156 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             onReveal={() => void load()}
           />
           <RevealCard orderId={id} field="card" title="Payment card" onReveal={() => void load()} />
+          {canCorrect && !closed ? (
+            <div className="staff-panel">
+              <h2>Correct form data (CS)</h2>
+              <div className="staff-panel-body">
+                <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", marginTop: 0 }}>
+                  Fix application details without taking ownership. Only EDIT — leave a field blank
+                  to keep its current value.
+                </p>
+                <div style={{ display: "grid", gap: "10px", maxWidth: "520px" }}>
+                  <label>
+                    Requestor first name (now: {order.applicant.firstName || "—"})
+                    <input
+                      value={corrFirst}
+                      onChange={(e) => setCorrFirst(e.target.value)}
+                      maxLength={120}
+                      autoComplete="off"
+                    />
+                  </label>
+                  <label>
+                    Requestor last name (now: {order.applicant.lastName || "—"})
+                    <input
+                      value={corrLast}
+                      onChange={(e) => setCorrLast(e.target.value)}
+                      maxLength={120}
+                      autoComplete="off"
+                    />
+                  </label>
+                  <label>
+                    Email (now: {order.applicant.email || "—"})
+                    <input
+                      type="email"
+                      value={corrEmail}
+                      onChange={(e) => setCorrEmail(e.target.value)}
+                      maxLength={200}
+                      autoComplete="off"
+                    />
+                  </label>
+                  <label>
+                    Phone E.164 (now: {order.applicant.phone || "—"})
+                    <input
+                      value={corrPhone}
+                      onChange={(e) => setCorrPhone(e.target.value)}
+                      maxLength={16}
+                      autoComplete="off"
+                      placeholder="+15551234567"
+                    />
+                  </label>
+                  <label>
+                    County (now: {order.geo.county || "—"})
+                    <input
+                      value={corrCounty}
+                      onChange={(e) => setCorrCounty(e.target.value)}
+                      maxLength={120}
+                      autoComplete="off"
+                    />
+                  </label>
+                  <label>
+                    City (now: {order.geo.city || "—"})
+                    <input
+                      value={corrCity}
+                      onChange={(e) => setCorrCity(e.target.value)}
+                      maxLength={120}
+                      autoComplete="off"
+                    />
+                  </label>
+                  <label>
+                    Correction note (optional, added to internal notes)
+                    <input
+                      value={corrNote}
+                      onChange={(e) => setCorrNote(e.target.value)}
+                      maxLength={2000}
+                      autoComplete="off"
+                    />
+                  </label>
+                </div>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "12px" }}>
+                  <button
+                    type="button"
+                    className="staff-btn"
+                    disabled={
+                      busy ||
+                      (!corrFirst.trim() &&
+                        !corrLast.trim() &&
+                        !corrEmail.trim() &&
+                        !corrPhone.trim() &&
+                        !corrCounty.trim() &&
+                        !corrCity.trim())
+                    }
+                    onClick={() => {
+                      const applicant: Record<string, string> = {};
+                      if (corrFirst.trim()) applicant.firstName = corrFirst.trim();
+                      if (corrLast.trim()) applicant.lastName = corrLast.trim();
+                      if (corrEmail.trim()) applicant.email = corrEmail.trim();
+                      if (corrPhone.trim()) applicant.phone = corrPhone.trim();
+                      const body: Record<string, unknown> = {};
+                      if (Object.keys(applicant).length > 0) body.applicant = applicant;
+                      if (corrCounty.trim() || corrCity.trim()) {
+                        if (!corrCounty.trim() || !corrCity.trim()) {
+                          setError("County and city are required together.");
+                          return;
+                        }
+                        body.geo = { county: corrCounty.trim(), city: corrCity.trim() };
+                      }
+                      if (corrNote.trim()) body.note = corrNote.trim();
+                      setBusy(true);
+                      setError("");
+                      staffJson(`/staff/orders/${id}/correction`, {
+                        method: "PATCH",
+                        body: JSON.stringify(body),
+                      })
+                        .then(() => {
+                          setCorrFirst("");
+                          setCorrLast("");
+                          setCorrEmail("");
+                          setCorrPhone("");
+                          setCorrCounty("");
+                          setCorrCity("");
+                          setCorrNote("");
+                          setToast("Form data corrected.");
+                          return load();
+                        })
+                        .catch((e: unknown) =>
+                          setError(e instanceof Error ? e.message : "Correction failed"),
+                        )
+                        .finally(() => setBusy(false));
+                    }}
+                  >
+                    Save corrections
+                  </button>
+                  {order.status === "ON_HOLD" || order.status === "NEED_INFO" ? (
+                    <button
+                      type="button"
+                      className="staff-btn secondary"
+                      disabled={busy}
+                      onClick={() =>
+                        void postAction(
+                          `/orders/${id}/status`,
+                          { status: "IN_REVIEW" },
+                          "PATCH",
+                          "Order resumed to fulfillment.",
+                        )
+                      }
+                    >
+                      Resume to fulfillment (→ In Review)
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          ) : null}
         </>
       ) : null}
 

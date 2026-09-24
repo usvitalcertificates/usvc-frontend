@@ -51,6 +51,7 @@ export default function StaffAdmin() {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteName, setInviteName] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("FULFILLMENT");
   const [inviteLink, setInviteLink] = useState("");
   const [inviteEmailed, setInviteEmailed] = useState(false);
   const [activityFilter, setActivityFilter] = useState("");
@@ -83,17 +84,22 @@ export default function StaffAdmin() {
     try {
       const data = await staffJson<{ setupToken?: string; emailed?: boolean }>("/auth/invite", {
         method: "POST",
-        body: JSON.stringify({ fullName: inviteName.trim(), email: inviteEmail.trim() }),
+        body: JSON.stringify({
+          fullName: inviteName.trim(),
+          email: inviteEmail.trim(),
+          role: inviteRole,
+        }),
       });
       if (data.emailed) {
         setInviteEmailed(true);
-        setToast(`Invitation emailed to ${inviteEmail.trim()} — valid 48h.`);
+        setToast(`Invitation emailed to ${inviteEmail.trim()} as ${inviteRole} — valid 48h.`);
       } else if (data.setupToken) {
         setInviteLink(`${window.location.origin}/auth?setup=${data.setupToken}`);
         setToast("Invitation created — email is disabled, share the setup link manually.");
       }
       setInviteName("");
       setInviteEmail("");
+      setInviteRole("FULFILLMENT");
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Invitation failed");
@@ -144,12 +150,27 @@ export default function StaffAdmin() {
     }
   };
 
+  const changeRole = async (id: string, email: string, role: string) => {
+    if (!window.confirm(`Change ${email} to role ${role}? They will be signed out.`)) return;
+    setError("");
+    try {
+      await staffJson(`/admin/staff/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ role }),
+      });
+      setToast(`${email} is now ${role}.`);
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Role change failed");
+    }
+  };
+
   if (!isAdmin) {
     return (
       <>
         <BackLink href="/staff">← Back to Open Orders</BackLink>
         <p role="alert" className="staff-alert error">
-          Administration is restricted to the super-admin.
+          Administration is restricted to ADMIN.
         </p>
       </>
     );
@@ -241,9 +262,11 @@ export default function StaffAdmin() {
                         <span className="staff-staffmeta">
                           <span className="staff-staffname">
                             <strong>{member.fullName || "—"}</strong>
-                            {member.role === "ADMIN" ? (
-                              <span className="staff-pill navy">ADMIN</span>
-                            ) : null}
+                            <span
+                              className={`staff-pill ${member.role === "ADMIN" ? "navy" : member.role === "CS" ? "green" : "gray"}`}
+                            >
+                              {member.role}
+                            </span>
                           </span>
                           <span className="staff-staffemail" title={member.email || undefined}>
                             {member.email}
@@ -283,70 +306,70 @@ export default function StaffAdmin() {
                       )}
                     </td>
                     <td>
-                      {member.role === "ADMIN" ? (
-                        <span style={{ fontSize: "0.85rem", color: "var(--muted-text)" }}>
-                          Owner
-                        </span>
-                      ) : (
-                        <span style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                          {member.accountStatus === "pending" ? (
-                            <button
-                              type="button"
-                              className="staff-btn secondary"
-                              onClick={() => void resend(member.id, member.email)}
-                            >
-                              Re-send invite
-                            </button>
-                          ) : null}
+                      <span style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                        <select
+                          aria-label={`Role for ${member.email}`}
+                          value={member.role}
+                          onChange={(e) => void changeRole(member.id, member.email, e.target.value)}
+                          style={{ maxWidth: "150px" }}
+                        >
+                          {["ADMIN", "FULFILLMENT", "CS"].map((r) => (
+                            <option key={r} value={r}>
+                              {r}
+                            </option>
+                          ))}
+                        </select>
+                        {member.accountStatus === "pending" ? (
                           <button
                             type="button"
                             className="staff-btn secondary"
+                            onClick={() => void resend(member.id, member.email)}
+                          >
+                            Re-send invite
+                          </button>
+                        ) : null}
+                        <button
+                          type="button"
+                          className="staff-btn secondary"
+                          onClick={() =>
+                            void act(member.id, "revoke", "Revoke all sessions for this account")
+                          }
+                        >
+                          Revoke sessions
+                        </button>
+                        <button
+                          type="button"
+                          className="staff-btn secondary"
+                          onClick={() =>
+                            void act(
+                              member.id,
+                              "mfa-reset",
+                              "Reset this person's authenticator? They must re-enroll and all sessions are revoked",
+                            )
+                          }
+                        >
+                          Reset 2-step
+                        </button>
+                        {member.accountStatus === "active" ? (
+                          <button
+                            type="button"
+                            className="staff-btn danger"
                             onClick={() =>
-                              void act(member.id, "revoke", "Revoke all sessions for this account")
+                              void act(member.id, "disable", "Deactivate this account immediately")
                             }
                           >
-                            Revoke sessions
+                            Deactivate
                           </button>
+                        ) : member.accountStatus === "disabled" ? (
                           <button
                             type="button"
                             className="staff-btn secondary"
-                            onClick={() =>
-                              void act(
-                                member.id,
-                                "mfa-reset",
-                                "Reset this person's authenticator? They must re-enroll and all sessions are revoked",
-                              )
-                            }
+                            onClick={() => void act(member.id, "enable", "Reactivate this account")}
                           >
-                            Reset 2-step
+                            Reactivate
                           </button>
-                          {member.accountStatus === "active" ? (
-                            <button
-                              type="button"
-                              className="staff-btn danger"
-                              onClick={() =>
-                                void act(
-                                  member.id,
-                                  "disable",
-                                  "Deactivate this account immediately",
-                                )
-                              }
-                            >
-                              Deactivate
-                            </button>
-                          ) : member.accountStatus === "disabled" ? (
-                            <button
-                              type="button"
-                              className="staff-btn secondary"
-                              onClick={() =>
-                                void act(member.id, "enable", "Reactivate this account")
-                              }
-                            >
-                              Reactivate
-                            </button>
-                          ) : null}
-                        </span>
-                      )}
+                        ) : null}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -449,6 +472,16 @@ export default function StaffAdmin() {
                   onChange={(e) => setInviteEmail(e.target.value)}
                   required
                 />
+              </label>
+              <label>
+                Role
+                <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)}>
+                  {["ADMIN", "FULFILLMENT", "CS"].map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))}
+                </select>
               </label>
               <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
                 <button type="submit" className="staff-btn">

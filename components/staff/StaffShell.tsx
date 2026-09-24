@@ -88,6 +88,9 @@ export function StaffShell({ children }: { children: ReactNode }) {
           {link("/staff/closed", "Closed Orders", Archive)}
           {link("/staff/search", "Order Search", Search)}
           {role === "ADMIN" ? link("/staff/admin", "Administration", ShieldCheck) : null}
+          {role === "ADMIN" || role === "CS"
+            ? link("/staff/cs", "CS Corrections", UserCheck)
+            : null}
           {link("/staff/settings", "Settings", Settings)}
         </nav>
         <div className="staff-userbox">
@@ -100,10 +103,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
                 {email}
               </span>
               <span className="staff-userchip-role">
-                Role:{" "}
-                <span className="staff-role-pill">
-                  {role === "ADMIN" ? "Super Admin" : "Agent"}
-                </span>
+                Role: <span className="staff-role-pill">{role ?? "—"}</span>
               </span>
             </span>
           </div>

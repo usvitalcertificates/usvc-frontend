@@ -37,7 +37,7 @@ export default function StaffSettings() {
             <strong>Signed in as:</strong> {email || "—"}
           </p>
           <p>
-            <strong>Role:</strong> {role === "ADMIN" ? "Super Admin" : "Agent"}
+            <strong>Role:</strong> {role || "—"}
           </p>
           <p style={{ color: "var(--muted-text)" }}>
             Sessions expire after 30 minutes of inactivity and are revoked immediately if the
