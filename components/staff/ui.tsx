@@ -6,8 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 export const STATUS_LABELS: Record<string, string> = {
   PAID: "Payment Successful",
   IN_REVIEW: "Order Processing",
-  ON_HOLD: "On Hold",
-  NEED_INFO: "Need Customer Information",
+  TO_CS: "To CS",
   SUBMITTED: "Submitted to Govt Agency",
   CANCELLED: "Cancelled",
 };
@@ -15,8 +14,7 @@ export const STATUS_LABELS: Record<string, string> = {
 const STATUS_TONE: Record<string, "navy" | "red" | "gray" | "green"> = {
   PAID: "navy",
   IN_REVIEW: "navy",
-  ON_HOLD: "red",
-  NEED_INFO: "red",
+  TO_CS: "red",
   SUBMITTED: "green",
   CANCELLED: "gray",
 };
@@ -189,7 +187,7 @@ export function Pagination({
 /**
  * Agent-centric stepper: Claimed → Order Processing → Submitted.
  * Payment is a precondition chip (only paid orders reach agents), and
- * ON_HOLD / NEED_INFO park as a red branch off Processing.
+ * TO_CS parks as a red branch off Processing.
  */
 const AGENT_STEPS = [
   { key: "claimed", label: "Took Ownership", caption: "Order is yours, work not started." },
@@ -199,7 +197,7 @@ const AGENT_STEPS = [
 
 function agentStepIndex(status: string): number {
   if (status === "SUBMITTED") return 2;
-  if (status === "IN_REVIEW" || status === "ON_HOLD" || status === "NEED_INFO") return 1;
+  if (status === "IN_REVIEW" || status === "TO_CS") return 1;
   return 0;
 }
 
@@ -212,7 +210,7 @@ export function Stepper({
   submittedAt?: string | null;
   parkedNote?: string | null;
 }) {
-  const isException = status === "ON_HOLD" || status === "NEED_INFO";
+  const isException = status === "TO_CS";
   const index = agentStepIndex(status);
   const done = status === "SUBMITTED";
   return (

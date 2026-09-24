@@ -15,9 +15,8 @@ import {
 
 const NEXT_STATUS: Record<string, string[]> = {
   PAID: ["IN_REVIEW"],
-  IN_REVIEW: ["SUBMITTED", "ON_HOLD", "NEED_INFO"],
-  ON_HOLD: ["IN_REVIEW"],
-  NEED_INFO: ["IN_REVIEW"],
+  IN_REVIEW: ["SUBMITTED", "TO_CS"],
+  TO_CS: ["IN_REVIEW"],
   SUBMITTED: [],
 };
 
@@ -432,7 +431,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
   const closed = order.status === "SUBMITTED";
   const effectiveMoveTo = moveTo ?? next[0] ?? "";
-  const exceptionMove = effectiveMoveTo === "ON_HOLD" || effectiveMoveTo === "NEED_INFO";
+  const exceptionMove = effectiveMoveTo === "TO_CS";
   const requestorName =
     `${order.applicant.firstName ?? ""} ${order.applicant.lastName ?? ""}`.trim() || "—";
   const certName = `${order.stateCode} ${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} Certificate`;
@@ -542,7 +541,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     )?.createdAt ?? null
                 }
                 parkedNote={
-                  order.status === "ON_HOLD" || order.status === "NEED_INFO"
+                  order.status === "TO_CS"
                     ? ((order.notes ?? []).at(-1)?.body.slice(0, 140) ?? null)
                     : null
                 }
@@ -561,7 +560,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   </label>
                   {exceptionMove ? (
                     <label>
-                      Internal note (required for On Hold / Need Customer Information)
+                      Internal note (required for To CS)
                       <input
                         value={statusNote}
                         onChange={(e) => setStatusNote(e.target.value)}
@@ -887,7 +886,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   >
                     Save corrections
                   </button>
-                  {order.status === "ON_HOLD" || order.status === "NEED_INFO" ? (
+                  {order.status === "TO_CS" ? (
                     <button
                       type="button"
                       className="staff-btn secondary"

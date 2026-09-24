@@ -64,6 +64,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Branded sign-in 2026-09-23: centered card with USVC Flow brandmark + "Processing today for brighter tomorrows" slogan, stepper line removed
 - [x] Staff auth slogan removed 2026-09-24: deleted `staff-auth-slogan` line from `/auth` (brandmark + eyebrow + H1 kept)
 - [x] Staff roles 2026-09-24: raw DB role labels (`ADMIN`/`FULFILLMENT`/`CS`) in shell/settings/roster; admin invite role picker (default `FULFILLMENT`) + roster role select; Products pricing card gated to `ADMIN`/`CS`; new `/staff/cs` corrections inbox with EDIT-only form correction + resume to `IN_REVIEW`
+- [x] To-CS status 2026-09-24: `On Hold`/`Need Info` removed, single `To CS` park status (required internal note); Open Orders filter drops `Submitted to Govt Agency`, chips are All / To CS / Rush, KPI shows To CS; detail workflow + stepper + CS inbox follow `TO_CS`
 - [x] Staging host access 2026-09-23: `staging.*` allows staff paths by path (verified 200 + noindex on staging pattern, 404 preserved on www/flow patterns)
 - [x] Roster polish 2026-09-23: avatar + name/pill flex row with gap, truncated email with hover title, two-line Last-activity date + time badge
 - [x] Agent stepper + focused queues 2026-09-23: Claimed → Processing → Submitted stepper with Paid precondition chip, per-step captions, parked-note excerpt, submitted timestamp; My Work shows open claimed only with attention-first order + quick-filter chips + guided empty state; Closed Orders drops irrelevant filters

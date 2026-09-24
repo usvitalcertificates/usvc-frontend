@@ -144,8 +144,7 @@ export function QueueView({
         setKpis({
           unassigned: (unassigned.data.total ?? 0) as number,
           mine: (mine.data.total ?? 0) as number,
-          attention: [...u, ...m].filter((o) => o.status === "ON_HOLD" || o.status === "NEED_INFO")
-            .length,
+          attention: [...u, ...m].filter((o) => o.status === "TO_CS").length,
           rush: [...u, ...m].filter((o) => o.rush).length,
         });
       } catch {
@@ -192,11 +191,7 @@ export function QueueView({
         <div className="staff-stats">
           <StatCard value={kpis.unassigned} label="Unassigned open" icon={<Inbox aria-hidden />} />
           <StatCard value={kpis.mine} label="Assigned to me" icon={<UserCheck aria-hidden />} />
-          <StatCard
-            value={kpis.attention}
-            label="On hold / need info"
-            icon={<Clock aria-hidden />}
-          />
+          <StatCard value={kpis.attention} label="To CS" icon={<Clock aria-hidden />} />
           <StatCard value={kpis.rush} label="Rush open" icon={<Zap aria-hidden />} />
         </div>
       ) : null}
@@ -237,9 +232,7 @@ export function QueueView({
                 <option value="">All statuses</option>
                 <option value="PAID">Payment Successful</option>
                 <option value="IN_REVIEW">Order Processing</option>
-                <option value="ON_HOLD">On Hold</option>
-                <option value="NEED_INFO">Need Customer Information</option>
-                <option value="SUBMITTED">Submitted to Govt Agency</option>
+                <option value="TO_CS">To CS</option>
                 <option value="__rush">Rush only</option>
               </select>
             </label>
@@ -283,8 +276,7 @@ export function QueueView({
             {(
               [
                 ["all", "All"],
-                ["ON_HOLD", "On Hold"],
-                ["NEED_INFO", "Need Info"],
+                ["TO_CS", "To CS"],
                 ["rush", "Rush"],
               ] as const
             ).map(([value, label]) => {

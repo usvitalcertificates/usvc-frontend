@@ -32,11 +32,8 @@ export default function CsCorrections() {
     setError("");
     setLoading(true);
     try {
-      const [onHold, needInfo] = await Promise.all([
-        staffJson<{ orders: CsOrder[] }>(`/staff/orders?status=${"ON_HOLD"}`),
-        staffJson<{ orders: CsOrder[] }>(`/staff/orders?status=${"NEED_INFO"}`),
-      ]);
-      setOrders([...(onHold.orders ?? []), ...(needInfo.orders ?? [])]);
+      const res = await staffJson<{ orders: CsOrder[] }>(`/staff/orders?status=${"TO_CS"}`);
+      setOrders(res.orders ?? []);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load corrections");
     } finally {
@@ -67,7 +64,7 @@ export default function CsCorrections() {
       <PageBand
         eyebrow="CS — form corrections"
         title="Corrections inbox"
-        subtitle="Orders parked On Hold or needing customer info. Open one, fix the form without taking ownership, then resume it to fulfillment."
+        subtitle="Orders sent To CS with a problem note. Open one, fix the form without taking ownership, then resume it to fulfillment."
       />
       {error ? (
         <p role="alert" className="staff-alert error">
@@ -81,7 +78,7 @@ export default function CsCorrections() {
           ) : orders.length === 0 ? (
             <EmptyState
               title="No orders need correction."
-              hint="Parked orders appear here when fulfillment sets On Hold or Need Customer Information."
+              hint="Orders appear here when fulfillment sends them To CS with an internal note."
             />
           ) : (
             <div className="staff-tablewrap">
