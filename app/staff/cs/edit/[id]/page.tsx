@@ -453,6 +453,40 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
         </p>
       ) : null}
 
+      <div
+        className="staff-panel"
+        style={{ background: "#eef2ff", borderColor: "#c7d2fe", marginBottom: "16px" }}
+      >
+        <h2 style={{ color: "#312e81" }}>GTG Submit Notes (Optional)</h2>
+        <div className="staff-panel-body" style={{ display: "grid", gap: "10px" }}>
+          <p style={{ fontSize: "0.9rem", color: "#4338ca", margin: 0 }}>
+            Staff only — never shown to the customer. Save it on its own, or leave it filled and it
+            rides along with Save corrections / Mark GTG below.
+          </p>
+          <Field label="Note" error={errors["note"]}>
+            <textarea
+              style={{ ...inputStyle, minHeight: "72px", resize: "vertical", background: "#fff" }}
+              rows={3}
+              value={form.note}
+              onChange={(e) => setTop("note", e.target.value)}
+              maxLength={2000}
+              autoComplete="off"
+              placeholder="What was checked or fixed?…"
+            />
+          </Field>
+          <div>
+            <button
+              type="button"
+              className="staff-btn secondary"
+              disabled={busy || closed || !form.note.trim()}
+              onClick={() => void saveNote()}
+            >
+              {busy ? "Saving…" : "Save Note"}
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="staff-grid-2">
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           <div className="staff-panel">
@@ -794,37 +828,6 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
               </div>
             </div>
           </div>
-
-          <div className="staff-panel">
-            <h2>9 · Internal note</h2>
-            <div className="staff-panel-body" style={{ display: "grid", gap: "10px" }}>
-              <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", margin: 0 }}>
-                Staff only — never shown to the customer. Save it on its own, or leave it filled and
-                it rides along with Save corrections / Mark GTG below.
-              </p>
-              <Field label="Note" error={errors["note"]}>
-                <textarea
-                  style={{ ...inputStyle, minHeight: "72px", resize: "vertical" }}
-                  rows={3}
-                  value={form.note}
-                  onChange={(e) => setTop("note", e.target.value)}
-                  maxLength={2000}
-                  autoComplete="off"
-                  placeholder="What was checked or fixed?…"
-                />
-              </Field>
-              <div>
-                <button
-                  type="button"
-                  className="staff-btn secondary"
-                  disabled={busy || closed || !form.note.trim()}
-                  onClick={() => void saveNote()}
-                >
-                  {busy ? "Saving…" : "Save Note"}
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="staff-rail">
@@ -895,13 +898,15 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
       <div
         style={{
           position: "sticky",
-          bottom: 0,
-          background: "var(--background, #fff)",
-          borderTop: "1px solid var(--border)",
-          padding: "12px 0",
+          bottom: "12px",
+          background: "#fff",
+          border: "1px solid var(--border)",
+          borderRadius: "12px",
+          boxShadow: "0 4px 16px rgba(15, 23, 42, 0.08)",
+          padding: "12px 16px",
           marginTop: "16px",
           display: "flex",
-          gap: "10px",
+          gap: "12px",
           flexWrap: "wrap",
           alignItems: "center",
         }}
@@ -914,16 +919,6 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
         >
           {busy ? "Saving…" : "Save corrections"}
         </button>
-        {order.status === "TO_CS" ? (
-          <button
-            type="button"
-            className="staff-btn secondary"
-            disabled={busy}
-            onClick={() => void markGtg()}
-          >
-            Mark GTG
-          </button>
-        ) : null}
         {!dirty && !busy ? (
           <span style={{ fontSize: "0.9rem", color: "var(--muted-text)" }}>
             No unsaved changes.
@@ -932,6 +927,18 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
         {closed ? (
           <span style={{ fontSize: "0.9rem", color: "var(--muted-text)" }}>
             Closed orders are read-only.
+          </span>
+        ) : null}
+        {order.status === "TO_CS" ? (
+          <span style={{ marginLeft: "auto" }}>
+            <button
+              type="button"
+              className="staff-btn secondary"
+              disabled={busy}
+              onClick={() => void markGtg()}
+            >
+              Mark GTG
+            </button>
           </span>
         ) : null}
       </div>
