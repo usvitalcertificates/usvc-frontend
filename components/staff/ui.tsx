@@ -174,9 +174,9 @@ export function ConfirmModal({
 }
 
 /**
- * Floating success popup (pastel green) with a countdown auto-dismiss.
- * Non-blocking on purpose: claiming several orders in a row never traps the
- * user behind a backdrop. Parent should key it by order id so re-claims reset.
+ * Centered success popup (pastel green) with a countdown auto-dismiss.
+ * Backdrop click counts as skip. Parent should key it by order id so
+ * re-claims reset the timer.
  */
 export function TimedActionModal({
   title,
@@ -205,62 +205,60 @@ export function TimedActionModal({
     if (left <= 0) onClose();
   }, [left, onClose]);
   return (
-    <div
-      role="dialog"
-      aria-label={title}
-      style={{
-        position: "fixed",
-        right: "16px",
-        bottom: "16px",
-        left: "16px",
-        marginLeft: "auto",
-        maxWidth: "380px",
-        zIndex: 60,
-        background: "var(--flow-success-bg)",
-        border: "1px solid #bbf7d0",
-        borderRadius: "12px",
-        boxShadow: "0 8px 28px rgba(15, 23, 42, 0.16)",
-        padding: "14px 16px",
-      }}
-    >
-      <p style={{ margin: "0 0 4px", fontWeight: 800, color: "#15803d" }}>{title}</p>
-      <p style={{ margin: "0 0 12px", fontSize: "0.9rem" }}>
-        You have taken ownership of order number <strong>{orderNumber}</strong>.
-      </p>
-      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
-        <Link
-          href={primaryHref}
-          className="staff-btn green"
-          style={{ textDecoration: "none" }}
-          onClick={onClose}
-        >
-          {primaryLabel}
-        </Link>
-        <button type="button" className="staff-btn secondary" onClick={onClose}>
-          Skip now
-        </button>
-        <span style={{ marginLeft: "auto", fontSize: "0.78rem", color: "var(--muted-text)" }}>
-          Closing in {left}s
-        </span>
-      </div>
+    <div className="staff-modal-backdrop" onClick={onClose}>
       <div
-        aria-hidden
-        style={{
-          marginTop: "10px",
-          height: "4px",
-          borderRadius: "999px",
-          background: "#bbf7d0",
-          overflow: "hidden",
-        }}
+        className="staff-modal"
+        role="dialog"
+        aria-label={title}
+        onClick={(e) => e.stopPropagation()}
+        style={{ background: "var(--flow-success-bg)", borderColor: "#bbf7d0" }}
       >
+        <h2 style={{ color: "#15803d" }}>{title}</h2>
+        <p style={{ fontSize: "0.95rem" }}>
+          You have taken ownership of order number <strong>{orderNumber}</strong>.
+        </p>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "14px" }}>
+          <Link
+            href={primaryHref}
+            className="staff-btn green"
+            style={{ textDecoration: "none" }}
+            onClick={onClose}
+          >
+            {primaryLabel}
+          </Link>
+          <button type="button" className="staff-btn secondary" onClick={onClose}>
+            Skip now
+          </button>
+          <span
+            style={{
+              marginLeft: "auto",
+              alignSelf: "center",
+              fontSize: "0.78rem",
+              color: "var(--muted-text)",
+            }}
+          >
+            Closing in {left}s
+          </span>
+        </div>
         <div
+          aria-hidden
           style={{
-            height: "100%",
-            width: `${(left / seconds) * 100}%`,
-            background: "#16a34a",
+            marginTop: "12px",
+            height: "4px",
             borderRadius: "999px",
+            background: "#bbf7d0",
+            overflow: "hidden",
           }}
-        />
+        >
+          <div
+            style={{
+              height: "100%",
+              width: `${(left / seconds) * 100}%`,
+              background: "#16a34a",
+              borderRadius: "999px",
+            }}
+          />
+        </div>
       </div>
     </div>
   );
