@@ -118,6 +118,52 @@ export function Toast({ message, onDone }: { message: string; onDone: () => void
   );
 }
 
+/** Styled confirmation popup. Use this instead of window.confirm everywhere. */
+export function ConfirmModal({
+  title,
+  body,
+  confirmLabel,
+  danger,
+  busy,
+  onCancel,
+  onConfirm,
+}: {
+  title: string;
+  body: string;
+  confirmLabel: string;
+  danger?: boolean;
+  busy?: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <div className="staff-modal-backdrop" onClick={onCancel}>
+      <div
+        className="staff-modal"
+        role="dialog"
+        aria-label={title}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2>{title}</h2>
+        <p style={{ color: "var(--muted-text)" }}>{body}</p>
+        <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
+          <button
+            type="button"
+            className={`staff-btn${danger ? " danger" : ""}`}
+            disabled={busy}
+            onClick={onConfirm}
+          >
+            {busy ? "Please wait…" : confirmLabel}
+          </button>
+          <button type="button" className="staff-btn secondary" onClick={onCancel}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** Numbered pagination (MILES-style with ellipsis). */
 export function Pagination({
   page,

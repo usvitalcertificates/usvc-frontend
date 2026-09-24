@@ -4,7 +4,14 @@ import { useCallback, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
-import { BackLink, EmptyState, PageBand, StatCard, Toast } from "@/components/staff/ui";
+import {
+  BackLink,
+  ConfirmModal,
+  EmptyState,
+  PageBand,
+  StatCard,
+  Toast,
+} from "@/components/staff/ui";
 import {
   activityCategory,
   dayKey,
@@ -56,6 +63,13 @@ export default function StaffAdmin() {
   const [inviteEmailed, setInviteEmailed] = useState(false);
   const [activityFilter, setActivityFilter] = useState("");
   const [activityLimit, setActivityLimit] = useState(20);
+  const [confirm, setConfirm] = useState<{
+    title: string;
+    body: string;
+    confirmLabel: string;
+    danger?: boolean;
+    run: () => Promise<void>;
+  } | null>(null);
 
   const load = useCallback(async () => {
     setError("");
@@ -132,37 +146,60 @@ export default function StaffAdmin() {
     action: "revoke" | "mfa-reset" | "disable" | "enable",
     label: string,
   ) => {
-    if (!window.confirm(`${label}?`)) return;
-    setError("");
-    try {
-      if (action === "disable" || action === "enable") {
-        await staffJson(`/admin/staff/${id}`, {
-          method: "PATCH",
-          body: JSON.stringify({ accountStatus: action === "enable" ? "active" : "disabled" }),
-        });
-      } else {
-        await staffJson(`/admin/staff/${id}/${action}`, { method: "POST", body: "{}" });
+    const run = async () => {
+      setConfirm(null);
+      setError("");
+      try {
+        if (action === "disable" || action === "enable") {
+          await staffJson(`/admin/staff/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify({ accountStatus: action === "enable" ? "active" : "disabled" }),
+          });
+        } else {
+          await staffJson(`/admin/staff/${id}/${action}`, { method: "POST", body: "{}" });
+        }
+        setToast("Done.");
+        await load();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Action failed");
       }
-      setToast("Done.");
-      await load();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Action failed");
-    }
+    };
+    const titles: Record<typeof action, string> = {
+      revoke: "Revoke sessions?",
+      "mfa-reset": "Reset 2-step?",
+      disable: "Deactivate account?",
+      enable: "Reactivate account?",
+    };
+    setConfirm({
+      title: titles[action],
+      body: `${label}?`,
+      confirmLabel: action === "disable" ? "Deactivate" : "Confirm",
+      danger: action === "disable",
+      run,
+    });
   };
 
   const changeRole = async (id: string, email: string, role: string) => {
-    if (!window.confirm(`Change ${email} to role ${role}? They will be signed out.`)) return;
-    setError("");
-    try {
-      await staffJson(`/admin/staff/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ role }),
-      });
-      setToast(`${email} is now ${role}.`);
-      await load();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Role change failed");
-    }
+    const run = async () => {
+      setConfirm(null);
+      setError("");
+      try {
+        await staffJson(`/admin/staff/${id}`, {
+          method: "PATCH",
+          body: JSON.stringify({ role }),
+        });
+        setToast(`${email} is now ${role}.`);
+        await load();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Role change failed");
+      }
+    };
+    setConfirm({
+      title: "Change role?",
+      body: `Change ${email} to role ${role}? They will be signed out.`,
+      confirmLabel: "Change Role",
+      run,
+    });
   };
 
   if (!isAdmin) {
@@ -510,6 +547,17 @@ export default function StaffAdmin() {
             ) : null}
           </div>
         </div>
+      ) : null}
+
+      {confirm ? (
+        <ConfirmModal
+          title={confirm.title}
+          body={confirm.body}
+          confirmLabel={confirm.confirmLabel}
+          danger={confirm.danger}
+          onCancel={() => setConfirm(null)}
+          onConfirm={() => void confirm.run()}
+        />
       ) : null}
     </>
   );

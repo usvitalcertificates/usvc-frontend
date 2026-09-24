@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffData, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
-import { BackLink, STATUS_LABELS, StatusPill, Stepper, Toast } from "@/components/staff/ui";
+import {
+  BackLink,
+  ConfirmModal,
+  STATUS_LABELS,
+  StatusPill,
+  Stepper,
+  Toast,
+} from "@/components/staff/ui";
 import {
   activityCategory,
   dayKey,
@@ -335,6 +342,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [moveTo, setMoveTo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [toCsOpen, setToCsOpen] = useState(false);
+  const [releaseOpen, setReleaseOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("summary");
   const [isAdmin, setIsAdmin] = useState(false);
   const [canSeePricing, setCanSeePricing] = useState(false);
@@ -390,7 +398,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   };
 
   const releaseOrder = () => {
-    if (!window.confirm("Release this order back to the queue? You will lose ownership.")) return;
+    setReleaseOpen(false);
     void postAction(
       `/staff/orders/${id}/release`,
       {},
@@ -508,7 +516,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               type="button"
               className="staff-btn danger"
               disabled={busy}
-              onClick={releaseOrder}
+              onClick={() => setReleaseOpen(true)}
             >
               Drop Ownership
             </button>
@@ -976,7 +984,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               }}
             >
               <strong style={{ color: "#b91c1c" }}>Note to CS: </strong>
-              <p>{statusNote.trim()}</p>
+              <span style={{ display: "block", marginTop: "4px" }}>{statusNote.trim()}</span>
             </p>
             <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
               <button
@@ -997,6 +1005,18 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
         </div>
+      ) : null}
+
+      {releaseOpen && order ? (
+        <ConfirmModal
+          title="Drop Ownership?"
+          body="Release this order back to the queue? You will lose ownership."
+          confirmLabel="Drop Ownership"
+          danger
+          busy={busy}
+          onCancel={() => setReleaseOpen(false)}
+          onConfirm={() => releaseOrder()}
+        />
       ) : null}
     </>
   );
