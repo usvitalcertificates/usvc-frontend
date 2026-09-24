@@ -496,9 +496,6 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       <BackLink href="/staff">← Back to Open Orders</BackLink>
       <div className="staff-orderbar">
         <div className="staff-orderbar-id">
-          <p className="staff-orderbar-eyebrow">
-            {closed ? "Closed order — read only" : "Internal order record — access is logged"}
-          </p>
           <h1>
             Order #{order.publicNumber}{" "}
             <CopyButton value={order.publicNumber} label="Order number" />
@@ -512,20 +509,25 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           </div>
         </div>
         {!closed ? (
-          <div className="staff-orderbar-actions">
-            <button type="button" className="staff-btn light" onClick={goWorkflow}>
-              Update status
-            </button>
-            <button
-              type="button"
-              className="staff-btn danger"
-              disabled={busy}
-              onClick={() => setReleaseOpen(true)}
-            >
-              Drop Ownership
-            </button>
+          <div className="staff-orderbar-side">
+            <div className="staff-orderbar-actions">
+              <button type="button" className="staff-btn light" onClick={goWorkflow}>
+                Update status
+              </button>
+              <button
+                type="button"
+                className="staff-btn danger"
+                disabled={busy}
+                onClick={() => setReleaseOpen(true)}
+              >
+                Drop Ownership
+              </button>
+            </div>
+            <p className="staff-orderbar-audit">Internal order record — access is logged</p>
           </div>
-        ) : null}
+        ) : (
+          <p className="staff-orderbar-audit">Closed order — read only</p>
+        )}
       </div>
       {toast ? <Toast message={toast} onDone={() => setToast("")} /> : null}
       {error ? (

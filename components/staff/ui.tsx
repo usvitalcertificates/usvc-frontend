@@ -42,8 +42,10 @@ export function PageBand({
 }) {
   return (
     <div className="staff-band">
-      <p className="staff-eyebrow">{eyebrow}</p>
-      <h1>{title}</h1>
+      <div className="staff-band-heading">
+        <h1>{title}</h1>
+        <p className="staff-eyebrow">{eyebrow}</p>
+      </div>
       {subtitle ? <p>{subtitle}</p> : null}
       {actions ? (
         <div style={{ marginTop: "14px", display: "flex", gap: "10px", flexWrap: "wrap" }}>

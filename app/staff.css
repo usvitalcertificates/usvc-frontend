@@ -416,7 +416,19 @@ form.staff-lookup,
 }
 .staff-band h1 {
   color: #fff;
-  font-size: 1.3rem;
+  font-size: clamp(1.55rem, 2vw, 1.75rem);
+}
+.staff-band-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.staff-band-heading h1 {
+  margin: 0;
+}
+.staff-band > .staff-band-heading + p {
+  margin-top: 7px;
 }
 .staff-band p {
   color: rgb(255 255 255 / 75%);
@@ -431,6 +443,8 @@ form.staff-lookup,
 }
 .staff-band .staff-eyebrow {
   color: var(--flow-muted);
+  flex: 0 0 auto;
+  text-align: right;
 }
 
 /* Compact queue metrics keep all operational counts above the fold. */
@@ -1061,6 +1075,12 @@ table.staff-table {
   .staff-topstrip {
     padding-inline: 14px;
   }
+  .staff-orderbar-side {
+    justify-items: start;
+  }
+  .staff-orderbar-audit {
+    text-align: left;
+  }
   .staff-cards-fallback thead {
     display: none;
   }
@@ -1110,16 +1130,11 @@ table.staff-table {
 }
 .staff-orderbar-id {
   min-width: 0;
-}
-.staff-orderbar-eyebrow {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--flow-muted);
-  margin: 0 0 2px;
+  flex: 1 1 640px;
 }
 .staff-orderbar h1 {
   color: #fff;
-  font-size: 1.3rem;
+  font-size: clamp(1.45rem, 2vw, 1.75rem);
   font-variant-numeric: tabular-nums;
 }
 .staff-orderbar-sub {
@@ -1143,6 +1158,18 @@ table.staff-table {
   flex-wrap: wrap;
   align-items: center;
   padding-top: 0;
+}
+.staff-orderbar-side {
+  display: grid;
+  justify-items: end;
+  gap: 7px;
+}
+.staff-orderbar-audit {
+  margin: 0;
+  color: var(--flow-muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-align: right;
 }
 .staff-backlink {
   margin: 0 0 8px;
@@ -1208,6 +1235,14 @@ dl.staff-deflist {
   }
   .staff-band p {
     font-size: 0.8rem;
+  }
+  .staff-band-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .staff-band-heading h1 {
+    font-size: 1.35rem;
   }
   .staff-lookup-trigger span {
     display: none;

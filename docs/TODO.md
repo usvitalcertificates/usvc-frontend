@@ -87,6 +87,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Compact Open Orders header 2026-09-24: on-demand order lookup, condensed page band, and five one-row semantic pastel KPI mini-cards (two columns on tablet, one on narrow mobile) move queue rows above the fold
 - [x] Order Search polish 2026-09-24: wider order-number column, county context, fixed-width actions, and role-aware unavailable/open-queue actions prevent overflow and dead-end links
 - [x] Order-detail header compactness 2026-09-24: shorter back link, command bar, and tabs; status/Rush pills now share the identity block instead of consuming a dedicated header row
+- [x] Order-header hierarchy 2026-09-24: access notice moves below right-side commands, order number is larger, and shared staff page bands place the internal-access label beside the title on desktop
 
 ## Phase 3 (remaining + proposed backlog)
 
