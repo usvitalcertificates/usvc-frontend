@@ -1015,15 +1015,27 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
           </span>
         ) : null}
         {order.status === "TO_CS" ? (
-          <span style={{ marginLeft: "auto" }}>
+          <span
+            style={{
+              marginLeft: "auto",
+              display: "inline-flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: "2px",
+            }}
+          >
             <button
               type="button"
-              className="staff-btn secondary"
+              className="staff-btn green"
               disabled={busy}
               onClick={() => void markGtg()}
+              title="Updates order status to GTG"
             >
               Mark GTG
             </button>
+            <span style={{ fontSize: "0.75rem", color: "var(--muted-text)" }}>
+              Updates status → GTG
+            </span>
           </span>
         ) : null}
       </div>
