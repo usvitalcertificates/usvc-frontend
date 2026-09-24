@@ -16,6 +16,7 @@ interface CsOrder {
   copies: number;
   rush: boolean;
   status: string;
+  assignedToMe: boolean;
   assignedName: string | null;
   createdAt: string;
 }
@@ -24,6 +25,7 @@ export default function CsCorrections() {
   useRequireStaffAuth();
   useInactivitySignout();
   const [allowed, setAllowed] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [orders, setOrders] = useState<CsOrder[]>([]);
   const [error, setError] = useState("");
   const [claimed, setClaimed] = useState<{ number: string; id: string } | null>(null);
@@ -56,6 +58,7 @@ export default function CsCorrections() {
   useEffect(() => {
     const role = staffRole();
     setAllowed(role === "ADMIN" || role === "CS");
+    setIsAdmin(role === "ADMIN");
     if (role === "ADMIN" || role === "CS") void load();
     else setLoading(false);
   }, [load]);
@@ -140,8 +143,12 @@ export default function CsCorrections() {
                           >
                             Take Ownership
                           </button>
-                        ) : (
+                        ) : o.assignedToMe || isAdmin ? (
                           <Link href={`/staff/cs/edit/${o.id}`}>Open</Link>
+                        ) : (
+                          <span style={{ fontSize: "0.85rem", color: "var(--muted-text)" }}>
+                            Claimed by {o.assignedName}
+                          </span>
                         )}
                       </td>
                     </tr>

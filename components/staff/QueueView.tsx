@@ -408,7 +408,7 @@ export function QueueView({
                         >
                           <UserPlus aria-hidden style={{ width: 15, height: 15 }} /> Take Ownership
                         </button>
-                      ) : order.assignedToMe || role === "ADMIN" || role === "CS" ? (
+                      ) : order.assignedToMe || role === "ADMIN" ? (
                         <Link className="staff-btn green" href={`/staff/${order.id}`}>
                           <FolderOpen aria-hidden style={{ width: 15, height: 15 }} /> Open Order
                         </Link>
