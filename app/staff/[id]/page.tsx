@@ -566,10 +566,24 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               />
               {!closed ? (
                 toCsLocked ? (
-                  <p role="status" style={{ color: "#b91c1c", fontWeight: 700, marginBottom: 0 }}>
-                    CS is looking into it — only CS or ADMIN can mark this order GTG. Submit is
-                    blocked until then.
-                  </p>
+                  <div
+                    role="status"
+                    style={{
+                      background: "#fef2f2",
+                      border: "1px solid #fecaca",
+                      borderRadius: "8px",
+                      padding: "12px 14px",
+                      marginTop: "16px",
+                    }}
+                  >
+                    <p style={{ color: "#b91c1c", fontWeight: 700, margin: "0 0 4px" }}>
+                      CS is looking into it.
+                    </p>
+                    <p style={{ margin: 0, fontSize: "0.9rem", color: "#7f1d1d" }}>
+                      Submit is blocked until CS or ADMIN marks this order GTG. It will then return
+                      to the queue so you can continue.
+                    </p>
+                  </div>
                 ) : (
                   <div style={{ marginTop: "16px" }}>
                     <label>

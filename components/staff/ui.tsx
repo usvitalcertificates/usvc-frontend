@@ -252,12 +252,11 @@ export function Stepper({
           );
         })}
       </div>
-      {isParked ? (
+      {isParked && parkedNote ? (
         <p style={{ margin: "8px 0 0" }}>
           <StatusPill status={status} />{" "}
-          <span style={{ fontSize: "0.9rem", color: "#b91c1c", fontWeight: 700 }}>
-            CS is looking into it — submit is blocked until CS marks GTG.
-            {parkedNote ? ` Latest note: “${parkedNote}”` : ""}
+          <span style={{ fontSize: "0.9rem", color: "var(--flow-secondary)" }}>
+            Latest note: “{parkedNote}”
           </span>
         </p>
       ) : null}
