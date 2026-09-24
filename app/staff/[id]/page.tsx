@@ -962,7 +962,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               }}
             >
               <strong style={{ color: "#b91c1c" }}>Note to CS: </strong>
-              {statusNote.trim()}
+              <p>{statusNote.trim()}</p>
             </p>
             <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
               <button
