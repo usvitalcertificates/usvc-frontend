@@ -123,6 +123,45 @@ function addrFrom(source: Record<string, string> | undefined): Addr {
   return base;
 }
 
+const digitsOnly = (value: string) => value.replace(/\D/g, "");
+
+/** Live SSN mask: digits capped at 9, hyphens inserted as XXX-XX-XXXX. */
+function formatSsnInput(value: string): string {
+  const digits = digitsOnly(value).slice(0, 9);
+  const parts = [digits.slice(0, 3), digits.slice(3, 5), digits.slice(5, 9)].filter(
+    (part) => part !== "",
+  );
+  return parts.join("-");
+}
+
+/** Live card mask: digits capped at 16, grouped XXXX XXXX XXXX XXXX. */
+function formatCardInput(value: string): string {
+  return digitsOnly(value)
+    .slice(0, 16)
+    .replace(/(\d{4})(?=\d)/g, "$1 ");
+}
+
+/** Live expiry mask: digits capped at 4, slash inserted as MM/YY. */
+function formatExpiryInput(value: string): string {
+  const digits = digitsOnly(value).slice(0, 4);
+  return digits.length <= 2 ? digits : `${digits.slice(0, 2)}/${digits.slice(2)}`;
+}
+
+function cardBrandOf(value: string): "visa" | "mastercard" | null {
+  const digits = digitsOnly(value);
+  if (!digits) return null;
+  if (digits[0] === "4") return "visa";
+  if (digits[0] === "5") return "mastercard";
+  return null;
+}
+
+function isPlausibleExpiryMonth(value: string): boolean {
+  const digits = digitsOnly(value);
+  if (digits.length < 2) return true;
+  const month = Number(digits.slice(0, 2));
+  return month >= 1 && month <= 12;
+}
+
 function formFromOrder(order: EditOrder): EditForm {
   const get = (obj: Record<string, string> | undefined, key: string) => obj?.[key] ?? "";
   return {
@@ -170,7 +209,7 @@ function Field({
 }) {
   return (
     <label style={{ display: "block" }}>
-      <span style={{ fontWeight: 600 }}>
+      <span style={{ fontWeight: 600, display: "block", marginBottom: "6px" }}>
         {label}
         {required ? <span style={{ color: "#b91c1c" }}> *</span> : null}
       </span>
@@ -744,54 +783,96 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
             </div>
           </div>
 
-          <div className="staff-panel">
-            <h2>8 · SSN &amp; payment card</h2>
-            <div className="staff-panel-body" style={{ display: "grid", gap: "10px" }}>
-              <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", margin: 0 }}>
-                Stored values are encrypted and never shown. Leave blank to keep them — fill to
-                replace. Replacements are encrypted before storage and never logged.
+          <div className="staff-panel" style={{ background: "#fffbeb", borderColor: "#fde68a" }}>
+            <h2 style={{ color: "#78350f" }}>8 · SSN &amp; payment card</h2>
+            <div className="staff-panel-body" style={{ display: "grid", gap: "12px" }}>
+              <p style={{ fontSize: "0.9rem", color: "#92400e", margin: 0 }}>
+                Confidential — stored values are encrypted and never shown. Leave blank to keep them
+                — fill to replace. Replacements are encrypted before storage and never logged.
               </p>
               <Field label="SSN (stored: •••••, encrypted)" error={errors["requestorSsn"]}>
                 <input
-                  style={inputStyle}
+                  style={{ ...inputStyle, background: "#fff" }}
                   value={form.ssn}
-                  onChange={(e) => setTop("ssn", e.target.value)}
-                  maxLength={20}
+                  onChange={(e) => setTop("ssn", formatSsnInput(e.target.value))}
+                  maxLength={11}
+                  inputMode="numeric"
                   autoComplete="off"
-                  placeholder="Leave blank to keep"
+                  placeholder="XXX-XX-XXXX"
                 />
+                {(() => {
+                  const digits = digitsOnly(form.ssn).length;
+                  return digits > 0 && digits < 9 ? (
+                    <small className="application-error" role="alert" style={{ display: "block" }}>
+                      Enter all 9 digits ({digits}/9).
+                    </small>
+                  ) : null;
+                })()}
               </Field>
               <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "10px" }}>
                 <Field
                   label="Card number (stored: ••••, encrypted)"
                   error={errors["paymentCard.number"]}
                 >
-                  <input
-                    style={inputStyle}
-                    value={form.cardNumber}
-                    onChange={(e) => setTop("cardNumber", e.target.value)}
-                    maxLength={24}
-                    inputMode="numeric"
-                    autoComplete="off"
-                    placeholder="Leave blank to keep"
-                  />
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <input
+                      style={{ ...inputStyle, background: "#fff" }}
+                      value={form.cardNumber}
+                      onChange={(e) => setTop("cardNumber", formatCardInput(e.target.value))}
+                      maxLength={19}
+                      inputMode="numeric"
+                      autoComplete="off"
+                      placeholder="4111 1111 1111 1111"
+                    />
+                    {(() => {
+                      const brand = cardBrandOf(form.cardNumber);
+                      return brand ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={brand === "visa" ? "/assets/visa.svg" : "/assets/mastercard.svg"}
+                          alt={brand === "visa" ? "Visa" : "Mastercard"}
+                          width={36}
+                          height={22}
+                          style={{ flexShrink: 0 }}
+                        />
+                      ) : null;
+                    })()}
+                  </div>
+                  {(() => {
+                    const digits = digitsOnly(form.cardNumber).length;
+                    return digits > 0 && digits < 16 ? (
+                      <small
+                        className="application-error"
+                        role="alert"
+                        style={{ display: "block" }}
+                      >
+                        Enter all 16 digits ({digits}/16).
+                      </small>
+                    ) : null;
+                  })()}
                 </Field>
                 <Field label="Expiry MM/YY" error={errors["paymentCard.expiry"]}>
                   <input
-                    style={inputStyle}
+                    style={{ ...inputStyle, background: "#fff" }}
                     value={form.cardExpiry}
-                    onChange={(e) => setTop("cardExpiry", e.target.value)}
-                    maxLength={7}
+                    onChange={(e) => setTop("cardExpiry", formatExpiryInput(e.target.value))}
+                    maxLength={5}
+                    inputMode="numeric"
                     autoComplete="off"
                     placeholder="MM/YY"
                   />
+                  {!isPlausibleExpiryMonth(form.cardExpiry) ? (
+                    <small className="application-error" role="alert" style={{ display: "block" }}>
+                      Use MM/YY with a month from 01 to 12.
+                    </small>
+                  ) : null}
                 </Field>
                 <Field label="CVC" error={errors["paymentCard.securityCode"]}>
                   <input
-                    style={inputStyle}
+                    style={{ ...inputStyle, background: "#fff" }}
                     value={form.cardCvc}
-                    onChange={(e) => setTop("cardCvc", e.target.value)}
-                    maxLength={5}
+                    onChange={(e) => setTop("cardCvc", digitsOnly(e.target.value).slice(0, 3))}
+                    maxLength={3}
                     inputMode="numeric"
                     autoComplete="off"
                     placeholder="•••"
