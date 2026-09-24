@@ -459,40 +459,6 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
         </p>
       ) : null}
 
-      <div
-        className="staff-panel"
-        style={{ background: "#eef2ff", borderColor: "#c7d2fe", marginBottom: "16px" }}
-      >
-        <h2 style={{ color: "#312e81" }}>GTG Submit Notes (Optional)</h2>
-        <div className="staff-panel-body" style={{ display: "grid", gap: "10px" }}>
-          <p style={{ fontSize: "0.9rem", color: "#4338ca", margin: 0 }}>
-            Staff only — never shown to the customer. Save it on its own, or leave it filled and it
-            rides along with Save corrections / Mark GTG below.
-          </p>
-          <Field label="Note" error={errors["note"]}>
-            <textarea
-              style={{ ...inputStyle, minHeight: "72px", resize: "vertical", background: "#fff" }}
-              rows={3}
-              value={form.note}
-              onChange={(e) => setTop("note", e.target.value)}
-              maxLength={2000}
-              autoComplete="off"
-              placeholder="What was checked or fixed?…"
-            />
-          </Field>
-          <div>
-            <button
-              type="button"
-              className="staff-btn secondary"
-              disabled={busy || closed || !form.note.trim()}
-              onClick={() => void saveNote()}
-            >
-              {busy ? "Saving…" : "Save Note"}
-            </button>
-          </div>
-        </div>
-      </div>
-
       <div className="staff-grid-2">
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           <div className="staff-panel">
@@ -831,6 +797,38 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
                     placeholder="•••"
                   />
                 </Field>
+              </div>
+            </div>
+          </div>
+
+          <div className="staff-panel" style={{ background: "#eef2ff", borderColor: "#c7d2fe" }}>
+            <h2 style={{ color: "#312e81" }}>GTG Submit Notes (Optional)</h2>
+            <div className="staff-panel-body" style={{ display: "grid", gap: "10px" }}>
+              <Field label="Note" error={errors["note"]}>
+                <textarea
+                  style={{
+                    ...inputStyle,
+                    minHeight: "72px",
+                    resize: "vertical",
+                    background: "#fff",
+                  }}
+                  rows={3}
+                  value={form.note}
+                  onChange={(e) => setTop("note", e.target.value)}
+                  maxLength={2000}
+                  autoComplete="off"
+                  placeholder="What was checked or fixed?…"
+                />
+              </Field>
+              <div>
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  disabled={busy || closed || !form.note.trim()}
+                  onClick={() => void saveNote()}
+                >
+                  {busy ? "Saving…" : "Save Note"}
+                </button>
               </div>
             </div>
           </div>
