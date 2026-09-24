@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { staffData, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { BackLink, PageBand, StatusPill, Toast } from "@/components/staff/ui";
+import { CopyButton } from "@/components/staff/CopyButton";
 
 interface EditOrder {
   _id: string;
@@ -419,13 +420,18 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
         eyebrow={`CS correction — ${order.publicNumber}`}
         title="Edit order form"
         subtitle={
-          <>
-            <StatusPill status={order.status} />{" "}
-            {order.rush ? <span className="staff-pill red">RUSH</span> : null}{" "}
-            <span style={{ color: "var(--muted-text)" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+            <StatusPill status={order.status} />
+            <span style={{ color: "#cbd5e1", fontWeight: 600 }}>
               {order.stateCode} {order.certificate} · Owner: {order.assignedName ?? "Unassigned"}
             </span>
-          </>
+            <CopyButton value={order.publicNumber} label="Order number" />
+            {order.rush ? (
+              <span style={{ marginLeft: "auto" }}>
+                <span className="staff-pill red">RUSH</span>
+              </span>
+            ) : null}
+          </span>
         }
       />
       {toast ? <Toast message={toast} onDone={() => setToast("")} /> : null}
