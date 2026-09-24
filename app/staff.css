@@ -1137,6 +1137,20 @@ dl.staff-lines {
 .staff-secthead h3 {
   margin: 0;
 }
+/* Application sections as separated bordered cards. */
+.staff-appsect {
+  border: 1px solid var(--flow-border);
+  border-radius: 12px;
+  background: #fff;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.staff-appsect:last-child {
+  margin-bottom: 0;
+}
+.staff-appsect dl.staff-deflist {
+  margin-bottom: 0;
+}
 .staff-secthead + .staff-deflist {
   margin-bottom: 22px;
 }

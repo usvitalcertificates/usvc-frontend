@@ -89,7 +89,7 @@ function FieldSection({ title, entries }: { title: string; entries: [string, unk
   const visible = entries.filter(([, val]) => val !== "" && val !== undefined && val !== null);
   if (visible.length === 0) return null;
   return (
-    <section aria-label={title} style={{ marginBottom: "6px" }}>
+    <section aria-label={title} className="staff-appsect">
       <div className="staff-secthead">
         <h3>{title}</h3>
         <CopyButton value={sectionText(visible)} label={`${title} section`} />
