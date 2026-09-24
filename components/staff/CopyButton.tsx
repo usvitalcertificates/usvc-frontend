@@ -66,31 +66,30 @@ export function CopyButton({
         )}
         {copied ? "Copied" : "Copy"}
       </button>
-      <button
-        type="button"
-        aria-label={`Copy ${label} again`}
-        title={`Copy ${label} again`}
-        aria-hidden={!copied}
-        tabIndex={copied ? 0 : -1}
-        onClick={() => {
-          setCopied(false);
-          window.setTimeout(() => void copy(), 60);
-        }}
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          border: "1px solid #dce4ef",
-          background: "#fff",
-          color: "#1d4ed8",
-          borderRadius: "6px",
-          padding: "3px 6px",
-          cursor: copied ? "pointer" : "default",
-          visibility: copied ? "visible" : "hidden",
-        }}
-      >
-        <RotateCcw aria-hidden style={{ width: 13, height: 13 }} />
-      </button>
+      {copied ? (
+        <button
+          type="button"
+          aria-label={`Copy ${label} again`}
+          title={`Copy ${label} again`}
+          onClick={() => {
+            setCopied(false);
+            window.setTimeout(() => void copy(), 60);
+          }}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            border: "1px solid #dce4ef",
+            background: "#fff",
+            color: "#1d4ed8",
+            borderRadius: "6px",
+            padding: "3px 6px",
+            cursor: "pointer",
+          }}
+        >
+          <RotateCcw aria-hidden style={{ width: 13, height: 13 }} />
+        </button>
+      ) : null}
     </span>
   );
 }

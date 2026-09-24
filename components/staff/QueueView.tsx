@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Clock, FolderOpen, Inbox, UserCheck, UserPlus, Zap } from "lucide-react";
-import { staffData } from "@/lib/staff-client";
+import { CheckCircle2, Clock, FolderOpen, Inbox, UserCheck, UserPlus, Zap } from "lucide-react";
+import { staffData, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
   EmptyState,
@@ -12,7 +12,7 @@ import {
   SkeletonRows,
   StatCard,
   StatusPill,
-  Toast,
+  TimedActionModal,
 } from "@/components/staff/ui";
 
 interface QueueOrder {
@@ -79,8 +79,13 @@ export function QueueView({
   const [rushOnly, setRushOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [toast, setToast] = useState("");
-  const [kpis, setKpis] = useState({ unassigned: 0, mine: 0, attention: 0, rush: 0 });
+  const [claimed, setClaimed] = useState<{ number: string; id: string } | null>(null);
+  const [role, setRole] = useState<string | null>(null);
+  const [kpis, setKpis] = useState({ unassigned: 0, mine: 0, attention: 0, ready: 0, rush: 0 });
+
+  useEffect(() => {
+    setRole(staffRole());
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -144,8 +149,8 @@ export function QueueView({
         setKpis({
           unassigned: (unassigned.data.total ?? 0) as number,
           mine: (mine.data.total ?? 0) as number,
-          attention: [...u, ...m].filter((o) => o.status === "ON_HOLD" || o.status === "NEED_INFO")
-            .length,
+          attention: [...u, ...m].filter((o) => o.status === "TO_CS").length,
+          ready: [...u, ...m].filter((o) => o.status === "GTG").length,
           rush: [...u, ...m].filter((o) => o.rush).length,
         });
       } catch {
@@ -165,7 +170,7 @@ export function QueueView({
         { method: "POST" },
       );
       if (!response.ok) throw new Error(data.message || "Could not take ownership of this order");
-      setToast(`You took ownership of order ${publicNumber} — it is now in My Work.`);
+      setClaimed({ number: publicNumber, id });
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not take ownership of this order");
@@ -181,7 +186,17 @@ export function QueueView({
         title={title}
         subtitle={`${subtitle} Showing ${orders.length} of ${total}.`}
       />
-      {toast ? <Toast message={toast} onDone={() => setToast("")} /> : null}
+      {claimed ? (
+        <TimedActionModal
+          key={claimed.id}
+          title="Ownership taken"
+          orderNumber={claimed.number}
+          primaryLabel="Open Order"
+          primaryHref={`/staff/${claimed.id}`}
+          seconds={10}
+          onClose={() => setClaimed(null)}
+        />
+      ) : null}
       {error ? (
         <p role="alert" className="staff-alert error">
           {error}
@@ -190,14 +205,26 @@ export function QueueView({
 
       {showKpis ? (
         <div className="staff-stats">
-          <StatCard value={kpis.unassigned} label="Unassigned open" icon={<Inbox aria-hidden />} />
-          <StatCard value={kpis.mine} label="Assigned to me" icon={<UserCheck aria-hidden />} />
           <StatCard
-            value={kpis.attention}
-            label="On hold / need info"
-            icon={<Clock aria-hidden />}
+            value={kpis.unassigned}
+            label="Unassigned open"
+            icon={<Inbox aria-hidden />}
+            tone="blue"
           />
-          <StatCard value={kpis.rush} label="Rush open" icon={<Zap aria-hidden />} />
+          <StatCard
+            value={kpis.mine}
+            label="Assigned to me"
+            icon={<UserCheck aria-hidden />}
+            tone="lavender"
+          />
+          <StatCard value={kpis.attention} label="To CS" icon={<Clock aria-hidden />} tone="rose" />
+          <StatCard
+            value={kpis.ready}
+            label="GTG ready"
+            icon={<CheckCircle2 aria-hidden />}
+            tone="green"
+          />
+          <StatCard value={kpis.rush} label="Rush open" icon={<Zap aria-hidden />} tone="amber" />
         </div>
       ) : null}
 
@@ -237,9 +264,8 @@ export function QueueView({
                 <option value="">All statuses</option>
                 <option value="PAID">Payment Successful</option>
                 <option value="IN_REVIEW">Order Processing</option>
-                <option value="ON_HOLD">On Hold</option>
-                <option value="NEED_INFO">Need Customer Information</option>
-                <option value="SUBMITTED">Submitted to Govt Agency</option>
+                <option value="TO_CS">To CS</option>
+                <option value="GTG">GTG</option>
                 <option value="__rush">Rush only</option>
               </select>
             </label>
@@ -283,8 +309,8 @@ export function QueueView({
             {(
               [
                 ["all", "All"],
-                ["ON_HOLD", "On Hold"],
-                ["NEED_INFO", "Need Info"],
+                ["TO_CS", "To CS"],
+                ["GTG", "GTG"],
                 ["rush", "Rush"],
               ] as const
             ).map(([value, label]) => {
@@ -369,7 +395,7 @@ export function QueueView({
                     </td>
                     <td>
                       <strong>{order.publicNumber}</strong>{" "}
-                      {order.rush ? <span className="staff-pill red">RUSH</span> : null}
+                      {order.rush ? <span className="staff-pill amber">RUSH</span> : null}
                       <br />
                       <span style={{ fontSize: "0.82rem", color: "var(--muted-text)" }}>
                         {order.copies} {order.copies === 1 ? "copy" : "copies"}
@@ -389,17 +415,26 @@ export function QueueView({
                     <td>{order.assignedName ?? "Unassigned"}</td>
                     <td>{order.requestor}</td>
                     <td style={{ whiteSpace: "nowrap" }}>
-                      {order.assignedToMe || order.assignedName ? (
-                        <Link className="staff-btn green" href={`/staff/${order.id}`}>
-                          <FolderOpen aria-hidden style={{ width: 15, height: 15 }} /> Open Order
-                        </Link>
-                      ) : (
+                      {!order.assignedName ? (
                         <button
                           type="button"
                           className="staff-btn"
                           onClick={() => void claim(order.id, order.publicNumber)}
                         >
                           <UserPlus aria-hidden style={{ width: 15, height: 15 }} /> Take Ownership
+                        </button>
+                      ) : order.assignedToMe || role === "ADMIN" ? (
+                        <Link className="staff-btn green" href={`/staff/${order.id}`}>
+                          <FolderOpen aria-hidden style={{ width: 15, height: 15 }} /> Open Order
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          className="staff-btn green"
+                          disabled
+                          title={`Claimed by ${order.assignedName} — only the owner can open it`}
+                        >
+                          <FolderOpen aria-hidden style={{ width: 15, height: 15 }} /> Open Order
                         </button>
                       )}
                     </td>

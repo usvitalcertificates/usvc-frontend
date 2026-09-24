@@ -1,10 +1,18 @@
 "use client";
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffData, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
-import { BackLink, STATUS_LABELS, StatusPill, Stepper, Toast } from "@/components/staff/ui";
+import {
+  BackLink,
+  ConfirmModal,
+  STATUS_LABELS,
+  StatusPill,
+  Stepper,
+  Toast,
+} from "@/components/staff/ui";
 import {
   activityCategory,
   dayKey,
@@ -15,9 +23,9 @@ import {
 
 const NEXT_STATUS: Record<string, string[]> = {
   PAID: ["IN_REVIEW"],
-  IN_REVIEW: ["SUBMITTED", "ON_HOLD", "NEED_INFO"],
-  ON_HOLD: ["IN_REVIEW"],
-  NEED_INFO: ["IN_REVIEW"],
+  IN_REVIEW: ["SUBMITTED", "TO_CS"],
+  TO_CS: ["GTG"],
+  GTG: ["IN_REVIEW"],
   SUBMITTED: [],
 };
 
@@ -40,8 +48,8 @@ interface OrderDetail {
   status: string;
   paymentStatus: string;
   assignedName: string | null;
-  pricing: { serviceCents: number; rushCents: number; totalCents: number };
-  amountCents: number;
+  pricing?: { serviceCents: number; rushCents: number; totalCents: number };
+  amountCents?: number;
   notes: { authorId?: string; body: string; createdAt?: string }[];
   createdAt: string;
 }
@@ -81,7 +89,7 @@ function FieldSection({ title, entries }: { title: string; entries: [string, unk
   const visible = entries.filter(([, val]) => val !== "" && val !== undefined && val !== null);
   if (visible.length === 0) return null;
   return (
-    <section aria-label={title} style={{ marginBottom: "6px" }}>
+    <section aria-label={title} className="staff-appsect">
       <div className="staff-secthead">
         <h3>{title}</h3>
         <CopyButton value={sectionText(visible)} label={`${title} section`} />
@@ -322,6 +330,7 @@ type Tab = "summary" | "application" | "notes";
 
 export default function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   useRequireStaffAuth();
   useInactivitySignout();
   const [order, setOrder] = useState<OrderDetail | null>(null);
@@ -332,13 +341,20 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [statusNote, setStatusNote] = useState("");
   const [moveTo, setMoveTo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [toCsOpen, setToCsOpen] = useState(false);
+  const [releaseOpen, setReleaseOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("summary");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [canSeePricing, setCanSeePricing] = useState(false);
+  const [canCorrect, setCanCorrect] = useState(false);
   const [histLimit, setHistLimit] = useState(10);
   const [noteLimit, setNoteLimit] = useState(10);
 
   useEffect(() => {
-    setIsAdmin(staffRole() === "ADMIN");
+    const role = staffRole();
+    setIsAdmin(role === "ADMIN");
+    setCanSeePricing(role === "ADMIN" || role === "CS");
+    setCanCorrect(role === "ADMIN" || role === "CS");
   }, []);
 
   const load = useCallback(async () => {
@@ -381,14 +397,36 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     }
   };
 
-  const releaseOrder = () => {
-    if (!window.confirm("Release this order back to the queue? You will lose ownership.")) return;
-    void postAction(
-      `/staff/orders/${id}/release`,
-      {},
-      "POST",
-      "You have dropped ownership of this order.",
-    );
+  const releaseOrder = async () => {
+    setReleaseOpen(false);
+    setBusy(true);
+    setError("");
+    try {
+      await staffJson(`/staff/orders/${id}/release`, { method: "POST", body: "{}" });
+      router.replace("/staff");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not release this order");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const confirmToCs = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      await staffJson(`/orders/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "TO_CS", note: statusNote.trim() }),
+      });
+      setToCsOpen(false);
+      router.replace("/staff");
+    } catch (e) {
+      setToCsOpen(false);
+      setError(e instanceof Error ? e.message : "Could not send to CS");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const goWorkflow = () => {
@@ -420,7 +458,10 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
   const closed = order.status === "SUBMITTED";
   const effectiveMoveTo = moveTo ?? next[0] ?? "";
-  const exceptionMove = effectiveMoveTo === "ON_HOLD" || effectiveMoveTo === "NEED_INFO";
+  const exceptionMove = effectiveMoveTo === "TO_CS";
+  const gtgMove = effectiveMoveTo === "GTG";
+  // TO_CS is locked: only CS/ADMIN (canCorrect) may move it — and only to GTG.
+  const toCsLocked = order.status === "TO_CS" && !canCorrect;
   const requestorName =
     `${order.applicant.firstName ?? ""} ${order.applicant.lastName ?? ""}`.trim() || "—";
   const certName = `${order.stateCode} ${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} Certificate`;
@@ -465,10 +506,10 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <p className="staff-orderbar-sub">
             {`${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} · ${order.stateName} (${order.geo.county}, ${order.geo.city}) · Submitted ${new Date(order.createdAt).toLocaleString("en-US")}`}
           </p>
-          <p className="staff-orderbar-pills">
+          <div className="staff-orderbar-statuses">
             <StatusPill status={order.status} />
-            {order.rush ? <span className="staff-pill red">RUSH</span> : null}
-          </p>
+            {order.rush ? <span className="staff-pill amber">RUSH</span> : null}
+          </div>
         </div>
         {!closed ? (
           <div className="staff-orderbar-actions">
@@ -479,7 +520,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               type="button"
               className="staff-btn danger"
               disabled={busy}
-              onClick={releaseOrder}
+              onClick={() => setReleaseOpen(true)}
             >
               Drop Ownership
             </button>
@@ -530,60 +571,97 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     )?.createdAt ?? null
                 }
                 parkedNote={
-                  order.status === "ON_HOLD" || order.status === "NEED_INFO"
+                  order.status === "TO_CS"
                     ? ((order.notes ?? []).at(-1)?.body.slice(0, 140) ?? null)
                     : null
                 }
               />
               {!closed ? (
-                <div style={{ marginTop: "16px" }}>
-                  <label>
-                    Move to
-                    <select value={effectiveMoveTo} onChange={(e) => setMoveTo(e.target.value)}>
-                      {next.map((s) => (
-                        <option key={s} value={s}>
-                          {STATUS_LABELS[s] ?? s}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  {exceptionMove ? (
-                    <label>
-                      Internal note (required for On Hold / Need Customer Information)
-                      <input
-                        value={statusNote}
-                        onChange={(e) => setStatusNote(e.target.value)}
-                        maxLength={2000}
-                        placeholder="What does this order need before it can continue?…"
-                        autoComplete="off"
-                      />
-                    </label>
-                  ) : null}
+                toCsLocked ? (
                   <div
-                    style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}
+                    role="status"
+                    style={{
+                      background: "#fef2f2",
+                      border: "1px solid #fecaca",
+                      borderRadius: "8px",
+                      padding: "12px 14px",
+                      marginTop: "16px",
+                    }}
                   >
-                    <button
-                      type="button"
-                      className="staff-btn"
-                      disabled={busy}
-                      onClick={() => {
-                        void postAction(
-                          `/orders/${id}/status`,
-                          {
-                            status: effectiveMoveTo,
-                            ...(exceptionMove && statusNote.trim()
-                              ? { note: statusNote.trim() }
-                              : {}),
-                          },
-                          "PATCH",
-                          "The order status has been changed for this order.",
-                        );
-                      }}
-                    >
-                      Update status
-                    </button>
+                    <p style={{ color: "#b91c1c", fontWeight: 700, margin: "0 0 4px" }}>
+                      CS is looking into it.
+                    </p>
+                    <p style={{ margin: 0, fontSize: "0.9rem", color: "#7f1d1d" }}>
+                      Submit is blocked until CS or ADMIN marks this order GTG. It will then return
+                      to the queue so you can continue.
+                    </p>
                   </div>
-                </div>
+                ) : (
+                  <div style={{ marginTop: "16px" }}>
+                    <label>
+                      Move to
+                      <select value={effectiveMoveTo} onChange={(e) => setMoveTo(e.target.value)}>
+                        {next.map((s) => (
+                          <option key={s} value={s}>
+                            {STATUS_LABELS[s] ?? s}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    {exceptionMove ? (
+                      <label>
+                        Internal note (required for To CS)
+                        <textarea
+                          value={statusNote}
+                          onChange={(e) => setStatusNote(e.target.value)}
+                          rows={4}
+                          maxLength={2000}
+                          placeholder="What does this order need before it can continue?…"
+                          autoComplete="off"
+                          style={{ width: "100%", minHeight: "88px", resize: "vertical" }}
+                        />
+                      </label>
+                    ) : null}
+                    {gtgMove ? (
+                      <label>
+                        Completion note (optional)
+                        <input
+                          value={statusNote}
+                          onChange={(e) => setStatusNote(e.target.value)}
+                          maxLength={2000}
+                          placeholder="What was fixed?…"
+                          autoComplete="off"
+                        />
+                      </label>
+                    ) : null}
+                    <div
+                      style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}
+                    >
+                      <button
+                        type="button"
+                        className="staff-btn"
+                        disabled={busy || (exceptionMove && !statusNote.trim())}
+                        onClick={() => {
+                          if (exceptionMove) {
+                            setToCsOpen(true);
+                            return;
+                          }
+                          void postAction(
+                            `/orders/${id}/status`,
+                            {
+                              status: effectiveMoveTo,
+                              ...(gtgMove && statusNote.trim() ? { note: statusNote.trim() } : {}),
+                            },
+                            "PATCH",
+                            "The order status has been changed for this order.",
+                          );
+                        }}
+                      >
+                        Update status
+                      </button>
+                    </div>
+                  </div>
+                )
               ) : (
                 <p style={{ color: "var(--flow-secondary)", marginBottom: 0 }}>
                   No further actions — the submission record above is final.
@@ -678,35 +756,37 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   ) : null}
                 </div>
               </div>
-              <div className="staff-panel">
-                <h3>Products</h3>
-                <div className="staff-panel-body">
-                  <dl className="staff-lines">
-                    <div>
-                      <dt>
-                        Certified copy of{" "}
-                        {order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()}{" "}
-                        Certificate
-                        <span className="staff-lines-sub">
-                          Online Processing Fee · Qty: {order.copies} Certificate(s)
-                        </span>
-                      </dt>
-                      <dd>{money(order.pricing.serviceCents)}</dd>
-                    </div>
-                    {order.pricing.rushCents > 0 ? (
+              {canSeePricing && order.pricing && order.amountCents !== undefined ? (
+                <div className="staff-panel">
+                  <h3>Products</h3>
+                  <div className="staff-panel-body">
+                    <dl className="staff-lines">
                       <div>
-                        <dt>Rush Processing</dt>
-                        <dd>{money(order.pricing.rushCents)}</dd>
+                        <dt>
+                          Certified copy of{" "}
+                          {order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()}{" "}
+                          Certificate
+                          <span className="staff-lines-sub">
+                            Online Processing Fee · Qty: {order.copies} Certificate(s)
+                          </span>
+                        </dt>
+                        <dd>{money(order.pricing.serviceCents)}</dd>
                       </div>
-                    ) : null}
-                    <div className="staff-lines-total">
-                      <dt>Total Paid</dt>
-                      <dd>{money(order.amountCents)}</dd>
-                    </div>
-                  </dl>
-                  <p className="staff-lines-note">Processing fee collected at checkout.</p>
+                      {order.pricing.rushCents > 0 ? (
+                        <div>
+                          <dt>Rush Processing</dt>
+                          <dd>{money(order.pricing.rushCents)}</dd>
+                        </div>
+                      ) : null}
+                      <div className="staff-lines-total">
+                        <dt>Total Paid</dt>
+                        <dd>{money(order.amountCents)}</dd>
+                      </div>
+                    </dl>
+                    <p className="staff-lines-note">Processing fee collected at checkout.</p>
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
           </div>
         </>
@@ -744,6 +824,12 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             onReveal={() => void load()}
           />
           <RevealCard orderId={id} field="card" title="Payment card" onReveal={() => void load()} />
+          {canCorrect && !closed && (order.status === "TO_CS" || order.status === "GTG") ? (
+            <p style={{ fontSize: "0.9rem", color: "var(--muted-text)" }}>
+              CS edits this order in the dedicated editor:{" "}
+              <a href={`/staff/cs/edit/${id}`}>Open in CS editor →</a>
+            </p>
+          ) : null}
         </>
       ) : null}
 
@@ -874,6 +960,67 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
         </>
+      ) : null}
+
+      {toCsOpen && order ? (
+        <div className="staff-modal-backdrop" onClick={() => setToCsOpen(false)}>
+          <div
+            className="staff-modal"
+            role="dialog"
+            aria-label="Confirm send To CS"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2>Send To CS?</h2>
+            <p style={{ color: "var(--muted-text)" }}>
+              This will send order to CS for review and your ownership will drop automatically.
+            </p>
+            <p
+              role="note"
+              style={{
+                background: "#fef2f2",
+                border: "1px solid #fecaca",
+                borderRadius: "8px",
+                padding: "10px 12px",
+                fontSize: "0.9rem",
+                whiteSpace: "pre-wrap",
+                maxHeight: "180px",
+                overflowY: "auto",
+              }}
+            >
+              <strong style={{ color: "#b91c1c" }}>Note to CS: </strong>
+              <span style={{ display: "block", marginTop: "4px" }}>{statusNote.trim()}</span>
+            </p>
+            <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
+              <button
+                type="button"
+                className="staff-btn"
+                disabled={busy}
+                onClick={() => void confirmToCs()}
+              >
+                {busy ? "Sending…" : "Send To CS"}
+              </button>
+              <button
+                type="button"
+                className="staff-btn secondary"
+                onClick={() => setToCsOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {releaseOpen && order ? (
+        <ConfirmModal
+          title="Drop Ownership?"
+          body="Release this order back to the queue? You will lose ownership."
+          confirmLabel="Drop Ownership"
+          danger
+          busy={busy}
+          onCancel={() => setReleaseOpen(false)}
+          onConfirm={() => void releaseOrder()}
+        />
       ) : null}
     </>
   );

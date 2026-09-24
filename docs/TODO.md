@@ -62,6 +62,19 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Notes & History 2026-09-23: latest-10 paging with Show more/less + counts, day-grouped history preserved, category-colored dots, relative timestamps, note bubble cards
 - [x] Shared activity module 2026-09-23: `components/staff/activity.tsx` (human labels incl. staff actions, dot categories incl. access/security, relTime) used by order history + admin feed; admin activity paged (20 + more) with human filter options
 - [x] Branded sign-in 2026-09-23: centered card with USVC Flow brandmark + "Processing today for brighter tomorrows" slogan, stepper line removed
+- [x] Staff auth slogan removed 2026-09-24: deleted `staff-auth-slogan` line from `/auth` (brandmark + eyebrow + H1 kept)
+- [x] Staff roles 2026-09-24: raw DB role labels (`ADMIN`/`FULFILLMENT`/`CS`) in shell/settings/roster; admin invite role picker (default `FULFILLMENT`) + roster role select; Products pricing card gated to `ADMIN`/`CS`; new `/staff/cs` corrections inbox with EDIT-only form correction + resume to `IN_REVIEW`
+- [x] To-CS status 2026-09-24: `On Hold`/`Need Info` removed, single `To CS` park status (required internal note); Open Orders filter drops `Submitted to Govt Agency`, chips are All / To CS / Rush, KPI shows To CS; detail workflow + stepper + CS inbox follow `TO_CS`
+- [x] GTG status 2026-09-24: `TO_CS → GTG` (CS/ADMIN only, note optional) → `GTG → IN_REVIEW`; red `TO_CS` blocker banner (submit locked), green `GTG` ready banner; queue adds GTG filter/chip/KPI; detail Move-to is role-aware; correction panel shows flagged note + Mark GTG
+- [x] Confirm modals 2026-09-24: shared `ConfirmModal` replaces all `window.confirm` (Drop Ownership, admin revoke/2-step/disable/enable/role change); To-CS/GTG flows already used styled modals
+- [x] Claim toasts 2026-09-24: `Toast` accepts an action link — Take Ownership toasts offer Open order / Open editor without leaving the list
+- [x] Claim popup 2026-09-24: pastel-green `TimedActionModal` (10s countdown + progress, Open Order / Skip now) replaces claim toasts in queues and CS inbox; non-blocking by design
+- [x] Others-orders guard 2026-09-24: fulfillment sees a disabled Open Order button (with owner tooltip) on colleagues' rows instead of a dead-end link; CS audit access fixed at the API so CS never hits the 403
+- [x] Strict ownership UI 2026-09-24: CS follows fulfillment Open rules (own/unassigned only, ADMIN opens all); CS inbox uses assignedToMe with owner chip for colleagues' rows
+- [x] Dedicated CS editor 2026-09-24: `/staff/cs/edit/[id]` full-form workspace (prefilled sections, required badges, inline errors, dirty-aware sticky bar, flagged-note callout, notes rail, locked recap, SSN/card re-entry encrypted, Mark GTG → inbox); inbox opens here; embedded quick-edit panel removed from `staff/[id]` (deep link to editor instead)
+- [x] Ownership loop UI 2026-09-24: Open Orders shows all orders with role-aware actions (others' orders show owner chip, no dead-end Open link); CS inbox Take Ownership buttons; editor requires ownership (Take-ownership CTA otherwise, ADMIN bypasses); Mark GTG behind a confirm modal stating status + ownership drop
+- [x] CS editor note section 2026-09-24: correction note moved out of SSN/card into its own Section 9 with standalone Save Note (posts without touching form edits); sticky Save corrections / Mark GTG row unchanged
+- [x] To-CS send flow 2026-09-24: multiline note box + Send-To-CS confirm modal (ownership-drop warning + note preview) redirecting to Open Orders; RUSH pill moved from red to amber pastel everywhere (red reserved for To CS)
 - [x] Staging host access 2026-09-23: `staging.*` allows staff paths by path (verified 200 + noindex on staging pattern, 404 preserved on www/flow patterns)
 - [x] Roster polish 2026-09-23: avatar + name/pill flex row with gap, truncated email with hover title, two-line Last-activity date + time badge
 - [x] Agent stepper + focused queues 2026-09-23: Claimed → Processing → Submitted stepper with Paid precondition chip, per-step captions, parked-note excerpt, submitted timestamp; My Work shows open claimed only with attention-first order + quick-filter chips + guided empty state; Closed Orders drops irrelevant filters
@@ -70,6 +83,10 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Submit-time cell + form fixes 2026-09-23: two-line date + time-badge cell; form reset scoped so filter panels keep padding (`form.staff-filters` wins fairly)
 - [x] Closed celebration 2026-09-23: green tick on Submitted, centered bold-green closed panel with timestamp
 - [x] Error-proof client + stepper language 2026-09-23: `staffData` safe body reader (text fallback, no SyntaxError on any staff page), Took Ownership step, muted-done / ticked-current / blue Up-next stepper states
+- [x] CS inbox refresh 2026-09-24: full-width Open Orders queue treatment, mobile card fallback, red correction-needed callout, and audit-derived sent-to-CS date; fixed To-CS status column removed
+- [x] Compact Open Orders header 2026-09-24: on-demand order lookup, condensed page band, and five one-row semantic pastel KPI mini-cards (two columns on tablet, one on narrow mobile) move queue rows above the fold
+- [x] Order Search polish 2026-09-24: wider order-number column, county context, fixed-width actions, and role-aware unavailable/open-queue actions prevent overflow and dead-end links
+- [x] Order-detail header compactness 2026-09-24: shorter back link, command bar, and tabs; status/Rush pills now share the identity block instead of consuming a dedicated header row
 
 ## Phase 3 (remaining + proposed backlog)
 

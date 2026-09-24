@@ -27,6 +27,18 @@ export function staffRole(): string | null {
   }
 }
 
+export function staffId(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const access = sessionStorage.getItem(ACCESS_KEY);
+    if (!access) return null;
+    const payload = JSON.parse(atob(access.split(".")[1]));
+    return typeof payload.sub === "string" ? payload.sub : null;
+  } catch {
+    return null;
+  }
+}
+
 export function clearStaffSession(): void {
   sessionStorage.removeItem(ACCESS_KEY);
   sessionStorage.removeItem(REFRESH_KEY);

@@ -6,8 +6,8 @@ import { useEffect, useState, type ReactNode } from "react";
 export const STATUS_LABELS: Record<string, string> = {
   PAID: "Payment Successful",
   IN_REVIEW: "Order Processing",
-  ON_HOLD: "On Hold",
-  NEED_INFO: "Need Customer Information",
+  TO_CS: "To CS",
+  GTG: "GTG",
   SUBMITTED: "Submitted to Govt Agency",
   CANCELLED: "Cancelled",
 };
@@ -15,8 +15,8 @@ export const STATUS_LABELS: Record<string, string> = {
 const STATUS_TONE: Record<string, "navy" | "red" | "gray" | "green"> = {
   PAID: "navy",
   IN_REVIEW: "navy",
-  ON_HOLD: "red",
-  NEED_INFO: "red",
+  TO_CS: "red",
+  GTG: "green",
   SUBMITTED: "green",
   CANCELLED: "gray",
 };
@@ -58,13 +58,15 @@ export function StatCard({
   value,
   label,
   icon,
+  tone = "blue",
 }: {
   value: ReactNode;
   label: string;
   icon?: ReactNode;
+  tone?: "blue" | "lavender" | "rose" | "green" | "amber";
 }) {
   return (
-    <div className="staff-stat">
+    <div className={`staff-stat staff-stat-${tone}`}>
       {icon}
       <div>
         <strong>{value}</strong>
@@ -106,7 +108,15 @@ export function SkeletonRows({ rows = 5 }: { rows?: number }) {
 }
 
 /** Success toast banner (MILES-style). Auto-dismisses after 6s. */
-export function Toast({ message, onDone }: { message: string; onDone: () => void }) {
+export function Toast({
+  message,
+  action,
+  onDone,
+}: {
+  message: string;
+  action?: ReactNode;
+  onDone: () => void;
+}) {
   useEffect(() => {
     const timer = setTimeout(onDone, 6000);
     return () => clearTimeout(timer);
@@ -114,7 +124,146 @@ export function Toast({ message, onDone }: { message: string; onDone: () => void
   return (
     <p role="status" className="staff-alert success">
       {message}
+      {action ? <span style={{ marginLeft: "12px" }}>{action}</span> : null}
     </p>
+  );
+}
+
+/** Styled confirmation popup. Use this instead of window.confirm everywhere. */
+export function ConfirmModal({
+  title,
+  body,
+  confirmLabel,
+  danger,
+  busy,
+  onCancel,
+  onConfirm,
+}: {
+  title: string;
+  body: string;
+  confirmLabel: string;
+  danger?: boolean;
+  busy?: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <div className="staff-modal-backdrop" onClick={onCancel}>
+      <div
+        className="staff-modal"
+        role="dialog"
+        aria-label={title}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2>{title}</h2>
+        <p style={{ color: "var(--muted-text)" }}>{body}</p>
+        <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
+          <button
+            type="button"
+            className={`staff-btn${danger ? " danger" : ""}`}
+            disabled={busy}
+            onClick={onConfirm}
+          >
+            {busy ? "Please wait…" : confirmLabel}
+          </button>
+          <button type="button" className="staff-btn secondary" onClick={onCancel}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Centered success popup (pastel green) with a countdown auto-dismiss.
+ * Backdrop click counts as skip. Parent should key it by order id so
+ * re-claims reset the timer.
+ */
+export function TimedActionModal({
+  title,
+  orderNumber,
+  primaryLabel,
+  primaryHref,
+  seconds = 10,
+  onClose,
+}: {
+  title: string;
+  orderNumber: string;
+  primaryLabel: string;
+  primaryHref: string;
+  seconds?: number;
+  onClose: () => void;
+}) {
+  const [left, setLeft] = useState(seconds);
+  useEffect(() => {
+    setLeft(seconds);
+    const timer = setInterval(() => {
+      setLeft((n) => (n <= 1 ? 0 : n - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [seconds]);
+  useEffect(() => {
+    if (left <= 0) onClose();
+  }, [left, onClose]);
+  return (
+    <div className="staff-modal-backdrop" onClick={onClose}>
+      <div
+        className="staff-modal"
+        role="dialog"
+        aria-label={title}
+        onClick={(e) => e.stopPropagation()}
+        style={{ background: "var(--flow-success-bg)", borderColor: "#bbf7d0" }}
+      >
+        <h2 style={{ color: "#15803d" }}>{title}</h2>
+        <p style={{ fontSize: "0.95rem" }}>
+          You have taken ownership of order number <br />
+          <strong className="py-1">{orderNumber}</strong>.
+        </p>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "14px" }}>
+          <Link
+            href={primaryHref}
+            className="staff-btn green"
+            style={{ textDecoration: "none" }}
+            onClick={onClose}
+          >
+            {primaryLabel}
+          </Link>
+          <button type="button" className="staff-btn secondary" onClick={onClose}>
+            Skip now
+          </button>
+          <span
+            style={{
+              marginLeft: "auto",
+              alignSelf: "center",
+              fontSize: "0.78rem",
+              color: "var(--muted-text)",
+            }}
+          >
+            Closing in {left}s
+          </span>
+        </div>
+        <div
+          aria-hidden
+          style={{
+            marginTop: "12px",
+            height: "4px",
+            borderRadius: "999px",
+            background: "#bbf7d0",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              width: `${(left / seconds) * 100}%`,
+              background: "#16a34a",
+              borderRadius: "999px",
+            }}
+          />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -189,7 +338,7 @@ export function Pagination({
 /**
  * Agent-centric stepper: Claimed → Order Processing → Submitted.
  * Payment is a precondition chip (only paid orders reach agents), and
- * ON_HOLD / NEED_INFO park as a red branch off Processing.
+ * TO_CS parks as a red branch off Processing.
  */
 const AGENT_STEPS = [
   { key: "claimed", label: "Took Ownership", caption: "Order is yours, work not started." },
@@ -199,7 +348,7 @@ const AGENT_STEPS = [
 
 function agentStepIndex(status: string): number {
   if (status === "SUBMITTED") return 2;
-  if (status === "IN_REVIEW" || status === "ON_HOLD" || status === "NEED_INFO") return 1;
+  if (status === "IN_REVIEW" || status === "TO_CS" || status === "GTG") return 1;
   return 0;
 }
 
@@ -212,7 +361,8 @@ export function Stepper({
   submittedAt?: string | null;
   parkedNote?: string | null;
 }) {
-  const isException = status === "ON_HOLD" || status === "NEED_INFO";
+  const isParked = status === "TO_CS";
+  const isReady = status === "GTG";
   const index = agentStepIndex(status);
   const done = status === "SUBMITTED";
   return (
@@ -251,12 +401,19 @@ export function Stepper({
           );
         })}
       </div>
-      {isException ? (
+      {isParked && parkedNote ? (
         <p style={{ margin: "8px 0 0" }}>
           <StatusPill status={status} />{" "}
           <span style={{ fontSize: "0.9rem", color: "var(--flow-secondary)" }}>
-            Parked — resume to Order Processing to continue.
-            {parkedNote ? ` Latest note: “${parkedNote}”` : ""}
+            Latest note: “{parkedNote}”
+          </span>
+        </p>
+      ) : null}
+      {isReady ? (
+        <p style={{ margin: "8px 0 0" }}>
+          <StatusPill status={status} />{" "}
+          <span style={{ fontSize: "0.9rem", color: "#15803d", fontWeight: 700 }}>
+            This form is now correct and can continue — move it back to Order Processing.
           </span>
         </p>
       ) : null}
@@ -284,10 +441,8 @@ export function dayKey(value: string | Date): string {
 
 export function BackLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <p style={{ margin: "0 0 14px" }}>
-      <Link href={href} style={{ color: "var(--navy)", fontWeight: 700 }}>
-        {children}
-      </Link>
+    <p className="staff-backlink">
+      <Link href={href}>{children}</Link>
     </p>
   );
 }

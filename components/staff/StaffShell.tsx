@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Archive,
   Inbox,
@@ -11,6 +11,7 @@ import {
   Settings,
   ShieldCheck,
   UserCheck,
+  X,
   type LucideIcon,
 } from "lucide-react";
 import { staffLogout, staffRole } from "@/lib/staff-client";
@@ -18,29 +19,77 @@ import { staffLogout, staffRole } from "@/lib/staff-client";
 function OrderLookup() {
   const router = useRouter();
   const [value, setValue] = useState("");
+  const [open, setOpen] = useState(false);
+  const lookupRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    inputRef.current?.focus();
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (!lookupRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("mousedown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open]);
+
   return (
-    <form
-      className="staff-lookup"
-      role="search"
-      aria-label="Order lookup"
-      onSubmit={(e) => {
-        e.preventDefault();
-        const term = value.trim();
-        if (term) router.push(`/staff/search?q=${encodeURIComponent(term)}`);
-      }}
-    >
-      <input
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder="Order Lookup by #"
-        aria-label="Order Lookup by number"
-        autoComplete="off"
-        spellCheck={false}
-      />
-      <button type="submit" className="staff-btn navy">
-        <Search aria-hidden style={{ width: 16, height: 16 }} /> Search
+    <div ref={lookupRef} className="staff-lookup-control">
+      <button
+        type="button"
+        className="staff-lookup-trigger"
+        aria-expanded={open}
+        aria-controls="staff-order-lookup"
+        onClick={() => setOpen((isOpen) => !isOpen)}
+      >
+        <Search aria-hidden />
+        <span>Order lookup</span>
       </button>
-    </form>
+      {open ? (
+        <form
+          id="staff-order-lookup"
+          className="staff-lookup"
+          role="search"
+          aria-label="Order lookup"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const term = value.trim();
+            if (term) {
+              setOpen(false);
+              router.push(`/staff/search?q=${encodeURIComponent(term)}`);
+            }
+          }}
+        >
+          <input
+            ref={inputRef}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="Order number"
+            aria-label="Order Lookup by number"
+            autoComplete="off"
+            spellCheck={false}
+          />
+          <button type="submit" className="staff-btn navy">
+            Search
+          </button>
+          <button
+            type="button"
+            className="staff-lookup-close"
+            aria-label="Close order lookup"
+            onClick={() => setOpen(false)}
+          >
+            <X aria-hidden />
+          </button>
+        </form>
+      ) : null}
+    </div>
   );
 }
 
@@ -88,6 +137,9 @@ export function StaffShell({ children }: { children: ReactNode }) {
           {link("/staff/closed", "Closed Orders", Archive)}
           {link("/staff/search", "Order Search", Search)}
           {role === "ADMIN" ? link("/staff/admin", "Administration", ShieldCheck) : null}
+          {role === "ADMIN" || role === "CS"
+            ? link("/staff/cs", "CS Corrections", UserCheck)
+            : null}
           {link("/staff/settings", "Settings", Settings)}
         </nav>
         <div className="staff-userbox">
@@ -100,10 +152,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
                 {email}
               </span>
               <span className="staff-userchip-role">
-                Role:{" "}
-                <span className="staff-role-pill">
-                  {role === "ADMIN" ? "Super Admin" : "Agent"}
-                </span>
+                Role: <span className="staff-role-pill">{role ?? "—"}</span>
               </span>
             </span>
           </div>

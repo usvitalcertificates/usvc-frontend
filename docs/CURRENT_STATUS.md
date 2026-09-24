@@ -1,6 +1,6 @@
 # Current frontend status
 
-Last updated: 2026-09-23 (official USVC branding; two-fee model; staff fulfillment MVP: sidebar dashboard shell, /auth TOTP, KPIs + masked queue/my/closed/search, tabbed detail with stepper + reveal + copy, admin with invite modal + activity timeline, settings).
+Last updated: 2026-09-24 (official USVC branding; two-fee model; staff roles ADMIN/FULFILLMENT/CS with raw labels; pricing gated to ADMIN+CS; compact staff queue and order-detail headers, polished Order Search, and refreshed /staff/cs corrections inbox).
 
 ## Implemented
 

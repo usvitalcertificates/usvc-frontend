@@ -63,8 +63,9 @@ layout but namespaced so no selector can match public pages. Own tokens:
 - Status pills carry text labels, never color alone; sticky-header tables with
   row hover, stacked-card fallback under 760px; numbered pagination.
 - Fulfillment stepper, day-grouped timelines, success toasts, skeletons,
-  destructive actions use explicit danger styling + `confirm()` (Drop
-  Ownership); destructive admin actions already confirm.
+  destructive actions use explicit danger styling + the shared `ConfirmModal`
+  popup (Drop Ownership, status moves, admin revoke/disable/role changes) —
+  never `window.confirm`.
 - Icons: `lucide-react` with `aria-hidden`, always paired with visible text.
 - Audited 2026-09-23 against Vercel web-interface-guidelines (focus-visible,
   labels, spellcheck/autocomplete, reduced motion, img dimensions, no

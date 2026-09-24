@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { FolderOpen, Search as SearchIcon, X } from "lucide-react";
-import { staffData } from "@/lib/staff-client";
+import { FolderOpen, Inbox, Search as SearchIcon, X } from "lucide-react";
+import { staffData, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { EmptyState, PageBand, SkeletonRows, StatusPill } from "@/components/staff/ui";
 
@@ -46,6 +46,11 @@ function SearchView() {
   const [results, setResults] = useState<Result[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    setIsAdmin(staffRole() === "ADMIN");
+  }, []);
 
   const run = useCallback(async (query: string, cert: string) => {
     if (!query.trim() && !cert) {
@@ -179,7 +184,7 @@ function SearchView() {
               />
             ) : (
               <div className="staff-tablewrap">
-                <table className="staff-table staff-cards-fallback">
+                <table className="staff-table staff-cards-fallback staff-search-table">
                   <thead>
                     <tr>
                       <th>Order #</th>
@@ -193,7 +198,7 @@ function SearchView() {
                   <tbody>
                     {results.map((order) => (
                       <tr key={order.id}>
-                        <td>
+                        <td className="staff-search-order">
                           <strong>
                             <Highlight text={order.publicNumber} term={activeQuery} />
                           </strong>
@@ -201,21 +206,33 @@ function SearchView() {
                         <td>
                           {order.stateCode}{" "}
                           {order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()}
+                          <br />
+                          <span className="staff-row-meta">{order.county || "—"}</span>
                         </td>
                         <td>
                           <StatusPill status={order.status} />
                         </td>
                         <td>{order.assignedName ?? "Unassigned"}</td>
                         <td>{order.requestor}</td>
-                        <td style={{ whiteSpace: "nowrap" }}>
-                          {order.assignedToMe || order.assignedName ? (
+                        <td className="staff-search-action">
+                          {order.assignedToMe || isAdmin ? (
                             <Link className="staff-btn green" href={`/staff/${order.id}`}>
                               <FolderOpen aria-hidden style={{ width: 15, height: 15 }} /> Open
                               Order
                             </Link>
+                          ) : order.assignedName ? (
+                            <button
+                              type="button"
+                              className="staff-btn green"
+                              disabled
+                              title={`Claimed by ${order.assignedName} — only the owner can open it`}
+                            >
+                              <FolderOpen aria-hidden style={{ width: 15, height: 15 }} /> Open
+                              Order
+                            </button>
                           ) : (
                             <Link className="staff-btn secondary" href="/staff">
-                              Take Ownership from queue
+                              <Inbox aria-hidden style={{ width: 15, height: 15 }} /> Open queue
                             </Link>
                           )}
                         </td>
