@@ -705,8 +705,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     addressTypeOf(values.shippingType ?? draft.shippingType ?? ADDRESS_TYPE_OPTIONS[0].label) ===
     "international";
   // Two-fee model: only the Online Processing Fee (+ rush) is charged now.
-  const total = copies * 125 + (rush ? 30 : 0);
-  const serviceCents = 125 * copies;
+  const total = copies * 149 + (rush ? 45 : 0);
+  const serviceCents = 149 * copies;
 
   const requestorFirst = values.applicantFirstName ?? draft.applicantFirstName ?? "";
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
@@ -1383,7 +1383,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </option>
               ))}
             </select>
-            <small>Each copy includes the $125.00 USVC Processing Fee.</small>
+            <small>Each copy includes the $149.00 USVC Processing Fee.</small>
           </label>
           <label className="application-field wide">
             Delivery Method <span>*</span>
@@ -1439,7 +1439,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 <strong>Rush Processing</strong>
                 <small>Your application will be processed the next day.</small>
               </span>
-              <b>+$30.00 per order</b>
+              <b>+$45.00 per order</b>
             </label>
           </fieldset>
           <p className="hint">{PROCESSING_CLARIFICATION_NOTE}</p>
@@ -1601,16 +1601,16 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <hr />
             <div>
               <span>
-                Online Processing Fee<small>$125.00 per copy × {copies}</small>
+                Online Processing Fee<small>$149.00 per copy × {copies}</small>
               </span>
-              <b>${(125 * copies).toFixed(2)}</b>
+              <b>${(149 * copies).toFixed(2)}</b>
             </div>
             {rush ? (
               <div>
                 <span>
                   Rush Processing<small>Per order</small>
                 </span>
-                <b>$30.00</b>
+                <b>$45.00</b>
               </div>
             ) : null}
             <div className="total">
@@ -1676,7 +1676,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               value={rush ? "Rush Processing" : "Standard Processing"}
             />
             <ReviewRow label="Online Processing Fee" value={`$${serviceCents.toFixed(2)}`} />
-            <ReviewRow label="Rush processing" value={rush ? "$30.00" : "Not selected"} />
+            <ReviewRow label="Rush processing" value={rush ? "$45.00" : "Not selected"} />
             <ReviewRow
               label="Payment card"
               value={cardProvided ? "Card provided (kept private)" : "—"}
