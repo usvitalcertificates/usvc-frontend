@@ -844,7 +844,79 @@ table.staff-table {
 .staff-notes-grid .staff-panel {
   margin-bottom: 0;
 }
-/* Completion document panel: dashed picker plus file card. */
+/* Completion document header: title + subtitle left, Required pill right. */
+.staff-doc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 20px 0;
+}
+.staff-doc-head h2 {
+  margin: 0;
+}
+.staff-doc-head p {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--flow-secondary);
+}
+.staff-doc-head .staff-pill {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+/* File row: type icon, name block, and uniformly aligned action pills. */
+.staff-doc-fileicon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #dcfce7;
+  color: #16a34a;
+}
+.staff-doc-fileicon svg {
+  width: 20px;
+  height: 20px;
+}
+.staff-doc-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+.staff-btn.staff-doc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+.staff-btn.staff-doc-btn svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+label.staff-btn.staff-doc-btn {
+  margin: 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+.staff-btn.danger-outline {
+  background: var(--flow-surface);
+  color: var(--flow-danger);
+  border: 1px solid #f3b8b8;
+}
+.staff-btn.danger-outline:hover {
+  background: var(--flow-danger-bg);
+  color: var(--flow-danger);
+  border-color: #f3b8b8;
+}
 .staff-doc-drop {
   display: grid;
   gap: 4px;
@@ -890,12 +962,6 @@ table.staff-table {
 .staff-doc-info span {
   font-size: 0.8rem;
   color: var(--flow-secondary);
-}
-.staff-doc-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
 }
 .staff-file-label {
   cursor: pointer;
