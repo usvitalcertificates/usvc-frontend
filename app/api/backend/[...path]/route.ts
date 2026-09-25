@@ -10,6 +10,10 @@ async function proxy(request: NextRequest, context: RouteContext<"/api/backend/[
   const headers = new Headers();
   const contentType = request.headers.get("content-type");
   if (contentType) headers.set("content-type", contentType);
+  // Staff JWT for fulfillment/admin routes. The token lives in sessionStorage
+  // on the staff pages and is attached here; it never touches a cookie or URL.
+  const authorization = request.headers.get("authorization");
+  if (authorization) headers.set("authorization", authorization);
 
   let response: Response;
   try {
@@ -32,8 +36,14 @@ async function proxy(request: NextRequest, context: RouteContext<"/api/backend/[
   const responseHeaders = new Headers();
   const responseContentType = response.headers.get("content-type");
   if (responseContentType) responseHeaders.set("content-type", responseContentType);
+  // Pass through so file downloads keep their server filename.
+  const disposition = response.headers.get("content-disposition");
+  if (disposition) responseHeaders.set("content-disposition", disposition);
   return new Response(response.body, { status: response.status, headers: responseHeaders });
 }
 
 export const GET = proxy;
 export const POST = proxy;
+export const PATCH = proxy;
+export const PUT = proxy;
+export const DELETE = proxy;
