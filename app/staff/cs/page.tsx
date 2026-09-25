@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Clock, Inbox, UserCheck, Zap } from "lucide-react";
 import { staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
@@ -158,20 +157,10 @@ export default function CsCorrections() {
       ) : null}
 
       <div className="staff-stats staff-cs-stats">
-        <StatCard value={kpis.total} label="To CS" icon={<Clock aria-hidden />} tone="rose" />
-        <StatCard
-          value={kpis.unassigned}
-          label="Unassigned"
-          icon={<Inbox aria-hidden />}
-          tone="blue"
-        />
-        <StatCard
-          value={kpis.mine}
-          label="Assigned to me"
-          icon={<UserCheck aria-hidden />}
-          tone="lavender"
-        />
-        <StatCard value={kpis.rush} label="Rush" icon={<Zap aria-hidden />} tone="amber" />
+        <StatCard value={kpis.total} label="To CS" tone="rose" />
+        <StatCard value={kpis.unassigned} label="Unassigned" tone="blue" />
+        <StatCard value={kpis.mine} label="Assigned to me" tone="lavender" />
+        <StatCard value={kpis.rush} label="Rush" tone="amber" />
       </div>
 
       <div className="staff-panel">

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { CheckCircle2, Clock, FolderOpen, Inbox, UserCheck, UserPlus, Zap } from "lucide-react";
+import { FolderOpen, UserPlus } from "lucide-react";
 import { staffData, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
@@ -206,26 +206,11 @@ export function QueueView({
 
       {showKpis ? (
         <div className="staff-stats">
-          <StatCard
-            value={kpis.unassigned}
-            label="Unassigned open"
-            icon={<Inbox aria-hidden />}
-            tone="blue"
-          />
-          <StatCard
-            value={kpis.mine}
-            label="Assigned to me"
-            icon={<UserCheck aria-hidden />}
-            tone="lavender"
-          />
-          <StatCard value={kpis.attention} label="To CS" icon={<Clock aria-hidden />} tone="rose" />
-          <StatCard
-            value={kpis.ready}
-            label="GTG ready"
-            icon={<CheckCircle2 aria-hidden />}
-            tone="green"
-          />
-          <StatCard value={kpis.rush} label="Rush open" icon={<Zap aria-hidden />} tone="amber" />
+          <StatCard value={kpis.unassigned} label="Unassigned open" tone="blue" />
+          <StatCard value={kpis.mine} label="Assigned to me" tone="lavender" />
+          <StatCard value={kpis.attention} label="To CS" tone="rose" />
+          <StatCard value={kpis.ready} label="GTG ready" tone="green" />
+          <StatCard value={kpis.rush} label="Rush open" tone="amber" />
         </div>
       ) : null}
 

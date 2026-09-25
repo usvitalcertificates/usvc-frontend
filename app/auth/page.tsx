@@ -108,8 +108,7 @@ function AuthForm() {
           <form onSubmit={submitLogin} style={{ marginTop: 0, maxWidth: "none" }}>
             {setupToken ? (
               <p>
-                Create your own password (12+ characters). You will pair your authenticator app
-                next.
+                Create your own password (8+ characters). You will pair your authenticator app next.
               </p>
             ) : (
               <>
@@ -131,7 +130,7 @@ function AuthForm() {
               type="password"
               autoComplete={setupToken ? "new-password" : "current-password"}
               required
-              minLength={12}
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />

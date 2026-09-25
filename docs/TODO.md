@@ -116,6 +116,11 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] Staff workflow/document polish 2026-09-25: single-line KPI cards, compact next-step selection and confirmation hierarchy, accurate “Sent to Government Agency” terminology, corrected order-created timestamp label, and responsive completion-PDF upload/file actions
 - [x] Doc-card actions to icons 2026-09-25 (`feat/doc-action-icons`): Download/Replace/Delete are 38px icon buttons with tooltips (fixes label-margin baseline drift); dead pill CSS removed
 - [x] Doc-card actions to text pills 2026-09-25: compact 32px-high, wide text buttons (fixed-height boxes so the file-picker label aligns pixel-perfect); red-outline Delete
+- [x] Order command bar unpinned 2026-09-25 (`feat/orderbar-unstick`): dark order header scrolls normally instead of sticking (slim topstrip stays sticky)
+- [x] SaaS stat cards 2026-09-25 (`feat/stat-cards-saas-v2`): all 16 KPI cards site-wide restyled to small label on top + big number below with no icons (pastel tones + grids unchanged, still filter-driven); dead icon props, imports, and CSS removed
+- [x] Marked-GTG analytics 2026-09-25 (`feat/analytics-marked-gtg`): amber Marked GTG card + workflow chip on the shared per-user dashboard (admin + My Analytics); needs backend `feat/analytics-marked-gtg`
+- [x] Marked-GTG role gate 2026-09-25: card + chip render for CS/ADMIN viewers only (fulfillment sees 4 cards via a 4-column grid fallback); metric stays computed for everyone
+- [x] Staff password management 2026-09-25: ADMIN-only Change password panel in Settings (current verified, re-login after) plus per-row reset-password action in Administration issuing 48h setup links; needs backend endpoints
 - [x] OpenAI Ads conversion tracking 2026-09-25: production-only public pixel, privacy-safe normalized page views, checkout starts, verified completed orders with refresh deduplication, environment/deployment documentation, and updated privacy disclosure
 
 - [ ] Confirmation: replace static page with `GET /orders/:id/confirmation` verification + print receipt (needs backend endpoint)
