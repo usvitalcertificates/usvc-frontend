@@ -4,7 +4,7 @@ import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Flag, Play, Send } from "lucide-react";
 import { CopyButton } from "@/components/staff/CopyButton";
-import { staffData, staffJson, staffRole } from "@/lib/staff-client";
+import { staffData, staffFetch, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
   BackLink,
@@ -70,6 +70,12 @@ interface OrderDetail {
   deliveryMethod: string;
   status: string;
   substatus?: string | null;
+  document?: {
+    name: string;
+    size: number;
+    uploadedBy: string;
+    uploadedAt: string;
+  } | null;
   paymentStatus: string;
   assignedName: string | null;
   pricing?: { serviceCents: number; rushCents: number; totalCents: number };
@@ -367,6 +373,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [moveTo, setMoveTo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [toCsOpen, setToCsOpen] = useState(false);
+  const [docDeleteOpen, setDocDeleteOpen] = useState(false);
+  const [docBusy, setDocBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [releaseOpen, setReleaseOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("summary");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -467,6 +476,63 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     }, 60);
   };
 
+  const uploadDocument = async (file: File) => {
+    setDocBusy(true);
+    setError("");
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      await staffJson(`/orders/${id}/document`, { method: "POST", body: form });
+      setToast("Completion PDF uploaded.");
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setDocBusy(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const downloadDocument = async () => {
+    setError("");
+    try {
+      const response = await staffFetch(`/orders/${id}/document`);
+      if (!response.ok) {
+        let message = `Download failed (${response.status})`;
+        try {
+          const data = (await response.json()) as { message?: string };
+          if (data.message) message = data.message;
+        } catch {
+          /* non-JSON error body */
+        }
+        throw new Error(message);
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = order?.document?.name || "document.pdf";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 5000);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Download failed");
+    }
+  };
+
+  const deleteDocument = async () => {
+    setDocDeleteOpen(false);
+    setError("");
+    try {
+      await staffJson(`/orders/${id}/document`, { method: "DELETE", body: "{}" });
+      setToast("Completion PDF deleted.");
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Delete failed");
+    }
+  };
+
   if (error && !order) {
     return (
       <>
@@ -491,6 +557,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const effectiveMoveTo = moveTo ?? next[0] ?? "";
   const exceptionMove = effectiveMoveTo === "TO_CS";
   const gtgMove = effectiveMoveTo === "GTG";
+  const submitMove = effectiveMoveTo === "SUBMITTED";
+  // Fulfillment must attach the completion PDF + note before SUBMITTED.
+  const submitNeedsPackage = submitMove && !isAdmin;
   // TO_CS is locked: only CS/ADMIN (canCorrect) may move it — and only to GTG.
   const toCsLocked = order.status === "TO_CS" && !canCorrect;
   const requestorName =
@@ -572,7 +641,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           [
             ["summary", "Summary"],
             ["application", "Application (Owners only)"],
-            ["notes", "Notes & History"],
+            ["notes", "Notes & Document Upload"],
           ] as [Tab, string][]
         ).map(([value, label]) => (
           <button
@@ -647,6 +716,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                             onClick={() => {
                               setMoveTo(s);
                               if (s !== "TO_CS") setSubstatus("");
+                              setStatusNote("");
                             }}
                             className={`staff-move-btn tone-${MOVE_TONE[s] ?? "primary"}`}
                           >
@@ -698,13 +768,29 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                         />
                       </label>
                     ) : null}
+                    {submitMove ? (
+                      <label>
+                        Completion note ({submitNeedsPackage ? "required" : "optional"})
+                        <input
+                          value={statusNote}
+                          onChange={(e) => setStatusNote(e.target.value)}
+                          maxLength={2000}
+                          placeholder="What was completed?…"
+                          autoComplete="off"
+                        />
+                      </label>
+                    ) : null}
                     <div
                       style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}
                     >
                       <button
                         type="button"
                         className="staff-btn"
-                        disabled={busy || (exceptionMove && !statusNote.trim())}
+                        disabled={
+                          busy ||
+                          (exceptionMove && !statusNote.trim()) ||
+                          (submitNeedsPackage && (!statusNote.trim() || !order.document))
+                        }
                         onClick={() => {
                           if (exceptionMove) {
                             setToCsOpen(true);
@@ -714,7 +800,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                             `/orders/${id}/status`,
                             {
                               status: effectiveMoveTo,
-                              ...(gtgMove && statusNote.trim() ? { note: statusNote.trim() } : {}),
+                              ...(statusNote.trim() ? { note: statusNote.trim() } : {}),
                             },
                             "PATCH",
                             "The order status has been changed for this order.",
@@ -724,6 +810,18 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                         Update status: {STATUS_LABELS[effectiveMoveTo] ?? effectiveMoveTo}
                       </button>
                     </div>
+                    {submitNeedsPackage && (!statusNote.trim() || !order.document) ? (
+                      <p
+                        style={{
+                          fontSize: "0.85rem",
+                          color: "var(--flow-secondary)",
+                          margin: "8px 0 0",
+                        }}
+                      >
+                        Add a completion note and upload the PDF in Notes &amp; Document Upload to
+                        submit.
+                      </p>
+                    ) : null}
                   </div>
                 )
               ) : (
@@ -995,6 +1093,79 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
           <div className="staff-panel">
+            <h2>Completion document</h2>
+            <div className="staff-panel-body">
+              <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", marginTop: 0 }}>
+                One PDF per order. Fulfillment must attach it before submitting to the government
+                agency.
+              </p>
+              {order.document ? (
+                <div className="staff-doc-card">
+                  <span className="staff-doc-info">
+                    <strong>{order.document.name}</strong>
+                    <span>
+                      {(order.document.size / 1024).toFixed(0)} KB · uploaded{" "}
+                      {new Date(order.document.uploadedAt).toLocaleString("en-US")}
+                    </span>
+                  </span>
+                  <span className="staff-doc-actions">
+                    <button
+                      type="button"
+                      className="staff-btn secondary"
+                      onClick={() => void downloadDocument()}
+                    >
+                      Download
+                    </button>
+                    {!closed ? (
+                      <>
+                        <label className="staff-btn secondary staff-file-label">
+                          Replace
+                          <input
+                            ref={fileRef}
+                            type="file"
+                            accept="application/pdf,.pdf"
+                            hidden
+                            disabled={docBusy}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) void uploadDocument(file);
+                            }}
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          className="staff-btn danger"
+                          disabled={docBusy}
+                          onClick={() => setDocDeleteOpen(true)}
+                        >
+                          Delete
+                        </button>
+                      </>
+                    ) : null}
+                  </span>
+                </div>
+              ) : !closed ? (
+                <label className="staff-doc-drop">
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="application/pdf,.pdf"
+                    hidden
+                    disabled={docBusy}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) void uploadDocument(file);
+                    }}
+                  />
+                  <strong>{docBusy ? "Uploading…" : "Upload completion PDF"}</strong>
+                  <span>PDF only · up to 10 MB · replaces any previous file</span>
+                </label>
+              ) : (
+                <p style={{ color: "var(--flow-secondary)" }}>No document attached.</p>
+              )}
+            </div>
+          </div>
+          <div className="staff-panel">
             <h2>Order History</h2>
             <div className="staff-panel-body">
               <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", marginTop: 0 }}>
@@ -1094,6 +1265,17 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
         </div>
+      ) : null}
+
+      {docDeleteOpen && order?.document ? (
+        <ConfirmModal
+          title="Delete completion PDF?"
+          body={`Delete ${order.document.name}? The order cannot be submitted until a new PDF is uploaded.`}
+          confirmLabel="Delete"
+          danger
+          onCancel={() => setDocDeleteOpen(false)}
+          onConfirm={() => void deleteDocument()}
+        />
       ) : null}
 
       {releaseOpen && order ? (
