@@ -1,24 +1,31 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Plus } from "lucide-react";
-import { staffJson, staffRole } from "@/lib/staff-client";
+import {
+  ClipboardList,
+  Clock3,
+  KeyRound,
+  LogOut,
+  Plus,
+  Power,
+  RotateCcw,
+  ShieldCheck,
+  UserRoundCheck,
+} from "lucide-react";
+import { staffId, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
   BackLink,
   ConfirmModal,
   EmptyState,
   PageBand,
+  Pagination,
+  SkeletonRows,
   StatCard,
+  StatusPill,
   Toast,
 } from "@/components/staff/ui";
-import {
-  activityCategory,
-  dayKey,
-  fullTime,
-  humanizeActivity,
-  relTime,
-} from "@/components/staff/activity";
 
 interface StaffMember {
   id: string;
@@ -32,12 +39,16 @@ interface StaffMember {
   activeOrders: number;
 }
 
-interface ActivityEntry {
-  at: string;
-  actorEmail: string;
-  action: string;
-  orderNumber?: string;
-  detail?: Record<string, unknown>;
+interface OrderActivitySummary {
+  id: string;
+  publicNumber: string;
+  certificate: string;
+  stateCode: string;
+  county: string;
+  rush: boolean;
+  status: string;
+  activityCount: number;
+  latestActivityAt: string | null;
 }
 
 function initials(name: string, email: string): string {
@@ -50,8 +61,14 @@ export default function StaffAdmin() {
   useRequireStaffAuth();
   useInactivitySignout();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentStaffId, setCurrentStaffId] = useState("");
   const [staff, setStaff] = useState<StaffMember[]>([]);
-  const [activity, setActivity] = useState<ActivityEntry[]>([]);
+  const [orderActivity, setOrderActivity] = useState<OrderActivitySummary[]>([]);
+  const [orderActivityTotal, setOrderActivityTotal] = useState(0);
+  const [activityPage, setActivityPage] = useState(1);
+  const [activityPages, setActivityPages] = useState(1);
+  const [activitySearch, setActivitySearch] = useState("");
+  const [activityLoading, setActivityLoading] = useState(true);
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
   const [tab, setTab] = useState<"staff" | "activity">("staff");
@@ -61,8 +78,6 @@ export default function StaffAdmin() {
   const [inviteRole, setInviteRole] = useState("FULFILLMENT");
   const [inviteLink, setInviteLink] = useState("");
   const [inviteEmailed, setInviteEmailed] = useState(false);
-  const [activityFilter, setActivityFilter] = useState("");
-  const [activityLimit, setActivityLimit] = useState(20);
   const [confirm, setConfirm] = useState<{
     title: string;
     body: string;
@@ -71,24 +86,46 @@ export default function StaffAdmin() {
     run: () => Promise<void>;
   } | null>(null);
 
-  const load = useCallback(async () => {
+  const loadRoster = useCallback(async () => {
     setError("");
     try {
-      const [roster, feed] = await Promise.all([
-        staffJson<{ staff: StaffMember[] }>("/admin/staff"),
-        staffJson<{ activity: ActivityEntry[] }>("/admin/activity?limit=200"),
-      ]);
+      const roster = await staffJson<{ staff: StaffMember[] }>("/admin/staff");
       setStaff(roster.staff);
-      setActivity(feed.activity);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load administration");
     }
   }, []);
 
+  const loadOrderActivity = useCallback(async () => {
+    setActivityLoading(true);
+    try {
+      const search = new URLSearchParams({ page: String(activityPage), limit: "20" });
+      if (activitySearch.trim()) search.set("search", activitySearch.trim());
+      const result = await staffJson<{
+        orders: OrderActivitySummary[];
+        total: number;
+        pages: number;
+      }>(`/admin/order-activity?${search}`);
+      setOrderActivity(result.orders);
+      setOrderActivityTotal(result.total);
+      setActivityPages(result.pages);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not load order activity");
+    } finally {
+      setActivityLoading(false);
+    }
+  }, [activityPage, activitySearch]);
+
   useEffect(() => {
     setIsAdmin(staffRole() === "ADMIN");
-    void load();
-  }, [load]);
+    setCurrentStaffId(staffId() ?? "");
+    if (new URLSearchParams(window.location.search).get("tab") === "activity") setTab("activity");
+    void loadRoster();
+  }, [loadRoster]);
+
+  useEffect(() => {
+    if (isAdmin) void loadOrderActivity();
+  }, [isAdmin, loadOrderActivity]);
 
   const invite = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -114,7 +151,7 @@ export default function StaffAdmin() {
       setInviteName("");
       setInviteEmail("");
       setInviteRole("FULFILLMENT");
-      await load();
+      await loadRoster();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Invitation failed");
     }
@@ -135,7 +172,7 @@ export default function StaffAdmin() {
         setInviteLink(`${window.location.origin}/auth?setup=${data.setupToken}`);
         setToast("New setup link created — email is disabled, share it manually.");
       }
-      await load();
+      await loadRoster();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Re-send failed");
     }
@@ -159,7 +196,7 @@ export default function StaffAdmin() {
           await staffJson(`/admin/staff/${id}/${action}`, { method: "POST", body: "{}" });
         }
         setToast("Done.");
-        await load();
+        await loadRoster();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Action failed");
       }
@@ -189,7 +226,7 @@ export default function StaffAdmin() {
           body: JSON.stringify({ role }),
         });
         setToast(`${email} is now ${role}.`);
-        await load();
+        await loadRoster();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Role change failed");
       }
@@ -215,26 +252,13 @@ export default function StaffAdmin() {
 
   const pending = staff.filter((m) => m.accountStatus === "pending").length;
   const activeOrders = staff.reduce((sum, m) => sum + m.activeOrders, 0);
-  const filteredActivity = activityFilter
-    ? activity.filter((a) => a.action === activityFilter)
-    : activity;
-  const actionOptions = [...new Set(activity.map((a) => a.action))].sort();
-  const shownActivity = filteredActivity.slice(0, activityLimit);
-
-  const days: { day: string; entries: ActivityEntry[] }[] = [];
-  for (const entry of shownActivity) {
-    const day = dayKey(entry.at);
-    const group = days.find((g) => g.day === day);
-    if (group) group.entries.push(entry);
-    else days.push({ day, entries: [entry] });
-  }
 
   return (
     <>
       <PageBand
         eyebrow="Internal — access control"
         title="Administration"
-        subtitle="Staff accounts, invitations, sessions, and the complete audit history. Every change is recorded."
+        subtitle="Manage staff access, security, workload, and individual performance from one place."
         actions={
           <button type="button" className="staff-btn" onClick={() => setInviteOpen(true)}>
             <Plus aria-hidden style={{ width: 16, height: 16 }} /> Invite staff member
@@ -248,18 +272,42 @@ export default function StaffAdmin() {
         </p>
       ) : null}
 
-      <div className="staff-stats">
-        <StatCard value={staff.length} label="Staff accounts" />
-        <StatCard value={activeOrders} label="Active orders" />
-        <StatCard value={pending} label="Invitations pending" />
-        <StatCard value={activity.length} label="Recent events" />
+      <div className="staff-stats staff-admin-stats">
+        <StatCard
+          value={staff.length}
+          label="Staff accounts"
+          icon={<UserRoundCheck aria-hidden />}
+          tone="blue"
+        />
+        <StatCard
+          value={activeOrders}
+          label="Active orders"
+          icon={<ClipboardList aria-hidden />}
+          tone="green"
+        />
+        <StatCard
+          value={pending}
+          label="Invitations pending"
+          icon={<Clock3 aria-hidden />}
+          tone="amber"
+        />
+        <StatCard
+          value={orderActivityTotal}
+          label="Orders with activity"
+          icon={<ShieldCheck aria-hidden />}
+          tone="lavender"
+        />
       </div>
 
-      <div className="staff-tabs" role="tablist" aria-label="Administration sections">
+      <div
+        className="staff-tabs staff-admin-tabs"
+        role="tablist"
+        aria-label="Administration sections"
+      >
         {(
           [
             ["staff", "Staff"],
-            ["activity", "Activity"],
+            ["activity", "Orders Activity"],
           ] as ["staff" | "activity", string][]
         ).map(([value, label]) => (
           <button
@@ -277,14 +325,14 @@ export default function StaffAdmin() {
       {tab === "staff" ? (
         <div className="staff-panel">
           <div className="staff-tablewrap">
-            <table className="staff-table staff-cards-fallback">
+            <table className="staff-table staff-cards-fallback staff-admin-table">
               <thead>
                 <tr>
                   <th>Staff</th>
+                  <th>Role</th>
+                  <th>Assign role</th>
                   <th>Status</th>
                   <th>2-step</th>
-                  <th>Active orders</th>
-                  <th>Last activity</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -299,17 +347,40 @@ export default function StaffAdmin() {
                         <span className="staff-staffmeta">
                           <span className="staff-staffname">
                             <strong>{member.fullName || "—"}</strong>
-                            <span
-                              className={`staff-pill ${member.role === "ADMIN" ? "navy" : member.role === "CS" ? "green" : "gray"}`}
-                            >
-                              {member.role}
-                            </span>
                           </span>
                           <span className="staff-staffemail" title={member.email || undefined}>
                             {member.email}
                           </span>
                         </span>
                       </span>
+                    </td>
+                    <td data-label="Role">
+                      <span
+                        className={`staff-pill ${member.role === "ADMIN" ? "navy" : member.role === "CS" ? "green" : "gray"}`}
+                      >
+                        {member.role}
+                      </span>
+                    </td>
+                    <td data-label="Assign role">
+                      <div className="staff-admin-role-select">
+                        <select
+                          aria-label={`Role for ${member.email}`}
+                          value={member.role}
+                          disabled={member.id === currentStaffId}
+                          title={
+                            member.id === currentStaffId
+                              ? "You cannot change your own role"
+                              : `Assign a role to ${member.fullName || member.email}`
+                          }
+                          onChange={(e) => void changeRole(member.id, member.email, e.target.value)}
+                        >
+                          {["ADMIN", "FULFILLMENT", "CS"].map((r) => (
+                            <option key={r} value={r}>
+                              {r}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </td>
                     <td>
                       <span
@@ -319,93 +390,87 @@ export default function StaffAdmin() {
                       </span>
                     </td>
                     <td>{member.mfaEnabled ? "Enrolled" : "Not enrolled"}</td>
-                    <td className="num">{member.activeOrders}</td>
-                    <td style={{ whiteSpace: "nowrap" }}>
-                      {member.lastActivityAt ? (
-                        <>
-                          <span className="staff-date">
-                            {new Date(member.lastActivityAt).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
-                          </span>
-                          <br />
-                          <span className="staff-pill gray staff-time-badge">
-                            {new Date(member.lastActivityAt).toLocaleTimeString("en-US", {
-                              hour: "numeric",
-                              minute: "2-digit",
-                            })}
-                          </span>
-                        </>
-                      ) : (
-                        "—"
-                      )}
-                    </td>
                     <td>
-                      <span style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                        <select
-                          aria-label={`Role for ${member.email}`}
-                          value={member.role}
-                          onChange={(e) => void changeRole(member.id, member.email, e.target.value)}
-                          style={{ maxWidth: "150px" }}
-                        >
-                          {["ADMIN", "FULFILLMENT", "CS"].map((r) => (
-                            <option key={r} value={r}>
-                              {r}
-                            </option>
-                          ))}
-                        </select>
-                        {member.accountStatus === "pending" ? (
-                          <button
-                            type="button"
-                            className="staff-btn secondary"
-                            onClick={() => void resend(member.id, member.email)}
-                          >
-                            Re-send invite
-                          </button>
-                        ) : null}
-                        <button
-                          type="button"
-                          className="staff-btn secondary"
-                          onClick={() =>
-                            void act(member.id, "revoke", "Revoke all sessions for this account")
-                          }
-                        >
-                          Revoke sessions
-                        </button>
-                        <button
-                          type="button"
-                          className="staff-btn secondary"
-                          onClick={() =>
-                            void act(
-                              member.id,
-                              "mfa-reset",
-                              "Reset this person's authenticator? They must re-enroll and all sessions are revoked",
-                            )
-                          }
-                        >
-                          Reset 2-step
-                        </button>
-                        {member.accountStatus === "active" ? (
-                          <button
-                            type="button"
-                            className="staff-btn danger"
-                            onClick={() =>
-                              void act(member.id, "disable", "Deactivate this account immediately")
-                            }
-                          >
-                            Deactivate
-                          </button>
-                        ) : member.accountStatus === "disabled" ? (
-                          <button
-                            type="button"
-                            className="staff-btn secondary"
-                            onClick={() => void act(member.id, "enable", "Reactivate this account")}
-                          >
-                            Reactivate
-                          </button>
-                        ) : null}
+                      <span className="staff-admin-actions">
+                        <Link className="staff-btn" href={`/staff/admin/${member.id}`}>
+                          View details
+                        </Link>
+                        {member.id === currentStaffId ? (
+                          <span className="staff-current-account">Current account</span>
+                        ) : (
+                          <span className="staff-admin-icon-actions">
+                            {member.accountStatus === "pending" ? (
+                              <button
+                                type="button"
+                                className="staff-icon-btn"
+                                aria-label={`Re-send invitation to ${member.email}`}
+                                title="Re-send invitation"
+                                onClick={() => void resend(member.id, member.email)}
+                              >
+                                <RotateCcw aria-hidden />
+                              </button>
+                            ) : null}
+                            <button
+                              type="button"
+                              className="staff-icon-btn"
+                              aria-label={`Revoke sessions for ${member.email}`}
+                              title="Revoke all sessions"
+                              onClick={() =>
+                                void act(
+                                  member.id,
+                                  "revoke",
+                                  "Revoke all sessions for this account",
+                                )
+                              }
+                            >
+                              <LogOut aria-hidden />
+                            </button>
+                            <button
+                              type="button"
+                              className="staff-icon-btn"
+                              aria-label={`Reset 2-step for ${member.email}`}
+                              title="Reset 2-step authentication"
+                              onClick={() =>
+                                void act(
+                                  member.id,
+                                  "mfa-reset",
+                                  "Reset this person's authenticator? They must re-enroll and all sessions are revoked",
+                                )
+                              }
+                            >
+                              <KeyRound aria-hidden />
+                            </button>
+                            {member.accountStatus === "active" ? (
+                              <button
+                                type="button"
+                                className="staff-icon-btn danger"
+                                aria-label={`Deactivate ${member.email}`}
+                                title="Deactivate account"
+                                onClick={() =>
+                                  void act(
+                                    member.id,
+                                    "disable",
+                                    "Deactivate this account immediately",
+                                  )
+                                }
+                              >
+                                <Power aria-hidden />
+                              </button>
+                            ) : member.accountStatus === "disabled" ? (
+                              <button
+                                type="button"
+                                className="staff-icon-btn success"
+                                aria-label={`Reactivate ${member.email}`}
+                                title="Reactivate account"
+                                onClick={() =>
+                                  void act(member.id, "enable", "Reactivate this account")
+                                }
+                              >
+                                <Power aria-hidden />
+                              </button>
+                            ) : null}
+                          </span>
+                        )}
                       </span>
                     </td>
                   </tr>
@@ -416,66 +481,93 @@ export default function StaffAdmin() {
         </div>
       ) : (
         <div className="staff-panel">
-          <div className="staff-filters">
-            <label>
-              Event type
-              <select value={activityFilter} onChange={(e) => setActivityFilter(e.target.value)}>
-                <option value="">All events</option>
-                {actionOptions.map((a) => (
-                  <option key={a} value={a}>
-                    {humanizeActivity({ action: a })}
-                  </option>
-                ))}
-              </select>
+          <div className="staff-order-activity-head">
+            <div>
+              <h2>Orders Activity</h2>
+              <p>Open an order to review its complete audit timeline.</p>
+            </div>
+            <label className="search">
+              Search order number
+              <input
+                value={activitySearch}
+                placeholder="USCA-BT-…"
+                onChange={(event) => {
+                  setActivitySearch(event.target.value);
+                  setActivityPage(1);
+                }}
+              />
             </label>
           </div>
-          <div className="staff-panel-body">
-            <p style={{ fontSize: "0.9rem", color: "var(--flow-secondary)", marginTop: 0 }}>
-              Showing {shownActivity.length} of {filteredActivity.length}.
-            </p>
-            {filteredActivity.length === 0 ? (
-              <EmptyState title="No activity recorded yet." />
-            ) : (
-              days.map((group) => (
-                <div key={group.day}>
-                  <p className="staff-day">{group.day}</p>
-                  <ul className="staff-timeline">
-                    {group.entries.map((entry, i) => (
-                      <li key={i} className={`cat-${activityCategory(entry.action)}`}>
-                        <p style={{ margin: 0 }}>
-                          <span className="t-date" title={fullTime(entry.at)}>
-                            {relTime(entry.at)}
+          {activityLoading ? (
+            <SkeletonRows rows={6} />
+          ) : orderActivity.length === 0 ? (
+            <EmptyState title="No order activity found." hint="Try another order number." />
+          ) : (
+            <div className="staff-tablewrap">
+              <table className="staff-table staff-cards-fallback staff-order-activity-table">
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Certificate</th>
+                    <th>Current status</th>
+                    <th>Total activity</th>
+                    <th>Latest activity</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orderActivity.map((order) => (
+                    <tr key={order.id}>
+                      <td>
+                        <strong>{order.publicNumber}</strong>
+                        {order.rush ? <span className="staff-pill amber">RUSH</span> : null}
+                      </td>
+                      <td>
+                        {order.stateCode} {order.certificate}
+                        <br />
+                        <span className="staff-row-meta">{order.county || "—"}</span>
+                      </td>
+                      <td>
+                        <StatusPill status={order.status} />
+                      </td>
+                      <td>
+                        <span className="staff-activity-count">{order.activityCount}</span>
+                      </td>
+                      <td className="staff-analytics-date">
+                        {order.latestActivityAt
+                          ? new Date(order.latestActivityAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })
+                          : "—"}
+                        {order.latestActivityAt ? (
+                          <span>
+                            {new Date(order.latestActivityAt).toLocaleTimeString("en-US", {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })}
                           </span>
-                          : <strong>{humanizeActivity(entry)}</strong> — {entry.actorEmail}
-                          {entry.orderNumber ? ` · ${entry.orderNumber}` : ""}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))
-            )}
-            {filteredActivity.length > shownActivity.length ? (
-              <button
-                type="button"
-                className="staff-btn secondary"
-                onClick={() => setActivityLimit((n) => n + 20)}
-              >
-                Show more ({filteredActivity.length - shownActivity.length} older)
-              </button>
-            ) : null}
-            {activityLimit > 20 &&
-            filteredActivity.length <= shownActivity.length &&
-            filteredActivity.length > 0 ? (
-              <button
-                type="button"
-                className="staff-btn secondary"
-                onClick={() => setActivityLimit(20)}
-              >
-                Show less
-              </button>
-            ) : null}
-          </div>
+                        ) : null}
+                      </td>
+                      <td>
+                        <Link
+                          className="staff-btn secondary"
+                          href={`/staff/admin/activity/${order.id}`}
+                        >
+                          View activity
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <Pagination page={activityPage} pages={activityPages} onChange={setActivityPage} />
+          <p className="staff-results-count">
+            Showing {orderActivity.length} of {orderActivityTotal} orders.
+          </p>
         </div>
       )}
 

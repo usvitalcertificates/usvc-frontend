@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Archive,
+  ChartNoAxesCombined,
   Inbox,
   LogOut,
   Search,
@@ -134,6 +135,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
         <nav className="staff-nav">
           {link("/staff", "Open Orders", Inbox)}
           {link("/staff/my", "My Work", UserCheck)}
+          {link("/staff/analytics", "Analytics", ChartNoAxesCombined)}
           {link("/staff/closed", "Closed Orders", Archive)}
           {link("/staff/search", "Order Search", Search)}
           {role === "ADMIN" ? link("/staff/admin", "Administration", ShieldCheck) : null}
