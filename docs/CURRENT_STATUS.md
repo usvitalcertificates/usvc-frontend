@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-25 (official USVC branding; two-fee model; staff roles ADMIN/FULFILLMENT/CS; split ADMIN analytics nav with nested staff + orders analytics; full-width staff content with filtered analytics roster; polished staff queues and CS corrections inbox).
 
+- Staff UI polish keeps KPI values and labels on one line, presents workflow destinations as compact selectable steps with a separate confirmation action, consistently calls the terminal state “Sent to Government Agency,” and redesigns the required completion-PDF panel with resilient upload copy and labeled file actions.
+
 ## Implemented
 
 - ADMIN sidebar now shows Staff Analytics (`/staff/admin/staff-analytics`: roster with View analytics per-user drill-down) and Orders Analytics (`/staff/admin/orders-analytics`: order index with search plus per-order timeline) instead of the generic Analytics item; FULFILLMENT/CS keep a renamed My Analytics item (`/staff/analytics`) for their own token-scoped dashboard. Administration (`/staff/admin`) is staff management only: invite, roles, status, 2-step controls, three stat cards — the View details buttons and Orders Activity tab moved to the new pages. Legacy detail URLs (`/staff/admin/[id]`, `/staff/admin/activity/[id]`) redirect to the nested routes.
