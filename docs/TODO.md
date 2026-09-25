@@ -7,6 +7,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [ ] Port reference data verbatim: states, certificates, government-fees, faq, legal, pricing, form-config, address → `lib/data/*`
 - [ ] Order form upgrade: per-state rules, county/city validation, address same-as copy, sessionStorage draft (no SSN), Zod validation, working review + Edit scroll
 - [x] Checkout: Checkout Sessions embedded tabs (reference UI verbatim), summary sidebar, authorize + Pay flow, session-verified confirmation receipt — done 2026-09-21, real $238 test payment passed
+- [x] Pricing $149/copy + $45 rush 2026-09-25 (`feat/price-149-45`): two-fee display values updated across order form, state pages, and processing options (server is authoritative; needs backend `feat/price-149-45`)
 - [ ] Confirmation (→ Phase 3): replace static page with `GET /orders/:id/confirmation` verification + print receipt
 - [x] Tracking: sanitized, customer-friendly progress timeline backed by `POST /orders/tracking` — done 2026-09-22
 - [x] State detail page UI (`/state/[state]`) — done 2026-09-21, matches reference
