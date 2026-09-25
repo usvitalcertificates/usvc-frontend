@@ -18,6 +18,7 @@ const ORDER_LABELS: Record<string, string> = {
   order_claimed: "Order claimed",
   order_released: "Ownership released",
   order_reassigned: "Order reassigned",
+  form_corrected: "Application form corrected",
   fulfillment_status_updated: "Status updated",
   internal_note_added: "Internal note added",
   sensitive_reveal: "Sensitive data revealed",

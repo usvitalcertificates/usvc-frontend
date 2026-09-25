@@ -1,8 +1,12 @@
 # Current frontend status
 
-Last updated: 2026-09-25 (official USVC branding; two-fee model; staff roles ADMIN/FULFILLMENT/CS with raw labels; pricing gated to ADMIN+CS; compact staff headers with right-aligned access notices, polished Order Search, and Open Orders–parity /staff/cs corrections inbox with pastel-red note column).
+Last updated: 2026-09-25 (official USVC branding; two-fee model; staff roles ADMIN/FULFILLMENT/CS; modern pastel Administration roster and dedicated date-filtered per-staff analytics; polished staff queues and CS corrections inbox).
 
 ## Implemented
+
+- Administration now uses pastel operational cards and a responsive roster with a dedicated role column, compact account controls, and a per-user analytics drill-down. Analytics default to 30 days and provide audit-attributed KPI cards, date/workflow filters, and paginated form history.
+- The roster separates role display from role assignment, protects the current admin from self-service security actions, and uses compact icon controls. Orders Activity replaces the mixed feed with an order index and dedicated per-order timeline.
+- Every signed-in ADMIN, FULFILLMENT, and CS user has an Analytics navigation item showing their own token-scoped performance dashboard with the same date/workflow filters as the admin view.
 
 - Order form rebuilt from reference `form-config.ts` (ported to `lib/form-config.ts`): per-cert subject/family fields, relationships, reasons, father-status conditional, and CA-birth SSN+DOB override. The name-history and alternate-spelling questions (and their dependent inputs) have been removed from every certificate form and order payload. County/city dropdowns from `lib/geo.ts` + `public/geo/` datasets; working home→shipping/billing copy; live review blocks with Edit scroll; sessionStorage draft excluding SSN; verify-before-payment then create then checkout redirect.
 - Section 9 matches reference exactly (dl rows: Certificate / Subject / Requestor & contact / Copies-fees with fee math); master consent auto-checks all 7 incl. payment authorization; address State is a 52-state dropdown (military APO/FPO, international region+country); conditional Other/previous-name/history fields for all 4 types. UI E2E passed 2026-09-21 (headless Chromium, all 4 types → checkout; Atlas rows + vault verified; fixed live address-copy sync + explicit radio values).
