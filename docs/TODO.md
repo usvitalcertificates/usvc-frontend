@@ -112,6 +112,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 
 ## Phase 3 (remaining + proposed backlog)
 
+- [x] Staff workflow/document polish 2026-09-25: single-line KPI cards, compact next-step selection and confirmation hierarchy, accurate “Sent to Government Agency” terminology, corrected order-created timestamp label, and responsive completion-PDF upload/file actions
 - [x] OpenAI Ads conversion tracking 2026-09-25: production-only public pixel, privacy-safe normalized page views, checkout starts, verified completed orders with refresh deduplication, environment/deployment documentation, and updated privacy disclosure
 
 - [ ] Confirmation: replace static page with `GET /orders/:id/confirmation` verification + print receipt (needs backend endpoint)

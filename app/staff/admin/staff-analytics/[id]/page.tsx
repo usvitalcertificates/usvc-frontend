@@ -154,7 +154,7 @@ export default function StaffAnalyticsPage({
         />
         <StatCard
           value={data?.metrics.submittedToAgency ?? "—"}
-          label="Submitted to agency"
+          label="Sent to agency"
           icon={<CheckCircle2 aria-hidden />}
           tone="green"
         />
@@ -222,7 +222,7 @@ export default function StaffAnalyticsPage({
               ["all", "All forms"],
               ["processing", "Order Processing"],
               ["to_cs", "Sent To CS"],
-              ["submitted", "Submitted to Govt Agency"],
+              ["submitted", "Sent to Government Agency"],
             ] as [Workflow, string][]
           ).map(([value, label]) => (
             <button

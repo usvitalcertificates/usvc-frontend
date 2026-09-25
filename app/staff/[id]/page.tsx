@@ -2,7 +2,18 @@
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Download, FileText, Flag, Play, Repeat, Send, Trash2 } from "lucide-react";
+import {
+  Check,
+  CheckCircle2,
+  Download,
+  FileText,
+  Flag,
+  Play,
+  Repeat,
+  Send,
+  Trash2,
+  UploadCloud,
+} from "lucide-react";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffData, staffFetch, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
@@ -47,7 +58,7 @@ const MOVE_ICON: Record<string, typeof Send> = {
 
 const MOVE_HINT: Record<string, string> = {
   IN_REVIEW: "Resume processing",
-  SUBMITTED: "Finish — send to the government agency",
+  SUBMITTED: "Complete work and send to the agency",
   GTG: "Approve — return to the queue",
   TO_CS: "Park with a required note for CS",
 };
@@ -601,7 +612,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <CopyButton value={order.publicNumber} label="Order number" />
           </h1>
           <p className="staff-orderbar-sub">
-            {`${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} · ${order.stateName} (${order.geo.county}, ${order.geo.city}) · Submitted ${new Date(order.createdAt).toLocaleString("en-US")}`}
+            {`${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} · ${order.stateName} (${order.geo.county}, ${order.geo.city}) · Created ${new Date(order.createdAt).toLocaleString("en-US")}`}
           </p>
           <div className="staff-orderbar-statuses">
             <StatusPill status={order.status} />
@@ -705,6 +716,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   </div>
                 ) : (
                   <div style={{ marginTop: "16px" }}>
+                    <p className="staff-move-label">Choose the next workflow step</p>
                     <div className="staff-move-group" role="group" aria-label="Move to">
                       {next.map((s) => {
                         const Icon = MOVE_ICON[s] ?? Play;
@@ -725,6 +737,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                               <strong>{STATUS_LABELS[s] ?? s}</strong>
                               <small>{MOVE_HINT[s] ?? ""}</small>
                             </span>
+                            {effectiveMoveTo === s ? (
+                              <span className="staff-move-check" aria-hidden>
+                                <Check />
+                              </span>
+                            ) : null}
                           </button>
                         );
                       })}
@@ -796,7 +813,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                           );
                         }}
                       >
-                        Update status: {STATUS_LABELS[effectiveMoveTo] ?? effectiveMoveTo}
+                        {effectiveMoveTo === "SUBMITTED"
+                          ? "Confirm: Send to Government Agency"
+                          : `Confirm: ${STATUS_LABELS[effectiveMoveTo] ?? effectiveMoveTo}`}
                       </button>
                     </div>
                     {submitNeedsPackage && ((order.notes ?? []).length === 0 || !order.document) ? (
@@ -808,7 +827,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                         }}
                       >
                         Add at least one order note and upload the PDF in Notes &amp; Document
-                        Upload to submit.
+                        Upload before sending this order to the agency.
                       </p>
                     ) : null}
                   </div>
@@ -838,7 +857,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     </dd>
                   </div>
                   <div>
-                    <dt>Submitted</dt>
+                    <dt>Sent to agency</dt>
                     <dd>{new Date(order.createdAt).toLocaleString("en-US")}</dd>
                   </div>
                 </dl>
@@ -1083,52 +1102,53 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
             <div className="staff-panel staff-package-panel">
-              <div className="staff-doc-head">
+              <div className="staff-package-heading">
                 <div>
-                  <h2>Completion document</h2>
+                  <h2>
+                    Completion document
+                    <span className="staff-sr-only"> (required)</span>
+                  </h2>
                   <p>Attach the final PDF before sending this order to the agency.</p>
                 </div>
-                <span className="staff-pill green">
-                  Required{" "}
-                  <span className="staff-req" aria-hidden="true">
-                    *
-                  </span>
-                  <span className="staff-sr-only">(required)</span>
+                <span className="staff-required-badge">
+                  Required <span aria-hidden>*</span>
                 </span>
               </div>
               <div className="staff-panel-body">
                 {order.document ? (
                   <div className="staff-doc-card">
-                    <span className="staff-doc-fileicon" aria-hidden="true">
-                      <FileText aria-hidden />
-                    </span>
-                    <span className="staff-doc-info">
-                      <strong>{order.document.name}</strong>
-                      <span>
-                        {(order.document.size / 1024).toFixed(0)} KB · uploaded{" "}
-                        {new Date(order.document.uploadedAt).toLocaleString("en-US")}
+                    <div className="staff-doc-main">
+                      <span className="staff-doc-icon" aria-hidden>
+                        <FileText />
                       </span>
-                    </span>
-                    <span className="staff-doc-actions">
+                      <span className="staff-doc-info">
+                        <strong>{order.document.name}</strong>
+                        <span>
+                          {(order.document.size / 1024).toFixed(0)} KB · uploaded{" "}
+                          {new Date(order.document.uploadedAt).toLocaleString("en-US")}
+                        </span>
+                      </span>
+                    </div>
+                    <div className="staff-doc-actions">
                       <button
                         type="button"
-                        className="staff-btn secondary staff-doc-btn"
+                        className="staff-doc-action"
                         title="Download PDF"
                         aria-label="Download completion PDF"
                         onClick={() => void downloadDocument()}
                       >
                         <Download aria-hidden />
-                        Download
+                        <span>Download</span>
                       </button>
                       {!closed ? (
                         <>
                           <label
-                            className="staff-btn secondary staff-doc-btn staff-file-label"
+                            className="staff-doc-action staff-file-label"
                             title="Replace PDF"
                             aria-label="Replace completion PDF"
                           >
                             <Repeat aria-hidden />
-                            Replace
+                            <span>{docBusy ? "Uploading…" : "Replace"}</span>
                             <input
                               ref={fileRef}
                               type="file"
@@ -1143,18 +1163,18 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                           </label>
                           <button
                             type="button"
-                            className="staff-btn danger-outline staff-doc-btn"
+                            className="staff-doc-action danger"
                             title="Delete PDF"
                             aria-label="Delete completion PDF"
                             disabled={docBusy}
                             onClick={() => setDocDeleteOpen(true)}
                           >
                             <Trash2 aria-hidden />
-                            Delete
+                            <span>Delete</span>
                           </button>
                         </>
                       ) : null}
-                    </span>
+                    </div>
                   </div>
                 ) : !closed ? (
                   <label className="staff-doc-drop">
@@ -1169,8 +1189,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                         if (file) void uploadDocument(file);
                       }}
                     />
-                    <strong>{docBusy ? "Uploading…" : "Upload completion PDF"}</strong>
-                    <span>PDF only · up to 10 MB · replaces any previous file</span>
+                    <UploadCloud aria-hidden />
+                    <span className="staff-doc-drop-copy">
+                      <strong>{docBusy ? "Uploading…" : "Choose completion PDF"}</strong>
+                      <span>PDF only · up to 10 MB</span>
+                    </span>
                   </label>
                 ) : (
                   <p style={{ color: "var(--flow-secondary)" }}>No document attached.</p>

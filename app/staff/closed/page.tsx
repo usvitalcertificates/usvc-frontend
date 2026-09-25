@@ -6,7 +6,7 @@ export default function ClosedOrders() {
   return (
     <QueueView
       title="Closed Orders"
-      subtitle="Submitted to the government agency — read-only history."
+      subtitle="Sent to the government agency — read-only history."
       preset={{ status: "SUBMITTED", hideAssignment: true }}
       empty={{
         title: "No submitted orders yet.",
