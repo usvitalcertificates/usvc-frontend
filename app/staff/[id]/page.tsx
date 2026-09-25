@@ -1097,27 +1097,52 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     Completion document
                     <span className="staff-sr-only"> (required)</span>
                   </h2>
+
                   <p>Attach the final PDF before sending this order to the agency.</p>
                 </div>
+
                 <span className="staff-required-badge">
                   Required <span aria-hidden>*</span>
                 </span>
               </div>
+
               <div className="staff-panel-body">
+                {/* Keep the file input mounted at all times so Replace works */}
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  hidden
+                  disabled={docBusy}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+
+                    if (file) {
+                      void uploadDocument(file);
+                    }
+
+                    // Allow selecting the same file again
+                    e.target.value = "";
+                  }}
+                />
+
                 {order.document ? (
                   <div className="staff-doc-card">
                     <div className="staff-doc-main">
                       <span className="staff-doc-icon" aria-hidden>
                         <FileText />
                       </span>
+
                       <span className="staff-doc-info">
                         <strong>{order.document.name}</strong>
+
                         <span>
                           {(order.document.size / 1024).toFixed(0)} KB · uploaded{" "}
                           {new Date(order.document.uploadedAt).toLocaleString("en-US")}
                         </span>
                       </span>
                     </div>
+
                     <div className="staff-doc-actions">
                       <button
                         type="button"
@@ -1127,22 +1152,19 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                       >
                         Download
                       </button>
+
                       {!closed ? (
                         <>
-                          <label className="staff-doc-textbtn staff-file-label" title="Replace PDF">
+                          <button
+                            type="button"
+                            className="staff-doc-textbtn"
+                            title="Replace PDF"
+                            disabled={docBusy}
+                            onClick={() => fileRef.current?.click()}
+                          >
                             Replace
-                            <input
-                              ref={fileRef}
-                              type="file"
-                              accept="application/pdf,.pdf"
-                              hidden
-                              disabled={docBusy}
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) void uploadDocument(file);
-                              }}
-                            />
-                          </label>
+                          </button>
+
                           <button
                             type="button"
                             className="staff-doc-textbtn danger"
@@ -1157,24 +1179,20 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     </div>
                   </div>
                 ) : !closed ? (
-                  <label className="staff-doc-drop">
-                    <input
-                      ref={fileRef}
-                      type="file"
-                      accept="application/pdf,.pdf"
-                      hidden
-                      disabled={docBusy}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) void uploadDocument(file);
-                      }}
-                    />
+                  <button
+                    type="button"
+                    className="staff-doc-drop"
+                    disabled={docBusy}
+                    onClick={() => fileRef.current?.click()}
+                  >
                     <UploadCloud aria-hidden />
+
                     <span className="staff-doc-drop-copy">
                       <strong>{docBusy ? "Uploading…" : "Choose completion PDF"}</strong>
+
                       <span>PDF only · up to 10 MB</span>
                     </span>
-                  </label>
+                  </button>
                 ) : (
                   <p style={{ color: "var(--flow-secondary)" }}>No document attached.</p>
                 )}
