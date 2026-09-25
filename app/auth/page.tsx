@@ -200,9 +200,15 @@ function AuthForm() {
             </button>
           </form>
         )}
-        <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", marginBottom: 0 }}>
-          Lost your authenticator device? Contact the super-admin — only they can reset your
-          pairing.
+        <p
+          style={{
+            fontSize: "0.9rem",
+            color: "var(--muted-text)",
+            marginBottom: 0,
+            marginTop: "14px",
+          }}
+        >
+          Lost your authenticator device? Contact the Admin — only they can reset your pairing.
         </p>
       </div>
     </div>

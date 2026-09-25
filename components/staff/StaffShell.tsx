@@ -100,18 +100,28 @@ export function StaffShell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
   const [email, setEmail] = useState("");
+  // Session lives in sessionStorage (never cookies), so the server cannot
+  // gate first paint. Hold rendering until the check runs — otherwise an
+  // unauthenticated visitor sees a frame of the dashboard before the bounce.
+  const [authState, setAuthState] = useState<"checking" | "signed-in" | "signed-out">("checking");
+  const isAuth = pathname === "/auth" || pathname.startsWith("/auth?");
   useEffect(() => {
     setRole(staffRole());
+    let signedIn = false;
     try {
       const token = sessionStorage.getItem("usvc-staff-access");
       if (token) setEmail(JSON.parse(atob(token.split(".")[1])).email ?? "");
+      signedIn = Boolean(token);
     } catch {
       setEmail("");
     }
-  }, [pathname]);
-
-  const isAuth = pathname === "/auth" || pathname.startsWith("/auth?");
+    setAuthState(signedIn ? "signed-in" : "signed-out");
+    // Same-tick decision on freshly-read storage: a separate redirect effect
+    // would see last render's stale authState and bounce a fresh login.
+    if (!isAuth && !signedIn) router.replace("/auth");
+  }, [pathname, isAuth, router]);
   if (isAuth) return <>{children}</>;
+  if (authState !== "signed-in") return null;
 
   const link = (href: string, label: string, Icon: LucideIcon) => (
     <Link key={href} href={href} aria-current={pathname === href ? "page" : undefined}>

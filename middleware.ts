@@ -36,6 +36,20 @@ export function middleware(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
   const { pathname } = request.nextUrl;
   const staffArea = pathname === "/auth" || pathname === "/staff" || pathname.startsWith("/staff/");
+  /**
+   * Root of a staff host serves the queue, but the layout picks its chrome
+   * from this flag — a bare rewrite would first-paint the public
+   * header/footer and stick it there across the client-side bounce to /auth.
+   */
+  const rewriteToStaff = () => {
+    const headers = new Headers(request.headers);
+    headers.set("x-staff-area", "1");
+    const response = NextResponse.rewrite(new URL("/staff", request.url), {
+      request: { headers },
+    });
+    response.headers.set("x-robots-tag", "noindex, nofollow");
+    return response;
+  };
   const withStaffFlag = () => {
     if (!staffArea) return NextResponse.next();
     const headers = new Headers(request.headers);
@@ -49,13 +63,13 @@ export function middleware(request: NextRequest) {
   if (isLocalOrPreview(host) || isStagingHost(host)) {
     // Localhost, previews, and staging allow all paths.
     if (pathname === "/" && host.split(":")[0].toLowerCase() === "flow.localtest") {
-      return NextResponse.rewrite(new URL("/staff", request.url));
+      return rewriteToStaff();
     }
     return withStaffFlag();
   }
 
   if (isFlowHost(host)) {
-    if (pathname === "/") return NextResponse.rewrite(new URL("/staff", request.url));
+    if (pathname === "/") return rewriteToStaff();
     const allowed =
       STAFF_PATHS.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)) ||
       pathname.startsWith("/_next") ||
