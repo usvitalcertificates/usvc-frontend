@@ -167,7 +167,12 @@ export default function StaffSettings() {
                   The new password needs at least 8 characters.
                 </p>
               ) : null}
-              <button type="submit" className="staff-btn" disabled={saving || mismatch || tooShort}>
+              <button
+                type="submit"
+                className="staff-btn"
+                disabled={saving || mismatch || tooShort}
+                style={{ marginTop: "14px" }}
+              >
                 {saving ? "Changing…" : "Change password"}
               </button>
             </form>
