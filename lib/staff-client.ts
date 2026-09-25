@@ -66,7 +66,10 @@ export async function staffFetch(path: string, init: RequestInit = {}): Promise<
   const send = (token: string | null) => {
     const headers = new Headers(init.headers);
     if (token) headers.set("authorization", `Bearer ${token}`);
-    if (init.body && !headers.has("content-type")) headers.set("content-type", "application/json");
+    // FormData sets its own multipart content-type (with boundary); forcing
+    // JSON here would corrupt file uploads.
+    if (init.body && !(init.body instanceof FormData) && !headers.has("content-type"))
+      headers.set("content-type", "application/json");
     return fetch(`/api/backend${path}`, { ...init, headers });
   };
   let response = await send(staffTokens().access);

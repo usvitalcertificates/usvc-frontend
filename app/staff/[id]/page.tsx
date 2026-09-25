@@ -2,9 +2,9 @@
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Flag, Play, Send } from "lucide-react";
+import { CheckCircle2, Download, Flag, Play, Repeat, Send, Trash2 } from "lucide-react";
 import { CopyButton } from "@/components/staff/CopyButton";
-import { staffData, staffJson, staffRole } from "@/lib/staff-client";
+import { staffData, staffFetch, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
   BackLink,
@@ -70,6 +70,12 @@ interface OrderDetail {
   deliveryMethod: string;
   status: string;
   substatus?: string | null;
+  document?: {
+    name: string;
+    size: number;
+    uploadedBy: string;
+    uploadedAt: string;
+  } | null;
   paymentStatus: string;
   assignedName: string | null;
   pricing?: { serviceCents: number; rushCents: number; totalCents: number };
@@ -367,6 +373,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [moveTo, setMoveTo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [toCsOpen, setToCsOpen] = useState(false);
+  const [docDeleteOpen, setDocDeleteOpen] = useState(false);
+  const [docBusy, setDocBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [releaseOpen, setReleaseOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("summary");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -467,6 +476,63 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     }, 60);
   };
 
+  const uploadDocument = async (file: File) => {
+    setDocBusy(true);
+    setError("");
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      await staffJson(`/orders/${id}/document`, { method: "POST", body: form });
+      setToast("Completion PDF uploaded.");
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setDocBusy(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const downloadDocument = async () => {
+    setError("");
+    try {
+      const response = await staffFetch(`/orders/${id}/document`);
+      if (!response.ok) {
+        let message = `Download failed (${response.status})`;
+        try {
+          const data = (await response.json()) as { message?: string };
+          if (data.message) message = data.message;
+        } catch {
+          /* non-JSON error body */
+        }
+        throw new Error(message);
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = order?.document?.name || "document.pdf";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 5000);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Download failed");
+    }
+  };
+
+  const deleteDocument = async () => {
+    setDocDeleteOpen(false);
+    setError("");
+    try {
+      await staffJson(`/orders/${id}/document`, { method: "DELETE", body: "{}" });
+      setToast("Completion PDF deleted.");
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Delete failed");
+    }
+  };
+
   if (error && !order) {
     return (
       <>
@@ -491,6 +557,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const effectiveMoveTo = moveTo ?? next[0] ?? "";
   const exceptionMove = effectiveMoveTo === "TO_CS";
   const gtgMove = effectiveMoveTo === "GTG";
+  const submitMove = effectiveMoveTo === "SUBMITTED";
+  // Fulfillment must attach the completion PDF + note before SUBMITTED.
+  const submitNeedsPackage = submitMove && !isAdmin;
   // TO_CS is locked: only CS/ADMIN (canCorrect) may move it — and only to GTG.
   const toCsLocked = order.status === "TO_CS" && !canCorrect;
   const requestorName =
@@ -572,7 +641,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           [
             ["summary", "Summary"],
             ["application", "Application (Owners only)"],
-            ["notes", "Notes & History"],
+            ["notes", "Notes & Document Upload"],
           ] as [Tab, string][]
         ).map(([value, label]) => (
           <button
@@ -647,6 +716,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                             onClick={() => {
                               setMoveTo(s);
                               if (s !== "TO_CS") setSubstatus("");
+                              setStatusNote("");
                             }}
                             className={`staff-move-btn tone-${MOVE_TONE[s] ?? "primary"}`}
                           >
@@ -704,7 +774,12 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                       <button
                         type="button"
                         className="staff-btn"
-                        disabled={busy || (exceptionMove && !statusNote.trim())}
+                        disabled={
+                          busy ||
+                          (exceptionMove && !statusNote.trim()) ||
+                          (submitNeedsPackage &&
+                            ((order.notes ?? []).length === 0 || !order.document))
+                        }
                         onClick={() => {
                           if (exceptionMove) {
                             setToCsOpen(true);
@@ -724,6 +799,18 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                         Update status: {STATUS_LABELS[effectiveMoveTo] ?? effectiveMoveTo}
                       </button>
                     </div>
+                    {submitNeedsPackage && ((order.notes ?? []).length === 0 || !order.document) ? (
+                      <p
+                        style={{
+                          fontSize: "0.85rem",
+                          color: "var(--flow-secondary)",
+                          margin: "8px 0 0",
+                        }}
+                      >
+                        Add at least one order note and upload the PDF in Notes &amp; Document
+                        Upload to submit.
+                      </p>
+                    ) : null}
                   </div>
                 )
               ) : (
@@ -899,99 +986,184 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
       {tab === "notes" ? (
         <>
-          <div className="staff-panel">
-            <h2>Order Notes</h2>
-            <div className="staff-panel-body">
-              <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", marginTop: 0 }}>
-                Notes are internal only and never shown to the customer.
-              </p>
-              {!closed ? (
-                <>
-                  <textarea
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    rows={3}
-                    maxLength={2000}
-                    aria-label="New internal note"
-                  />
-                  {sensitiveWarning ? (
-                    <p role="alert" className="staff-alert error">
-                      {sensitiveWarning}
-                    </p>
+          <div className="staff-notes-grid">
+            <div className="staff-panel">
+              <h2>Order Notes</h2>
+              <div className="staff-panel-body">
+                <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", marginTop: 0 }}>
+                  Notes are internal only and never shown to the customer.
+                </p>
+                {!closed ? (
+                  <>
+                    <textarea
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      rows={3}
+                      maxLength={2000}
+                      aria-label="New internal note"
+                    />
+                    {sensitiveWarning ? (
+                      <p role="alert" className="staff-alert error">
+                        {sensitiveWarning}
+                      </p>
+                    ) : null}
+                    <button
+                      type="button"
+                      className="staff-btn"
+                      disabled={busy || !note.trim()}
+                      onClick={() =>
+                        void postAction(
+                          `/staff/orders/${id}/notes`,
+                          { body: note.trim() },
+                          "POST",
+                          "Note added.",
+                        )
+                      }
+                      style={{ marginTop: "8px" }}
+                    >
+                      Submit
+                    </button>
+                  </>
+                ) : null}
+                <ul className="staff-timeline" style={{ marginTop: "18px" }}>
+                  {order.status === "TO_CS" && order.substatus ? (
+                    <li className="cat-status">
+                      <div
+                        className="staff-note-card"
+                        style={{
+                          background: "#fef2f2",
+                          border: "1px solid #fecaca",
+                        }}
+                      >
+                        <p style={{ margin: 0 }}>
+                          <strong style={{ color: "#b91c1c" }}>Substatus: </strong>
+                          {order.substatus}
+                        </p>
+                      </div>
+                    </li>
                   ) : null}
+                  {shownNotes.map((n, i) => (
+                    <li key={i} className="cat-note">
+                      <div className="staff-note-card">
+                        <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{n.body}</p>
+                        <p
+                          className="t-date"
+                          style={{ margin: "6px 0 0" }}
+                          title={fullTime(n.createdAt)}
+                        >
+                          {relTime(n.createdAt)}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                {(order.notes ?? []).length === 0 ? (
+                  <p style={{ color: "var(--flow-secondary)" }}>
+                    No notes yet — add the first one above.
+                  </p>
+                ) : null}
+                {(order.notes ?? []).length > shownNotes.length ? (
                   <button
                     type="button"
-                    className="staff-btn"
-                    disabled={busy || !note.trim()}
-                    onClick={() =>
-                      void postAction(
-                        `/staff/orders/${id}/notes`,
-                        { body: note.trim() },
-                        "POST",
-                        "Note added.",
-                      )
-                    }
-                    style={{ marginTop: "8px" }}
+                    className="staff-btn secondary"
+                    onClick={() => setNoteLimit((n) => n + 10)}
                   >
-                    Submit
+                    Show more ({(order.notes ?? []).length - shownNotes.length} older)
                   </button>
-                </>
-              ) : null}
-              <ul className="staff-timeline" style={{ marginTop: "18px" }}>
-                {order.status === "TO_CS" && order.substatus ? (
-                  <li className="cat-status">
-                    <div
-                      className="staff-note-card"
-                      style={{
-                        background: "#fef2f2",
-                        border: "1px solid #fecaca",
-                      }}
-                    >
-                      <p style={{ margin: 0 }}>
-                        <strong style={{ color: "#b91c1c" }}>Substatus: </strong>
-                        {order.substatus}
-                      </p>
-                    </div>
-                  </li>
                 ) : null}
-                {shownNotes.map((n, i) => (
-                  <li key={i} className="cat-note">
-                    <div className="staff-note-card">
-                      <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{n.body}</p>
-                      <p
-                        className="t-date"
-                        style={{ margin: "6px 0 0" }}
-                        title={fullTime(n.createdAt)}
+                {noteLimit > 10 && (order.notes ?? []).length <= shownNotes.length ? (
+                  <button
+                    type="button"
+                    className="staff-btn secondary"
+                    onClick={() => setNoteLimit(10)}
+                  >
+                    Show less
+                  </button>
+                ) : null}
+              </div>
+            </div>
+            <div className="staff-panel staff-package-panel">
+              <h2>
+                Order Completion PDF{" "}
+                <span className="staff-req" aria-hidden="true">
+                  *
+                </span>
+                <span className="staff-sr-only">(required)</span>
+              </h2>
+              <div className="staff-panel-body">
+                {order.document ? (
+                  <div className="staff-doc-card">
+                    <span className="staff-doc-info">
+                      <strong>{order.document.name}</strong>
+                      <span>
+                        {(order.document.size / 1024).toFixed(0)} KB · uploaded{" "}
+                        {new Date(order.document.uploadedAt).toLocaleString("en-US")}
+                      </span>
+                    </span>
+                    <span className="staff-doc-actions">
+                      <button
+                        type="button"
+                        className="staff-icon-btn"
+                        title="Download PDF"
+                        aria-label="Download completion PDF"
+                        onClick={() => void downloadDocument()}
                       >
-                        {relTime(n.createdAt)}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              {(order.notes ?? []).length === 0 ? (
-                <p style={{ color: "var(--flow-secondary)" }}>
-                  No notes yet — add the first one above.
-                </p>
-              ) : null}
-              {(order.notes ?? []).length > shownNotes.length ? (
-                <button
-                  type="button"
-                  className="staff-btn secondary"
-                  onClick={() => setNoteLimit((n) => n + 10)}
-                >
-                  Show more ({(order.notes ?? []).length - shownNotes.length} older)
-                </button>
-              ) : null}
-              {noteLimit > 10 && (order.notes ?? []).length <= shownNotes.length ? (
-                <button
-                  type="button"
-                  className="staff-btn secondary"
-                  onClick={() => setNoteLimit(10)}
-                >
-                  Show less
-                </button>
-              ) : null}
+                        <Download aria-hidden />
+                      </button>
+                      {!closed ? (
+                        <>
+                          <label
+                            className="staff-icon-btn staff-file-label"
+                            title="Replace PDF"
+                            aria-label="Replace completion PDF"
+                          >
+                            <Repeat aria-hidden />
+                            <input
+                              ref={fileRef}
+                              type="file"
+                              accept="application/pdf,.pdf"
+                              hidden
+                              disabled={docBusy}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) void uploadDocument(file);
+                              }}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            className="staff-icon-btn danger"
+                            title="Delete PDF"
+                            aria-label="Delete completion PDF"
+                            disabled={docBusy}
+                            onClick={() => setDocDeleteOpen(true)}
+                          >
+                            <Trash2 aria-hidden />
+                          </button>
+                        </>
+                      ) : null}
+                    </span>
+                  </div>
+                ) : !closed ? (
+                  <label className="staff-doc-drop">
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept="application/pdf,.pdf"
+                      hidden
+                      disabled={docBusy}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) void uploadDocument(file);
+                      }}
+                    />
+                    <strong>{docBusy ? "Uploading…" : "Upload completion PDF"}</strong>
+                    <span>PDF only · up to 10 MB · replaces any previous file</span>
+                  </label>
+                ) : (
+                  <p style={{ color: "var(--flow-secondary)" }}>No document attached.</p>
+                )}
+              </div>
             </div>
           </div>
           <div className="staff-panel">
@@ -1094,6 +1266,17 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
         </div>
+      ) : null}
+
+      {docDeleteOpen && order?.document ? (
+        <ConfirmModal
+          title="Delete completion PDF?"
+          body={`Delete ${order.document.name}? The order cannot be submitted until a new PDF is uploaded.`}
+          confirmLabel="Delete"
+          danger
+          onCancel={() => setDocDeleteOpen(false)}
+          onConfirm={() => void deleteDocument()}
+        />
       ) : null}
 
       {releaseOpen && order ? (

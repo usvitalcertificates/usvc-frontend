@@ -36,6 +36,9 @@ async function proxy(request: NextRequest, context: RouteContext<"/api/backend/[
   const responseHeaders = new Headers();
   const responseContentType = response.headers.get("content-type");
   if (responseContentType) responseHeaders.set("content-type", responseContentType);
+  // Pass through so file downloads keep their server filename.
+  const disposition = response.headers.get("content-disposition");
+  if (disposition) responseHeaders.set("content-disposition", disposition);
   return new Response(response.body, { status: response.status, headers: responseHeaders });
 }
 
