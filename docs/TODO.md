@@ -111,6 +111,8 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 
 ## Phase 3 (remaining + proposed backlog)
 
+- [x] OpenAI Ads conversion tracking 2026-09-25: production-only public pixel, privacy-safe normalized page views, checkout starts, verified completed orders with refresh deduplication, environment/deployment documentation, and updated privacy disclosure
+
 - [ ] Confirmation: replace static page with `GET /orders/:id/confirmation` verification + print receipt (needs backend endpoint)
 - [ ] Email display: receipt UI matches backend email template (backend owns sending)
 - [ ] Content: per-state fee/rules data port

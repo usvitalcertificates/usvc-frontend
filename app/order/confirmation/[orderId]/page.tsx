@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
+import { trackOpenAIOrderCreated } from "../../../openai-analytics";
+
 const api = "/api/backend";
 
 function formatUSD(cents: number): string {
@@ -53,6 +55,12 @@ function ConfirmationBody({ orderId }: { orderId: string }) {
       cancelled = true;
     };
   }, [sessionId, orderId]);
+
+  useEffect(() => {
+    if (state === "paid" && receipt && orderId) {
+      trackOpenAIOrderCreated(orderId, receipt.amountCents);
+    }
+  }, [state, receipt, orderId]);
 
   return (
     <main>
