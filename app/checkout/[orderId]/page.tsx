@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { PageHeader } from "../../usvc-ui";
 import { STRIPE_APPEARANCE, StripeCheckoutForm } from "./stripe-checkout-form";
 import { trackAnalytics } from "../../analytics";
+import { trackOpenAICheckoutStarted } from "../../openai-analytics";
 
 const api = "/api/backend";
 const SUPPORT_EMAIL = "support@usvitalcertificates.org";
@@ -76,6 +77,11 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
               price: summary.amountCents / summary.copies / 100,
             },
           ],
+        });
+        trackOpenAICheckoutStarted({
+          amountCents: summary.amountCents,
+          certificate: summary.certificate,
+          copies: summary.copies,
         });
         const [configRes, sessionRes] = await Promise.all([
           fetch(`${api}/orders/checkout-config`),

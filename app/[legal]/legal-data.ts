@@ -24,7 +24,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
     title: "Privacy Policy",
     description:
       "How USVC collects, uses, discloses, retains, and protects the personal information you provide when requesting a vital certificate.",
-    lastUpdated: "May 19, 2025",
+    lastUpdated: "September 25, 2026",
     sections: [
       {
         heading: "Introduction",
@@ -97,7 +97,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
       {
         heading: "Website analytics and cookies",
         body: [
-          `${DOMAIN} uses Google Analytics 4 cookies and measurement tools to understand public-page and order-funnel activity and improve the Service. Analytics records are limited to page and funnel events, certificate type, copies, rush-processing selection, public order number, and charged amount after payment is confirmed. We do not send names, email addresses, phone numbers, addresses, Social Security numbers, dates of birth, certificate-subject details, payment-card data, Stripe identifiers, or form values to Google Analytics.`,
+          `${DOMAIN} uses Google Analytics 4 and the OpenAI Ads Measurement Pixel, including cookies and similar measurement tools, to understand public-page and order-funnel activity, attribute advertising conversions, and improve the Service. OpenAI measurement is limited to non-identifying page categories, certificate type, number of copies, checkout starts, and charged amount after payment is confirmed. We do not send names, email addresses, phone numbers, addresses, Social Security numbers, dates of birth, certificate-subject details, payment-card data, Stripe identifiers, application form values, or order identifiers to OpenAI. Google Analytics records remain limited to page and funnel events, certificate type, copies, rush-processing selection, public order number, and charged amount after payment is confirmed, and receive none of those sensitive customer, application, or payment fields.`,
         ],
       },
       {

@@ -7,6 +7,7 @@ import "./staff.css";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 import { Analytics } from "./analytics";
+import { OpenAIAnalytics } from "./openai-analytics";
 import { StaffShell } from "@/components/staff/StaffShell";
 
 const GTM_ID = "GTM-KC8LVCXR";
@@ -58,6 +59,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           </noscript>
         ) : null}
         <Analytics enabled={analyticsEnabled} measurementId={process.env.GA_MEASUREMENT_ID} />
+        <OpenAIAnalytics
+          enabled={analyticsEnabled && !staffArea}
+          pixelId={process.env.OPENAI_ADS_PIXEL_ID}
+          debug={process.env.OPENAI_ADS_PIXEL_DEBUG === "true"}
+        />
         {staffArea ? (
           <StaffShell>{children}</StaffShell>
         ) : (

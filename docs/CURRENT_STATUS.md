@@ -40,6 +40,7 @@ Last updated: 2026-09-25 (official USVC branding; two-fee model; staff roles ADM
 - Track Order shows a customer-safe, timestamped progress timeline instead of raw internal states. It includes payment confirmation, received, processing, government-agency submission, and completed milestones, plus neutral support notices for payment/order exceptions.
 - GA4 is production-only: public pages and core funnel actions are tracked in the browser, while a Purchase is sent only from the backend after a signed Stripe webhook confirms payment. No sensitive application or payment data is sent to GA4.
 - GTM container `GTM-KC8LVCXR` loads from the shared root layout on every production page, alongside direct GA4 `gtag.js`; both GTM snippets are absent when `ANALYTICS_ENABLED=false`.
+- OpenAI Ads Measurement Pixel is production-only and public-page-only, with normalized page views, checkout starts, and backend-verified completed-order events; dynamic order URLs and sensitive customer, application, Stripe, and payment data are excluded.
 
 ## Important current limits
 
