@@ -2,7 +2,7 @@
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Download, Flag, Play, Repeat, Send, Trash2 } from "lucide-react";
+import { CheckCircle2, Download, FileText, Flag, Play, Repeat, Send, Trash2 } from "lucide-react";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffData, staffFetch, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
@@ -1083,16 +1083,25 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
             <div className="staff-panel staff-package-panel">
-              <h2>
-                Order Completion PDF{" "}
-                <span className="staff-req" aria-hidden="true">
-                  *
+              <div className="staff-doc-head">
+                <div>
+                  <h2>Completion document</h2>
+                  <p>Attach the final PDF before sending this order to the agency.</p>
+                </div>
+                <span className="staff-pill green">
+                  Required{" "}
+                  <span className="staff-req" aria-hidden="true">
+                    *
+                  </span>
+                  <span className="staff-sr-only">(required)</span>
                 </span>
-                <span className="staff-sr-only">(required)</span>
-              </h2>
+              </div>
               <div className="staff-panel-body">
                 {order.document ? (
                   <div className="staff-doc-card">
+                    <span className="staff-doc-fileicon" aria-hidden="true">
+                      <FileText aria-hidden />
+                    </span>
                     <span className="staff-doc-info">
                       <strong>{order.document.name}</strong>
                       <span>
@@ -1103,21 +1112,23 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     <span className="staff-doc-actions">
                       <button
                         type="button"
-                        className="staff-icon-btn"
+                        className="staff-btn secondary staff-doc-btn"
                         title="Download PDF"
                         aria-label="Download completion PDF"
                         onClick={() => void downloadDocument()}
                       >
                         <Download aria-hidden />
+                        Download
                       </button>
                       {!closed ? (
                         <>
                           <label
-                            className="staff-icon-btn staff-file-label"
+                            className="staff-btn secondary staff-doc-btn staff-file-label"
                             title="Replace PDF"
                             aria-label="Replace completion PDF"
                           >
                             <Repeat aria-hidden />
+                            Replace
                             <input
                               ref={fileRef}
                               type="file"
@@ -1132,13 +1143,14 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                           </label>
                           <button
                             type="button"
-                            className="staff-icon-btn danger"
+                            className="staff-btn danger-outline staff-doc-btn"
                             title="Delete PDF"
                             aria-label="Delete completion PDF"
                             disabled={docBusy}
                             onClick={() => setDocDeleteOpen(true)}
                           >
                             <Trash2 aria-hidden />
+                            Delete
                           </button>
                         </>
                       ) : null}
