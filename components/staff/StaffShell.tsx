@@ -12,6 +12,7 @@ import {
   Settings,
   ShieldCheck,
   UserCheck,
+  Users,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -135,7 +136,11 @@ export function StaffShell({ children }: { children: ReactNode }) {
         <nav className="staff-nav">
           {link("/staff", "Open Orders", Inbox)}
           {link("/staff/my", "My Work", UserCheck)}
-          {link("/staff/analytics", "Analytics", ChartNoAxesCombined)}
+          {role === "ADMIN" ? null : link("/staff/analytics", "My Analytics", ChartNoAxesCombined)}
+          {role === "ADMIN" ? link("/staff/admin/staff-analytics", "Staff Analytics", Users) : null}
+          {role === "ADMIN"
+            ? link("/staff/admin/orders-analytics", "Orders Analytics", ChartNoAxesCombined)
+            : null}
           {link("/staff/closed", "Closed Orders", Archive)}
           {link("/staff/search", "Order Search", Search)}
           {role === "ADMIN" ? link("/staff/admin", "Administration", ShieldCheck) : null}

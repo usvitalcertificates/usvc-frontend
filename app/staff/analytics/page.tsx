@@ -1,6 +1,6 @@
 "use client";
 
-import StaffAnalyticsPage from "@/app/staff/admin/[id]/page";
+import StaffAnalyticsPage from "@/app/staff/admin/staff-analytics/[id]/page";
 
 const SELF_PARAMS = Promise.resolve({ id: "self" });
 

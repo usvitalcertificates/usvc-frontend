@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, Copy, RotateCcw } from "lucide-react";
 
 export function CopyButton({
@@ -91,5 +91,41 @@ export function CopyButton({
         </button>
       ) : null}
     </span>
+  );
+}
+
+/** Compact icon-only copy button for table rows. Sits left of the value. */
+export function CopyIconButton({ value, label }: { value: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+  const timer = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (timer.current !== null) window.clearTimeout(timer.current);
+    },
+    [],
+  );
+  if (!value) return null;
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      if (timer.current !== null) window.clearTimeout(timer.current);
+      timer.current = window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      className={`staff-icon-btn staff-copy-icon${copied ? " success" : ""}`}
+      aria-label={copied ? `${label} copied` : `Copy ${label}`}
+      title={copied ? `${label} copied` : `Copy ${label}`}
+      onClick={() => void copy()}
+    >
+      {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
+    </button>
   );
 }

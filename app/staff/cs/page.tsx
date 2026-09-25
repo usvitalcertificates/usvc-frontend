@@ -13,6 +13,7 @@ import {
   StatCard,
   TimedActionModal,
 } from "@/components/staff/ui";
+import { CopyIconButton } from "@/components/staff/CopyButton";
 
 interface CsOrder {
   id: string;
@@ -26,6 +27,7 @@ interface CsOrder {
   assignedToMe: boolean;
   assignedName: string | null;
   lastNote: string | null;
+  substatus: string | null;
   sentToCsAt: string | null;
   createdAt: string;
 }
@@ -73,7 +75,7 @@ export default function CsCorrections() {
   // queries so the stat cards stay accurate no matter what the table filters.
   const loadKpis = useCallback(async () => {
     try {
-      const [all, unassigned, mine] = await Promise.all([
+      const [all, unassigned, mine, rush] = await Promise.all([
         staffJson<{ orders?: CsOrder[]; total?: number }>(`/staff/orders?status=TO_CS`),
         staffJson<{ orders?: CsOrder[]; total?: number }>(
           `/staff/orders?status=TO_CS&assigned=unassigned`,
@@ -81,14 +83,15 @@ export default function CsCorrections() {
         staffJson<{ orders?: CsOrder[]; total?: number }>(
           `/staff/orders?status=TO_CS&assigned=mine`,
         ),
+        staffJson<{ orders?: CsOrder[]; total?: number }>(
+          `/staff/orders?status=TO_CS&rushOnly=true`,
+        ),
       ]);
-      const u = (unassigned.orders ?? []) as CsOrder[];
-      const m = (mine.orders ?? []) as CsOrder[];
       setKpis({
         total: all.total ?? 0,
         unassigned: unassigned.total ?? 0,
         mine: mine.total ?? 0,
-        rush: [...u, ...m].filter((o) => o.rush).length,
+        rush: rush.total ?? 0,
       });
     } catch {
       /* KPIs are decorative; the table is authoritative. */
@@ -135,7 +138,7 @@ export default function CsCorrections() {
       <PageBand
         eyebrow="CS — form corrections"
         title="Corrections inbox"
-        subtitle={`Orders sent To CS with a problem note. Showing ${orders.length} of ${total}.`}
+        subtitle={`Orders sent to CS with a problem note. Showing ${orders.length} of ${total}.`}
       />
       {claimed ? (
         <TimedActionModal
@@ -154,7 +157,7 @@ export default function CsCorrections() {
         </p>
       ) : null}
 
-      <div className="staff-stats">
+      <div className="staff-stats staff-cs-stats">
         <StatCard value={kpis.total} label="To CS" icon={<Clock aria-hidden />} tone="rose" />
         <StatCard
           value={kpis.unassigned}
@@ -303,11 +306,12 @@ export default function CsCorrections() {
                       )}
                     </td>
                     <td className="staff-correction-order">
-                      <strong>{o.publicNumber}</strong>{" "}
-                      {o.rush ? <span className="staff-pill amber">RUSH</span> : null}
-                      <br />
-                      <span className="staff-row-meta">
-                        {o.copies} {o.copies === 1 ? "copy" : "copies"}
+                      <span className="staff-ordercell">
+                        <CopyIconButton value={o.publicNumber} label="order number" />
+                        <span>
+                          <strong>{o.publicNumber}</strong>{" "}
+                          {o.rush ? <span className="staff-pill amber">RUSH</span> : null}
+                        </span>
                       </span>
                     </td>
                     <td>
@@ -319,13 +323,16 @@ export default function CsCorrections() {
                       {o.lastNote ? (
                         <span className="staff-correction-note">
                           <strong>Correction needed</strong>
+                          {o.substatus ? (
+                            <span className="staff-pill red">{o.substatus}</span>
+                          ) : null}
                           <span>{o.lastNote}</span>
                         </span>
                       ) : (
                         <span className="staff-row-meta">—</span>
                       )}
                     </td>
-                    <td>{o.assignedName ?? "Unassigned"}</td>
+                    <td>{o.assignedName ?? <span className="staff-pill gray">Unassigned</span>}</td>
                     <td>{o.requestor}</td>
                     <td className="staff-correction-action">
                       {!o.assignedName ? (

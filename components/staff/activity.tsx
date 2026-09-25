@@ -54,8 +54,14 @@ export function humanizeActivity(entry: ActivityEntryLike): string {
   const meta = (entry.metadata ?? entry.detail ?? {}) as {
     status?: string;
     field?: string;
+    substatus?: string;
   };
-  if (meta.status) return `${base} → ${STATUS_LABELS[meta.status] ?? meta.status}`;
+  if (meta.status) {
+    const label = `${base} → ${STATUS_LABELS[meta.status] ?? meta.status}`;
+    return typeof meta.substatus === "string" && meta.substatus
+      ? `${label} · ${meta.substatus}`
+      : label;
+  }
   if (meta.field) return `${base} (${meta.field === "ssn" ? "SSN" : "card"})`;
   return base;
 }

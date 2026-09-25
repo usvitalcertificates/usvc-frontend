@@ -7,6 +7,7 @@ import { FolderOpen, Inbox, Search as SearchIcon, X } from "lucide-react";
 import { staffData, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { EmptyState, PageBand, SkeletonRows, StatusPill } from "@/components/staff/ui";
+import { CopyIconButton } from "@/components/staff/CopyButton";
 
 interface Result {
   id: string;
@@ -199,9 +200,12 @@ function SearchView() {
                     {results.map((order) => (
                       <tr key={order.id}>
                         <td className="staff-search-order">
-                          <strong>
-                            <Highlight text={order.publicNumber} term={activeQuery} />
-                          </strong>
+                          <span className="staff-ordercell">
+                            <CopyIconButton value={order.publicNumber} label="order number" />
+                            <strong>
+                              <Highlight text={order.publicNumber} term={activeQuery} />
+                            </strong>
+                          </span>
                         </td>
                         <td>
                           {order.stateCode}{" "}
