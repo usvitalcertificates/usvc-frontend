@@ -1892,11 +1892,8 @@ label.staff-icon-btn {
   }
 }
 
-/* Unified sticky order command bar (detail page). Identity + actions in one. */
+/* Unified order command bar (detail page). Identity + actions in one. */
 .staff-orderbar {
-  position: sticky;
-  top: 52px;
-  z-index: 10;
   display: flex;
   gap: 12px;
   align-items: flex-start;
