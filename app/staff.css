@@ -813,6 +813,37 @@ table.staff-table {
   font-size: 0.9rem;
   text-align: right;
 }
+/* Completion package panel: pastel green group for the required PDF. */
+.staff-package-panel {
+  background: #effaf2;
+  border-color: #bfe6c9;
+}
+.staff-req {
+  color: var(--flow-danger);
+  font-weight: 800;
+}
+.staff-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* Notes tab: Order Notes left, PDF panel right, stacking on narrow screens. */
+.staff-notes-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+.staff-notes-grid .staff-panel {
+  margin-bottom: 0;
+}
 /* Completion document panel: dashed picker plus file card. */
 .staff-doc-drop {
   display: grid;
@@ -1585,6 +1616,9 @@ table.staff-table {
 
 @media (max-width: 1020px) {
   .staff-grid-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .staff-notes-grid {
     grid-template-columns: minmax(0, 1fr);
   }
   .staff-rail {
