@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { use, useCallback, useEffect, useState } from "react";
-import { CheckCircle2, ClipboardCheck, Files, Send } from "lucide-react";
 import { staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
@@ -140,28 +139,16 @@ export default function StaffAnalyticsPage({
       ) : null}
 
       <div className="staff-stats staff-analytics-stats">
-        <StatCard
-          value={data?.metrics.ownershipTaken ?? "—"}
-          label="Ownership taken"
-          icon={<ClipboardCheck aria-hidden />}
-          tone="blue"
-        />
-        <StatCard
-          value={data?.metrics.sentToCs ?? "—"}
-          label="Sent to CS"
-          icon={<Send aria-hidden />}
-          tone="rose"
-        />
+        <StatCard value={data?.metrics.ownershipTaken ?? "—"} label="Ownership taken" tone="blue" />
+        <StatCard value={data?.metrics.sentToCs ?? "—"} label="Sent to CS" tone="rose" />
         <StatCard
           value={data?.metrics.submittedToAgency ?? "—"}
           label="Sent to agency"
-          icon={<CheckCircle2 aria-hidden />}
           tone="green"
         />
         <StatCard
           value={data?.metrics.totalFormsHandled ?? "—"}
           label="Total forms handled"
-          icon={<Files aria-hidden />}
           tone="lavender"
         />
       </div>

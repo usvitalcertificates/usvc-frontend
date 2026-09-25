@@ -93,21 +93,16 @@ export function PageBand({
 export function StatCard({
   value,
   label,
-  icon,
   tone = "blue",
 }: {
   value: ReactNode;
   label: string;
-  icon?: ReactNode;
   tone?: "blue" | "lavender" | "rose" | "green" | "amber";
 }) {
   return (
     <div className={`staff-stat staff-stat-${tone}`}>
-      {icon}
-      <div className="staff-stat-content">
-        <strong>{value}</strong>
-        <span>{label}</span>
-      </div>
+      <span>{label}</span>
+      <strong>{value}</strong>
     </div>
   );
 }
