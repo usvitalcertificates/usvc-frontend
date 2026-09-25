@@ -1,8 +1,11 @@
 # Current frontend status
 
-Last updated: 2026-09-25 (official USVC branding; two-fee model; staff roles ADMIN/FULFILLMENT/CS; modern pastel Administration roster and dedicated date-filtered per-staff analytics; polished staff queues and CS corrections inbox).
+Last updated: 2026-09-25 (official USVC branding; two-fee model; staff roles ADMIN/FULFILLMENT/CS; split ADMIN analytics nav with nested staff + orders analytics; full-width staff content with filtered analytics roster; polished staff queues and CS corrections inbox).
 
 ## Implemented
+
+- ADMIN sidebar now shows Staff Analytics (`/staff/admin/staff-analytics`: roster with View analytics per-user drill-down) and Orders Analytics (`/staff/admin/orders-analytics`: order index with search plus per-order timeline) instead of the generic Analytics item; FULFILLMENT/CS keep a renamed My Analytics item (`/staff/analytics`) for their own token-scoped dashboard. Administration (`/staff/admin`) is staff management only: invite, roles, status, 2-step controls, three stat cards — the View details buttons and Orders Activity tab moved to the new pages. Legacy detail URLs (`/staff/admin/[id]`, `/staff/admin/activity/[id]`) redirect to the nested routes.
+- Staff content fills the full viewport width (no 1240px cap, so no dead right space); tables use fixed full-width column grids. The Staff Analytics roster has a search box plus role (All/ADMIN/FULFILLMENT/CS) and status (All/active/pending/disabled) chip filters with a no-match empty state — all client-side on the `/admin/staff` roster response, so no backend change was needed.
 
 - Administration now uses pastel operational cards and a responsive roster with a dedicated role column, compact account controls, and a per-user analytics drill-down. Analytics default to 30 days and provide audit-attributed KPI cards, date/workflow filters, and paginated form history.
 - The roster separates role display from role assignment, protects the current admin from self-service security actions, and uses compact icon controls. Orders Activity replaces the mixed feed with an order index and dedicated per-order timeline.

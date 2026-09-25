@@ -12,6 +12,40 @@ export const STATUS_LABELS: Record<string, string> = {
   CANCELLED: "Cancelled",
 };
 
+/**
+ * Optional substatus for To-CS parks. Mirrors the backend enum in
+ * `usvc-backend/src/lib/order-substatus.ts` (source of truth; drift 422s).
+ * No 2nd/3rd Contact per owner decision.
+ */
+export const TO_CS_SUBSTATUSES: readonly string[] = [
+  "1st Contact",
+  "1st Contact - Multiple Issues",
+  "1st Contact - Credit Card Alignment",
+  "1st Contact - Billing Issues",
+  "1st Contact - Information Verification",
+  "1st Contact - Texas Audit Number Verification",
+  "1st Contact - Subject Name Alignment",
+  "1st Contact - Maiden Name Verification",
+  "1st Contact - Shipping Address Verification",
+  "1st Contact – Delivery Issues",
+  "Application Emailed to Client",
+  "Dead",
+  "CRC",
+  "Chargeback",
+  "Chargeback Refunded",
+  "Refunds",
+  "R-Refunded",
+  "R-Voided",
+  "R-Denied",
+  "R-CERT_NOT_AVAIL",
+  "Escalated",
+  "Follow Up",
+  "Future Order",
+  "Made GTG",
+  "Cancelled",
+  "Completed",
+];
+
 const STATUS_TONE: Record<string, "navy" | "red" | "gray" | "green"> = {
   PAID: "navy",
   IN_REVIEW: "navy",

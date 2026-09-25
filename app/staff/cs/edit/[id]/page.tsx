@@ -26,6 +26,7 @@ interface EditOrder {
   deliveryMethod: string;
   destinationType?: string;
   status: string;
+  substatus?: string | null;
   assignedTo: string | null;
   assignedName: string | null;
   pricing?: { serviceCents: number; rushCents: number; totalCents: number };
@@ -447,6 +448,9 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
   };
 
   const flaggedNote = order.status === "TO_CS" ? (order.notes ?? []).at(-1)?.body : null;
+  const notesNewest = [...(order.notes ?? [])].reverse();
+  const latestNote = notesNewest[0] ?? null;
+  const previousNotes = notesNewest.slice(1, 5);
   const requiredSubject = REQUIRED_SUBJECT[order.certificate] ?? [];
   const requiredFamily = REQUIRED_FAMILY[order.certificate] ?? [];
   const errorCount = Object.keys(errors).length;
@@ -563,20 +567,23 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
     <>
       <BackLink href="/staff/cs">← Back to Corrections inbox</BackLink>
       <PageBand
-        eyebrow={`CS correction — ${order.publicNumber}`}
+        eyebrow="CS correction"
         title="Edit order form"
         subtitle={
-          <span style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-            <StatusPill status={order.status} />
-            <span style={{ color: "#cbd5e1", fontWeight: 600 }}>
-              {order.stateCode} {order.certificate} · Owner: {order.assignedName ?? "Unassigned"}
+          <span className="staff-csedit-head">
+            <span className="staff-csedit-order">
+              <span className="staff-csedit-orderlabel">Order #</span>
+              <strong>{order.publicNumber}</strong>
+              <CopyButton value={order.publicNumber} label="Order number" />
             </span>
-            <CopyButton value={order.publicNumber} label="Order number" />
-            {order.rush ? (
-              <span style={{ marginLeft: "auto" }}>
-                <span className="staff-pill amber">RUSH</span>
-              </span>
-            ) : null}
+            <span className="staff-csedit-badges">
+              <StatusPill status={order.status} />
+              {order.rush ? <span className="staff-pill amber">RUSH</span> : null}
+            </span>
+            <span className="staff-csedit-meta">
+              {order.stateCode} {order.certificate}
+            </span>
+            <span className="staff-csedit-owner">Owner: {order.assignedName ?? "Unassigned"}</span>
           </span>
         }
       />
@@ -600,8 +607,14 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
             fontSize: "0.9rem",
           }}
         >
-          <strong style={{ color: "#b91c1c" }}>Fulfillment flagged: </strong>
+          <strong style={{ color: "#b91c1c" }}>Fulfillment flagged Notes: </strong>
           {flaggedNote}
+          {order.substatus ? (
+            <span style={{ display: "block", marginTop: "6px" }}>
+              <strong style={{ color: "#b91c1c" }}>Substatus: </strong>
+              {order.substatus}
+            </span>
+          ) : null}
         </p>
       ) : null}
 
@@ -1198,20 +1211,57 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
           <div className="staff-panel" style={{ background: "#fffbeb", borderColor: "#fde68a" }}>
             <h3 style={{ color: "#78350f" }}>Recent notes</h3>
             <div className="staff-panel-body">
-              {(order.notes ?? []).length === 0 ? (
-                <p style={{ color: "var(--muted-text)" }}>No internal notes yet.</p>
+              {order.status === "TO_CS" && order.substatus ? (
+                <p
+                  style={{
+                    margin: "0 0 4px",
+                    fontSize: "0.9rem",
+                    background: "#fef2f2",
+                    border: "1px solid #fecaca",
+                    borderRadius: "8px",
+                    padding: "8px 12px",
+                  }}
+                >
+                  <strong style={{ color: "#b91c1c" }}>Substatus: </strong>
+                  {order.substatus}
+                </p>
+              ) : null}
+              {latestNote ? (
+                <>
+                  <h4 style={{ color: "#78350f", fontSize: "0.85rem", margin: "12px 0 6px" }}>
+                    Fulfillment flagged Notes:
+                  </h4>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.9rem",
+                      whiteSpace: "pre-wrap",
+                      background: "#fff",
+                      border: "1px solid #fde68a",
+                      borderRadius: "8px",
+                      padding: "8px 12px",
+                    }}
+                  >
+                    {latestNote.body}
+                  </p>
+                </>
               ) : (
-                <ul style={{ margin: 0, paddingLeft: "18px", display: "grid", gap: "8px" }}>
-                  {[...order.notes]
-                    .reverse()
-                    .slice(0, 5)
-                    .map((n, i) => (
+                <p style={{ color: "var(--muted-text)" }}>No internal notes yet.</p>
+              )}
+              {previousNotes.length > 0 ? (
+                <>
+                  <h4 style={{ color: "#78350f", fontSize: "0.85rem", margin: "12px 0 6px" }}>
+                    Previous notes
+                  </h4>
+                  <ul style={{ margin: 0, paddingLeft: "18px", display: "grid", gap: "8px" }}>
+                    {previousNotes.map((n, i) => (
                       <li key={i} style={{ fontSize: "0.9rem", whiteSpace: "pre-wrap" }}>
                         {n.body}
                       </li>
                     ))}
-                </ul>
-              )}
+                  </ul>
+                </>
+              ) : null}
             </div>
           </div>
         </div>

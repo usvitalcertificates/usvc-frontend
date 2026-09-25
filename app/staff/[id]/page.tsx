@@ -2,6 +2,7 @@
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CheckCircle2, Flag, Play, Send } from "lucide-react";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffData, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
@@ -12,6 +13,7 @@ import {
   StatusPill,
   Stepper,
   Toast,
+  TO_CS_SUBSTATUSES,
 } from "@/components/staff/ui";
 import {
   activityCategory,
@@ -27,6 +29,27 @@ const NEXT_STATUS: Record<string, string[]> = {
   TO_CS: ["GTG"],
   GTG: ["IN_REVIEW"],
   SUBMITTED: [],
+};
+
+const MOVE_TONE: Record<string, "primary" | "green" | "red"> = {
+  IN_REVIEW: "primary",
+  SUBMITTED: "green",
+  GTG: "green",
+  TO_CS: "red",
+};
+
+const MOVE_ICON: Record<string, typeof Send> = {
+  IN_REVIEW: Play,
+  SUBMITTED: Send,
+  GTG: CheckCircle2,
+  TO_CS: Flag,
+};
+
+const MOVE_HINT: Record<string, string> = {
+  IN_REVIEW: "Resume processing",
+  SUBMITTED: "Finish — send to the government agency",
+  GTG: "Approve — return to the queue",
+  TO_CS: "Park with a required note for CS",
 };
 
 interface OrderDetail {
@@ -46,6 +69,7 @@ interface OrderDetail {
   rush: boolean;
   deliveryMethod: string;
   status: string;
+  substatus?: string | null;
   paymentStatus: string;
   assignedName: string | null;
   pricing?: { serviceCents: number; rushCents: number; totalCents: number };
@@ -339,6 +363,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [toast, setToast] = useState("");
   const [note, setNote] = useState("");
   const [statusNote, setStatusNote] = useState("");
+  const [substatus, setSubstatus] = useState("");
   const [moveTo, setMoveTo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [toCsOpen, setToCsOpen] = useState(false);
@@ -387,6 +412,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       await staffJson(path, { method, body: JSON.stringify(body ?? {}) });
       setNote("");
       setStatusNote("");
+      setSubstatus("");
       setMoveTo(null);
       setToast(success);
       await load();
@@ -417,9 +443,14 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     try {
       await staffJson(`/orders/${id}/status`, {
         method: "PATCH",
-        body: JSON.stringify({ status: "TO_CS", note: statusNote.trim() }),
+        body: JSON.stringify({
+          status: "TO_CS",
+          note: statusNote.trim(),
+          ...(substatus ? { substatus } : {}),
+        }),
       });
       setToCsOpen(false);
+      setSubstatus("");
       router.replace("/staff");
     } catch (e) {
       setToCsOpen(false);
@@ -593,6 +624,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     <p style={{ color: "#b91c1c", fontWeight: 700, margin: "0 0 4px" }}>
                       CS is looking into it.
                     </p>
+                    {order.substatus ? (
+                      <p style={{ margin: "0 0 4px", fontSize: "0.9rem", color: "#7f1d1d" }}>
+                        Substatus: <strong>{order.substatus}</strong>
+                      </p>
+                    ) : null}
                     <p style={{ margin: 0, fontSize: "0.9rem", color: "#7f1d1d" }}>
                       Submit is blocked until CS or ADMIN marks this order GTG. It will then return
                       to the queue so you can continue.
@@ -600,29 +636,55 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   </div>
                 ) : (
                   <div style={{ marginTop: "16px" }}>
-                    <label>
-                      Move to
-                      <select value={effectiveMoveTo} onChange={(e) => setMoveTo(e.target.value)}>
-                        {next.map((s) => (
-                          <option key={s} value={s}>
-                            {STATUS_LABELS[s] ?? s}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
+                    <div className="staff-move-group" role="group" aria-label="Move to">
+                      {next.map((s) => {
+                        const Icon = MOVE_ICON[s] ?? Play;
+                        return (
+                          <button
+                            key={s}
+                            type="button"
+                            aria-pressed={effectiveMoveTo === s}
+                            onClick={() => {
+                              setMoveTo(s);
+                              if (s !== "TO_CS") setSubstatus("");
+                            }}
+                            className={`staff-move-btn tone-${MOVE_TONE[s] ?? "primary"}`}
+                          >
+                            <Icon aria-hidden />
+                            <span>
+                              <strong>{STATUS_LABELS[s] ?? s}</strong>
+                              <small>{MOVE_HINT[s] ?? ""}</small>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
                     {exceptionMove ? (
-                      <label>
-                        Internal note (required for To CS)
-                        <textarea
-                          value={statusNote}
-                          onChange={(e) => setStatusNote(e.target.value)}
-                          rows={4}
-                          maxLength={2000}
-                          placeholder="What does this order need before it can continue?…"
-                          autoComplete="off"
-                          style={{ width: "100%", minHeight: "88px", resize: "vertical" }}
-                        />
-                      </label>
+                      <>
+                        <label>
+                          Internal note (required for To CS)
+                          <textarea
+                            value={statusNote}
+                            onChange={(e) => setStatusNote(e.target.value)}
+                            rows={4}
+                            maxLength={2000}
+                            placeholder="What does this order need before it can continue?…"
+                            autoComplete="off"
+                            style={{ width: "100%", minHeight: "88px", resize: "vertical" }}
+                          />
+                        </label>
+                        <label>
+                          Substatus (optional)
+                          <select value={substatus} onChange={(e) => setSubstatus(e.target.value)}>
+                            <option value="">No substatus</option>
+                            {TO_CS_SUBSTATUSES.map((s) => (
+                              <option key={s} value={s}>
+                                {s}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      </>
                     ) : null}
                     {gtgMove ? (
                       <label>
@@ -659,7 +721,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                           );
                         }}
                       >
-                        Update status
+                        Update status: {STATUS_LABELS[effectiveMoveTo] ?? effectiveMoveTo}
                       </button>
                     </div>
                   </div>
@@ -876,6 +938,22 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 </>
               ) : null}
               <ul className="staff-timeline" style={{ marginTop: "18px" }}>
+                {order.status === "TO_CS" && order.substatus ? (
+                  <li className="cat-status">
+                    <div
+                      className="staff-note-card"
+                      style={{
+                        background: "#fef2f2",
+                        border: "1px solid #fecaca",
+                      }}
+                    >
+                      <p style={{ margin: 0 }}>
+                        <strong style={{ color: "#b91c1c" }}>Substatus: </strong>
+                        {order.substatus}
+                      </p>
+                    </div>
+                  </li>
+                ) : null}
                 {shownNotes.map((n, i) => (
                   <li key={i} className="cat-note">
                     <div className="staff-note-card">
@@ -991,6 +1069,11 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             >
               <strong style={{ color: "#b91c1c" }}>Note to CS: </strong>
               <span style={{ display: "block", marginTop: "4px" }}>{statusNote.trim()}</span>
+              {substatus ? (
+                <span style={{ display: "block", marginTop: "8px", color: "#7f1d1d" }}>
+                  Substatus: <strong>{substatus}</strong>
+                </span>
+              ) : null}
             </p>
             <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
               <button

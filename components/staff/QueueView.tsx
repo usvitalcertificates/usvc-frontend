@@ -14,6 +14,7 @@ import {
   StatusPill,
   TimedActionModal,
 } from "@/components/staff/ui";
+import { CopyIconButton } from "@/components/staff/CopyButton";
 
 interface QueueOrder {
   id: string;
@@ -394,11 +395,12 @@ export function QueueView({
                       </span>
                     </td>
                     <td>
-                      <strong>{order.publicNumber}</strong>{" "}
-                      {order.rush ? <span className="staff-pill amber">RUSH</span> : null}
-                      <br />
-                      <span style={{ fontSize: "0.82rem", color: "var(--muted-text)" }}>
-                        {order.copies} {order.copies === 1 ? "copy" : "copies"}
+                      <span className="staff-ordercell">
+                        <CopyIconButton value={order.publicNumber} label="order number" />
+                        <span>
+                          <strong>{order.publicNumber}</strong>{" "}
+                          {order.rush ? <span className="staff-pill amber">RUSH</span> : null}
+                        </span>
                       </span>
                     </td>
                     <td>
