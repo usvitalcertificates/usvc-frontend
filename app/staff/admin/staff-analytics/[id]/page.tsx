@@ -15,7 +15,7 @@ import {
 } from "@/components/staff/ui";
 import { CopyIconButton } from "@/components/staff/CopyButton";
 
-type Workflow = "all" | "processing" | "to_cs" | "submitted";
+type Workflow = "all" | "processing" | "to_cs" | "gtg" | "submitted";
 type Preset = "today" | "7d" | "30d" | "month" | "all" | "custom";
 
 interface AnalyticsResponse {
@@ -23,6 +23,7 @@ interface AnalyticsResponse {
   metrics: {
     ownershipTaken: number;
     sentToCs: number;
+    markedGtg: number;
     submittedToAgency: number;
     totalFormsHandled: number;
   };
@@ -69,6 +70,7 @@ export default function StaffAnalyticsPage({
   useInactivitySignout();
   const initialRange = presetRange("today");
   const [allowed, setAllowed] = useState(false);
+  const [viewerRole, setViewerRole] = useState<string | null>(null);
   const [preset, setPreset] = useState<Preset>("today");
   const [from, setFrom] = useState(initialRange.from);
   const [to, setTo] = useState(initialRange.to);
@@ -100,9 +102,13 @@ export default function StaffAnalyticsPage({
     const role = staffRole();
     const canView = selfMode ? Boolean(role) : role === "ADMIN";
     setAllowed(canView);
+    setViewerRole(role);
     if (canView) void load();
     else setLoading(false);
   }, [load]);
+
+  // Marked GTG is a CS/ADMIN concern; fulfillment never sees the card or chip.
+  const showGtg = viewerRole !== "FULFILLMENT";
 
   const choosePreset = (next: Preset) => {
     setPreset(next);
@@ -138,9 +144,14 @@ export default function StaffAnalyticsPage({
         <p className="staff-alert error">From date must be on or before the to date.</p>
       ) : null}
 
-      <div className="staff-stats staff-analytics-stats">
+      <div
+        className={`staff-stats staff-analytics-stats${showGtg ? "" : " staff-analytics-stats-no-gtg"}`}
+      >
         <StatCard value={data?.metrics.ownershipTaken ?? "—"} label="Ownership taken" tone="blue" />
         <StatCard value={data?.metrics.sentToCs ?? "—"} label="Sent to CS" tone="rose" />
+        {showGtg ? (
+          <StatCard value={data?.metrics.markedGtg ?? "—"} label="Marked GTG" tone="amber" />
+        ) : null}
         <StatCard
           value={data?.metrics.submittedToAgency ?? "—"}
           label="Sent to agency"
@@ -209,6 +220,7 @@ export default function StaffAnalyticsPage({
               ["all", "All forms"],
               ["processing", "Order Processing"],
               ["to_cs", "Sent To CS"],
+              ...(showGtg ? [["gtg", "Marked GTG"] as [Workflow, string]] : []),
               ["submitted", "Sent to Government Agency"],
             ] as [Workflow, string][]
           ).map(([value, label]) => (
