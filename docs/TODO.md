@@ -120,6 +120,8 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] SaaS stat cards 2026-09-25 (`feat/stat-cards-saas-v2`): all 16 KPI cards site-wide restyled to small label on top + big number below with no icons (pastel tones + grids unchanged, still filter-driven); dead icon props, imports, and CSS removed
 - [x] Marked-GTG analytics 2026-09-25 (`feat/analytics-marked-gtg`): amber Marked GTG card + workflow chip on the shared per-user dashboard (admin + My Analytics); needs backend `feat/analytics-marked-gtg`
 - [x] Marked-GTG role gate 2026-09-25: card + chip render for CS/ADMIN viewers only (fulfillment sees 4 cards via a 4-column grid fallback); metric stays computed for everyone
+- [x] Flow-host first-paint fixes 2026-09-25 (`feat/flow-root-chrome-flash`): `/ → /staff` rewrites carry the staff-area flag so the public header/footer never wraps staff pages; StaffShell holds first paint until the sessionStorage check runs so signed-out visitors never glimpse the dashboard
+- [x] Login bounce race fix 2026-09-25: StaffShell check + redirect merged into a single effect on freshly-read storage (separate effects raced on navigation and sent fresh logins back to /auth); auth helper copy spaced off the button and retitled to Admin
 - [x] Staff password management 2026-09-25: ADMIN-only Change password panel in Settings (current verified, re-login after) plus per-row reset-password action in Administration issuing 48h setup links; needs backend endpoints
 - [x] OpenAI Ads conversion tracking 2026-09-25: production-only public pixel, privacy-safe normalized page views, checkout starts, verified completed orders with refresh deduplication, environment/deployment documentation, and updated privacy disclosure
 
