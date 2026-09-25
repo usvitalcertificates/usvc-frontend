@@ -457,73 +457,47 @@ form.staff-lookup,
 .staff-stat {
   border: 1px solid transparent;
   border-radius: 10px;
-  padding: 9px 11px;
+  padding: 10px 14px;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 58px;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 76px;
+  justify-content: center;
 }
-.staff-stat svg {
-  width: 19px;
-  height: 19px;
-  flex-shrink: 0;
+.staff-stat span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--flow-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .staff-stat strong {
-  font-size: 1.35rem;
+  font-size: 1.7rem;
   line-height: 1.1;
   font-weight: 800;
   color: var(--flow-ink);
   font-variant-numeric: tabular-nums;
 }
-.staff-stat span {
-  font-size: 0.75rem;
-  color: var(--flow-secondary);
-}
-.staff-stat-content {
-  display: flex;
-  align-items: baseline;
-  gap: 7px;
-  min-width: 0;
-  white-space: nowrap;
-}
-.staff-stat-content span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 .staff-stat-blue {
   background: #edf4ff;
   border-color: #cbdfff;
-}
-.staff-stat-blue svg {
-  color: #2563eb;
 }
 .staff-stat-lavender {
   background: #f3efff;
   border-color: #ddd2ff;
 }
-.staff-stat-lavender svg {
-  color: #7c3aed;
-}
 .staff-stat-rose {
   background: #fff0f1;
   border-color: #fecdd3;
-}
-.staff-stat-rose svg {
-  color: #dc2626;
 }
 .staff-stat-green {
   background: #effaf2;
   border-color: #bfe6c9;
 }
-.staff-stat-green svg {
-  color: #16a34a;
-}
 .staff-stat-amber {
   background: #fff7e8;
   border-color: #fde0a8;
-}
-.staff-stat-amber svg {
-  color: #b45309;
 }
 
 /* Panels + filters. */

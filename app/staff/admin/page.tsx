@@ -1,16 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import {
-  ClipboardList,
-  Clock3,
-  KeyRound,
-  LogOut,
-  Plus,
-  Power,
-  RotateCcw,
-  UserRoundCheck,
-} from "lucide-react";
+import { KeyRound, LogOut, Plus, Power, RotateCcw } from "lucide-react";
 import { staffId, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { BackLink, ConfirmModal, PageBand, StatCard, Toast } from "@/components/staff/ui";
@@ -217,24 +208,9 @@ export default function StaffAdmin() {
       ) : null}
 
       <div className="staff-stats staff-admin-stats">
-        <StatCard
-          value={staff.length}
-          label="Staff accounts"
-          icon={<UserRoundCheck aria-hidden />}
-          tone="blue"
-        />
-        <StatCard
-          value={activeOrders}
-          label="Active orders"
-          icon={<ClipboardList aria-hidden />}
-          tone="green"
-        />
-        <StatCard
-          value={pending}
-          label="Invitations pending"
-          icon={<Clock3 aria-hidden />}
-          tone="amber"
-        />
+        <StatCard value={staff.length} label="Staff accounts" tone="blue" />
+        <StatCard value={activeOrders} label="Active orders" tone="green" />
+        <StatCard value={pending} label="Invitations pending" tone="amber" />
       </div>
 
       <div className="staff-panel">
