@@ -2,6 +2,8 @@
 
 Last updated: 2026-09-25 (official USVC branding; two-fee model; staff roles ADMIN/FULFILLMENT/CS; split ADMIN analytics nav with nested staff + orders analytics; full-width staff content with filtered analytics roster; polished staff queues and CS corrections inbox).
 
+- Staff UI polish keeps KPI values and labels on one line, presents workflow destinations as compact selectable steps with a separate confirmation action, consistently calls the terminal state “Sent to Government Agency,” and redesigns the required completion-PDF panel with resilient upload copy and labeled file actions.
+
 ## Implemented
 
 - ADMIN sidebar now shows Staff Analytics (`/staff/admin/staff-analytics`: roster with View analytics per-user drill-down) and Orders Analytics (`/staff/admin/orders-analytics`: order index with search plus per-order timeline) instead of the generic Analytics item; FULFILLMENT/CS keep a renamed My Analytics item (`/staff/analytics`) for their own token-scoped dashboard. Administration (`/staff/admin`) is staff management only: invite, roles, status, 2-step controls, three stat cards — the View details buttons and Orders Activity tab moved to the new pages. Legacy detail URLs (`/staff/admin/[id]`, `/staff/admin/activity/[id]`) redirect to the nested routes.
@@ -15,7 +17,7 @@ Last updated: 2026-09-25 (official USVC branding; two-fee model; staff roles ADM
 - Section 9 matches reference exactly (dl rows: Certificate / Subject / Requestor & contact / Copies-fees with fee math); master consent auto-checks all 7 incl. payment authorization; address State is a 52-state dropdown (military APO/FPO, international region+country); conditional Other/previous-name/history fields for all 4 types. UI E2E passed 2026-09-21 (headless Chromium, all 4 types → checkout; Atlas rows + vault verified; fixed live address-copy sync + explicit radio values).
 - UI E2E passed 2026-09-21 (headless Chromium, real form → `/checkout/[id]` for all 4 types; Atlas rows + vault verified). Fixed: live address-copy sync (billing/shipping required fields), explicit "same as" radio values.
 
-- State detail page `/state/[state]` rebuilt to reference UI: breadcrumbs, Available Certificates header, 4 certificate cards ($125/copy + included-fees note), Start This Request + how-to links, instructions/eligibility panels, full disclosure, per-state metadata.
+- State detail page `/state/[state]` rebuilt to reference UI: breadcrumbs, Available Certificates header, 4 certificate cards ($149/copy + included-fees note), Start This Request + how-to links, instructions/eligibility panels, full disclosure, per-state metadata.
 - FAQ page `/faq` rebuilt to reference UI: Support header, numbered 29-item accordion (first open, single-toggle) with answers verbatim from usvitalrecords.org/alabama/faq.html + markdown links/lists, FAQPage JSON-LD, Disclaimer box, Contact Support panel.
 - Legal pages (`/privacy-policy`, `/terms-of-service`, `/accessibility`) rebuilt to reference UI: Legal header, last-updated line, verbatim sections with tricolor rules + hanging bullets, per-page SEO, disclosure box.
 

@@ -7,6 +7,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [ ] Port reference data verbatim: states, certificates, government-fees, faq, legal, pricing, form-config, address → `lib/data/*`
 - [ ] Order form upgrade: per-state rules, county/city validation, address same-as copy, sessionStorage draft (no SSN), Zod validation, working review + Edit scroll
 - [x] Checkout: Checkout Sessions embedded tabs (reference UI verbatim), summary sidebar, authorize + Pay flow, session-verified confirmation receipt — done 2026-09-21, real $238 test payment passed
+- [x] Pricing $149/copy + $45 rush 2026-09-25 (`feat/price-149-45`): two-fee display values updated across order form, state pages, and processing options (server is authoritative; needs backend `feat/price-149-45`)
 - [ ] Confirmation (→ Phase 3): replace static page with `GET /orders/:id/confirmation` verification + print receipt
 - [x] Tracking: sanitized, customer-friendly progress timeline backed by `POST /orders/tracking` — done 2026-09-22
 - [x] State detail page UI (`/state/[state]`) — done 2026-09-21, matches reference
@@ -103,6 +104,7 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 - [x] CS editor header number 2026-09-25: order number renders big white next to its copy button in the band subtitle (eyebrow shortened to "CS correction" to avoid duplication)
 - [x] CS editor header + notes clarity 2026-09-25: band redesigned as grid (big "Order #…" + copy left, To CS/RUSH badges right, cert/owner meta on its own row); flagged panel shows the latest note plus a separate Substatus line; Recent notes split into Latest note card vs Previous notes with a properly labeled Substatus line (detail Notes tab label fixed the same way)
 - [x] CS editor header wording 2026-09-25: "Order #" white and same size as the number, Owner right-aligned under the badges, both flagged-note spots labeled "Fulfillment flagged Notes:"
+- [x] Completion document card 2026-09-25 (`feat/completion-doc-card`): header with Required pill + subtitle, file-type icon, icon+text action pills with fixed baseline alignment (uniform inline-flex, label margin reset) and red-outline Delete
 - [x] Notes & Document Upload 2026-09-25 (`feat/order-document-upload`): tab renamed from Notes & History; pastel-green PDF-only panel ("Order Completion PDF" + red required star) beside Order Notes in a responsive grid; file card actions are icon buttons with hover text; SUBMITTED needs ≥1 note + PDF for non-ADMIN with inline hint (ADMIN bypasses); proxy forwards `content-disposition` for filenames; FormData-safe auth fetch
 - [x] Compact Open Orders header 2026-09-24: on-demand order lookup, condensed page band, and five one-row semantic pastel KPI mini-cards (two columns on tablet, one on narrow mobile) move queue rows above the fold
 - [x] Order Search polish 2026-09-24: wider order-number column, county context, fixed-width actions, and role-aware unavailable/open-queue actions prevent overflow and dead-end links
@@ -111,6 +113,9 @@ Scope: Phase 1 (public funnel) and Phase 2 (staff MVP) are built; PR `feat/fulfi
 
 ## Phase 3 (remaining + proposed backlog)
 
+- [x] Staff workflow/document polish 2026-09-25: single-line KPI cards, compact next-step selection and confirmation hierarchy, accurate “Sent to Government Agency” terminology, corrected order-created timestamp label, and responsive completion-PDF upload/file actions
+- [x] Doc-card actions to icons 2026-09-25 (`feat/doc-action-icons`): Download/Replace/Delete are 38px icon buttons with tooltips (fixes label-margin baseline drift); dead pill CSS removed
+- [x] Doc-card actions to text pills 2026-09-25: compact 32px-high, wide text buttons (fixed-height boxes so the file-picker label aligns pixel-perfect); red-outline Delete
 - [x] OpenAI Ads conversion tracking 2026-09-25: production-only public pixel, privacy-safe normalized page views, checkout starts, verified completed orders with refresh deduplication, environment/deployment documentation, and updated privacy disclosure
 
 - [ ] Confirmation: replace static page with `GET /orders/:id/confirmation` verification + print receipt (needs backend endpoint)

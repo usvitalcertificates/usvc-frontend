@@ -19,7 +19,7 @@ const MILESTONES = [
   "Payment Successful",
   "Order Received",
   "Order Processing",
-  "Order Processed – Submitted to the Govt Agency",
+  "Order Processed – Sent to the Government Agency",
 ];
 
 function formatDate(value: string) {

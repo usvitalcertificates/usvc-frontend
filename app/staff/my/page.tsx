@@ -6,7 +6,7 @@ export default function MyWork() {
   return (
     <QueueView
       title="My Work"
-      subtitle="Your open claimed orders, most urgent first. Advance each one to Submitted, then pick another from the queue."
+      subtitle="Your open claimed orders, most urgent first. Send each completed order to the government agency, then pick another from the queue."
       preset={{ assigned: "mine", openOnly: true, attentionFirst: true, hideStatus: true }}
       empty={{
         title: "Your work is clear.",

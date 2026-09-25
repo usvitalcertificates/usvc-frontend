@@ -8,7 +8,7 @@ export const STATUS_LABELS: Record<string, string> = {
   IN_REVIEW: "Order Processing",
   TO_CS: "To CS",
   GTG: "GTG",
-  SUBMITTED: "Submitted to Govt Agency",
+  SUBMITTED: "Sent to Government Agency",
   CANCELLED: "Cancelled",
 };
 
@@ -104,7 +104,7 @@ export function StatCard({
   return (
     <div className={`staff-stat staff-stat-${tone}`}>
       {icon}
-      <div>
+      <div className="staff-stat-content">
         <strong>{value}</strong>
         <span>{label}</span>
       </div>
@@ -372,14 +372,14 @@ export function Pagination({
 }
 
 /**
- * Agent-centric stepper: Claimed → Order Processing → Submitted.
+ * Agent-centric stepper: Claimed → Order Processing → Sent to agency.
  * Payment is a precondition chip (only paid orders reach agents), and
  * TO_CS parks as a red branch off Processing.
  */
 const AGENT_STEPS = [
   { key: "claimed", label: "Took Ownership", caption: "Order is yours, work not started." },
   { key: "processing", label: "Order Processing", caption: "You're working this order now." },
-  { key: "submitted", label: "Submitted", caption: "Sent to the government agency." },
+  { key: "submitted", label: "Sent to Agency", caption: "Delivered to the government agency." },
 ];
 
 function agentStepIndex(status: string): number {
@@ -456,11 +456,11 @@ export function Stepper({
       {done ? (
         <div className="staff-closed-panel" role="status">
           <p className="staff-closed-title">
-            <span aria-hidden>✓ </span>This order is closed — submitted to the government agency.
+            <span aria-hidden>✓ </span>This order is closed — sent to the government agency.
           </p>
           {submittedAt ? (
             <p className="staff-closed-sub">
-              Submitted {new Date(submittedAt).toLocaleString("en-US")}.
+              Sent {new Date(submittedAt).toLocaleString("en-US")}.
             </p>
           ) : null}
         </div>
