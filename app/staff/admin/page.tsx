@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { KeyRound, LogOut, Plus, Power, RotateCcw } from "lucide-react";
+import { KeyRound, LockKeyhole, LogOut, Plus, Power, RotateCcw } from "lucide-react";
 import { staffId, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { BackLink, ConfirmModal, PageBand, StatCard, Toast } from "@/components/staff/ui";
@@ -147,6 +147,37 @@ export default function StaffAdmin() {
       body: `${label}?`,
       confirmLabel: action === "disable" ? "Deactivate" : "Confirm",
       danger: action === "disable",
+      run,
+    });
+  };
+
+  const resetPassword = async (id: string, email: string) => {
+    const run = async () => {
+      setConfirm(null);
+      setError("");
+      setInviteLink("");
+      setInviteEmailed(false);
+      try {
+        const data = await staffJson<{ setupToken?: string; emailed?: boolean }>(
+          `/admin/staff/${id}/password-reset`,
+          { method: "POST", body: "{}" },
+        );
+        if (data.emailed) {
+          setInviteEmailed(true);
+          setToast(`Password reset emailed to ${email} — valid 48h.`);
+        } else if (data.setupToken) {
+          setInviteLink(`${window.location.origin}/auth?setup=${data.setupToken}`);
+          setToast("Password reset link created — email is disabled, share it manually.");
+        }
+        await loadRoster();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Password reset failed");
+      }
+    };
+    setConfirm({
+      title: "Reset password?",
+      body: `Issue ${email} a fresh 48-hour setup link? Their current password keeps working until they set a new one.`,
+      confirmLabel: "Reset Password",
       run,
     });
   };
@@ -328,6 +359,15 @@ export default function StaffAdmin() {
                             }
                           >
                             <KeyRound aria-hidden />
+                          </button>
+                          <button
+                            type="button"
+                            className="staff-icon-btn"
+                            aria-label={`Reset password for ${member.email}`}
+                            title="Reset password (48h setup link)"
+                            onClick={() => void resetPassword(member.id, member.email)}
+                          >
+                            <LockKeyhole aria-hidden />
                           </button>
                           {member.accountStatus === "active" ? (
                             <button
