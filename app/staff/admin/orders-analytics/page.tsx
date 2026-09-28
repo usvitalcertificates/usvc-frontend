@@ -21,10 +21,12 @@ import {
   CHART_CERT_COLORS,
   CHART_CERT_LABELS,
   CHART_STATUS_COLORS,
+  CHART_STATUS_EDGES,
   CHART_STATUS_LABELS,
   ChartCard,
   ChartTooltip,
   chartColor,
+  chartEdge,
   formatMoney,
   formatMoneyTick,
 } from "@/components/staff/charts-theme";
@@ -150,6 +152,7 @@ export default function OrdersAnalyticsDashboard() {
         ...slice,
         name: certLabel(slice.certificate),
         fill: chartColor(slice.certificate, index),
+        edge: chartEdge(slice.certificate, index),
       })),
     [data],
   );
@@ -159,6 +162,7 @@ export default function OrdersAnalyticsDashboard() {
     const top = rows.slice(0, 10).map((row, index) => ({
       ...row,
       fill: chartColor(row.stateCode, index),
+      edge: chartEdge(row.stateCode, index),
     }));
     const rest = rows.slice(10);
     const restOrders = rest.reduce((sum, row) => sum + row.orders, 0);
@@ -166,7 +170,13 @@ export default function OrdersAnalyticsDashboard() {
     return restOrders > 0
       ? [
           ...top,
-          { stateCode: "Other", orders: restOrders, revenueCents: restRevenue, fill: "#94A3B8" },
+          {
+            stateCode: "Other",
+            orders: restOrders,
+            revenueCents: restRevenue,
+            fill: "#E2E8F0",
+            edge: "#64748B",
+          },
         ]
       : top;
   }, [data]);
@@ -187,7 +197,8 @@ export default function OrdersAnalyticsDashboard() {
       (data?.statuses ?? []).map((slice) => ({
         ...slice,
         name: CHART_STATUS_LABELS[slice.status] ?? slice.status,
-        fill: CHART_STATUS_COLORS[slice.status] ?? "#64748B",
+        fill: CHART_STATUS_COLORS[slice.status] ?? "#E2E8F0",
+        edge: CHART_STATUS_EDGES[slice.status] ?? "#64748B",
       })),
     [data],
   );
@@ -198,6 +209,7 @@ export default function OrdersAnalyticsDashboard() {
         name: slice.name,
         revenue: Math.round(slice.revenueCents / 100),
         fill: slice.fill,
+        edge: slice.edge,
       })),
     [certificates],
   );
@@ -207,7 +219,8 @@ export default function OrdersAnalyticsDashboard() {
       topStates.map((row, index) => ({
         stateCode: row.stateCode,
         revenue: Math.round(row.revenueCents / 100),
-        fill: chartColor(row.stateCode, index),
+        fill: row.fill,
+        edge: chartEdge(row.stateCode, index),
       })),
     [topStates],
   );
@@ -316,12 +329,33 @@ export default function OrdersAnalyticsDashboard() {
                     stroke="#ffffff"
                   >
                     {certificates.map((slice) => (
-                      <Cell key={slice.certificate} fill={slice.fill} />
+                      <Cell
+                        key={slice.certificate}
+                        fill={slice.fill}
+                        stroke={slice.edge}
+                        strokeWidth={2}
+                      />
                     ))}
                   </Pie>
                   <Tooltip content={<ChartTooltip />} />
                   <Legend />
                 </PieChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard title="Revenue by form type" hint="Charged dollars per certificate (USD).">
+              <ResponsiveContainer width="100%" height={340}>
+                <BarChart data={revenueByForm} margin={{ left: 8, right: 32 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#DCE4EF" />
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} tickFormatter={formatMoneyTick} />
+                  <Tooltip content={<ChartTooltip money />} />
+                  <Bar dataKey="revenue" radius={[8, 8, 0, 0]}>
+                    {revenueByForm.map((row) => (
+                      <Cell key={row.name} fill={row.fill} stroke={row.edge} strokeWidth={1.5} />
+                    ))}
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             </ChartCard>
 
@@ -334,7 +368,12 @@ export default function OrdersAnalyticsDashboard() {
                   <Tooltip content={<ChartTooltip />} />
                   <Bar dataKey="orders" radius={[0, 8, 8, 0]}>
                     {topStates.map((row) => (
-                      <Cell key={row.stateCode} fill={row.fill} />
+                      <Cell
+                        key={row.stateCode}
+                        fill={row.fill}
+                        stroke={row.edge}
+                        strokeWidth={1.5}
+                      />
                     ))}
                   </Bar>
                 </BarChart>
@@ -359,25 +398,11 @@ export default function OrdersAnalyticsDashboard() {
                       dataKey={code}
                       stackId="forms"
                       fill={CHART_CERT_COLORS[code]}
+                      stroke="#ffffff"
+                      strokeWidth={1}
                       radius={[0, 0, 0, 0]}
                     />
                   ))}
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartCard>
-
-            <ChartCard title="Revenue by form type" hint="Charged dollars per certificate (USD).">
-              <ResponsiveContainer width="100%" height={320}>
-                <BarChart data={revenueByForm} margin={{ left: 8, right: 32 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#DCE4EF" />
-                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} tickFormatter={formatMoneyTick} />
-                  <Tooltip content={<ChartTooltip money />} />
-                  <Bar dataKey="revenue" radius={[8, 8, 0, 0]}>
-                    {revenueByForm.map((row) => (
-                      <Cell key={row.name} fill={row.fill} />
-                    ))}
-                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
@@ -391,7 +416,12 @@ export default function OrdersAnalyticsDashboard() {
                   <Tooltip content={<ChartTooltip money />} />
                   <Bar dataKey="revenue" radius={[0, 8, 8, 0]}>
                     {revenueByState.map((row) => (
-                      <Cell key={row.stateCode} fill={row.fill} />
+                      <Cell
+                        key={row.stateCode}
+                        fill={row.fill}
+                        stroke={row.edge}
+                        strokeWidth={1.5}
+                      />
                     ))}
                   </Bar>
                 </BarChart>
@@ -407,7 +437,12 @@ export default function OrdersAnalyticsDashboard() {
                   <Tooltip content={<ChartTooltip />} />
                   <Bar dataKey="orders" radius={[0, 8, 8, 0]}>
                     {statuses.map((slice) => (
-                      <Cell key={slice.status} fill={slice.fill} />
+                      <Cell
+                        key={slice.status}
+                        fill={slice.fill}
+                        stroke={slice.edge}
+                        strokeWidth={1.5}
+                      />
                     ))}
                   </Bar>
                 </BarChart>

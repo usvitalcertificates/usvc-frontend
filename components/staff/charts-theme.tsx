@@ -2,24 +2,34 @@
 
 import type { ReactNode } from "react";
 
-/** Vibrant categorical palette for charts (colorblind-sensible order). */
-export const CHART_PALETTE = [
-  "#6366F1",
-  "#10B981",
-  "#F59E0B",
-  "#F43F5E",
-  "#06B6D4",
-  "#8B5CF6",
-  "#84CC16",
-  "#FB923C",
-  "#38BDF8",
-  "#D946EF",
-  "#2DD4BF",
-  "#64748B",
-] as const;
+/** Pastel categorical slots: soft fill + vivid edge (colorblind-sensible order). */
+const PASTEL_SLOTS: [fill: string, edge: string][] = [
+  ["#C7D2FE", "#6366F1"],
+  ["#BBF7D0", "#10B981"],
+  ["#FDE68A", "#F59E0B"],
+  ["#FECDD3", "#F43F5E"],
+  ["#A5F3FC", "#06B6D4"],
+  ["#DDD6FE", "#8B5CF6"],
+  ["#D9F99D", "#65A30D"],
+  ["#FED7AA", "#FB923C"],
+  ["#BAE6FD", "#0284C7"],
+  ["#F5D0FE", "#D946EF"],
+  ["#99F6E4", "#14B8A6"],
+  ["#E2E8F0", "#64748B"],
+];
 
-/** Certificate colors: vivid but harmonious with the staff theme. */
+/** Vibrant categorical palette for charts (colorblind-sensible order). */
+export const CHART_PALETTE = PASTEL_SLOTS.map(([, edge]) => edge);
+
+/** Certificate colors: pastel fill, vivid edge. */
 export const CHART_CERT_COLORS: Record<string, string> = {
+  BIRTH: "#C7D2FE",
+  DEATH: "#A5F3FC",
+  MARRIAGE: "#BBF7D0",
+  DIVORCE: "#FECDD3",
+};
+
+export const CHART_CERT_EDGES: Record<string, string> = {
   BIRTH: "#6366F1",
   DEATH: "#06B6D4",
   MARRIAGE: "#10B981",
@@ -33,10 +43,18 @@ export const CHART_CERT_LABELS: Record<string, string> = {
   DIVORCE: "Divorce",
 };
 
-/** Fulfillment status tones (semantic, not categorical). */
+/** Fulfillment status tones: pastel fill, semantic vivid edge. */
 export const CHART_STATUS_COLORS: Record<string, string> = {
+  PAID: "#C7D2FE",
+  IN_REVIEW: "#BAE6FD",
+  TO_CS: "#FDE68A",
+  GTG: "#BBF7D0",
+  SUBMITTED: "#CBD5E1",
+};
+
+export const CHART_STATUS_EDGES: Record<string, string> = {
   PAID: "#6366F1",
-  IN_REVIEW: "#38BDF8",
+  IN_REVIEW: "#0284C7",
   TO_CS: "#F59E0B",
   GTG: "#10B981",
   SUBMITTED: "#0B2545",
@@ -50,9 +68,14 @@ export const CHART_STATUS_LABELS: Record<string, string> = {
   SUBMITTED: "Sent to Government Agency",
 };
 
-/** Stable color per key (certificate code or state code). */
+/** Stable pastel fill per key (certificate code or state code). */
 export function chartColor(key: string, index = 0): string {
-  return CHART_CERT_COLORS[key] ?? CHART_PALETTE[index % CHART_PALETTE.length]!;
+  return CHART_CERT_COLORS[key] ?? PASTEL_SLOTS[index % PASTEL_SLOTS.length]![0];
+}
+
+/** Vivid edge matching chartColor, for strokes and dots. */
+export function chartEdge(key: string, index = 0): string {
+  return CHART_CERT_EDGES[key] ?? PASTEL_SLOTS[index % PASTEL_SLOTS.length]![1];
 }
 
 /** Gradient pair per palette slot for area/bar fills. */

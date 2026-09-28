@@ -535,6 +535,13 @@ form.staff-lookup,
 }
 .staff-chart-grid .staff-panel {
   margin-bottom: 0;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+.staff-chart-grid .staff-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgb(11 37 69 / 12%);
 }
 .staff-chart-wide {
   grid-column: 1 / -1;
@@ -1780,6 +1787,12 @@ label.staff-icon-btn {
   }
   .staff-countdown > div {
     transition: none;
+  }
+  .staff-chart-grid .staff-panel {
+    transition: none;
+  }
+  .staff-chart-grid .staff-panel:hover {
+    transform: none;
   }
 }
 
