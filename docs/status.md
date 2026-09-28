@@ -25,6 +25,8 @@ Proposed — awaiting owner decision:
 - [ ] SLA/age escalation for rush + stale unassigned orders
 - [ ] Saved queue filters, CSV export, print-friendly order sheet
 - [ ] Agency-payment confirmation display per order (needs backend field)
+- [ ] Gate GA4/GTM script loading on non-staff pages like the OpenAI pixel (today scripts load everywhere in prod; only `page_view` is suppressed on staff) — weigh GTM preview/debug impact first
+- [ ] Dead OpenAI pixel page IDs: `knownPages` maps `/terms-of-use` and `/refund-policy`, which 404 (only `privacy-policy`, `terms-of-service`, `accessibility` exist) — fix map or add redirects
 
 ## Doc rule
 

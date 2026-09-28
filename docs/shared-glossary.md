@@ -20,7 +20,7 @@ Staff flow: `PAID → IN_REVIEW → SUBMITTED` (terminal), plus `IN_REVIEW → T
 - `ADMIN` (super-admin): everything — roster, all orders, release/reassign, MFA reset, password resets, audit.
 - `FULFILLMENT` (agent/staff): claim and process only own assigned orders.
 - `CS`: claims orders, full-form correction (`EDIT`-only), marks `TO_CS → GTG`. Sees pricing (like ADMIN); FULFILLMENT does not.
-- Staff accounts are invite-only. No self-register. Login = email + password + TOTP code. 12+ char self-set passwords; 30m access + 7d rotating refresh; 30-min inactivity sign-out; 5 fails/15min lockout. Lost device: super-admin MFA reset (revokes sessions, audited) + recovery codes (still open, Phase 3 proposal).
+- Staff accounts are invite-only. No self-register. Login = email + password + TOTP code. 8+ char self-set passwords; 30m access + 7d rotating refresh; 30-min inactivity sign-out (frontend timer); 5 fails/15min lockout. Lost device: super-admin MFA reset (revokes sessions, audited) + recovery codes (still open, Phase 3 proposal).
 
 ## Order numbers
 

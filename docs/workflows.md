@@ -15,12 +15,13 @@ Staff local test: seed ADMIN in backend `staff_users`, pair TOTP at `/auth`, inv
 
 - `API_URL` — server-only Express upstream for the `/api/backend` proxy. Never expose to browsers.
 - `ANALYTICS_ENABLED` — `true` only in production (enables GA4 + GTM + OpenAI pixel).
-- `GA_MEASUREMENT_ID` (`G-GM4PWPHER1`), `OPENAI_ADS_PIXEL_ID`, `OPENAI_ADS_PIXEL_DEBUG` (temporary verification only).
-- Never put Mongo/Stripe/JWT secrets in frontend env.
+- `GA_MEASUREMENT_ID` (`G-GM4PWPHER1`), `OPENAI_ADS_PIXEL_ID`, `OPENAI_ADS_PIXEL_DEBUG` (temporary verification only). `GTM-KC8LVCXR` is hardcoded in `app/layout.tsx`, not an env var.
+- `.env.example` holds all 5 vars; `.env.local.example` holds only `API_URL` — either works for `cp` locally.
+- Never put Mongo/Stripe/JWT secrets in frontend env. `FRONTEND_URL` and Stripe keys live in the backend env, not here.
 
 ## Vercel deploy
 
-Deploy `usvc-frontend/` to one Vercel project; attach apex + `www` + `flow.*` to the **same** project (no wildcard, no second project). Backend `FRONTEND_URL` must be the exact production origin. Previews use test keys; run `npm run build` first; GTM `GTM-KC8LVCXR` prod-only; backend sends the only `purchase`.
+Deploy `usvc-frontend/` to one Vercel project; attach apex + `www` + `flow.*` to the **same** project (no wildcard, no second project). Backend `FRONTEND_URL` must be the exact production origin. Previews use test keys; run `npm run build` first. GA4 + GTM scripts load in production on all pages (the `page_view` event is skipped on staff paths; the OpenAI pixel never loads on staff); backend sends the only `purchase`.
 
 ## Gates
 
