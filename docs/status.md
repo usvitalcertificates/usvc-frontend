@@ -14,11 +14,16 @@ Last updated: 2026-09-25. Phase 1 (public funnel) and Phase 2 (staff MVP) are bu
 
 ## Remaining (Phase 3)
 
+- [x] Orders Analytics charts dashboard (`feat/orders-charts`): per-order activity table + timeline removed; recharts dashboard (form-type donut, Top-states bar, form×state stacked bar, status funnel, revenue by form/state) over `GET /admin/orders-summary` (paid orders, Today/7d/30d/3mo/6mo/1yr/All + custom, default 30d)
 - [ ] Confirmation: replace static page with backend-verified receipt + print (`GET /orders/:id/confirmation`, needs backend endpoint)
 - [ ] Receipt UI parity with backend email template (backend owns sending)
 - [ ] Content: per-state fee/rules data port
 - [ ] SEO: `app/sitemap.ts`, JSON-LD Organization, metadata per state/cert page
 - [ ] Gov-fee UI, sales/revenue charts, attendance port, Tasks system, Documents tab (backend designs open)
+
+Chart roadmap (backend `$facet` returns all dimensions in one call — new charts are frontend-only):
+
+- [ ] Orders-over-time line, per-agent throughput/conversion, refund/failed tracking, CSV export
 
 Proposed — awaiting owner decision:
 
