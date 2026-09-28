@@ -4,13 +4,13 @@ Last updated: 2026-09-25. Phase 1 (public funnel) and Phase 2 (staff MVP) are bu
 
 ## Implemented (see `architecture.md`, `main-website.md`, `flow-portal.md`)
 
-- Public funnel: home, certificates, state selector/landing, config-driven 4-type order form (11 sections, geo county/city, 9 CA counties blocked, SSN-safe draft, verify → create → checkout), Stripe Elements checkout, session-verified confirmation, sanitized tracking timeline, API-backed contact, 29-item FAQ + JSON-LD, verbatim legal pages, Times/Navy/Red theme.
-- Staff portal (`/auth`, `/staff/*`, host-split `middleware.ts`): TOTP auth + 30-min inactivity sign-out, Open/My/Closed/Search queues, tabbed order detail with stepper, per-field reveal + reason + 30s auto-mask, `TO_CS`/`GTG` lane, CS inbox + full-form editor, completion-PDF panel, split ADMIN analytics (staff + orders), My Analytics for all roles.
-- Analytics prod-only public: GA4 `G-GM4PWPHER1` + GTM `GTM-KC8LVCXR` + OpenAI Ads pixel (never on staff, never PII; backend sends the only `purchase`).
+- Public funnel: home, certificates, state selector/landing, config-driven 4-type order form (11 sections, geo county/city, 9 CA counties blocked, sensitive-safe draft, verify → create → checkout), Stripe Elements checkout, session-verified confirmation, sanitized tracking timeline, API-backed contact, 29-item FAQ + JSON-LD, verbatim legal pages, Times/Navy/Red theme.
+- Staff portal (`/auth`, `/staff/*`, host-split `middleware.ts`): TOTP auth + 30-min inactivity sign-out, Open/My/Closed/Search queues, tabbed order detail with stepper, controlled sensitive-data actions (policy TBD — see `fulfillment.md`), `TO_CS`/`GTG` lane, CS inbox + full-form editor, completion-PDF panel, split ADMIN analytics (staff + orders), My Analytics for all roles.
+- Analytics prod-only: GA4 `G-GM4PWPHER1` + GTM `GTM-KC8LVCXR` (scripts load on all pages; `page_view` skipped on staff) + OpenAI Ads pixel (never loads on staff); no PII in events; backend sends the only `purchase`.
 
 ## Limits
 
-- Display totals non-authoritative (backend recalculates). Per-state fee/rules port remains. SSN/card encrypted server-side (`confidentialData`); staff see `*********` until audited reveal.
+- Display totals non-authoritative (backend recalculates). Per-state fee/rules port remains. Sensitive order fields are masked in staff lists; access policy TBD — see `fulfillment.md`.
 
 ## Remaining (Phase 3)
 
