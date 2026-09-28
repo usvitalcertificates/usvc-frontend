@@ -4,7 +4,7 @@ Customer-facing only. Public host (apex/`www`), Times New Roman, Navy/Red tokens
 
 ## Funnel
 
-`/` → `/find-your-state` or `/state/[state]` → `/state/[state]/order/[certificate]` (canonical; legacy `/state/[state]/[certificate]` kept) → `POST /orders` (create unpaid) → `/checkout/[orderId]` (Stripe Elements tabs) → `/order/confirmation/[orderId]` (verifies `session_id` with backend, prints paid receipt) → `/track-order` (customer-safe timeline: Payment Successful → Order Received → Order Processing → Submitted to Govt Agency; exceptions show a neutral support message only).
+`/` → `/find-your-state` or `/state/[state]` → `/state/[state]/order/[certificate]` (canonical; legacy `/state/[state]/[certificate]` kept) → `POST /orders` (create unpaid) → `/checkout/[orderId]` (Stripe Elements tabs) → `/order/confirmation/[orderId]` (verifies `session_id` with backend, prints paid receipt) → `/track-order` (customer-safe timeline: Payment Successful → Order Received → Order Processing → `Order Processed – Sent to the Government Agency`; exceptions show a neutral support message only).
 
 ## Order form (11 sections, config-driven)
 
@@ -14,7 +14,7 @@ Validation UX: server 422s scroll to first invalid input in form order, focus + 
 
 ## Checkout / tracking / support
 
-- Checkout: reference-style (eyebrow, trust badges, all-inclusive notice, tabbed payment, authorize checkbox, Pay button, sticky summary). Flow: `verify-before-payment` → `createOrder` → `checkout-session` → Stripe confirm → `checkout-session/confirm` → receipt.
+- Checkout: reference-style (eyebrow, trust badges, all-inclusive notice, tabbed payment, authorize checkbox, Pay button, sticky summary). Flow: `verify-before-payment` (in the order form) → `createOrder` → `checkout-session` → Stripe confirm → `checkout-session/confirm` → receipt at `/order/confirmation/[orderId]?session_id=`.
 - Track Order: timestamped customer-safe timeline only; never raw internal states, notes, or staff info.
 - Contact: API-backed (`POST /contact-messages`), honeypot + `formStartedAt`, sending/success/failure states, SSN/card-like warning without blocking.
 - Home/cert/state/FAQ/legal: reference-ported layouts; FAQ 29-item accordion + JSON-LD; legal verbatim with tricolor rules.
