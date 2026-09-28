@@ -2,38 +2,38 @@
 
 import type { ReactNode } from "react";
 
-/** Pastel categorical slots: soft fill + vivid edge (colorblind-sensible order). */
+/** Chart.js classic slots: solid fill + darker edge (colorblind-sensible order). */
 const PASTEL_SLOTS: [fill: string, edge: string][] = [
-  ["#C7D2FE", "#6366F1"],
-  ["#BBF7D0", "#10B981"],
-  ["#FDE68A", "#F59E0B"],
-  ["#FECDD3", "#F43F5E"],
-  ["#A5F3FC", "#06B6D4"],
-  ["#DDD6FE", "#8B5CF6"],
-  ["#D9F99D", "#65A30D"],
-  ["#FED7AA", "#FB923C"],
-  ["#BAE6FD", "#0284C7"],
-  ["#F5D0FE", "#D946EF"],
-  ["#99F6E4", "#14B8A6"],
-  ["#E2E8F0", "#64748B"],
+  ["#FF6384", "#D14D6B"],
+  ["#36A2EB", "#2B86C5"],
+  ["#FF9F40", "#D98A36"],
+  ["#FFCD56", "#D9AE45"],
+  ["#4BC0C0", "#3AA3A3"],
+  ["#9966FF", "#7A4FD6"],
+  ["#C9CBCE", "#9AA0A8"],
+  ["#34D399", "#1FA97A"],
+  ["#FB7185", "#D14D6B"],
+  ["#60A5FA", "#2B86C5"],
+  ["#FBBF24", "#D98A36"],
+  ["#2DD4BF", "#3AA3A3"],
 ];
 
 /** Vibrant categorical palette for charts (colorblind-sensible order). */
 export const CHART_PALETTE = PASTEL_SLOTS.map(([, edge]) => edge);
 
-/** Certificate colors: pastel fill, vivid edge. */
+/** Certificate colors: Chart.js classic set. */
 export const CHART_CERT_COLORS: Record<string, string> = {
-  BIRTH: "#C7D2FE",
-  DEATH: "#A5F3FC",
-  MARRIAGE: "#BBF7D0",
-  DIVORCE: "#FECDD3",
+  BIRTH: "#FF6384",
+  DEATH: "#36A2EB",
+  MARRIAGE: "#FF9F40",
+  DIVORCE: "#4BC0C0",
 };
 
 export const CHART_CERT_EDGES: Record<string, string> = {
-  BIRTH: "#6366F1",
-  DEATH: "#06B6D4",
-  MARRIAGE: "#10B981",
-  DIVORCE: "#F43F5E",
+  BIRTH: "#D14D6B",
+  DEATH: "#2B86C5",
+  MARRIAGE: "#D98A36",
+  DIVORCE: "#3AA3A3",
 };
 
 export const CHART_CERT_LABELS: Record<string, string> = {
@@ -43,21 +43,21 @@ export const CHART_CERT_LABELS: Record<string, string> = {
   DIVORCE: "Divorce",
 };
 
-/** Fulfillment status tones: pastel fill, semantic vivid edge. */
+/** Fulfillment status tones: Chart.js-style solid fills, semantic hues. */
 export const CHART_STATUS_COLORS: Record<string, string> = {
-  PAID: "#C7D2FE",
-  IN_REVIEW: "#BAE6FD",
-  TO_CS: "#FDE68A",
-  GTG: "#BBF7D0",
-  SUBMITTED: "#CBD5E1",
+  PAID: "#36A2EB",
+  IN_REVIEW: "#9966FF",
+  TO_CS: "#FF9F40",
+  GTG: "#4BC0C0",
+  SUBMITTED: "#C9CBCE",
 };
 
 export const CHART_STATUS_EDGES: Record<string, string> = {
-  PAID: "#6366F1",
-  IN_REVIEW: "#0284C7",
-  TO_CS: "#F59E0B",
-  GTG: "#10B981",
-  SUBMITTED: "#0B2545",
+  PAID: "#2B86C5",
+  IN_REVIEW: "#7A4FD6",
+  TO_CS: "#D98A36",
+  GTG: "#3AA3A3",
+  SUBMITTED: "#9AA0A8",
 };
 
 export const CHART_STATUS_LABELS: Record<string, string> = {

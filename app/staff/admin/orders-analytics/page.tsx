@@ -332,7 +332,7 @@ export default function OrdersAnalyticsDashboard() {
                       <Cell
                         key={slice.certificate}
                         fill={slice.fill}
-                        stroke={slice.edge}
+                        stroke="#ffffff"
                         strokeWidth={2}
                       />
                     ))}
@@ -352,7 +352,7 @@ export default function OrdersAnalyticsDashboard() {
                   <Tooltip content={<ChartTooltip money />} />
                   <Bar dataKey="revenue" radius={[8, 8, 0, 0]}>
                     {revenueByForm.map((row) => (
-                      <Cell key={row.name} fill={row.fill} stroke={row.edge} strokeWidth={1.5} />
+                      <Cell key={row.name} fill={row.fill} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -368,12 +368,7 @@ export default function OrdersAnalyticsDashboard() {
                   <Tooltip content={<ChartTooltip />} />
                   <Bar dataKey="orders" radius={[0, 8, 8, 0]}>
                     {topStates.map((row) => (
-                      <Cell
-                        key={row.stateCode}
-                        fill={row.fill}
-                        stroke={row.edge}
-                        strokeWidth={1.5}
-                      />
+                      <Cell key={row.stateCode} fill={row.fill} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -416,12 +411,7 @@ export default function OrdersAnalyticsDashboard() {
                   <Tooltip content={<ChartTooltip money />} />
                   <Bar dataKey="revenue" radius={[0, 8, 8, 0]}>
                     {revenueByState.map((row) => (
-                      <Cell
-                        key={row.stateCode}
-                        fill={row.fill}
-                        stroke={row.edge}
-                        strokeWidth={1.5}
-                      />
+                      <Cell key={row.stateCode} fill={row.fill} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -437,12 +427,7 @@ export default function OrdersAnalyticsDashboard() {
                   <Tooltip content={<ChartTooltip />} />
                   <Bar dataKey="orders" radius={[0, 8, 8, 0]}>
                     {statuses.map((slice) => (
-                      <Cell
-                        key={slice.status}
-                        fill={slice.fill}
-                        stroke={slice.edge}
-                        strokeWidth={1.5}
-                      />
+                      <Cell key={slice.status} fill={slice.fill} />
                     ))}
                   </Bar>
                 </BarChart>
