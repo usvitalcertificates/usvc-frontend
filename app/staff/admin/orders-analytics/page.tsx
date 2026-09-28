@@ -17,6 +17,17 @@ import {
 import { staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { BackLink, EmptyState, PageBand, SkeletonRows, StatCard } from "@/components/staff/ui";
+import {
+  CHART_CERT_COLORS,
+  CHART_CERT_LABELS,
+  CHART_STATUS_COLORS,
+  CHART_STATUS_LABELS,
+  ChartCard,
+  ChartTooltip,
+  chartColor,
+  formatMoney,
+  formatMoneyTick,
+} from "@/components/staff/charts-theme";
 
 type Preset = "today" | "7d" | "30d" | "3mo" | "6mo" | "1yr" | "all" | "custom";
 
@@ -64,27 +75,7 @@ const PRESETS: [Preset, string][] = [
   ["custom", "Custom"],
 ];
 
-const CERT_LABELS: Record<string, string> = {
-  BIRTH: "Birth",
-  DEATH: "Death",
-  MARRIAGE: "Marriage",
-  DIVORCE: "Divorce",
-};
-
-const CERT_COLORS: Record<string, string> = {
-  BIRTH: "#1D4ED8",
-  DEATH: "#0B2545",
-  MARRIAGE: "#16A34A",
-  DIVORCE: "#B22234",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  PAID: "Paid",
-  IN_REVIEW: "In Review",
-  TO_CS: "To CS",
-  GTG: "Marked GTG",
-  SUBMITTED: "Sent to Government Agency",
-};
+const CERT_CODES = Object.keys(CHART_CERT_LABELS);
 
 function dateValue(date: Date): string {
   const offset = date.getTimezoneOffset() * 60_000;
@@ -103,12 +94,8 @@ function presetRange(preset: Preset): { from: string; to: string } {
   return { from: dateValue(start), to: dateValue(end) };
 }
 
-function formatMoney(cents: number): string {
-  return `$${(cents / 100).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
-}
-
 function certLabel(code: string): string {
-  return CERT_LABELS[code] ?? code;
+  return CHART_CERT_LABELS[code] ?? code;
 }
 
 export default function OrdersAnalyticsDashboard() {
@@ -159,22 +146,28 @@ export default function OrdersAnalyticsDashboard() {
 
   const certificates = useMemo(
     () =>
-      (data?.certificates ?? []).map((slice) => ({
+      (data?.certificates ?? []).map((slice, index) => ({
         ...slice,
         name: certLabel(slice.certificate),
-        fill: CERT_COLORS[slice.certificate] ?? "#8DA9C4",
+        fill: chartColor(slice.certificate, index),
       })),
     [data],
   );
 
   const topStates = useMemo(() => {
     const rows = data?.states ?? [];
-    const top = rows.slice(0, 10);
+    const top = rows.slice(0, 10).map((row, index) => ({
+      ...row,
+      fill: chartColor(row.stateCode, index),
+    }));
     const rest = rows.slice(10);
     const restOrders = rest.reduce((sum, row) => sum + row.orders, 0);
     const restRevenue = rest.reduce((sum, row) => sum + row.revenueCents, 0);
     return restOrders > 0
-      ? [...top, { stateCode: "Other", orders: restOrders, revenueCents: restRevenue }]
+      ? [
+          ...top,
+          { stateCode: "Other", orders: restOrders, revenueCents: restRevenue, fill: "#94A3B8" },
+        ]
       : top;
   }, [data]);
 
@@ -193,7 +186,8 @@ export default function OrdersAnalyticsDashboard() {
     () =>
       (data?.statuses ?? []).map((slice) => ({
         ...slice,
-        name: STATUS_LABELS[slice.status] ?? slice.status,
+        name: CHART_STATUS_LABELS[slice.status] ?? slice.status,
+        fill: CHART_STATUS_COLORS[slice.status] ?? "#64748B",
       })),
     [data],
   );
@@ -210,9 +204,10 @@ export default function OrdersAnalyticsDashboard() {
 
   const revenueByState = useMemo(
     () =>
-      topStates.map((row) => ({
+      topStates.map((row, index) => ({
         stateCode: row.stateCode,
         revenue: Math.round(row.revenueCents / 100),
+        fill: chartColor(row.stateCode, index),
       })),
     [topStates],
   );
@@ -306,125 +301,118 @@ export default function OrdersAnalyticsDashboard() {
             <StatCard value={rushShare} label="Rush share" tone="amber" />
           </div>
 
-          <div className="staff-panel">
-            <h2 className="staff-chart-title">Orders by form type</h2>
-            <p className="staff-chart-hint">Which certificates customers file most.</p>
-            <div className="staff-chart-body">
-              <ResponsiveContainer width="100%" height={300}>
+          <div className="staff-chart-grid">
+            <ChartCard title="Orders by form type" hint="Which certificates customers file most.">
+              <ResponsiveContainer width="100%" height={340}>
                 <PieChart>
                   <Pie
                     data={certificates}
                     dataKey="orders"
                     nameKey="name"
-                    innerRadius={70}
-                    outerRadius={110}
-                    paddingAngle={2}
+                    innerRadius={80}
+                    outerRadius={125}
+                    paddingAngle={3}
+                    strokeWidth={2}
+                    stroke="#ffffff"
                   >
                     {certificates.map((slice) => (
                       <Cell key={slice.certificate} fill={slice.fill} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => [`${value} orders`, "Orders"]} />
+                  <Tooltip content={<ChartTooltip />} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
-            </div>
-          </div>
+            </ChartCard>
 
-          <div className="staff-panel">
-            <h2 className="staff-chart-title">Orders by state</h2>
-            <p className="staff-chart-hint">Top 10 states plus all others combined.</p>
-            <div className="staff-chart-body">
-              <ResponsiveContainer width="100%" height={Math.max(260, topStates.length * 36)}>
-                <BarChart data={topStates} layout="vertical" margin={{ left: 24, right: 24 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#DCE4EF" />
-                  <XAxis type="number" tick={{ fontSize: 12 }} />
-                  <YAxis type="category" dataKey="stateCode" tick={{ fontSize: 12 }} width={70} />
-                  <Tooltip formatter={(value) => [`${value} orders`, "Orders"]} />
-                  <Bar dataKey="orders" fill="#1D4ED8" radius={[0, 6, 6, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          <div className="staff-panel">
-            <h2 className="staff-chart-title">Form mix by top state</h2>
-            <p className="staff-chart-hint">Certificate mix inside the six busiest states.</p>
-            <div className="staff-chart-body">
-              <ResponsiveContainer width="100%" height={320}>
-                <BarChart data={stackedStates} margin={{ left: 8, right: 24 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#DCE4EF" />
-                  <XAxis dataKey="stateCode" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Legend formatter={(value) => certLabel(String(value))} />
-                  {(Object.keys(CERT_LABELS) as string[]).map((code) => (
-                    <Bar key={code} dataKey={code} stackId="forms" fill={CERT_COLORS[code]} />
-                  ))}
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          <div className="staff-panel">
-            <h2 className="staff-chart-title">Orders by status</h2>
-            <p className="staff-chart-hint">Where paid orders sit in the fulfillment flow.</p>
-            <div className="staff-chart-body">
-              <ResponsiveContainer width="100%" height={Math.max(220, statuses.length * 44)}>
-                <BarChart data={statuses} layout="vertical" margin={{ left: 24, right: 24 }}>
+            <ChartCard title="Orders by status" hint="Where paid orders sit in fulfillment.">
+              <ResponsiveContainer width="100%" height={340}>
+                <BarChart data={statuses} layout="vertical" margin={{ left: 24, right: 32 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#DCE4EF" />
                   <XAxis type="number" tick={{ fontSize: 12 }} />
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={180} />
-                  <Tooltip formatter={(value) => [`${value} orders`, "Orders"]} />
-                  <Bar dataKey="orders" fill="#0B2545" radius={[0, 6, 6, 0]} />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Bar dataKey="orders" radius={[0, 8, 8, 0]}>
+                    {statuses.map((slice) => (
+                      <Cell key={slice.status} fill={slice.fill} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
-            </div>
-          </div>
+            </ChartCard>
 
-          <div className="staff-panel">
-            <h2 className="staff-chart-title">Revenue by form type</h2>
-            <p className="staff-chart-hint">Charged dollars per certificate (USD).</p>
-            <div className="staff-chart-body">
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={revenueByForm} margin={{ left: 8, right: 24 }}>
+            <ChartCard wide title="Orders by state" hint="Top 10 states plus all others combined.">
+              <ResponsiveContainer width="100%" height={440}>
+                <BarChart data={topStates} layout="vertical" margin={{ left: 24, right: 32 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#DCE4EF" />
+                  <XAxis type="number" tick={{ fontSize: 12 }} />
+                  <YAxis type="category" dataKey="stateCode" tick={{ fontSize: 12 }} width={70} />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Bar dataKey="orders" radius={[0, 8, 8, 0]}>
+                    {topStates.map((row) => (
+                      <Cell key={row.stateCode} fill={row.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard
+              wide
+              title="Form mix by top state"
+              hint="Certificate mix inside the six busiest states."
+            >
+              <ResponsiveContainer width="100%" height={380}>
+                <BarChart data={stackedStates} margin={{ left: 8, right: 32 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#DCE4EF" />
+                  <XAxis dataKey="stateCode" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Legend formatter={(value) => certLabel(String(value))} />
+                  {CERT_CODES.map((code) => (
+                    <Bar
+                      key={code}
+                      dataKey={code}
+                      stackId="forms"
+                      fill={CHART_CERT_COLORS[code]}
+                      radius={[0, 0, 0, 0]}
+                    />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard title="Revenue by form type" hint="Charged dollars per certificate (USD).">
+              <ResponsiveContainer width="100%" height={320}>
+                <BarChart data={revenueByForm} margin={{ left: 8, right: 32 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#DCE4EF" />
                   <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                  <YAxis
-                    tick={{ fontSize: 12 }}
-                    tickFormatter={(value) =>
-                      `$${Number(value) >= 1000 ? `${Math.round(Number(value) / 100) / 10}k` : value}`
-                    }
-                  />
-                  <Tooltip
-                    formatter={(value) => [`$${Number(value).toLocaleString()}`, "Revenue"]}
-                  />
-                  <Bar dataKey="revenue" radius={[6, 6, 0, 0]}>
+                  <YAxis tick={{ fontSize: 12 }} tickFormatter={formatMoneyTick} />
+                  <Tooltip content={<ChartTooltip money />} />
+                  <Bar dataKey="revenue" radius={[8, 8, 0, 0]}>
                     {revenueByForm.map((row) => (
                       <Cell key={row.name} fill={row.fill} />
                     ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
-            </div>
-          </div>
+            </ChartCard>
 
-          <div className="staff-panel">
-            <h2 className="staff-chart-title">Revenue by state</h2>
-            <p className="staff-chart-hint">Charged dollars per state, Top 10 plus others (USD).</p>
-            <div className="staff-chart-body">
-              <ResponsiveContainer width="100%" height={Math.max(260, revenueByState.length * 36)}>
-                <BarChart data={revenueByState} layout="vertical" margin={{ left: 24, right: 24 }}>
+            <ChartCard title="Revenue by state" hint="Charged dollars, Top 10 plus others (USD).">
+              <ResponsiveContainer width="100%" height={320}>
+                <BarChart data={revenueByState} layout="vertical" margin={{ left: 24, right: 32 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#DCE4EF" />
-                  <XAxis type="number" tick={{ fontSize: 12 }} />
+                  <XAxis type="number" tick={{ fontSize: 12 }} tickFormatter={formatMoneyTick} />
                   <YAxis type="category" dataKey="stateCode" tick={{ fontSize: 12 }} width={70} />
-                  <Tooltip
-                    formatter={(value) => [`$${Number(value).toLocaleString()}`, "Revenue"]}
-                  />
-                  <Bar dataKey="revenue" fill="#16A34A" radius={[0, 6, 6, 0]} />
+                  <Tooltip content={<ChartTooltip money />} />
+                  <Bar dataKey="revenue" radius={[0, 8, 8, 0]}>
+                    {revenueByState.map((row) => (
+                      <Cell key={row.stateCode} fill={row.fill} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
-            </div>
+            </ChartCard>
           </div>
         </>
       )}
