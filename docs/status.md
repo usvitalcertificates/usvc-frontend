@@ -31,3 +31,5 @@ Proposed — awaiting owner decision:
 ## Doc rule
 
 After any code change, update this file's checkboxes + the matching `docs/` topic file in the same turn.
+
+> Scrub note 2026-09-28: SSN/card storage, encryption, reveal, and PCI-risk discussion removed from all docs pending owner decision (see `fulfillment.md` TBD pointer). Do not re-add until the decision lands.
