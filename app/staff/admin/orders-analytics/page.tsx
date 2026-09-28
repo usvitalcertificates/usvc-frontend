@@ -325,22 +325,6 @@ export default function OrdersAnalyticsDashboard() {
               </ResponsiveContainer>
             </ChartCard>
 
-            <ChartCard title="Orders by status" hint="Where paid orders sit in fulfillment.">
-              <ResponsiveContainer width="100%" height={340}>
-                <BarChart data={statuses} layout="vertical" margin={{ left: 24, right: 32 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#DCE4EF" />
-                  <XAxis type="number" tick={{ fontSize: 12 }} />
-                  <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={180} />
-                  <Tooltip content={<ChartTooltip />} />
-                  <Bar dataKey="orders" radius={[0, 8, 8, 0]}>
-                    {statuses.map((slice) => (
-                      <Cell key={slice.status} fill={slice.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartCard>
-
             <ChartCard wide title="Orders by state" hint="Top 10 states plus all others combined.">
               <ResponsiveContainer width="100%" height={440}>
                 <BarChart data={topStates} layout="vertical" margin={{ left: 24, right: 32 }}>
@@ -408,6 +392,22 @@ export default function OrdersAnalyticsDashboard() {
                   <Bar dataKey="revenue" radius={[0, 8, 8, 0]}>
                     {revenueByState.map((row) => (
                       <Cell key={row.stateCode} fill={row.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard title="Orders by status" hint="Where paid orders sit in fulfillment.">
+              <ResponsiveContainer width="100%" height={340}>
+                <BarChart data={statuses} layout="vertical" margin={{ left: 24, right: 32 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#DCE4EF" />
+                  <XAxis type="number" tick={{ fontSize: 12 }} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={180} />
+                  <Tooltip content={<ChartTooltip />} />
+                  <Bar dataKey="orders" radius={[0, 8, 8, 0]}>
+                    {statuses.map((slice) => (
+                      <Cell key={slice.status} fill={slice.fill} />
                     ))}
                   </Bar>
                 </BarChart>
