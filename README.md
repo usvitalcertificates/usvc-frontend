@@ -14,4 +14,4 @@ Requires Node.js 24 and a running USVC backend.
 
 ## AI agents
 
-All AI documentation lives in the sibling private repo `../usvc-ai-context/` — see `usvc-frontend/AGENTS.md` there.
+Start with `AGENTS.md`, then `docs/` (`architecture.md`, `coding-rules.md`, `shared-overview.md`, `shared-glossary.md`, `shared-security.md`, plus `main-website.md` or `flow-portal.md`, `workflows.md`, `fulfillment.md`, `status.md`).
