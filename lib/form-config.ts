@@ -92,8 +92,9 @@ const FATHER_NOTE: GroupNote = {
 const BASE_REQUESTOR: RequestorConfig = {
   showDateOfBirth: true,
   dateOfBirthRequired: false,
-  showSsn: false,
-  ssnRequired: false,
+  showSsn: true,
+  ssnRequired: true,
+  note: REQUESTOR_SECURITY_NOTE,
 };
 
 export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormConfig> = {
