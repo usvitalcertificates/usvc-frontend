@@ -21,7 +21,7 @@ Validation UX: server 422s scroll to first invalid input in form order, focus + 
 
 ## Analytics (prod public-only)
 
-`ANALYTICS_ENABLED=true` only in production. GA4 `G-GM4PWPHER1` + GTM `GTM-KC8LVCXR` (direct `gtag.js`; never double-tag Purchase in GTM). OpenAI Ads pixel (async, apex/`www` only, excludes `/auth`/`/staff`): `page_viewed`, `checkout_started`, verified `order_created`. Never send dynamic order URLs, application fields, card data, Stripe IDs, or PII. Backend sends the only `purchase` event (after signed webhook). Debug via `OPENAI_ADS_PIXEL_DEBUG=true` temporarily, then disable.
+`ANALYTICS_ENABLED=true` only in production. GA4 `G-GM4PWPHER1` + GTM `GTM-KC8LVCXR` (direct `gtag.js`; never double-tag Purchase in GTM). OpenAI Ads pixel (async, apex/`www` only, excludes `/auth`/`/staff`): `page_viewed`, `checkout_started`, verified `order_created` (pixel `order_created` reuses the server `openAiEventId` as `event_id` for dedup). Order create forwards pixel `__oppref/__obref` cookies for CAPI matching. Browser events never send PII. After verified payment, the backend may send a normalized SHA-256 email hash only when the customer separately opts in; it never sends raw email, other application fields, card data, Stripe IDs, order IDs, or external IDs. Backend sends the only `purchase` event (after signed webhook). Debug via `OPENAI_ADS_PIXEL_DEBUG=true` temporarily, then disable.
 
 ## Limits / next
 

@@ -58,7 +58,13 @@ function ConfirmationBody({ orderId }: { orderId: string }) {
 
   useEffect(() => {
     if (state === "paid" && receipt && orderId) {
-      trackOpenAIOrderCreated(orderId, receipt.amountCents);
+      let eventId: string | undefined;
+      try {
+        eventId = sessionStorage.getItem(`usvc:oaiq:event-id:${orderId}`) ?? undefined;
+      } catch {
+        eventId = undefined;
+      }
+      trackOpenAIOrderCreated(orderId, receipt.amountCents, eventId);
     }
   }, [state, receipt, orderId]);
 
