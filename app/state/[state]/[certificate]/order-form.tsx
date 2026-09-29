@@ -6,7 +6,7 @@ import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 
 import { createOrder, verifyOrderBeforePayment, type Certificate } from "@/lib/api";
-import { getAnalyticsAttribution, trackAnalytics } from "@/app/analytics";
+import { getAnalyticsAttribution, getOpenAIAttribution, trackAnalytics } from "@/app/analytics";
 import { isCountyTemporarilyUnavailable } from "@/lib/county-availability";
 import {
   PROCESSING_CLARIFICATION_NOTE,
@@ -613,6 +613,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     independent: false,
     processingPayment: false,
   });
+  const [openAiEmailMatching, setOpenAiEmailMatching] = useState(false);
   const allConsents = CONSENT_KEYS.every((key) => consents[key]);
   const [geo, setGeo] = useState<StateGeography>({ state: abbr, counties: [] });
   const [busy, setBusy] = useState(false);
@@ -881,7 +882,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         copies,
         rush,
         deliveryMethod: get("delivery"),
-        consents: { ...consents },
+        consents: { ...consents, openAiEmailMatching },
         processingAuthorization: {
           accepted: true as const,
           text: PROCESSING_PAYMENT_AUTHORIZATION_TEXT,
@@ -893,11 +894,17 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           expiry: get("cardExpiry"),
           securityCode: get("cardSecurityCode"),
         },
-        analytics: getAnalyticsAttribution(),
+        analytics: { ...getAnalyticsAttribution(), ...getOpenAIAttribution() },
         totalCents: Math.round(total * 100),
       };
       await verifyOrderBeforePayment(payload);
       const order = await createOrder(payload);
+      try {
+        if (order.openAiEventId)
+          sessionStorage.setItem(`usvc:oaiq:event-id:${order.id}`, order.openAiEventId);
+      } catch {
+        /* ignore */
+      }
       try {
         sessionStorage.removeItem(draftKey);
       } catch {
@@ -1749,6 +1756,16 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 onChange={(event) => setConsents((c) => ({ ...c, privacy: event.target.checked }))}
               />{" "}
               I have read the <Link href="/privacy-policy">Privacy Policy</Link>.
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                name="openAiEmailMatching"
+                checked={openAiEmailMatching}
+                onChange={(event) => setOpenAiEmailMatching(event.target.checked)}
+              />{" "}
+              I agree that USVC may share a securely hashed version of my email address with OpenAI
+              to measure advertising conversions. This is optional and does not affect my order.
             </label>
             <label>
               <input

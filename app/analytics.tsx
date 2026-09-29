@@ -60,6 +60,21 @@ export function getAnalyticsAttribution(): { clientId?: string; sessionId?: stri
   return clientId || sessionId ? { clientId, sessionId } : undefined;
 }
 
+/** OpenAI pixel first-party cookies (`__oppref` click ref, `__obref` browser ref).
+ *  Opaque attribution IDs only — never application data. Read independently of
+ *  GA activation so server Conversions API matching works when GA is off. */
+export function getOpenAIAttribution():
+  { openAiOppref?: string; openAiObref?: string } | undefined {
+  if (typeof document === "undefined") return undefined;
+  const oppref = readCookie("__oppref")?.trim().slice(0, 500);
+  const obref = readCookie("__obref")?.trim().slice(0, 500);
+  if (!oppref && !obref) return undefined;
+  return {
+    ...(oppref ? { openAiOppref: oppref } : {}),
+    ...(obref ? { openAiObref: obref } : {}),
+  };
+}
+
 export function Analytics({
   enabled,
   measurementId,
