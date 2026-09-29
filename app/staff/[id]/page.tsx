@@ -78,6 +78,7 @@ interface OrderDetail {
   } | null;
   paymentStatus: string;
   assignedName: string | null;
+  cardLast4?: string;
   pricing?: { serviceCents: number; rushCents: number; totalCents: number };
   amountCents?: number;
   notes: { authorId?: string; body: string; createdAt?: string }[];
@@ -163,12 +164,14 @@ function RevealCard({
   field,
   title,
   shortTitle,
+  reference,
   onReveal,
 }: {
   orderId: string;
   field: "ssn" | "card";
   title: string;
   shortTitle?: string;
+  reference?: string;
   onReveal: () => void;
 }) {
   const [reason, setReason] = useState("Govt submission");
@@ -318,6 +321,9 @@ function RevealCard({
             <p>
               <code>*********</code>
             </p>
+            {reference ? (
+              <p style={{ fontSize: "0.85rem", color: "var(--muted-text)" }}>{reference}</p>
+            ) : null}
             <label>
               Reason (recorded in the audit trail)
               <select value={reason} onChange={(e) => setReason(e.target.value)}>
@@ -982,7 +988,17 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             shortTitle="SSN"
             onReveal={() => void load()}
           />
-          <RevealCard orderId={id} field="card" title="Payment card" onReveal={() => void load()} />
+          <RevealCard
+            orderId={id}
+            field="card"
+            title="Payment card"
+            reference={
+              order.cardLast4
+                ? `Reference only — card ending ${order.cardLast4}. Full details are removed after submission.`
+                : undefined
+            }
+            onReveal={() => void load()}
+          />
           {canCorrect && !closed && (order.status === "TO_CS" || order.status === "GTG") ? (
             <p style={{ fontSize: "0.9rem", color: "var(--muted-text)" }}>
               CS edits this order in the dedicated editor:{" "}
