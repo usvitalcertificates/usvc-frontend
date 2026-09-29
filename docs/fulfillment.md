@@ -7,21 +7,19 @@
 - Host at `https://flow.usvitalcertificates.org`; login route `/auth` within that subdomain.
 - Single Next.js project with host-split middleware (fits Vercel Hobby plan), not a separate deployment. `flow.*` serves only `/auth` + `/staff/*`; public host blocks staff paths. Backend authorization on every request is the real guard.
 
-## Sensitive-data UI (staff detail page — policy TBD)
+## Order detail (staff)
 
-> Handling policy TBD — pending owner decision. See code, not docs.
-
-- Lists show masked placeholders; controlled sensitive-data actions exist on the detail page. Do not document buttons, reasons, timers, or storage here until the decision lands.
+- Lists show masked placeholders; the detail page shows masked values with copy buttons.
 
 ## Staff experience
 
 - **Queue:** searchable/filterable paid-order queue; unassigned claimable; agents see their own work. Certificate-type filter, numbered pagination, attention-first + FIFO.
-- **Order detail:** customer/application info, workflow controls, internal notes, safe payment summary, controlled sensitive-data actions (policy TBD — see above).
+- **Order detail:** customer/application info, workflow controls, internal notes, safe payment summary.
 - **My work:** claimed orders, current status, age, exception indicators.
 - **Super-admin dashboard:** all orders, per-agent workload/progress, reassignment/release, staff management, audit review.
 
 ## Phase record (frontend)
 
-- Phase 1: no form change (already masks entry, excludes drafts, review shows generic placeholder). Sensitive-data access tested via authenticated API calls only; no staff sensitive-data UI in this phase.
-- Phase 2 (built 2026-09-23): invite-only TOTP auth UI, masked queue + atomic claim + filter + pagination, My Work / Closed / Search views, tabbed detail (Summary/Application/Notes & History) with stepper, controlled sensitive-data actions + sensitive-content warning, exception statuses with note rule, invitation setup flow, USVC-token sidebar dashboard (adapted MILES IA, not a clone), super-admin roster + workload + day-grouped timeline, settings page. Two bugs fixed (notes 500 on array-less docs; audit-wipe via projection+save → atomic updates).
+- Phase 1: no form change (already masks entry, excludes drafts, review shows generic placeholder). Staff order access tested via authenticated API calls only.
+- Phase 2 (built 2026-09-23): invite-only TOTP auth UI, masked queue + atomic claim + filter + pagination, My Work / Closed / Search views, tabbed detail (Summary/Application/Notes & History) with stepper, exception statuses with note rule, invitation setup flow, USVC-token sidebar dashboard (adapted MILES IA, not a clone), super-admin roster + workload + day-grouped timeline, settings page. Two bugs fixed (notes 500 on array-less docs; audit-wipe via projection+save → atomic updates).
 - Phase 3 (frontend runway): confirmation-receipt endpoint + UI, receipt parity, SEO, outbox failure visibility, saved filters + CSV export + print-friendly order sheet, deferred modules (gov-fee UI, sales/revenue, attendance, Tasks, Documents tab / Document Center, Test Orders), proposed (agency-payment confirmation field, read-only gov-fee reference, `Need Customer Information` outreach procedure — tracker neutral today, nothing contacts customer — SLA/age escalation).

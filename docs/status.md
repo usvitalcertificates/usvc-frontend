@@ -4,13 +4,13 @@ Last updated: 2026-09-29. Phase 1 (public funnel) and Phase 2 (staff MVP) are bu
 
 ## Implemented (see `architecture.md`, `main-website.md`, `flow-portal.md`)
 
-- Public funnel: home, certificates, state selector/landing, config-driven 4-type order form (11 sections, geo county/city, 9 CA counties blocked, sensitive-safe draft, verify → create → checkout), Stripe Elements checkout, session-verified confirmation, sanitized tracking timeline, API-backed contact, 29-item FAQ + JSON-LD, verbatim legal pages, Times/Navy/Red theme.
-- Staff portal (`/auth`, `/staff/*`, host-split `middleware.ts`): TOTP auth + 30-min inactivity sign-out, Open/My/Closed/Search queues, tabbed order detail with stepper, controlled sensitive-data actions (policy TBD — see `fulfillment.md`), `TO_CS`/`GTG` lane, CS inbox + full-form editor, completion-PDF panel, split ADMIN analytics (staff + orders), My Analytics for all roles.
+- Public funnel: home, certificates, state selector/landing, config-driven 4-type order form (11 sections, geo county/city, 9 CA counties blocked, safe draft, verify → create → checkout), Stripe Elements checkout, session-verified confirmation, sanitized tracking timeline, API-backed contact, 29-item FAQ + JSON-LD, verbatim legal pages, Times/Navy/Red theme.
+- Staff portal (`/auth`, `/staff/*`, host-split `middleware.ts`): TOTP auth + 30-min inactivity sign-out, Open/My/Closed/Search queues, tabbed order detail with stepper, `TO_CS`/`GTG` lane, CS inbox + full-form editor, completion-PDF panel, split ADMIN analytics (staff + orders), My Analytics for all roles.
 - Analytics prod-only: GA4 `G-GM4PWPHER1` + GTM `GTM-KC8LVCXR` (scripts load on all pages; `page_view` skipped on staff) + OpenAI Ads pixel (never loads on staff); browser events contain no PII. The backend sends a SHA-256 email hash only for opt-in, verified paid-order OpenAI conversions; backend sends the only `purchase`.
 
 ## Limits
 
-- Display totals non-authoritative (backend recalculates). Per-state fee/rules port remains. Sensitive order fields are masked in staff lists; access policy TBD — see `fulfillment.md`.
+- Display totals non-authoritative (backend recalculates). Per-state fee/rules port remains. Staff lists show masked rows.
 
 ## Remaining (Phase 3)
 
@@ -36,5 +36,3 @@ Proposed — awaiting owner decision:
 ## Doc rule
 
 After any code change, update this file's checkboxes + the matching `docs/` topic file in the same turn.
-
-> Scrub note 2026-09-28: SSN/card storage, encryption, reveal, and PCI-risk discussion removed from all docs pending owner decision (see `fulfillment.md` TBD pointer). Do not re-add until the decision lands.

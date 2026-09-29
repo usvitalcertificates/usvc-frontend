@@ -17,8 +17,8 @@ This folder is the USVC Next.js App Router frontend (public site + `flow.*` staf
 ## Hard rules (full list in `docs/coding-rules.md`)
 
 - Browser API calls go through the same-origin `/api/backend` proxy only. Upstream is server-only `API_URL`. No client secrets.
-- Stripe Elements is the only card collector. Never build raw card/CVV/expiry inputs.
-- Never send sensitive form fields to analytics, logs, URLs, or browser storage. Drafts exclude sensitive fields.
+- Checkout uses Stripe Elements. Never build raw payment inputs.
+- Never send form input to analytics, logs, URLs, or browser storage. Drafts persist only non-sensitive values.
 - Backend totals are authoritative; browser totals are display-only.
 - Gates before handoff: `npm run format`, `npm run format:check`, `npm run lint`, `npm run build`. Pre-commit runs lint-staged + `tsc --noEmit`.
 
