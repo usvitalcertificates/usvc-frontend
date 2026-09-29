@@ -13,7 +13,11 @@ import {
 } from "./openai-analytics-data";
 
 type OpenAIEventName = "page_viewed" | "checkout_started" | "order_created";
-type QueuedEvent = { name: OpenAIEventName; data: OpenAIContentsEvent };
+type QueuedEvent = {
+  name: OpenAIEventName;
+  data: OpenAIContentsEvent;
+  options?: { event_id: string };
+};
 
 declare global {
   interface Window {
@@ -29,12 +33,17 @@ function isProductionHost(): boolean {
   return typeof window !== "undefined" && isOpenAIProductionHost(window.location.hostname);
 }
 
-function sendOpenAIEvent(name: OpenAIEventName, data: OpenAIContentsEvent) {
+function sendOpenAIEvent(
+  name: OpenAIEventName,
+  data: OpenAIContentsEvent,
+  options?: { event_id: string },
+) {
   if (!pixelReady || !window.oaiq) {
-    if (pendingEvents.length < 20) pendingEvents.push({ name, data });
+    if (pendingEvents.length < 20) pendingEvents.push({ name, data, options });
     return;
   }
-  window.oaiq("measure", name, data);
+  if (options) window.oaiq("measure", name, data, options);
+  else window.oaiq("measure", name, data);
 }
 
 export function trackOpenAICheckoutStarted(input: {
@@ -46,7 +55,7 @@ export function trackOpenAICheckoutStarted(input: {
   if (data) sendOpenAIEvent("checkout_started", data);
 }
 
-export function trackOpenAIOrderCreated(orderKey: string, amountCents: number) {
+export function trackOpenAIOrderCreated(orderKey: string, amountCents: number, eventId?: string) {
   const data = orderCreatedData(amountCents);
   if (!orderKey || !data) return;
   const storageKey = `usvc:oaiq:order-created:${orderKey}`;
@@ -57,7 +66,7 @@ export function trackOpenAIOrderCreated(orderKey: string, amountCents: number) {
     if (recordedOrders.has(orderKey)) return;
     recordedOrders.add(orderKey);
   }
-  sendOpenAIEvent("order_created", data);
+  sendOpenAIEvent("order_created", data, eventId ? { event_id: eventId } : undefined);
 }
 
 export function OpenAIAnalytics({
@@ -92,7 +101,8 @@ export function OpenAIAnalytics({
   const initializePixel = () => {
     pixelReady = true;
     for (const event of pendingEvents.splice(0)) {
-      window.oaiq?.("measure", event.name, event.data);
+      if (event.options) window.oaiq?.("measure", event.name, event.data, event.options);
+      else window.oaiq?.("measure", event.name, event.data);
     }
     setReady(true);
   };

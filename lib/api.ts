@@ -48,11 +48,17 @@ export interface CreateOrderPayload {
     refund: boolean;
     independent: boolean;
     processingPayment: boolean;
+    openAiEmailMatching?: boolean;
   };
   processingAuthorization: { accepted: true; text: string; acceptedAt: string };
   signature: string;
   paymentCard: { number: string; expiry: string; securityCode: string };
-  analytics?: { clientId?: string; sessionId?: string };
+  analytics?: {
+    clientId?: string;
+    sessionId?: string;
+    openAiOppref?: string;
+    openAiObref?: string;
+  };
   totalCents: number;
 }
 
@@ -84,7 +90,10 @@ async function post<T>(path: string, payload: unknown): Promise<T> {
 }
 
 export async function createOrder(payload: CreateOrderPayload) {
-  return post<{ id: string; publicNumber: string; amountCents: number }>("/orders", payload);
+  return post<{ id: string; publicNumber: string; amountCents: number; openAiEventId: string }>(
+    "/orders",
+    payload,
+  );
 }
 
 export async function verifyOrderBeforePayment(payload: CreateOrderPayload) {
