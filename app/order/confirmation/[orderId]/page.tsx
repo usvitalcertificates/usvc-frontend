@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
+import { trackGoogleAdsPurchase } from "../../../analytics";
 import { trackOpenAIOrderCreated } from "../../../openai-analytics";
 
 const api = "/api/backend";
@@ -58,6 +59,7 @@ function ConfirmationBody({ orderId }: { orderId: string }) {
 
   useEffect(() => {
     if (state === "paid" && receipt && orderId) {
+      trackGoogleAdsPurchase(receipt.publicNumber, receipt.amountCents);
       let eventId: string | undefined;
       try {
         eventId = sessionStorage.getItem(`usvc:oaiq:event-id:${orderId}`) ?? undefined;
