@@ -12,6 +12,7 @@ import {
   googleAdsPurchaseStorageKey,
   isGoogleAdsProductionHost,
 } from "./google-ads-analytics-data.ts";
+import { BIRTH_GUIDE_SOURCES, CERTIFICATE_SLUGS, INDEXABLE_STATES } from "../lib/seo.ts";
 
 test("allows only the two public production hosts", () => {
   assert.equal(isOpenAIProductionHost("usvitalcertificates.org"), true);
@@ -72,4 +73,27 @@ test("builds a direct Google Ads conversion only for a valid paid order", () => 
     googleAdsPurchaseStorageKey("USCA-BT-20260930-00A001"),
     "usvc:google-ads-purchase:USCA-BT-20260930-00A001",
   );
+});
+
+test("SEO inventory contains canonical application and pilot guide coverage", () => {
+  assert.equal(INDEXABLE_STATES.length, 52);
+  assert.deepEqual(CERTIFICATE_SLUGS, [
+    "birth-certificate",
+    "death-certificate",
+    "marriage-certificate",
+    "divorce-certificate",
+  ]);
+  assert.deepEqual(Object.keys(BIRTH_GUIDE_SOURCES).sort(), [
+    "california",
+    "florida",
+    "georgia",
+    "illinois",
+    "michigan",
+    "new-york",
+    "north-carolina",
+    "ohio",
+    "pennsylvania",
+    "texas",
+  ]);
+  for (const guide of Object.values(BIRTH_GUIDE_SOURCES)) assert.match(guide.url, /^https:\/\//);
 });

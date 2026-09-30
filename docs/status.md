@@ -18,7 +18,7 @@ Last updated: 2026-09-29. Phase 1 (public funnel) and Phase 2 (staff MVP) are bu
 - [ ] Confirmation: replace static page with backend-verified receipt + print (`GET /orders/:id/confirmation`, needs backend endpoint)
 - [ ] Receipt UI parity with backend email template (backend owns sending)
 - [ ] Content: per-state fee/rules data port
-- [ ] SEO: `app/sitemap.ts`, JSON-LD Organization, metadata per state/cert page
+- [x] Public SEO foundation: `app/sitemap.ts`, `app/robots.ts`, Organization JSON-LD, canonical metadata, noindex customer/staff/non-production routes, and 10-state official-source birth-guide pilot (`docs/seo-strategy.md`)
 - [ ] Gov-fee UI, sales/revenue charts, attendance port, Tasks system, Documents tab (backend designs open)
 
 Chart roadmap (backend `$facet` returns all dimensions in one call — new charts are frontend-only):

@@ -28,7 +28,11 @@ const certificates = [
   },
 ] as const;
 
-export const metadata = { title: "Certificate Types | USVC" };
+export const metadata = {
+  title: "Vital Certificate Types",
+  description:
+    "Learn how USVC helps with birth, death, marriage, and divorce certificate requests.",
+};
 
 export default function Certificates() {
   return (

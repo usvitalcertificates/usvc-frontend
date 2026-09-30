@@ -1,7 +1,11 @@
 import { StateSelector } from "../state-selector";
 import { Disclaimer, PageHeader } from "../usvc-ui";
 
-export const metadata = { title: "Find Your State | USVC" };
+export const metadata = {
+  title: "Find Your State",
+  description:
+    "Choose the state where the vital record was created to begin a USVC certificate request.",
+};
 
 export default function FindState() {
   return (
