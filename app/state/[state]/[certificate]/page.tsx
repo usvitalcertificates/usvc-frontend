@@ -23,6 +23,10 @@ export async function generateMetadata({
   const { state, certificate } = await params;
   return {
     title: `${titleCase(state)} ${labels[certificate] ?? "Vital"} Certificate Application | USVC`,
+    robots: { index: false, follow: true },
+    alternates: {
+      canonical: `https://usvitalcertificates.org/state/${state}/order/${certificate}`,
+    },
   };
 }
 
