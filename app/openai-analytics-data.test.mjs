@@ -7,6 +7,11 @@ import {
   orderCreatedData,
   publicPageId,
 } from "./openai-analytics-data.ts";
+import {
+  googleAdsPurchaseData,
+  googleAdsPurchaseStorageKey,
+  isGoogleAdsProductionHost,
+} from "./google-ads-analytics-data.ts";
 
 test("allows only the two public production hosts", () => {
   assert.equal(isOpenAIProductionHost("usvitalcertificates.org"), true);
@@ -48,4 +53,23 @@ test("completed-order data contains no order or customer identifier", () => {
     currency: "USD",
   });
   assert.equal(orderCreatedData(-1), null);
+});
+
+test("builds a direct Google Ads conversion only for a valid paid order", () => {
+  assert.equal(isGoogleAdsProductionHost("usvitalcertificates.org"), true);
+  assert.equal(isGoogleAdsProductionHost("www.usvitalcertificates.org"), true);
+  assert.equal(isGoogleAdsProductionHost("flow.usvitalcertificates.org"), false);
+  assert.equal(isGoogleAdsProductionHost("staging.usvitalcertificates.org"), false);
+  assert.deepEqual(googleAdsPurchaseData("USCA-BT-20260930-00A001", 12999), {
+    value: 129.99,
+    currency: "USD",
+    transaction_id: "USCA-BT-20260930-00A001",
+  });
+  assert.equal(googleAdsPurchaseData("", 12999), null);
+  assert.equal(googleAdsPurchaseData("USCA-BT-20260930-00A001", 0), null);
+  assert.equal(googleAdsPurchaseData("USCA-BT-20260930-00A001", 12.99), null);
+  assert.equal(
+    googleAdsPurchaseStorageKey("USCA-BT-20260930-00A001"),
+    "usvc:google-ads-purchase:USCA-BT-20260930-00A001",
+  );
 });
