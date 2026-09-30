@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -101,13 +102,26 @@ const INSTRUCTIONS =
 const ELIGIBILITY =
   "Eligibility to receive a certified record is determined by the issuing agency and may be limited to the person named on the record or specific qualifying relatives and representatives.";
 
-export async function generateMetadata({ params }: { params: Promise<{ state: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ state: string }>;
+}): Promise<Metadata> {
   const { state } = await params;
   const found = STATES.find(([name]) => slugify(name) === state);
   const name = found ? found[0] : state;
+  const title = `${name} Vital Records | Birth, Death, Marriage & Divorce Certificates | USVC`;
+  const description = `How to request ${name} birth, death, marriage, and divorce certificate copies: eligibility, information needed, fees, and processing options, with guided help from USVC, an independent document assistance service.`;
   return {
-    title: `${name} Vital Records | Birth, Death, Marriage & Divorce Certificates | USVC`,
-    description: `How to request ${name} birth, death, marriage, and divorce certificate copies: eligibility, information needed, fees, and processing options, with guided help from USVC, an independent document assistance service.`,
+    title,
+    description,
+    alternates: { canonical: `https://usvitalcertificates.org/state/${state}` },
+    openGraph: {
+      title,
+      description,
+      url: `https://usvitalcertificates.org/state/${state}`,
+      type: "website",
+    },
   };
 }
 

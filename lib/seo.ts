@@ -1,0 +1,101 @@
+export const SITE_URL = "https://usvitalcertificates.org";
+
+export const BIRTH_GUIDE_SOURCES: Record<string, { state: string; url: string }> = {
+  california: {
+    state: "California",
+    url: "https://www.cdph.ca.gov/Programs/CHSI/Pages/Vital-Records-Obtaining-Certified-Copies-of-Birth-Records.aspx",
+  },
+  texas: { state: "Texas", url: "https://www.dshs.texas.gov/vital-statistics/birth-records" },
+  florida: {
+    state: "Florida",
+    url: "https://www.floridahealth.gov/certificates/certificates/birth/index.html",
+  },
+  "new-york": { state: "New York", url: "https://www.health.ny.gov/vital_records/birth.htm" },
+  pennsylvania: {
+    state: "Pennsylvania",
+    url: "https://www.pa.gov/agencies/health/programs/vital-records",
+  },
+  illinois: {
+    state: "Illinois",
+    url: "https://dph.illinois.gov/topics-services/birth-death-other-records/birth-records/obtain-birth-certificate.html",
+  },
+  ohio: {
+    state: "Ohio",
+    url: "https://odh.ohio.gov/know-our-programs/vital-statistics/how-to-order-certificates",
+  },
+  georgia: { state: "Georgia", url: "https://georgia.gov/request-vital-records" },
+  "north-carolina": { state: "North Carolina", url: "https://vitalrecords.nc.gov/order.htm" },
+  michigan: {
+    state: "Michigan",
+    url: "https://www.michigan.gov/mdhhs/doing-business/vitalrecords",
+  },
+};
+
+export const INDEXABLE_STATES = [
+  "alabama",
+  "alaska",
+  "arizona",
+  "arkansas",
+  "california",
+  "colorado",
+  "connecticut",
+  "delaware",
+  "district-of-columbia",
+  "florida",
+  "georgia",
+  "hawaii",
+  "idaho",
+  "illinois",
+  "indiana",
+  "iowa",
+  "kansas",
+  "kentucky",
+  "louisiana",
+  "maine",
+  "maryland",
+  "massachusetts",
+  "michigan",
+  "minnesota",
+  "mississippi",
+  "missouri",
+  "montana",
+  "nebraska",
+  "nevada",
+  "new-hampshire",
+  "new-jersey",
+  "new-mexico",
+  "new-york",
+  "north-carolina",
+  "north-dakota",
+  "ohio",
+  "oklahoma",
+  "oregon",
+  "pennsylvania",
+  "puerto-rico",
+  "rhode-island",
+  "south-carolina",
+  "south-dakota",
+  "tennessee",
+  "texas",
+  "utah",
+  "vermont",
+  "virginia",
+  "washington",
+  "west-virginia",
+  "wisconsin",
+  "wyoming",
+] as const;
+
+export const CERTIFICATE_SLUGS = [
+  "birth-certificate",
+  "death-certificate",
+  "marriage-certificate",
+  "divorce-certificate",
+] as const;
+
+export function titleCase(value: string) {
+  return value
+    .split("-")
+    .map((part) => part[0].toUpperCase() + part.slice(1))
+    .join(" ");
+}

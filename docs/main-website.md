@@ -25,4 +25,4 @@ Validation UX: server 422s scroll to first invalid input in form order, focus + 
 
 ## Limits / next
 
-Per-state fee/rules port, confirmation-receipt verification, SEO (sitemap, JSON-LD, per-page metadata) remain. Display totals non-authoritative by design.
+Public SEO: sitemap/robots, canonical metadata, public Organization JSON-LD, noindex customer/staff/non-production routes, and a 10-state official-source birth-guide pilot are maintained in `docs/seo-strategy.md`. Per-state fee/rules port and confirmation-receipt verification remain. Display totals non-authoritative by design.

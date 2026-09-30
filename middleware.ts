@@ -65,7 +65,9 @@ export function middleware(request: NextRequest) {
     if (pathname === "/" && host.split(":")[0].toLowerCase() === "flow.localtest") {
       return rewriteToStaff();
     }
-    return withStaffFlag();
+    const response = withStaffFlag();
+    response.headers.set("x-robots-tag", "noindex, nofollow");
+    return response;
   }
 
   if (isFlowHost(host)) {

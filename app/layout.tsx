@@ -9,6 +9,8 @@ import { SiteHeader } from "./site-header";
 import { Analytics } from "./analytics";
 import { OpenAIAnalytics } from "./openai-analytics";
 import { StaffShell } from "@/components/staff/StaffShell";
+import { SITE_URL } from "@/lib/seo";
+import { organizationLd, SeoJsonLd } from "./seo-json-ld";
 
 const GTM_ID = "GTM-KC8LVCXR";
 
@@ -23,9 +25,19 @@ const flowFont = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "USVC — Trusted Help for US Vital Certificates",
+  metadataBase: new URL(SITE_URL),
+  title: { default: "USVC — Trusted Help for US Vital Certificates", template: "%s | USVC" },
   description:
     "USVC helps Americans apply for birth, death, marriage, and divorce certificates with clear instructions, secure handling, and order tracking. Independent service, not a government agency.",
+  alternates: { canonical: SITE_URL },
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    title: "USVC — Trusted Help for US Vital Certificates",
+    description:
+      "Guided help for US vital certificate requests. Independent service, not a government agency.",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -47,6 +59,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         </head>
       ) : null}
       <body>
+        {!staffArea ? <SeoJsonLd value={organizationLd} /> : null}
         {analyticsEnabled ? (
           <noscript>
             <iframe
