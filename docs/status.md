@@ -6,7 +6,7 @@ Last updated: 2026-09-29. Phase 1 (public funnel) and Phase 2 (staff MVP) are bu
 
 - Public funnel: home, certificates, state selector/landing, config-driven 4-type order form (11 sections, geo county/city, 9 CA counties blocked, safe draft, verify → create → checkout), Stripe Elements checkout, session-verified confirmation, sanitized tracking timeline, API-backed contact, 29-item FAQ + JSON-LD, verbatim legal pages, Times/Navy/Red theme.
 - Staff portal (`/auth`, `/staff/*`, host-split `middleware.ts`): TOTP auth + 30-min inactivity sign-out, Open/My/Closed/Search queues, tabbed order detail with stepper, `TO_CS`/`GTG` lane, CS inbox + full-form editor, completion-PDF panel, split ADMIN analytics (staff + orders), My Analytics for all roles.
-- Analytics prod-only: GA4 `G-GM4PWPHER1` + GTM `GTM-KC8LVCXR` (scripts load on all pages; `page_view` skipped on staff) + OpenAI Ads pixel (never loads on staff); browser events contain no PII. The backend sends a SHA-256 email hash only for opt-in, verified paid-order OpenAI conversions; backend sends the only `purchase`.
+- Analytics prod-only: GA4 `G-GM4PWPHER1` + GTM `GTM-KC8LVCXR` (scripts load on all pages; `page_view` skipped on staff), direct Google Ads verified-purchase event `conversion_event_purchase_2` (public production only; value/currency/public transaction ID; Ads-team goal mapping required), and OpenAI Ads pixel (never loads on staff); browser events contain no PII. The backend sends a SHA-256 email hash only for opt-in, verified paid-order OpenAI conversions; backend sends the only GA4 `purchase`.
 
 ## Limits
 

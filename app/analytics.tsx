@@ -4,6 +4,13 @@ import Script from "next/script";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import {
+  googleAdsPurchaseData,
+  googleAdsPurchaseStorageKey,
+  isGoogleAdsProductionHost,
+  type GoogleAdsPurchaseEvent,
+} from "./google-ads-analytics-data";
+
 declare global {
   interface Window {
     dataLayer?: unknown[];
@@ -12,16 +19,23 @@ declare global {
 }
 
 let analyticsActive = false;
+let googleAdsActive = false;
 
 /** Events fired before activation (e.g. mount effects, which run before the
  *  Analytics effect flips the flag) wait here and flush once active, so mount
  *  events like select_certificate are never silently dropped. */
 const pendingEvents: Array<{ event: string; params: Record<string, unknown> }> = [];
+const pendingGoogleAdsPurchases: GoogleAdsPurchaseEvent[] = [];
+const recordedGoogleAdsPurchases = new Set<string>();
 
 function sendEvent(event: string, params: Record<string, unknown>) {
   window.dataLayer ??= [];
   window.gtag ??= (...args: unknown[]) => window.dataLayer?.push(args);
   window.gtag("event", event, params);
+}
+
+function sendGoogleAdsPurchase(data: GoogleAdsPurchaseEvent) {
+  sendEvent("conversion_event_purchase_2", data);
 }
 
 function isProductionHost(): boolean {
@@ -38,6 +52,32 @@ export function trackAnalytics(event: string, params: Record<string, unknown> = 
     return;
   }
   sendEvent(event, params);
+}
+
+/**
+ * Direct Google Ads purchase goal. This is intentionally browser-side so the
+ * Google tag/GTM container can attribute the paid visit; payment truth and
+ * value come only from the server-verified confirmation response.
+ */
+export function trackGoogleAdsPurchase(publicNumber: string, amountCents: number) {
+  if (typeof window === "undefined" || !isGoogleAdsProductionHost(window.location.hostname)) return;
+  const data = googleAdsPurchaseData(publicNumber, amountCents);
+  if (!data) return;
+
+  const storageKey = googleAdsPurchaseStorageKey(data.transaction_id);
+  try {
+    if (window.sessionStorage.getItem(storageKey) === "1") return;
+    window.sessionStorage.setItem(storageKey, "1");
+  } catch {
+    if (recordedGoogleAdsPurchases.has(data.transaction_id)) return;
+    recordedGoogleAdsPurchases.add(data.transaction_id);
+  }
+
+  if (!googleAdsActive) {
+    if (pendingGoogleAdsPurchases.length < 20) pendingGoogleAdsPurchases.push(data);
+    return;
+  }
+  sendGoogleAdsPurchase(data);
 }
 
 function readCookie(name: string): string | undefined {
@@ -92,12 +132,15 @@ export function Analytics({
 
   useEffect(() => {
     analyticsActive = active;
+    googleAdsActive = active;
     if (active) {
       for (const queued of pendingEvents.splice(0)) sendEvent(queued.event, queued.params);
+      for (const purchase of pendingGoogleAdsPurchases.splice(0)) sendGoogleAdsPurchase(purchase);
       if (!pathname.startsWith("/staff")) trackAnalytics("page_view", { page_path: pathname });
     }
     return () => {
       analyticsActive = false;
+      googleAdsActive = false;
     };
   }, [active, pathname]);
 
