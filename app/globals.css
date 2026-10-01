@@ -206,6 +206,7 @@ h3 {
   line-height: 1.35;
   text-align: center;
   box-shadow: var(--shadow-raised);
+  cursor: pointer;
   transition:
     opacity 0.15s ease,
     box-shadow 0.15s ease;
@@ -223,6 +224,13 @@ h3 {
   border-color: #16a34a;
   background: #16a34a;
   color: #fff;
+}
+.button.button-success:hover,
+.button.button-success:active {
+  border-color: #15803d;
+  background: #15803d;
+  color: #fff;
+  opacity: 1;
 }
 .button:hover,
 .button:active {
@@ -687,8 +695,13 @@ h3 {
   font-size: 17px;
 }
 .required-note span,
-.application-field > span {
+label.application-field > span {
   color: var(--red);
+  font-weight: 700;
+}
+/* Readonly requestor-name labels: navy like all other field headings. */
+div.application-field > span {
+  color: var(--navy);
   font-weight: 700;
 }
 .application-section {
@@ -696,7 +709,7 @@ h3 {
   padding: 24px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: #fff;
+  background: #fafafb;
   scroll-margin-top: 160px;
 }
 .application-section:first-of-type {
@@ -730,6 +743,7 @@ h3 {
   color: var(--navy);
   font-size: 16px;
   font-weight: 700;
+  line-height: 1.4;
 }
 .application-field.wide {
   grid-column: 1 / -1;
@@ -737,26 +751,75 @@ h3 {
 .application-field input,
 .application-field select {
   width: 100%;
-  min-height: 40px;
+  min-height: 44px;
   margin-top: 8px;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: 1px solid #dedde3;
-  border-radius: 5px;
+  border-radius: 6px;
   background: #fff;
   color: #000;
   font-weight: 400;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.application-field input:focus,
+.application-field select:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgb(60 59 110 / 15%);
+  outline: none;
 }
 .application-field input:disabled {
-  background: var(--muted);
+  background: #ececf0;
   color: #57575d;
 }
 .application-field small {
   display: block;
   margin-top: 5px;
   color: var(--muted-text);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
+}
+/* Title-case every form heading/label ("Your Relationship To The …").
+ *  capitalize never lowercases, so acronyms (CVV, MM/YY, SSN) are safe.
+ *  User-entered values, hints, sentences, and errors are reset below so
+ *  only headings are affected. */
+.application-section h2,
+.application-section legend,
+.contact-heading,
+label.application-field,
+.application-field > span,
+.group-note strong,
+.same-address > strong,
+.verify-panel h3,
+.order-summary h3,
+.possible-issues h4 {
+  text-transform: capitalize;
+}
+.application-field input,
+.application-field select,
+.application-field textarea,
+.application-field small,
+.verify-signature,
+.same-address label,
+.processing-options label,
+.verify-list,
+.order-summary > div,
+.order-summary > p,
+.hint,
+.restriction-note,
+.form-head-notices,
+.possible-issues p,
+.possible-issues li,
+.group-note em,
+.address-note,
+.adoption-note,
+.verify-warning,
+.verify-payment p,
+.county-blocked-alert,
+.application-error {
+  text-transform: none;
 }
 .group-note {
   display: grid;
@@ -804,6 +867,18 @@ h3 {
 .address-fields {
   display: grid;
   gap: 16px;
+}
+/* Divider separating the contact block from the address blocks above it. */
+.application-section fieldset.contact-block {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+/* Block heading matching the address-block legends below the divider line. */
+.contact-heading {
+  margin: 0 0 4px;
+  color: var(--navy);
+  font-size: 18px;
+  font-weight: 700;
 }
 .address-note {
   color: #000;
@@ -862,6 +937,7 @@ h3 {
   padding: 18px;
   border: 1px solid var(--border);
   border-radius: 6px;
+  background: #fff;
 }
 .processing-options label.selected {
   border: 2px solid var(--navy);
@@ -891,7 +967,7 @@ h3 {
   padding: 24px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--muted);
+  background: #fff;
 }
 .order-summary h3 {
   font-size: 22px;
@@ -996,8 +1072,9 @@ h3 {
   gap: 16px;
   margin-top: 24px;
   padding: 28px;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #f4f6f9;
+  background: #fff;
 }
 .verify-panel h3 {
   padding-bottom: 12px;
@@ -1104,8 +1181,8 @@ small.application-error {
 }
 /* Country-code phone picker (react-international-phone), themed to USVC. */
 .usvc-phone-input {
-  --react-international-phone-height: 40px;
-  --react-international-phone-border-radius: 5px;
+  --react-international-phone-height: 44px;
+  --react-international-phone-border-radius: 6px;
   --react-international-phone-border-color: #dedde3;
   --react-international-phone-text-color: #000;
   --react-international-phone-font-size: 16px;
@@ -1150,7 +1227,7 @@ small.application-error {
 }
 .county-blocked-fields {
   min-inline-size: 0;
-  margin: 0;
+  margin: 32px 0 0;
   padding: 0;
   border: 0;
 }
@@ -1162,6 +1239,72 @@ small.application-error {
   flex-wrap: wrap;
   align-items: center;
   gap: 16px;
+}
+/* Certificate guidance lines: plain inline text, smaller than field labels.
+ *  Red label, muted italic body. Copy must stay in sync with backend
+ *  order-validation rules. */
+.restriction-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.restriction-note strong {
+  color: var(--red);
+  font-style: italic;
+}
+.restriction-note em {
+  color: var(--muted-text);
+}
+/* Unified form guidance typography: every info/warning line in the form
+ * matches the certificate-notice treatment — 14px muted italic body with
+ * red italic labels. Errors (.application-error, .county-blocked-alert),
+ * legends, controls, and legal/transactional copy are excluded on purpose. */
+.application-section-content .hint,
+.application-section-content .hint em,
+.form-head-notices p,
+.group-note em,
+.address-note,
+.adoption-note,
+.same-address small,
+.processing-options label small,
+.verify-warning,
+.verify-warning em,
+.possible-issues p,
+.possible-issues li,
+.application-field small {
+  color: var(--muted-text);
+  font-size: 14px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.form-head-notices p strong,
+.group-note strong,
+.address-note strong,
+.adoption-note strong {
+  color: var(--red);
+  font-size: 14px;
+  font-style: italic;
+}
+.possible-issues h4 {
+  color: var(--red);
+  font-size: 14px;
+  font-style: italic;
+}
+/* Soft pre-submit cross-checks (birth only): plain text, warnings never block. */
+.possible-issues {
+  margin-top: 16px;
+}
+.possible-issues p {
+  margin-top: 8px;
+}
+.possible-issues ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+.possible-issues li + li {
+  margin-top: 4px;
 }
 .state-certificate-choices {
   display: grid;
@@ -1467,7 +1610,7 @@ small.application-error {
   padding: 24px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--muted);
+  background: #fff;
 }
 .checkout-summary p {
   margin: 0;
@@ -1519,8 +1662,10 @@ small.application-error {
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px solid var(--border);
-  font-size: 15px;
-  line-height: 1.65;
+  color: var(--muted-text);
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.5;
 }
 .confirmation-wrap {
   max-width: 768px;

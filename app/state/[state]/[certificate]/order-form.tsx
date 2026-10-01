@@ -9,8 +9,10 @@ import { createOrder, verifyOrderBeforePayment, type Certificate } from "@/lib/a
 import { getAnalyticsAttribution, getOpenAIAttribution, trackAnalytics } from "@/app/analytics";
 import { isCountyTemporarilyUnavailable } from "@/lib/county-availability";
 import {
+  BIRTH_MIN_YEAR,
   PROCESSING_CLARIFICATION_NOTE,
   resolveFormConfig,
+  SUFFIX_OPTIONS,
   type CertificateSlug,
   type FieldDef,
 } from "@/lib/form-config";
@@ -639,6 +641,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
 
   const copies = Math.min(20, Math.max(1, Number(values.copies ?? draft.copies ?? 1) || 1));
   const rush = (values.processing ?? draft.processing ?? "standard") === "rush";
+  const delivery = values.delivery ?? draft.delivery ?? "Regular";
   const shippingIntl =
     addressTypeOf(values.shippingType ?? draft.shippingType ?? ADDRESS_TYPE_OPTIONS[0].label) ===
     "international";
@@ -649,6 +652,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
   const relationship = values.relationship ?? draft.relationship ?? "";
   const reason = values.reason ?? draft.reason ?? "";
+  const isBirth = certSlug === "birth-certificate";
+  const sexValue = values.sex ?? draft.sex ?? "";
+  const valueOf = (key: string) => values[key] ?? draft[key] ?? "";
 
   function syncForm(event?: { target?: EventTarget | null }) {
     const changed = (event?.target as HTMLElement | null)?.getAttribute("name");
@@ -754,6 +760,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     try {
       const subject: Record<string, string> = {};
       for (const field of config.person) subject[field.key] = get(field.key);
+      // The maiden field is hidden for a Male subject — never submit a stale value.
+      if (certSlug === "birth-certificate" && get("sex") === "Male")
+        subject["subjectMaidenLastName"] = "";
       const family: Record<string, string> = {};
       for (const field of [...config.family, ...(config.familySecond ?? [])])
         family[field.key] = get(field.key);
@@ -789,7 +798,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           relationship: get("relationship"),
           relationshipOther: get("relationshipOther"),
           firstName: get("applicantFirstName"),
+          middleName: get("applicantMiddleName"),
           lastName: get("applicantLastName"),
+          suffix: get("applicantSuffix"),
           dateOfBirth: get("applicantDob"),
           phone: get("phone"),
           email: get("email"),
@@ -861,6 +872,38 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const cardDigits = digitsOnly(values.cardNumber ?? "").length;
   const cardBrand = cardBrandOf(values.cardNumber ?? "");
   const expiryMonthOk = isPlausibleExpiryMonth(values.cardExpiry ?? "");
+
+  /** USVR-style soft cross-checks (birth only): warnings, never blockers. */
+  const maidenWarnings: string[] = [];
+  if (isBirth) {
+    const same = (a: string, b: string) => {
+      const x = a.trim().toLowerCase();
+      const y = b.trim().toLowerCase();
+      return x !== "" && y !== "" && x === y;
+    };
+    const different = (a: string, b: string) => {
+      const x = a.trim().toLowerCase();
+      const y = b.trim().toLowerCase();
+      return x !== "" && y !== "" && x !== y;
+    };
+    const motherMaiden = valueOf("motherLastName");
+    const motherCurrent = valueOf("motherCurrentLastName");
+    const fatherLast = valueOf("fatherLastName");
+    const subjectLast = valueOf("lastName");
+    const subjectMaiden = sexValue === "Male" ? "" : valueOf("subjectMaidenLastName");
+    if (same(motherMaiden, fatherLast))
+      maidenWarnings.push("Mother maiden name is the same as father's last name.");
+    if (different(subjectMaiden, subjectLast))
+      maidenWarnings.push("The Subject's maiden name is different than their last name.");
+    if (
+      different(subjectMaiden, motherCurrent) &&
+      different(subjectMaiden, motherMaiden) &&
+      different(subjectMaiden, fatherLast)
+    )
+      maidenWarnings.push("The Subject's maiden name is different than either parent's last name.");
+    if (same(motherMaiden, motherCurrent))
+      maidenWarnings.push("Mother maiden name is the same as last name.");
+  }
 
   return (
     <form
@@ -964,10 +1007,20 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </option>
               ))}
             </select>
-            <small>{config.eventLocationHelp}</small>
+            {isBirth ? null : <small>{config.eventLocationHelp}</small>}
           </label>
+          {isBirth ? (
+            <p className="restriction-note">
+              <strong>City/County of Birth:</strong>{" "}
+              <em>
+                Please select the exact city and county of birth for the subject of the certificate.{" "}
+                {config.eventLocationHelp}
+              </em>
+            </p>
+          ) : null}
           <label className="application-field wide">
-            Reason for requesting this certificate <span>*</span>
+            {isBirth ? "Reason for Request" : "Reason for requesting this certificate"}{" "}
+            <span>*</span>
             <select name="reason" required defaultValue={draft.reason ?? ""}>
               <option value="">Please select…</option>
               {config.reasons.map((item) => (
@@ -986,11 +1039,31 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               ) : null}
             </label>
           ) : null}
+          {isBirth ? (
+            <p className="restriction-note">
+              <strong>Year of Birth Restriction:</strong>{" "}
+              <em>
+                For the selected county we can only accept orders for births that occurred in the
+                year {BIRTH_MIN_YEAR} or later.
+              </em>
+            </p>
+          ) : null}
         </div>
       </FormSection>
 
       <fieldset className="county-blocked-fields">
         <FormSection number={2} title="Information About the Requestor">
+          {isBirth ? (
+            <p className="hint">
+              <strong className="important-note">Important:</strong>{" "}
+              <em>
+                The requestor is the person ordering the certificate, not the person named on the
+                certificate. If you are ordering your own certificate, you are both the requestor
+                and the subject. The name of the credit card holder must be the same as the
+                requestor.
+              </em>
+            </p>
+          ) : null}
           <div className="application-grid">
             <label className="application-field wide">
               Your relationship to the person named on the certificate <span>*</span>
@@ -1000,7 +1073,23 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                   <option key={item}>{item}</option>
                 ))}
               </select>
+              {isBirth ? (
+                <small>
+                  <em>
+                    If you are not named on the record you may be required to provide proof of
+                    Relationship, Entitlement, and/or Court Documents.
+                  </em>
+                </small>
+              ) : null}
             </label>
+            {isBirth ? (
+              <p className="hint application-field wide">
+                <strong className="important-note">Important:</strong>{" "}
+                <em>
+                  The relationship selected must match your relationship to the subject exactly.
+                </em>
+              </p>
+            ) : null}
             {relationship === "Other" ? (
               <label className="application-field wide">
                 Please describe your relationship <span>*</span>
@@ -1017,7 +1106,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </label>
             ) : null}
             <label className="application-field">
-              Your first name <span>*</span>
+              First Name of Requestor <span>*</span>
               <input
                 name="applicantFirstName"
                 required
@@ -1025,16 +1114,27 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               />
             </label>
             <label className="application-field">
-              Your middle name
+              Middle Name of Requestor
               <input name="applicantMiddleName" defaultValue={draft.applicantMiddleName ?? ""} />
             </label>
             <label className="application-field">
-              Your last name <span>*</span>
+              Current Last Name of Requestor <span>*</span>
               <input
                 name="applicantLastName"
                 required
                 defaultValue={draft.applicantLastName ?? ""}
               />
+            </label>
+            <label className="application-field">
+              Suffix
+              <select name="applicantSuffix" defaultValue={draft.applicantSuffix ?? ""}>
+                <option value="">Please select…</option>
+                {SUFFIX_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
           {config.requestor.note ? (
@@ -1074,6 +1174,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                   onChange={(event) => applyMask(event, formatSsnInput)}
                 />
                 <small>Shown only while you type. Never stored on this device.</small>
+                <small>
+                  <em>Valid SSN only, no ITINs or temporary SSNs permitted.</em>
+                </small>
                 {ssnLiveError ? (
                   <small className="application-error" role="alert">
                     {ssnLiveError}
@@ -1096,14 +1199,18 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               section.
             </p>
           ) : null}
-          <p>
-            {config.personLegend}. {config.personNote ? <em>{config.personNote.body}</em> : null}
+          <p className="restriction-note">
+            <strong>{config.personLegend}.</strong>{" "}
+            {config.personNote ? <em>{config.personNote.body}</em> : null}
           </p>
           <div className="application-grid">
             {config.person.map((field) => {
+              // Birth: maiden name only applies to a Female subject — hidden
+              // for Male, compulsory for Female.
+              if (isBirth && field.key === "subjectMaidenLastName" && sexValue === "Male")
+                return null;
               const requiredWhenFemale =
-                field.key === "subjectMaidenLastName" &&
-                (values.sex ?? draft.sex ?? "") === "Female";
+                isBirth && field.key === "subjectMaidenLastName" && sexValue === "Female";
               return (
                 <Field
                   key={field.key}
@@ -1120,11 +1227,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           <fieldset>
             <legend>{config.familyLegend}</legend>
             {config.familyNote ? (
-              <p>
-                <strong>{config.familyNote.title}</strong>
+              <p className="restriction-note">
+                <strong>{config.familyNote.title}</strong> <em>{config.familyNote.body}</em>
               </p>
             ) : null}
-            {config.familyNote ? <em>{config.familyNote.body}</em> : null}
             <div className="application-grid">
               {config.family.map((field) => (
                 <Field
@@ -1140,11 +1246,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <fieldset>
               <legend>{config.familySecondLegend}</legend>
               {config.familySecondNote ? (
-                <p>
-                  <strong>{config.familySecondNote.title}</strong>
+                <p className="restriction-note">
+                  <strong>{config.familySecondNote.title}</strong>{" "}
+                  <em>{config.familySecondNote.body}</em>
                 </p>
               ) : null}
-              {config.familySecondNote ? <em>{config.familySecondNote.body}</em> : null}
               {config.familySecondStatus ? (
                 <div className="application-grid">
                   <label className="application-field">
@@ -1228,11 +1334,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             requestorLast={requestorLast}
             errors={fieldErrors}
           />
-          <fieldset>
-            <legend>Contact information</legend>
+          <fieldset className="contact-block">
+            <p className="contact-heading">Contact Information</p>
             <div className="application-grid">
-              <label className="application-field">
-                Phone number <span>*</span>
+              <label className="application-field wide">
+                Phone Number <span>*</span>
                 <PhoneInput
                   defaultCountry="us"
                   preferredCountries={["us"]}
@@ -1244,7 +1350,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                     name: "phoneVisible",
                     required: true,
                     autoComplete: "tel",
-                    placeholder: "Daytime Phone Number",
+                    placeholder: "Phone Number",
                   }}
                 />
                 <input type="hidden" name="phone" value={phoneValue} />
@@ -1254,7 +1360,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                   </small>
                 ) : null}
               </label>
-              <div />
               <label className="application-field">
                 Email address <span>*</span>
                 <input name="email" type="email" required defaultValue={draft.email ?? ""} />
@@ -1362,7 +1467,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <strong className="important-note">Requirements:</strong>{" "}
             <em>The Billing Address Name must match the Requestor Name.</em>
           </p>
-          <p>
+          <p className="hint">
             Your billing address is used to verify your payment. Card details are collected in the
             Credit Card Details section below.
           </p>
@@ -1510,6 +1615,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <p>
               Number of copies: {copies} certified {copies === 1 ? "copy" : "copies"}
             </p>
+            <p>Delivery method: {delivery}</p>
             <hr />
             <div>
               <span>
@@ -1524,7 +1630,14 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </span>
                 <b>$45.00</b>
               </div>
-            ) : null}
+            ) : (
+              <div>
+                <span>
+                  Standard Processing<small>5–7 business days</small>
+                </span>
+                <b>Included</b>
+              </div>
+            )}
             <div className="total">
               <strong>TOTAL</strong>
               <strong>${total.toFixed(2)}</strong>
@@ -1571,6 +1684,25 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <p>
               <strong>Type your full name in the field below to submit your order.</strong>
             </p>
+            {isBirth && maidenWarnings.length > 0 ? (
+              <div className="possible-issues" role="status">
+                <h4>Possible Issues Detected</h4>
+                <p>
+                  <em>
+                    Hi there! Our system detected one or more potential issues with your submission.
+                    Please review each issue below. Once you are satisfied with your submission, you
+                    may continue by submitting the form again.
+                  </em>
+                </p>
+                <ul>
+                  {maidenWarnings.map((warning) => (
+                    <li key={warning}>
+                      {warning} If this is correct, then please ignore this warning.
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
             <input
               className="verify-signature"
               name="signature"
