@@ -49,6 +49,9 @@ export interface CertificateFormConfig {
   familySecondNote?: GroupNote;
   familySecond?: FieldDef[];
   familySecondStatus?: GroupStatusConfig;
+  /** When true, the family fields render inside section 3 under their own
+   *  sub-heading (e.g. marriage "Spouse 2") and section 4 is hidden. */
+  familyInSubjectSection?: boolean;
   relationships: string[];
   reasons: string[];
   eventLocationLabel: string;
@@ -116,6 +119,14 @@ const DEATH_RACE_OPTIONS = [
   "Mixed",
   "Other",
 ];
+
+/** Earliest marriage year shown on marriage orders (USVR parity, notice only —
+ *  unlike birth, the backend does not reject out-of-window marriage dates). */
+export const MARRIAGE_MIN_YEAR = 2010;
+
+/** Earliest divorce year shown on divorce orders (USVR parity, notice only —
+ *  unlike birth, the backend does not reject out-of-window divorce dates). */
+export const DIVORCE_MIN_YEAR = 2010;
 
 /** USVR Alabama Death Certificate — exact reason list. */
 const DEATH_REASONS = [
@@ -283,19 +294,43 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
     eventLocationHelp: "Enter the city or town where the death occurred.",
   },
   "marriage-certificate": {
-    requestor: BASE_REQUESTOR,
-    personLegend: "Spouse / party 1",
+    requestor: {
+      ...BASE_REQUESTOR,
+      dateOfBirthRequired: true,
+    },
+    personLegend: "Spouse 1",
+    personNote: {
+      title: "Information about the Subjects on the Certificate",
+      body: "Enter the names exactly as they appear on the certificate.",
+    },
     person: [
-      { key: "firstName", label: "First name", required: true },
-      { key: "middleName", label: "Middle name" },
-      { key: "lastName", label: "Last name at the time of marriage", required: true },
-      { key: "eventDate", label: "Date of marriage", type: "date", required: true },
+      { key: "sex", label: "Gender", type: "select", required: true, options: BIRTH_SEX_OPTIONS },
+      { key: "firstName", label: "First Name of Subject", required: true },
+      { key: "middleName", label: "Middle Name of Subject" },
+      { key: "lastName", label: "Current Last Name of Subject", required: true },
+      { key: "maidenLastName", label: "Maiden Last Name of Subject", required: true },
+      {
+        key: "eventDate",
+        label: "Date of Marriage",
+        type: "date",
+        required: true,
+        help: "The exact date of marriage listed on the certificate.",
+      },
     ],
-    familyLegend: "Spouse / party 2",
+    familyLegend: "Spouse 2",
+    familyInSubjectSection: true,
     family: [
-      { key: "spouseFirstName", label: "First name", required: true },
-      { key: "spouseMiddleName", label: "Middle name" },
-      { key: "spouseLastName", label: "Last name at the time of marriage", required: true },
+      {
+        key: "spouseSex",
+        label: "Gender",
+        type: "select",
+        required: true,
+        options: BIRTH_SEX_OPTIONS,
+      },
+      { key: "spouseFirstName", label: "First Name of Subject", required: true },
+      { key: "spouseMiddleName", label: "Middle Name of Subject" },
+      { key: "spouseLastName", label: "Current Last Name of Subject", required: true },
+      { key: "spouseMaidenLastName", label: "Maiden Last Name of Subject", required: true },
       { key: "spouseCurrentLastName", label: "Current last name, if different" },
     ],
     relationships: [
@@ -319,21 +354,47 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       "Other",
     ],
     eventLocationLabel: "marriage",
-    eventLocationHelp: "Enter the city or town where the marriage license was issued or recorded.",
+    eventLocationHelp:
+      "Enter the city or town where the marriage license was purchased and registered.",
   },
   "divorce-certificate": {
-    requestor: BASE_REQUESTOR,
-    personLegend: "Party 1",
+    requestor: {
+      ...BASE_REQUESTOR,
+      dateOfBirthRequired: true,
+    },
+    personLegend: "Spouse 1",
+    personNote: {
+      title: "Information about the Subjects on the Certificate",
+      body: "Enter the names exactly as they appear on the certificate.",
+    },
     person: [
-      { key: "firstName", label: "First name", required: true },
-      { key: "middleName", label: "Middle name" },
-      { key: "lastName", label: "Last name at the time of divorce", required: true },
-      { key: "eventDate", label: "Date of divorce, or approximate date", type: "date" },
+      { key: "sex", label: "Gender", type: "select", required: true, options: BIRTH_SEX_OPTIONS },
+      { key: "firstName", label: "First Name of Subject", required: true },
+      { key: "middleName", label: "Middle Name of Subject" },
+      { key: "lastName", label: "Current Last Name of Subject", required: true },
+      { key: "maidenLastName", label: "Maiden Last Name of Subject", required: true },
+      {
+        key: "eventDate",
+        label: "Date of Divorce",
+        type: "date",
+        required: true,
+        help: "The exact date of divorce listed on the certificate.",
+      },
     ],
-    familyLegend: "Party 2",
+    familyLegend: "Spouse 2",
+    familyInSubjectSection: true,
     family: [
-      { key: "spouseFirstName", label: "First name", required: true },
-      { key: "spouseLastName", label: "Last name at the time of divorce", required: true },
+      {
+        key: "spouseSex",
+        label: "Gender",
+        type: "select",
+        required: true,
+        options: BIRTH_SEX_OPTIONS,
+      },
+      { key: "spouseFirstName", label: "First Name of Subject", required: true },
+      { key: "spouseMiddleName", label: "Middle Name of Subject" },
+      { key: "spouseLastName", label: "Current Last Name of Subject", required: true },
+      { key: "spouseMaidenLastName", label: "Maiden Last Name of Subject", required: true },
       {
         key: "court",
         label: "Court or jurisdiction, if known",

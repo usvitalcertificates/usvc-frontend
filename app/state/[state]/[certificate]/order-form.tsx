@@ -11,6 +11,8 @@ import { isCountyTemporarilyUnavailable } from "@/lib/county-availability";
 import {
   BIRTH_MIN_YEAR,
   DEATH_MIN_YEAR,
+  DIVORCE_MIN_YEAR,
+  MARRIAGE_MIN_YEAR,
   PROCESSING_CLARIFICATION_NOTE,
   resolveFormConfig,
   SUFFIX_OPTIONS,
@@ -231,12 +233,14 @@ type SectionKey =
   | "summary"
   | "submit";
 
-/** Backend error key -> owning section key (scroll fallback). */
-function sectionForError(key: string): SectionKey {
+/** Backend error key -> owning section key (scroll fallback). When the family
+ *  section is merged into the subject section (marriage "Spouse 2"),
+ *  family errors scroll to the subject section instead. */
+function sectionForError(key: string, familyVisible: boolean): SectionKey {
   if (key === "county" || key === "reasonOther") return "certificate";
   if (key === "requestorSsn" || key.startsWith("applicant.")) return "requestor";
   if (key.startsWith("subject.")) return "subject";
-  if (key.startsWith("family.")) return "family";
+  if (key.startsWith("family.")) return familyVisible ? "family" : "subject";
   if (key.startsWith("addresses.home.") || key.startsWith("addresses.shipping.")) return "shipping";
   if (key === "totalCents") return "copies";
   if (key.startsWith("addresses.billing.")) return "billing";
@@ -594,7 +598,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       }
     }
     document
-      .getElementById(`application-section-${sectionForError(key)}`)
+      .getElementById(`application-section-${sectionForError(key, hasFamilySection)}`)
       ?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
@@ -670,8 +674,12 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const reason = values.reason ?? draft.reason ?? "";
   const isBirth = certSlug === "birth-certificate";
   const isDeath = certSlug === "death-certificate";
-  const isBirthOrDeath = isBirth || isDeath;
-  const hasFamilySection = config.family.length > 0 || Boolean(config.familySecondLegend);
+  const isMarriage = certSlug === "marriage-certificate";
+  const isDivorce = certSlug === "divorce-certificate";
+  const spousesTogether = isMarriage || isDivorce;
+  const hasFamilySection =
+    !config.familyInSubjectSection &&
+    (config.family.length > 0 || Boolean(config.familySecondLegend));
   /** Display numbers follow the visible sections only, so a hidden family
    *  section never leaves a numbering gap (death flows 1,2,3,4… instead of
    *  1,2,3,5…). Certificates with a family section keep 1–10 as before. */
@@ -1048,7 +1056,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </option>
               ))}
             </select>
-            {isBirthOrDeath ? null : <small>{config.eventLocationHelp}</small>}
           </label>
           {isBirth ? (
             <p className="restriction-note">
@@ -1068,8 +1075,26 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </em>
             </p>
           ) : null}
+          {isMarriage ? (
+            <p className="restriction-note">
+              <strong>City/County of Marriage:</strong>{" "}
+              <em>
+                Please select the exact city and county the marriage license was purchased and
+                registered. {config.eventLocationHelp}
+              </em>
+            </p>
+          ) : null}
+          {isDivorce ? (
+            <p className="restriction-note">
+              <strong>City/County of Divorce:</strong>{" "}
+              <em>
+                Please select the exact city and county of divorce for the subjects of the
+                certificate. {config.eventLocationHelp}
+              </em>
+            </p>
+          ) : null}
           <label className="application-field wide">
-            {isBirthOrDeath ? "Reason for Request" : "Reason for requesting this certificate"}{" "}
+            {isBirth || isDeath ? "Reason for Request" : "Reason for requesting this certificate"}{" "}
             <span>*</span>
             <select name="reason" required defaultValue={draft.reason ?? ""}>
               <option value="">Please select…</option>
@@ -1107,6 +1132,24 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </em>
             </p>
           ) : null}
+          {isMarriage ? (
+            <p className="restriction-note">
+              <strong>Year of Marriage Restriction:</strong>{" "}
+              <em>
+                For the selected county we can only accept orders for marriages that occurred from{" "}
+                {MARRIAGE_MIN_YEAR} to today.
+              </em>
+            </p>
+          ) : null}
+          {isDivorce ? (
+            <p className="restriction-note">
+              <strong>Year of Divorce Restriction:</strong>{" "}
+              <em>
+                For the selected county we can only accept orders for divorces that occurred from{" "}
+                {DIVORCE_MIN_YEAR} to today.
+              </em>
+            </p>
+          ) : null}
         </div>
       </FormSection>
 
@@ -1116,7 +1159,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           number={sectionNumber("requestor")}
           title="Information About the Requestor"
         >
-          {isBirth ? (
+          {isBirth || isMarriage || isDivorce ? (
             <p className="hint">
               <strong className="important-note">Important:</strong>{" "}
               <em>
@@ -1145,23 +1188,19 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                   <option key={item}>{item}</option>
                 ))}
               </select>
-              {isBirthOrDeath ? (
-                <small>
-                  <em>
-                    If you are not named on the record you may be required to provide proof of
-                    Relationship, Entitlement, and/or Court Documents.
-                  </em>
-                </small>
-              ) : null}
-            </label>
-            {isBirthOrDeath ? (
-              <p className="hint application-field wide">
-                <strong className="important-note">Important:</strong>{" "}
+              <small>
                 <em>
-                  The relationship selected must match your relationship to the subject exactly.
+                  If you are not named on the record you may be required to provide proof of
+                  Relationship, Entitlement, and/or Court Documents.
                 </em>
-              </p>
-            ) : null}
+              </small>
+            </label>
+            <p className="hint application-field wide">
+              <strong className="important-note">Important:</strong>{" "}
+              <em>
+                The relationship selected must match your relationship to the subject exactly.
+              </em>
+            </p>
             {relationship === "Other" ? (
               <label className="application-field wide">
                 Please describe your relationship <span>*</span>
@@ -1275,10 +1314,19 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               section.
             </p>
           ) : null}
-          <p className="restriction-note">
-            <strong>{config.personLegend}.</strong>{" "}
-            {config.personNote ? <em>{config.personNote.body}</em> : null}
-          </p>
+          {spousesTogether ? (
+            config.personNote ? (
+              <p className="restriction-note">
+                <em>{config.personNote.body}</em>
+              </p>
+            ) : null
+          ) : (
+            <p className="restriction-note">
+              <strong>{config.personLegend}.</strong>{" "}
+              {config.personNote ? <em>{config.personNote.body}</em> : null}
+            </p>
+          )}
+          {spousesTogether ? <h3 className="spouse-heading">Spouse 1</h3> : null}
           <div className="application-grid">
             {config.person.map((field) => {
               // Birth: maiden name only applies to a Female subject — hidden
@@ -1297,9 +1345,25 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               );
             })}
           </div>
+          {spousesTogether ? (
+            <>
+              <h3 className="spouse-heading">Spouse 2</h3>
+              <div className="application-grid">
+                {(config.family ?? []).map((field) => (
+                  <Field
+                    key={field.key}
+                    def={field}
+                    defaultValue={draft[field.key]}
+                    error={fieldErrors[`family.${field.key}`]}
+                  />
+                ))}
+              </div>
+            </>
+          ) : null}
         </FormSection>
 
-        {config.family.length > 0 || config.familySecondLegend ? (
+        {!config.familyInSubjectSection &&
+        (config.family.length > 0 || config.familySecondLegend) ? (
           <FormSection
             sectionKey="family"
             number={sectionNumber("family")}
