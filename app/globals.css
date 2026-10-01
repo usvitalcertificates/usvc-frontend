@@ -838,8 +838,7 @@ h3 {
   font-weight: 400;
 }
 .same-address input,
-.processing-options input,
-.verify-list input {
+.processing-options input {
   width: 20px;
   height: 20px;
   accent-color: var(--navy);
@@ -1073,8 +1072,10 @@ h3 {
   background: #f4f6f9;
 }
 .verify-panel h3 {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #d9d8de;
   color: #3c3b3b;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 400;
 }
 .verify-list {
@@ -1089,20 +1090,26 @@ h3 {
   line-height: 1.65;
 }
 .verify-list li {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
   counter-increment: verify;
 }
 .verify-list li::before {
-  content: counter(verify) ".";
-  flex: 0 0 auto;
-  font-weight: 700;
+  content: counter(verify) ". ";
+  font-weight: 400;
 }
-.verify-list input {
-  flex: 0 0 auto;
-  margin-top: 2px;
-  cursor: not-allowed;
+.verify-signature {
+  width: 100%;
+  max-width: 480px;
+  min-height: 48px;
+  padding: 8px 16px;
+  border: 1px solid #d9d8de;
+  border-radius: 6px;
+  font-size: 17px;
+  font-family: inherit;
+}
+.verify-payment {
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid #d9d8de;
 }
 .verify-list a {
   color: var(--navy);

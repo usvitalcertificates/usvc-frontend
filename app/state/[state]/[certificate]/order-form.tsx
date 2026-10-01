@@ -226,7 +226,7 @@ function sectionForError(key: string): number {
   if (key.startsWith("addresses.billing.")) return 7;
   if (key.startsWith("paymentCard.")) return 8;
   if (key === "consents" || key === "signature") return 10;
-  return 11;
+  return 10;
 }
 
 /** Rank for picking the first error in form order (lower = earlier). */
@@ -1680,67 +1680,57 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <ReviewRow label="Total" value={`$${total.toFixed(2)}`} />
           </ReviewBlock>
 
-          <label className="application-field wide">
-            Electronic Signature <span>*</span>
-            <input name="signature" required defaultValue={draft.signature ?? ""} />
-            <small>
-              Type your full name in the field below. Typing your full name constitutes a signature
-              and an agreement that you have read and agreed to all the provisions above. It
-              additionally affirms that all information provided on this order form is complete and
-              accurate and that you are an authorized individual to obtain the requested vital
-              certificate.
-            </small>
-            {fieldErrors.signature ? (
-              <small className="application-error" role="alert">
-                {fieldErrors.signature}
-              </small>
-            ) : null}
-          </label>
           <div className="verify-panel">
             <h3>Verify Order</h3>
             <ol className="verify-list">
               <li>
-                <input type="checkbox" checked disabled aria-hidden="true" tabIndex={-1} />{" "}
                 <span>
                   I certify that the information provided is accurate to the best of my knowledge
                   and that I am authorized to request this record.
                 </span>
               </li>
               <li>
-                <input type="checkbox" checked disabled aria-hidden="true" tabIndex={-1} />{" "}
                 <span>
                   I understand ID verification instructions will be emailed to me with steps on how
                   to send a copy of my government-issued picture ID for verification.
                 </span>
               </li>
               <li>
-                <input type="checkbox" checked disabled aria-hidden="true" tabIndex={-1} />{" "}
                 <span>
                   I accept the <Link href="/terms-of-service">Terms of Service</Link>, including the
                   refund and cancellation policies.
                 </span>
               </li>
               <li>
-                <input type="checkbox" checked disabled aria-hidden="true" tabIndex={-1} />{" "}
-                <span>
-                  I have read the <Link href="/privacy-policy">Privacy Policy</Link>.
-                </span>
-              </li>
-              <li>
-                <input type="checkbox" checked disabled aria-hidden="true" tabIndex={-1} />{" "}
-                <span>
-                  I accept the <Link href="/terms-of-service">Refund &amp; Cancellation terms</Link>
-                  .
-                </span>
-              </li>
-              <li>
-                <input type="checkbox" checked disabled aria-hidden="true" tabIndex={-1} />{" "}
                 <span>
                   <strong>Authorization for the complete order payment.</strong>{" "}
                   {PROCESSING_PAYMENT_AUTHORIZATION_TEXT}
                 </span>
               </li>
             </ol>
+            <p>
+              Type your full name in the field below. Typing your full name constitutes a signature
+              and an agreement that you have read and agreed to all the provisions above. It
+              additionally affirms that all information provided on this order form is complete and
+              accurate and that you are an authorized individual to obtain the requested vital
+              certificate.
+            </p>
+            <p>
+              <strong>Type your full name in the field below to submit your order.</strong>
+            </p>
+            <input
+              className="verify-signature"
+              name="signature"
+              placeholder="Signature"
+              aria-label="Signature — type your full name"
+              required
+              defaultValue={draft.signature ?? ""}
+            />
+            {fieldErrors.signature ? (
+              <small className="application-error" role="alert">
+                {fieldErrors.signature}
+              </small>
+            ) : null}
             <p className="verify-warning">
               <em>
                 Before submitting your order, please take a moment to review your information.
@@ -1748,6 +1738,25 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 order.
               </em>
             </p>
+            <div className="verify-payment">
+              <p>
+                Continue to the secure payment step to complete your order. Your card details are
+                encrypted. Your payment is processed safely through Stripe.
+              </p>
+              {error ? (
+                <p className="application-error" role="alert">
+                  {error}
+                </p>
+              ) : null}
+              <div className="payment-action">
+                <button className="button button-primary" disabled={busy || Boolean(blockedCounty)}>
+                  {busy ? "Saving your application…" : "Continue to Secure Payment"}
+                </button>
+                <strong>
+                  Total ${total.toFixed(2)} — one USVC payment (agency fees billed separately)
+                </strong>
+              </div>
+            </div>
           </div>
           {fieldErrors.consents ? (
             <small className="application-error" role="alert">
@@ -1771,26 +1780,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 ))}
             </div>
           ) : null}
-        </FormSection>
-
-        <FormSection number={11} title="Payment">
-          <p>
-            Continue to the secure payment step to complete your order. Your card details are
-            encrypted. Your payment is processed safely through Stripe.
-          </p>
-          {error ? (
-            <p className="application-error" role="alert">
-              {error}
-            </p>
-          ) : null}
-          <div className="payment-action">
-            <button className="button button-primary" disabled={busy || Boolean(blockedCounty)}>
-              {busy ? "Saving your application…" : "Continue to Secure Payment"}
-            </button>
-            <strong>
-              Total ${total.toFixed(2)} — one USVC payment (agency fees billed separately)
-            </strong>
-          </div>
         </FormSection>
       </fieldset>
     </form>
