@@ -240,21 +240,22 @@ export default function Contact() {
             <p>
               This site is available for use by the general public and legal profession to request
               vital certificate application assistance. We act as agents for expediting vital
-              certificate applications. We are not affiliated with any government agency. Vital
-              certificates and forms may be ordered from the relevant government agency for free or
-              a lesser cost.
+              certificate applications. We are not affiliated with any government agency. Orders are
+              processed by US Vital Certificates via VitalChek processing.
             </p>
-            <p>usvitalcertificates.org</p>
-            <p>US VITAL CERTIFICATES, LLC</p>
-            <p>7345 W Sand Lake Rd Ste 210 Office 4464</p>
-            <p>Orlando, FL 32819</p>
-            <p>
-              <a href="mailto:support@usvitalcertificates.org">support@usvitalcertificates.org</a>
-            </p>
-            <p>(689) 367-5431</p>
-            <p>
-              <em>(Mailing &amp; Correspondence)</em>
-            </p>
+            <div className="contact-address-details">
+              <p>usvitalcertificates.org</p>
+              <p>US VITAL CERTIFICATES, LLC</p>
+              <p>7345 W Sand Lake Rd Ste 210 Office 4464</p>
+              <p>Orlando, FL 32819</p>
+              <p>
+                <a href="mailto:support@usvitalcertificates.org">support@usvitalcertificates.org</a>
+              </p>
+              <p>(689) 367-5431</p>
+              <p>
+                <em>(Mailing &amp; Correspondence)</em>
+              </p>
+            </div>
           </div>
         </div>
       </section>
