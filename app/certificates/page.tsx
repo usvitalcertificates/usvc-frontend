@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Disclaimer, PageHeader } from "../usvc-ui";
+import { PageHeader } from "../usvc-ui";
 
 const certificates = [
   {
@@ -57,7 +57,6 @@ export default function Certificates() {
               </article>
             ))}
           </div>
-          <Disclaimer className="page-disclaimer" />
         </div>
       </section>
     </main>

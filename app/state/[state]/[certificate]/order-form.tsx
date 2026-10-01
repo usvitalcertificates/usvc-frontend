@@ -568,7 +568,6 @@ const CONSENT_KEYS = [
   "terms",
   "privacy",
   "refund",
-  "independent",
   "processingPayment",
 ] as const;
 
@@ -610,10 +609,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     terms: false,
     privacy: false,
     refund: false,
-    independent: false,
     processingPayment: false,
   });
-  const [openAiEmailMatching, setOpenAiEmailMatching] = useState(false);
   const allConsents = CONSENT_KEYS.every((key) => consents[key]);
   const [geo, setGeo] = useState<StateGeography>({ state: abbr, counties: [] });
   const [busy, setBusy] = useState(false);
@@ -785,7 +782,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       terms: checked,
       privacy: checked,
       refund: checked,
-      independent: checked,
       processingPayment: checked,
     });
   }
@@ -882,7 +878,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         copies,
         rush,
         deliveryMethod: get("delivery"),
-        consents: { ...consents, openAiEmailMatching },
+        consents: { ...consents },
         processingAuthorization: {
           accepted: true as const,
           text: PROCESSING_PAYMENT_AUTHORIZATION_TEXT,
@@ -1760,36 +1756,12 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <label>
               <input
                 type="checkbox"
-                name="openAiEmailMatching"
-                checked={openAiEmailMatching}
-                onChange={(event) => setOpenAiEmailMatching(event.target.checked)}
-              />{" "}
-              I agree that USVC may share a securely hashed version of my email address with OpenAI
-              to measure advertising conversions. This is optional and does not affect my order.
-            </label>
-            <label>
-              <input
-                type="checkbox"
                 name="agreeRefund"
                 required={!allConsents}
                 checked={consents.refund}
                 onChange={(event) => setConsents((c) => ({ ...c, refund: event.target.checked }))}
               />{" "}
               I accept the <Link href="/terms-of-service">Refund &amp; Cancellation terms</Link>.
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreeIndependent"
-                required={!allConsents}
-                checked={consents.independent}
-                onChange={(event) =>
-                  setConsents((c) => ({ ...c, independent: event.target.checked }))
-                }
-              />{" "}
-              I understand USVC is an independent service, not a government agency, and that the
-              Vital Statistics Agency Fee and any other shipping fees are payable upon review and
-              acceptance by the State Agency and will appear on my credit card statement separately.
             </label>
             <label>
               <input

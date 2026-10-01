@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { StateSelector } from "./state-selector";
+import { Disclaimer } from "./usvc-ui";
 
 const certificates = [
   {
@@ -235,6 +236,12 @@ export default function Home() {
               Contact Support
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section className="page-section">
+        <div className="container">
+          <Disclaimer className="page-disclaimer" />
         </div>
       </section>
     </main>

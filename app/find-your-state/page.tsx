@@ -1,5 +1,5 @@
 import { StateSelector } from "../state-selector";
-import { Disclaimer, PageHeader } from "../usvc-ui";
+import { PageHeader } from "../usvc-ui";
 
 export const metadata = {
   title: "Find Your State",
@@ -18,7 +18,6 @@ export default function FindState() {
       <section className="page-section find-state-page">
         <div className="container">
           <StateSelector showHeading={false} />
-          <Disclaimer className="page-disclaimer" />
           <p className="state-help">
             Not sure which state to choose? Contact USVC support at support@usvitalcertificates.org
             and we will help you decide before you start.
