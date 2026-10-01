@@ -238,10 +238,11 @@ export default function Contact() {
           <div className="contact-address-block">
             <h2>Disclaimer</h2>
             <p>
-              This site is available for use by the general public and legal profession to request
-              vital certificate application assistance. We act as agents for expediting vital
-              certificate applications. We are not affiliated with any government agency. Orders are
-              processed by US Vital Certificates via VitalChek processing.
+              This site is available for use by the general public and legal profession to obtain
+              government approved and official certificates issued by the government agency. We act
+              as agents for expediting vital certificate applications. We are not affiliated with
+              any government agency. Vital certificates and forms may be ordered from the relevant
+              government agency for free or a lesser cost.
             </p>
             <div className="contact-address-details">
               <p>usvitalcertificates.org</p>
