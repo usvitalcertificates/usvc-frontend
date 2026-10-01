@@ -226,7 +226,7 @@ function sectionForError(key: string): number {
   if (key.startsWith("addresses.billing.")) return 7;
   if (key.startsWith("paymentCard.")) return 8;
   if (key === "consents" || key === "signature") return 10;
-  return 11;
+  return 10;
 }
 
 /** Rank for picking the first error in form order (lower = earlier). */
@@ -503,65 +503,6 @@ function AddressFields({
   );
 }
 
-function ReviewBlock({
-  title,
-  target,
-  children,
-}: {
-  title: string;
-  target: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="review-block">
-      <div>
-        <h3>{title}</h3>
-        <button
-          type="button"
-          onClick={() =>
-            document
-              .getElementById(`application-section-${target}`)
-              ?.scrollIntoView({ behavior: "smooth", block: "center" })
-          }
-        >
-          Edit
-        </button>
-      </div>
-      <dl>{children}</dl>
-    </section>
-  );
-}
-
-function ReviewRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="review-row">
-      <dt>{label}</dt>
-      <dd>{value}</dd>
-    </div>
-  );
-}
-
-function formatAddress(parts: {
-  line1: string;
-  line2: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-}) {
-  return (
-    [
-      parts.line1,
-      parts.line2,
-      `${parts.city}, ${parts.state} ${parts.postalCode}`.trim(),
-      parts.country,
-    ]
-      .filter((part) => part && part.trim() && part.trim() !== ",")
-      .join(" · ") || "—"
-  );
-}
-
-const show = (value: string | undefined) => (value && value.trim() ? value : "—");
 const CONSENT_KEYS = [
   "accurate",
   "govtId",
@@ -603,15 +544,14 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     setPhoneValue(value);
     setValues((current) => ({ ...current, phone: value }));
   }
-  const [consents, setConsents] = useState<Record<(typeof CONSENT_KEYS)[number], boolean>>({
-    accurate: false,
-    govtId: false,
-    terms: false,
-    privacy: false,
-    refund: false,
-    processingPayment: false,
-  });
-  const allConsents = CONSENT_KEYS.every((key) => consents[key]);
+  const consents: Record<(typeof CONSENT_KEYS)[number], boolean> = {
+    accurate: true,
+    govtId: true,
+    terms: true,
+    privacy: true,
+    refund: true,
+    processingPayment: true,
+  };
   const [geo, setGeo] = useState<StateGeography>({ state: abbr, counties: [] });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -704,7 +644,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     "international";
   // Two-fee model: only the Online Processing Fee (+ rush) is charged now.
   const total = copies * 149 + (rush ? 45 : 0);
-  const serviceCents = 149 * copies;
 
   const requestorFirst = values.applicantFirstName ?? draft.applicantFirstName ?? "";
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
@@ -775,17 +714,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     else if (billingSource === "shipping") copyAddress("shipping", "billing");
   }
 
-  function toggleAll(checked: boolean) {
-    setConsents({
-      accurate: checked,
-      govtId: checked,
-      terms: checked,
-      privacy: checked,
-      refund: checked,
-      processingPayment: checked,
-    });
-  }
-
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -812,8 +740,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       });
       return;
     }
-    if (!allConsents || !get("signature")) {
-      setError("Please sign and accept the required certification statements before continuing.");
+    if (!get("signature")) {
+      setError("Please type your full name as your signature before continuing.");
       document
         .getElementById("application-section-10")
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -921,10 +849,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
 
   const fatherStatus = values[config.familySecondStatus?.key ?? ""] ?? "";
   const fatherRequired = config.familySecondStatus?.requiredWhen.includes(fatherStatus) ?? false;
-  const reasonDisplay = reason === "Other" ? values.reasonOther?.trim() || "Other" : reason || "—";
-  const relationshipDisplay =
-    relationship === "Other" ? values.relationshipOther?.trim() || "Other" : relationship || "—";
-  const cardProvided = Boolean((values.cardNumber ?? "").replace(/[\s-]/g, ""));
   const ssnDigits = digitsOnly(values.requestorSsn ?? "").length;
   const ssnLiveError =
     ssnDigits === 0
@@ -938,17 +862,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const cardBrand = cardBrandOf(values.cardNumber ?? "");
   const expiryMonthOk = isPlausibleExpiryMonth(values.cardExpiry ?? "");
 
-  const addressValues = (prefix: string) => ({
-    line1: values[`${prefix}Line1`] ?? "",
-    line2: values[`${prefix}Line2`] ?? "",
-    city: values[`${prefix}City`] ?? "",
-    state: values[`${prefix}State`] ?? "",
-    postalCode: values[`${prefix}Zip`] ?? "",
-    country:
-      values[`${prefix}Country`] ??
-      (addressTypeOf(values[`${prefix}Type`] ?? "") === "international" ? "" : "United States"),
-  });
-
   return (
     <form
       ref={formRef}
@@ -960,9 +873,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     >
       <div className="form-head-notices">
         <p>
-          <strong>ID Requirements must be met before certificate is issued.</strong> You will
-          receive an email with instructions on how to send your ID within one week of submitting
-          this application.
+          <strong>
+            ID requirements set by the issuing agency must be met before it can issue a certificate.
+          </strong>{" "}
+          We usually email instructions on how to send your ID within one week of submitting this
+          application.
         </p>
         <p>
           Items with an <span>*</span> asterisk are required fields.
@@ -1397,15 +1312,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             </select>
           </label>
           <p className="hint">
-            <strong className="important-note">Important:</strong>{" "}
-            <em>
-              The online Vital Certificate Processing Fee is payable upon ordering and the relevant
-              Vital Statistics Agency Fee and any other shipping fees are payable upon review and
-              acceptance by the State Agency and will appear on your credit card statement
-              separately.
-            </em>
-          </p>
-          <p className="hint">
             <em>
               Regular mail delivery is available, however, we recommend you choose a more secure
               shipping method that provides faster delivery and tracking of your order.
@@ -1440,7 +1346,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               />
               <span>
                 <strong>Rush Processing</strong>
-                <small>Your application will be processed the next day.</small>
+                <small>
+                  We aim to submit your application by the next business day. Government office and
+                  delivery time is extra.
+                </small>
               </span>
               <b>+$45.00 per order</b>
             </label>
@@ -1620,164 +1529,86 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               <strong>TOTAL</strong>
               <strong>${total.toFixed(2)}</strong>
             </div>
-            <p>
-              This total includes the USVC Processing Fee and Rush Processing when selected. The
-              relevant Vital Statistics Agency Fee and any other shipping fees are payable upon
-              review and acceptance by the State Agency and will appear on your credit card
-              statement separately.
-            </p>
           </div>
         </FormSection>
 
-        <FormSection number={10} title="Review To Submit">
-          <ReviewBlock title="Certificate" target={1}>
-            <ReviewRow label="Certificate" value={certificateName} />
-            <ReviewRow
-              label={noun.charAt(0).toUpperCase() + noun.slice(1)}
-              value={selectedCounty ? jurisdictionLabel(selectedCounty) : show(values.county)}
+        <FormSection number={10} title="Submit Your Order">
+          <div className="verify-panel">
+            <h3>Verify Order</h3>
+            <ol className="verify-list">
+              <li>
+                <span>
+                  I certify that the information provided is accurate to the best of my knowledge
+                  and that I am authorized to request this record.
+                </span>
+              </li>
+              <li>
+                <span>
+                  I understand ID verification instructions will be emailed to me with steps on how
+                  to send a copy of my government-issued picture ID for verification.
+                </span>
+              </li>
+              <li>
+                <span>
+                  I accept the <Link href="/terms-of-service">Terms of Service</Link>, including the{" "}
+                  <Link href="/terms-of-service">refund and cancellation policies</Link>.
+                </span>
+              </li>
+              <li>
+                <span>
+                  <strong>Authorization for the complete order payment.</strong>{" "}
+                  {PROCESSING_PAYMENT_AUTHORIZATION_TEXT}
+                </span>
+              </li>
+            </ol>
+            <p>
+              Type your full name in the field below. Typing your full name constitutes a signature
+              and an agreement that you have read and agreed to all the provisions above. It
+              additionally affirms that all information provided on this order form is complete and
+              accurate and that you are an authorized individual to obtain the requested vital
+              certificate.
+            </p>
+            <p>
+              <strong>Type your full name in the field below to submit your order.</strong>
+            </p>
+            <input
+              className="verify-signature"
+              name="signature"
+              placeholder="Signature"
+              aria-label="Signature — type your full name"
+              required
+              defaultValue={draft.signature ?? ""}
             />
-            <ReviewRow label="City / town" value={show(values.city)} />
-            <ReviewRow label="Reason" value={reasonDisplay} />
-          </ReviewBlock>
-          <ReviewBlock title="Subject of the certificate" target={3}>
-            {config.person.map((field) => (
-              <ReviewRow key={field.key} label={field.label} value={show(values[field.key])} />
-            ))}
-          </ReviewBlock>
-          <ReviewBlock title="Parent / Family Information" target={4}>
-            {config.family.map((field) => (
-              <ReviewRow key={field.key} label={field.label} value={show(values[field.key])} />
-            ))}
-            {config.familySecondStatus ? (
-              <ReviewRow
-                label={config.familySecondStatus.label}
-                value={show(values[config.familySecondStatus.key])}
-              />
-            ) : null}
-            {(fatherRequired || !config.familySecondStatus ? (config.familySecond ?? []) : []).map(
-              (field) => (
-                <ReviewRow key={field.key} label={field.label} value={show(values[field.key])} />
-              ),
-            )}
-          </ReviewBlock>
-          <ReviewBlock title="Requestor & contact" target={2}>
-            <ReviewRow label="Name" value={`${requestorFirst} ${requestorLast}`.trim() || "—"} />
-            <ReviewRow label="Relationship" value={relationshipDisplay} />
-            {config.requestor.showDateOfBirth ? (
-              <ReviewRow label="Date of birth" value={show(values.applicantDob)} />
-            ) : null}
-            <ReviewRow label="Phone" value={show(values.phone)} />
-            <ReviewRow label="Email" value={show(values.email)} />
-            <ReviewRow label="Home" value={formatAddress(addressValues("home"))} />
-            <ReviewRow label="Ship to" value={formatAddress(addressValues("shipping"))} />
-            <ReviewRow label="Bill to" value={formatAddress(addressValues("billing"))} />
-          </ReviewBlock>
-          <ReviewBlock title="Copies, processing & fees" target={6}>
-            <ReviewRow label="Number of copies" value={String(copies)} />
-            <ReviewRow
-              label="Processing speed"
-              value={rush ? "Rush Processing" : "Standard Processing"}
-            />
-            <ReviewRow label="Online Processing Fee" value={`$${serviceCents.toFixed(2)}`} />
-            <ReviewRow label="Rush processing" value={rush ? "$45.00" : "Not selected"} />
-            <ReviewRow
-              label="Payment card"
-              value={cardProvided ? "Card provided (kept private)" : "—"}
-            />
-            <ReviewRow label="Total" value={`$${total.toFixed(2)}`} />
-          </ReviewBlock>
-
-          <label className="application-field wide">
-            Electronic Signature <span>*</span>
-            <input name="signature" required defaultValue={draft.signature ?? ""} />
-            <small>Typing your name serves as your electronic signature for this order.</small>
             {fieldErrors.signature ? (
               <small className="application-error" role="alert">
                 {fieldErrors.signature}
               </small>
             ) : null}
-          </label>
-          <div className="agreements">
-            <label className="all-agreement">
-              <input
-                type="checkbox"
-                name="agreement"
-                checked={allConsents}
-                onChange={(event) => toggleAll(event.target.checked)}
-              />
-              <span>
-                <strong>I agree to all of the statements below.</strong> Selecting this checks every
-                item; you may also review and select them individually.
-              </span>
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreeAccurate"
-                required={!allConsents}
-                checked={consents.accurate}
-                onChange={(event) => setConsents((c) => ({ ...c, accurate: event.target.checked }))}
-              />{" "}
-              I certify that the information provided is accurate to the best of my knowledge and
-              that I am authorized to request this record.
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreeGovtId"
-                required={!allConsents}
-                checked={consents.govtId}
-                onChange={(event) => setConsents((c) => ({ ...c, govtId: event.target.checked }))}
-              />{" "}
-              I understand I will receive an email from the relevant government agency with
-              instructions on how to send a copy of my government issued picture ID for
-              verification.
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreeTerms"
-                required={!allConsents}
-                checked={consents.terms}
-                onChange={(event) => setConsents((c) => ({ ...c, terms: event.target.checked }))}
-              />{" "}
-              I agree to the <Link href="/terms-of-service">Terms of Service</Link>.
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreePrivacy"
-                required={!allConsents}
-                checked={consents.privacy}
-                onChange={(event) => setConsents((c) => ({ ...c, privacy: event.target.checked }))}
-              />{" "}
-              I have read the <Link href="/privacy-policy">Privacy Policy</Link>.
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreeRefund"
-                required={!allConsents}
-                checked={consents.refund}
-                onChange={(event) => setConsents((c) => ({ ...c, refund: event.target.checked }))}
-              />{" "}
-              I accept the <Link href="/terms-of-service">Refund &amp; Cancellation terms</Link>.
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreeProcessingPayment"
-                required={!allConsents}
-                checked={consents.processingPayment}
-                onChange={(event) =>
-                  setConsents((c) => ({ ...c, processingPayment: event.target.checked }))
-                }
-              />{" "}
-              <span>
-                <strong>Authorization for the complete order payment.</strong>{" "}
-                {PROCESSING_PAYMENT_AUTHORIZATION_TEXT}
-              </span>
-            </label>
+            <p className="verify-warning">
+              <em>
+                Before submitting your order, please take a moment to review your information.
+                Incorrect information provided will lead to delays and could possibly cancel your
+                order.
+              </em>
+            </p>
+            <div className="verify-payment">
+              <p>
+                Continue to the secure payment step to complete your order. Your card details are
+                encrypted. Your payment is processed safely through Stripe.
+              </p>
+              {error ? (
+                <p className="application-error" role="alert">
+                  {error}
+                </p>
+              ) : null}
+              <div className="payment-action">
+                <button className="button button-success" disabled={busy || Boolean(blockedCounty)}>
+                  {busy
+                    ? "Saving your application…"
+                    : `Continue to Secure Payment — Total $${total.toFixed(2)}`}
+                </button>
+              </div>
+            </div>
           </div>
           {fieldErrors.consents ? (
             <small className="application-error" role="alert">
@@ -1801,25 +1632,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 ))}
             </div>
           ) : null}
-        </FormSection>
-
-        <FormSection number={11} title="Payment">
-          <p>
-            Continue to the secure payment step to complete your order. Your card details are
-            encrypted before storage and are visible only to authorized staff for government-agency
-            processing.
-          </p>
-          {error ? (
-            <p className="application-error" role="alert">
-              {error}
-            </p>
-          ) : null}
-          <div className="payment-action">
-            <button className="button button-primary" disabled={busy || Boolean(blockedCounty)}>
-              {busy ? "Saving your application…" : "Continue to Secure Payment"}
-            </button>
-            <strong>Total ${total.toFixed(2)} — one all-inclusive payment</strong>
-          </div>
         </FormSection>
       </fieldset>
     </form>

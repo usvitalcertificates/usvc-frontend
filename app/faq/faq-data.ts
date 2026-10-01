@@ -24,18 +24,18 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: "How much does it cost to order a vital record and what type of payment is accepted?",
     answer:
-      "To find the cost of your order, select the relevant state and the vital certificate type (birth, death, marriage or divorce). The payment information is provided on that page, including additional certificates.\n\nWe accept payment by Visa, Mastercard, and debit credit cards.",
+      "To find the cost of your order, select the relevant state and the vital certificate type (birth, death, marriage or divorce). The payment information is provided on that page, including additional certificates.\n\nWe accept payment by Visa and Mastercard (including debit).",
   },
   {
     question: "Can I cancel and/or get a refund?",
     answer:
-      "We are a service oriented business, committed to the highest quality in customer service. We cannot provide refunds or cancel an application for any of our services as all vital record applications are reviewed and processed upon receipt. However, in some cases we do make exceptions to this policy.",
+      "You may cancel and receive a full refund of the USVC service fee if your application has not yet been sent to the government agency — contact support immediately. After submission, refunds follow the Cancellation and refund section of the Terms of Service.",
   },
   {
     question:
       "Is the certificate an official document and can it be used for a passport application?",
     answer:
-      "Yes. All certificates ordered through this website are certified photocopies of the original record with the embossed seal from the state issued and can typically be used for travel, passport, proof of citizenship, social security, driver's license, school registration, personal identification, and other legal purposes.",
+      "If the issuing government agency approves your request, it sends an official copy of the record. Most offices accept these for passport, travel, identification, and similar uses, but the receiving organization makes the final decision, and issuance is at the sole discretion of the government agency.",
   },
   {
     question: "How do I find information provided on a vital record?",
@@ -58,13 +58,13 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Can I pick my vital certificate up in person?",
     answer:
-      "Although we do not offer a walk-in service our safe and easy online order form allows you to request your vital certificate in less than 10 minutes.",
+      "We do not offer a walk-in service. Most people finish our online order form in about 10 minutes.",
   },
   {
     question:
       "How long will it take to receive my vital certificate and how many copies can I obtain?",
     answer:
-      "Processing and delivery times vary by state and certificate type. Detailed delivery times are listed on the order form. Depending on the state and certificate type you may request a minimum of 1 to a maximum of 20 certificates at one time. Additional fees apply per copy ordered.",
+      "Processing and delivery times vary by state and certificate type. The order form shows our processing estimates; agency processing and certificate delivery times may vary. Depending on the state and certificate type you may request a minimum of 1 to a maximum of 20 certificates at one time. Additional fees apply per copy ordered.",
   },
   {
     question: "Adoption – What last name do I use?",

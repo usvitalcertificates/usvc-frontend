@@ -18,6 +18,15 @@ export const organizationLd = {
   contactPoint: {
     "@type": "ContactPoint",
     email: "support@usvitalcertificates.org",
+    telephone: "+1-689-367-5431",
     contactType: "customer support",
+  },
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "7345 W Sand Lake Rd Ste 210 Office 4464",
+    addressLocality: "Orlando",
+    addressRegion: "FL",
+    postalCode: "32819",
+    addressCountry: "US",
   },
 };
