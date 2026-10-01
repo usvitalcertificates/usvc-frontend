@@ -3,7 +3,7 @@
 import { Clock, Mail } from "lucide-react";
 import { FormEvent, useRef, useState } from "react";
 import { submitContactMessage } from "../../lib/api";
-import { Disclaimer, PageHeader } from "../usvc-ui";
+import { PageHeader } from "../usvc-ui";
 import { trackAnalytics } from "../analytics";
 
 const sensitiveContentPattern = /\b\d{3}[- ]?\d{2}[- ]?\d{4}\b|\b(?:\d[ -]?){12,18}\d\b/;
@@ -163,7 +163,6 @@ export default function Contact() {
             <SupportRow icon={Clock} title="Hours">
               Monday – Friday, 9:00 AM – 6:00 PM ET
             </SupportRow>
-            <Disclaimer compact />
           </aside>
         </div>
       </section>

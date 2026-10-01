@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SeoJsonLd } from "@/app/seo-json-ld";
-import { Disclaimer, PageHeader } from "@/app/usvc-ui";
+import { PageHeader } from "@/app/usvc-ui";
 import { BIRTH_GUIDE_SOURCES, SITE_URL } from "@/lib/seo";
 
 const CHECKED = "September 30, 2026";
@@ -127,7 +127,6 @@ export default async function BirthCertificateGuide({
             Official source checked: {CHECKED}. Requirements are controlled by the issuing agency
             and may change.
           </p>
-          <Disclaimer className="page-disclaimer" />
         </div>
       </section>
     </main>
