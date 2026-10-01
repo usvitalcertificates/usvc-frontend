@@ -102,6 +102,45 @@ const BASE_REQUESTOR: RequestorConfig = {
  *  Keep in sync with BIRTH_MIN_DATE in backend src/lib/order-validation.ts. */
 export const BIRTH_MIN_YEAR = 1906;
 
+/** Earliest death year shown on death orders (USVR parity, notice only —
+ *  unlike birth, the backend does not reject out-of-window death dates). */
+export const DEATH_MIN_YEAR = 2010;
+
+/** USVR Alabama Death Certificate — exact race list (optional on our form). */
+const DEATH_RACE_OPTIONS = [
+  "American Indian/Alaskan Native",
+  "Asian/Pacific Islander",
+  "Black (African-American)",
+  "Caucasian (White)",
+  "Hispanic",
+  "Mixed",
+  "Other",
+];
+
+/** USVR Alabama Death Certificate — exact reason list. */
+const DEATH_REASONS = [
+  "Genealogy/Family History",
+  "Government Assistance/Benefits",
+  "Inheritance/Estate Settlement",
+  "Insurance/Pension/Retirement",
+  "Legal Purposes",
+  "Personal Records/Use",
+  "Social Security Card/Benefits",
+];
+
+/** USVR Alabama Death Certificate — exact relationship list. */
+const DEATH_RELATIONSHIPS = [
+  "Brother",
+  "Daughter",
+  "Father",
+  "Husband",
+  "Lawyer",
+  "Mother",
+  "Sister",
+  "Son",
+  "Wife",
+];
+
 /** USVR Alabama Birth Certificate — exact reason list. */
 const BIRTH_REASONS = [
   "Adoption (International)",
@@ -204,19 +243,31 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       "Enter the city or town where the birth occurred. If you are unsure, use the city where the hospital or birth facility was located. Birth records are not available until 90 days after the date of birth.",
   },
   "death-certificate": {
-    requestor: BASE_REQUESTOR,
-    personLegend: "Person named on the death record",
+    requestor: {
+      ...BASE_REQUESTOR,
+      dateOfBirthRequired: true,
+    },
+    personLegend: "Name of Subject",
+    personNote: {
+      title: "Information About the Subject of the Certificate",
+      body: "Enter the name exactly as it appears on the certificate.",
+    },
     person: [
-      { key: "firstName", label: "Deceased first name", required: true },
-      { key: "middleName", label: "Middle name" },
-      { key: "lastName", label: "Deceased last name", required: true },
-      { key: "eventDate", label: "Date of death", type: "date", required: true },
+      { key: "firstName", label: "First Name of Subject", required: true },
+      { key: "middleName", label: "Middle Name of Subject", required: true },
+      { key: "lastName", label: "Current Last Name of Subject", required: true },
+      { key: "suffix", label: "Suffix", type: "select", options: SUFFIX_OPTIONS },
+      {
+        key: "eventDate",
+        label: "Date of Death",
+        type: "date",
+        required: true,
+        help: "The exact date of death of the person listed on the record.",
+      },
       { key: "dateOfBirth", label: "Date of birth, if known", type: "date" },
       { key: "ageAtDeath", label: "Age at death, if known" },
-      { key: "sex", label: "Sex / gender as recorded", type: "select", options: SEX_OPTIONS },
-    ],
-    familyLegend: "Place of death",
-    family: [
+      { key: "sex", label: "Gender", type: "select", required: true, options: BIRTH_SEX_OPTIONS },
+      { key: "race", label: "Race", type: "select", options: DEATH_RACE_OPTIONS },
       {
         key: "facility",
         label: "Facility or place of death, if known",
@@ -224,27 +275,10 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
         wide: true,
       },
     ],
-    relationships: [
-      "Spouse",
-      "Parent",
-      "Child",
-      "Sibling",
-      "Grandchild",
-      "Legal representative",
-      "Funeral director",
-      "Authorized representative",
-      "Other",
-    ],
-    reasons: [
-      "Estate / legal matter",
-      "Insurance claim",
-      "Benefits",
-      "Pension / retirement account",
-      "Closing accounts",
-      "Personal records",
-      "Genealogy / family history",
-      "Other",
-    ],
+    familyLegend: "Place of death",
+    family: [],
+    relationships: DEATH_RELATIONSHIPS,
+    reasons: DEATH_REASONS,
     eventLocationLabel: "death",
     eventLocationHelp: "Enter the city or town where the death occurred.",
   },
