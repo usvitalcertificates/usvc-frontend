@@ -314,6 +314,15 @@ h3 {
   font-size: 17px;
   line-height: 1.65;
 }
+.independence-note {
+  width: 100%;
+  max-width: 1280px;
+  margin: 12px auto 0;
+  padding-inline: 24px;
+  color: var(--muted-text);
+  font-size: 15px;
+  text-align: center;
+}
 .disclaimer {
   display: flex;
   gap: 12px;

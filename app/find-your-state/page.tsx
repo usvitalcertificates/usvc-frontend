@@ -15,6 +15,7 @@ export default function FindState() {
         title="Find Your State"
         subtitle="Select the state where your vital record was issued to begin."
       />
+      <p className="independence-note">USVC is an independent service, not a government agency.</p>
       <section className="page-section find-state-page">
         <div className="container">
           <StateSelector showHeading={false} />

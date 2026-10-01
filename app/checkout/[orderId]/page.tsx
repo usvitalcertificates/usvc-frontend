@@ -183,6 +183,7 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
         title="Secure Checkout"
         subtitle="Review your totals and authorize payment. Your certificate request is forwarded for processing after payment is confirmed."
       />
+      <p className="independence-note">USVC is an independent service, not a government agency.</p>
       <section className="page-section">
         <div className="container checkout-grid">
           <div>

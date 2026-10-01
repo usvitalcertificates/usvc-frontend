@@ -960,9 +960,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     >
       <div className="form-head-notices">
         <p>
-          <strong>ID Requirements must be met before certificate is issued.</strong> You will
-          receive an email with instructions on how to send your ID within one week of submitting
-          this application.
+          <strong>
+            ID requirements set by the issuing agency must be met before it can issue a certificate.
+          </strong>{" "}
+          We usually email instructions on how to send your ID within one week of submitting this
+          application.
         </p>
         <p>
           Items with an <span>*</span> asterisk are required fields.
@@ -1732,9 +1734,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 checked={consents.govtId}
                 onChange={(event) => setConsents((c) => ({ ...c, govtId: event.target.checked }))}
               />{" "}
-              I understand I will receive an email from the relevant government agency with
-              instructions on how to send a copy of my government issued picture ID for
-              verification.
+              I understand ID verification instructions will be emailed to me with steps on how to
+              send a copy of my government-issued picture ID for verification.
             </label>
             <label>
               <input

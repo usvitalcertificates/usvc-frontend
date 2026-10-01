@@ -54,6 +54,7 @@ export default function TrackOrder() {
         title="Track Your Order"
         subtitle="Enter the order number from your confirmation email along with the email address used on the order."
       />
+      <p className="independence-note">USVC is an independent service, not a government agency.</p>
       <section className="page-section track-page">
         <div className="container track-grid">
           <form className="track-form" onSubmit={submit}>

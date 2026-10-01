@@ -120,10 +120,11 @@ export function StripeCheckoutForm({
         <PaymentElement options={{ layout: "tabs" }} />
         <div className="secure-payment-note">
           <p>
-            <strong>One secure payment</strong>
+            <strong>One secure USVC payment</strong>
           </p>
           <p>
-            Your complete order total is processed through Stripe. Your card details are encrypted.
+            Your USVC order total is processed through Stripe. Agency and shipping fees, if any, are
+            billed separately.
           </p>
         </div>
         <label className="checkout-authorize">
@@ -133,8 +134,9 @@ export function StripeCheckoutForm({
             onChange={(event) => setAuthorized(event.target.checked)}
           />
           <span>
-            I authorize USVC to charge the complete total of {formatUSD(amountCents)}, and I have
-            read the <Link href="/terms-of-service">Refund &amp; Cancellation Policy</Link>.
+            I authorize USVC to charge the USVC total of {formatUSD(amountCents)}. I understand
+            agency and shipping fees, if any, are billed separately, and I have read the{" "}
+            <Link href="/terms-of-service">Refund &amp; Cancellation Policy</Link>.
           </span>
         </label>
         <button

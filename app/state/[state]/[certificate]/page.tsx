@@ -46,6 +46,7 @@ export default async function CertificatePage({
         title={`${stateName} ${type} Certificate Application`}
         subtitle="Complete this application in one page. Review your order summary near the end, then continue to secure payment."
       />
+      <p className="independence-note">USVC is an independent service, not a government agency.</p>
       <section className="application-page">
         <div className="application-container">
           <OrderForm stateCode={state} certificate={certificate} />
