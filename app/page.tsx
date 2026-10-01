@@ -4,7 +4,6 @@ import {
   ClipboardCheck,
   FileText,
   Headphones,
-  Landmark,
   Lock,
   MapPin,
   PackageCheck,
@@ -12,7 +11,6 @@ import {
 } from "lucide-react";
 
 import { StateSelector } from "./state-selector";
-import { Disclaimer } from "./usvc-ui";
 
 const certificates = [
   {
@@ -59,8 +57,8 @@ const steps = [
   },
   {
     icon: PackageCheck,
-    title: "Track until delivery",
-    body: "Follow your order status from submission through processing and shipping with your order number.",
+    title: "Your application is submitted",
+    body: "Once your request is reviewed it gets submitted to the applicable govt agency.",
   },
 ] as const;
 
@@ -79,11 +77,6 @@ const trustItems = [
     icon: Headphones,
     title: "Real human support",
     body: "Reach our support team at support@usvitalcertificates.org during Monday – Friday, 9:00 AM – 6:00 PM ET.",
-  },
-  {
-    icon: Landmark,
-    title: "Independent service",
-    body: "USVC is not a government agency. Agencies may offer records directly, potentially at a lower cost.",
   },
 ] as const;
 
@@ -236,12 +229,6 @@ export default function Home() {
               Contact Support
             </Link>
           </div>
-        </div>
-      </section>
-
-      <section className="page-section">
-        <div className="container">
-          <Disclaimer className="page-disclaimer" />
         </div>
       </section>
     </main>

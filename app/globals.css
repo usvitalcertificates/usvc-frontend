@@ -1625,6 +1625,9 @@ small.application-error {
 .trust-grid {
   margin-top: 40px;
 }
+.four-column.trust-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 .certificate-card {
   display: flex;
   min-height: 316px;
@@ -1981,6 +1984,7 @@ textarea {
     grid-template-columns: 1fr;
   }
   .four-column,
+  .four-column.trust-grid,
   .state-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2016,6 +2020,7 @@ textarea {
     padding-block: 56px;
   }
   .four-column,
+  .four-column.trust-grid,
   .state-grid,
   .footer-columns {
     grid-template-columns: 1fr;
