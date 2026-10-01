@@ -503,65 +503,6 @@ function AddressFields({
   );
 }
 
-function ReviewBlock({
-  title,
-  target,
-  children,
-}: {
-  title: string;
-  target: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="review-block">
-      <div>
-        <h3>{title}</h3>
-        <button
-          type="button"
-          onClick={() =>
-            document
-              .getElementById(`application-section-${target}`)
-              ?.scrollIntoView({ behavior: "smooth", block: "center" })
-          }
-        >
-          Edit
-        </button>
-      </div>
-      <dl>{children}</dl>
-    </section>
-  );
-}
-
-function ReviewRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="review-row">
-      <dt>{label}</dt>
-      <dd>{value}</dd>
-    </div>
-  );
-}
-
-function formatAddress(parts: {
-  line1: string;
-  line2: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-}) {
-  return (
-    [
-      parts.line1,
-      parts.line2,
-      `${parts.city}, ${parts.state} ${parts.postalCode}`.trim(),
-      parts.country,
-    ]
-      .filter((part) => part && part.trim() && part.trim() !== ",")
-      .join(" · ") || "—"
-  );
-}
-
-const show = (value: string | undefined) => (value && value.trim() ? value : "—");
 const CONSENT_KEYS = [
   "accurate",
   "govtId",
@@ -703,7 +644,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     "international";
   // Two-fee model: only the Online Processing Fee (+ rush) is charged now.
   const total = copies * 149 + (rush ? 45 : 0);
-  const serviceCents = 149 * copies;
 
   const requestorFirst = values.applicantFirstName ?? draft.applicantFirstName ?? "";
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
@@ -909,10 +849,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
 
   const fatherStatus = values[config.familySecondStatus?.key ?? ""] ?? "";
   const fatherRequired = config.familySecondStatus?.requiredWhen.includes(fatherStatus) ?? false;
-  const reasonDisplay = reason === "Other" ? values.reasonOther?.trim() || "Other" : reason || "—";
-  const relationshipDisplay =
-    relationship === "Other" ? values.relationshipOther?.trim() || "Other" : relationship || "—";
-  const cardProvided = Boolean((values.cardNumber ?? "").replace(/[\s-]/g, ""));
   const ssnDigits = digitsOnly(values.requestorSsn ?? "").length;
   const ssnLiveError =
     ssnDigits === 0
@@ -925,17 +861,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const cardDigits = digitsOnly(values.cardNumber ?? "").length;
   const cardBrand = cardBrandOf(values.cardNumber ?? "");
   const expiryMonthOk = isPlausibleExpiryMonth(values.cardExpiry ?? "");
-
-  const addressValues = (prefix: string) => ({
-    line1: values[`${prefix}Line1`] ?? "",
-    line2: values[`${prefix}Line2`] ?? "",
-    city: values[`${prefix}City`] ?? "",
-    state: values[`${prefix}State`] ?? "",
-    postalCode: values[`${prefix}Zip`] ?? "",
-    country:
-      values[`${prefix}Country`] ??
-      (addressTypeOf(values[`${prefix}Type`] ?? "") === "international" ? "" : "United States"),
-  });
 
   return (
     <form
@@ -1622,64 +1547,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </div>
         </FormSection>
 
-        <FormSection number={10} title="Review To Submit">
-          <ReviewBlock title="Certificate" target={1}>
-            <ReviewRow label="Certificate" value={certificateName} />
-            <ReviewRow
-              label={noun.charAt(0).toUpperCase() + noun.slice(1)}
-              value={selectedCounty ? jurisdictionLabel(selectedCounty) : show(values.county)}
-            />
-            <ReviewRow label="City / town" value={show(values.city)} />
-            <ReviewRow label="Reason" value={reasonDisplay} />
-          </ReviewBlock>
-          <ReviewBlock title="Subject of the certificate" target={3}>
-            {config.person.map((field) => (
-              <ReviewRow key={field.key} label={field.label} value={show(values[field.key])} />
-            ))}
-          </ReviewBlock>
-          <ReviewBlock title="Parent / Family Information" target={4}>
-            {config.family.map((field) => (
-              <ReviewRow key={field.key} label={field.label} value={show(values[field.key])} />
-            ))}
-            {config.familySecondStatus ? (
-              <ReviewRow
-                label={config.familySecondStatus.label}
-                value={show(values[config.familySecondStatus.key])}
-              />
-            ) : null}
-            {(fatherRequired || !config.familySecondStatus ? (config.familySecond ?? []) : []).map(
-              (field) => (
-                <ReviewRow key={field.key} label={field.label} value={show(values[field.key])} />
-              ),
-            )}
-          </ReviewBlock>
-          <ReviewBlock title="Requestor & contact" target={2}>
-            <ReviewRow label="Name" value={`${requestorFirst} ${requestorLast}`.trim() || "—"} />
-            <ReviewRow label="Relationship" value={relationshipDisplay} />
-            {config.requestor.showDateOfBirth ? (
-              <ReviewRow label="Date of birth" value={show(values.applicantDob)} />
-            ) : null}
-            <ReviewRow label="Phone" value={show(values.phone)} />
-            <ReviewRow label="Email" value={show(values.email)} />
-            <ReviewRow label="Home" value={formatAddress(addressValues("home"))} />
-            <ReviewRow label="Ship to" value={formatAddress(addressValues("shipping"))} />
-            <ReviewRow label="Bill to" value={formatAddress(addressValues("billing"))} />
-          </ReviewBlock>
-          <ReviewBlock title="Copies, processing & fees" target={6}>
-            <ReviewRow label="Number of copies" value={String(copies)} />
-            <ReviewRow
-              label="Processing speed"
-              value={rush ? "Rush Processing" : "Standard Processing"}
-            />
-            <ReviewRow label="Online Processing Fee" value={`$${serviceCents.toFixed(2)}`} />
-            <ReviewRow label="Rush processing" value={rush ? "$45.00" : "Not selected"} />
-            <ReviewRow
-              label="Payment card"
-              value={cardProvided ? "Card provided (kept private)" : "—"}
-            />
-            <ReviewRow label="Total" value={`$${total.toFixed(2)}`} />
-          </ReviewBlock>
-
+        <FormSection number={10} title="Submit Your Order">
           <div className="verify-panel">
             <h3>Verify Order</h3>
             <ol className="verify-list">

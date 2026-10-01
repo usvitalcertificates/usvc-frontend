@@ -926,74 +926,6 @@ h3 {
   margin-top: 18px;
   color: #000;
 }
-.review-block {
-  padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--muted);
-}
-.review-block + .review-block {
-  margin-top: 16px;
-}
-.review-block > div {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-}
-.review-block h3 {
-  font-size: 18px;
-}
-.review-block button {
-  padding: 5px 14px;
-  border: 1px solid var(--red);
-  border-radius: 5px;
-  background: var(--red);
-  color: #fff;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-.review-block button:hover,
-.review-block button:active {
-  opacity: 0.88;
-}
-.review-block button:focus-visible {
-  outline: 3px solid rgb(178 34 52 / 30%);
-  outline-offset: 2px;
-}
-.review-block p {
-  display: grid;
-  grid-template-columns: 45% 1fr;
-  gap: 16px;
-  margin-top: 8px;
-  color: var(--muted-text);
-}
-.review-block p b {
-  color: #000;
-  font-weight: 400;
-}
-.review-block dl {
-  display: grid;
-  gap: 8px;
-  margin: 12px 0 0;
-}
-.review-row {
-  display: grid;
-  grid-template-columns: 45% 1fr;
-  gap: 16px;
-}
-.review-row dt {
-  color: var(--muted-text);
-  font-size: 15.2px;
-  line-height: 1.65;
-}
-.review-row dd {
-  margin: 0;
-  color: #000;
-  font-size: 16px;
-  line-height: 1.65;
-}
 .readonly-name {
   min-height: 40px;
   margin: 8px 0 0;
@@ -2067,14 +1999,6 @@ textarea {
   }
   .processing-options label b {
     grid-column: 2;
-  }
-  .review-block p {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
-  .review-row {
-    grid-template-columns: 1fr;
-    gap: 2px;
   }
   .certificate-type-card {
     min-height: 0;
