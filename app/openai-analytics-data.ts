@@ -31,8 +31,7 @@ export function publicPageId(pathname: string): string | null {
     "/faq": "faq",
     "/track-order": "track_order",
     "/privacy-policy": "privacy_policy",
-    "/terms-of-use": "terms_of_use",
-    "/refund-policy": "refund_policy",
+    "/terms-of-service": "terms_of_service",
   };
   return knownPages[pathname] ?? "other_public_page";
 }
