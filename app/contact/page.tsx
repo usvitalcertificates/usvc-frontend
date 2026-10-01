@@ -73,7 +73,6 @@ export default function Contact() {
         title="Contact USVC Support"
         subtitle="Need an update on a request already submitted? Send us a message."
       />
-      <p className="independence-note">USVC is an independent service, not a government agency.</p>
       <section className="page-section contact-page">
         <div className="container contact-column">
           <div className="contact-info-panel">
