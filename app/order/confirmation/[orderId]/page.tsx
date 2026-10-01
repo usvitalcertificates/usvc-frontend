@@ -89,13 +89,6 @@ function ConfirmationBody({ orderId }: { orderId: string }) {
               </p>
               <p>Reference: {receipt.publicNumber}</p>
               <div className="button-row">
-                <button
-                  type="button"
-                  className="button button-secondary"
-                  onClick={() => window.print()}
-                >
-                  Print receipt
-                </button>
                 <Link className="button button-primary" href="/track-order">
                   Track your order
                 </Link>
