@@ -1524,22 +1524,6 @@ small.application-error {
   font-size: 17px;
   line-height: 1.65;
 }
-.secure-payment-note {
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-.secure-payment-note p {
-  margin: 0;
-  font-size: 16px;
-}
-.secure-payment-note p strong {
-  color: var(--navy);
-}
-.secure-payment-note p + p {
-  margin-top: 4px;
-  font-size: 15px;
-}
 .checkout-authorize {
   display: flex;
   gap: 12px;

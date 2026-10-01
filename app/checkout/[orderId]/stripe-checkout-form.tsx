@@ -118,15 +118,6 @@ export function StripeCheckoutForm({
           <p>Enter your card information below to securely pay your online processing fees.</p>
         </div>
         <PaymentElement options={{ layout: "tabs" }} />
-        <div className="secure-payment-note">
-          <p>
-            <strong>One secure USVC payment</strong>
-          </p>
-          <p>
-            Your USVC order total is processed through Stripe. Agency and shipping fees, if any, are
-            billed separately.
-          </p>
-        </div>
         <label className="checkout-authorize">
           <input
             type="checkbox"
