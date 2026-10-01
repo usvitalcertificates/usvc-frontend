@@ -1111,6 +1111,9 @@ h3 {
   padding-top: 20px;
   border-top: 1px solid #d9d8de;
 }
+.verify-payment .payment-action {
+  margin-top: 20px;
+}
 .verify-list a {
   color: var(--navy);
   text-decoration: underline;

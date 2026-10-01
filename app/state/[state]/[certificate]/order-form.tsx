@@ -1697,8 +1697,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </li>
               <li>
                 <span>
-                  I accept the <Link href="/terms-of-service">Terms of Service</Link>, including the
-                  refund and cancellation policies.
+                  I accept the <Link href="/terms-of-service">Terms of Service</Link>, including the{" "}
+                  <Link href="/terms-of-service">refund and cancellation policies</Link>.
                 </span>
               </li>
               <li>
