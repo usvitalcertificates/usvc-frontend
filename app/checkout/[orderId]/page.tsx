@@ -190,7 +190,7 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
               <span>
                 <Lock aria-hidden="true" /> Locked. Private. Protected.
               </span>
-              <small>Details protected with 256-bit encryption.</small>
+              <small>Secure checkout.</small>
             </div>
             {setupError ? (
               <div role="alert" className="checkout-alert checkout-alert-spaced">

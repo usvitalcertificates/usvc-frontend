@@ -20,10 +20,6 @@ export function SiteHeader() {
   const pathname = usePathname();
   return (
     <header className="site-header">
-      <div className="trust-banner">
-        <strong>We Protect Your Data</strong>
-        <span>Secure Encryption &amp; Strict Confidentiality Protocols</span>
-      </div>
       <div className="container header-row">
         <Link href="/" className="logo" aria-label="US Vital Certificates — home">
           <Image

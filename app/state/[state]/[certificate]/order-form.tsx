@@ -1440,7 +1440,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               />
               <span>
                 <strong>Rush Processing</strong>
-                <small>Your application will be processed the next day.</small>
+                <small>
+                  We aim to submit your application by the next business day. Government office and
+                  delivery time is extra.
+                </small>
               </span>
               <b>+$45.00 per order</b>
             </label>
@@ -1806,8 +1809,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         <FormSection number={11} title="Payment">
           <p>
             Continue to the secure payment step to complete your order. Your card details are
-            encrypted before storage and are visible only to authorized staff for government-agency
-            processing.
+            encrypted. Your payment is processed safely through Stripe.
           </p>
           {error ? (
             <p className="application-error" role="alert">
@@ -1818,7 +1820,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <button className="button button-primary" disabled={busy || Boolean(blockedCounty)}>
               {busy ? "Saving your application…" : "Continue to Secure Payment"}
             </button>
-            <strong>Total ${total.toFixed(2)} — one all-inclusive payment</strong>
+            <strong>
+              Total ${total.toFixed(2)} — one USVC payment (agency fees billed separately)
+            </strong>
           </div>
         </FormSection>
       </fieldset>
