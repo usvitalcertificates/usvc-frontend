@@ -1,6 +1,5 @@
 "use client";
 
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
 import { submitContactMessage } from "../../lib/api";
@@ -15,26 +14,6 @@ const CONTACT_REASONS = [
   "Update My Information",
   "Other",
 ] as const;
-
-function SupportRow({
-  icon: Icon,
-  title,
-  children,
-}: {
-  icon: typeof Mail;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="support-row">
-      <Icon aria-hidden="true" />
-      <div>
-        <h3>{title}</h3>
-        <p>{children}</p>
-      </div>
-    </div>
-  );
-}
 
 export default function Contact() {
   const [sent, setSent] = useState(false);
@@ -256,25 +235,21 @@ export default function Contact() {
               )}
             </div>
             <aside className="support-panel">
-              <h2>Direct support</h2>
-              <SupportRow icon={Mail} title="Email">
-                <a href="mailto:support@usvitalcertificates.org">support@usvitalcertificates.org</a>
-              </SupportRow>
-              <SupportRow icon={Phone} title="Phone">
-                <a href="tel:+16893675431">(689) 367-5431</a>
-              </SupportRow>
-              <SupportRow icon={Clock} title="Hours">
-                Monday – Friday, 9:00 AM – 6:00 PM ET
-              </SupportRow>
-              <SupportRow icon={MapPin} title="Mailing address">
-                US VITAL CERTIFICATES, LLC
-                <br />
-                7345 W Sand Lake Rd Ste 210 Office 4464
-                <br />
-                Orlando, FL 32819
-                <br />
-                <em>(Mailing &amp; Correspondence)</em>
-              </SupportRow>
+              <div className="contact-address-block">
+                <p>usvitalcertificates.org</p>
+                <p>US VITAL CERTIFICATES, LLC</p>
+                <p>7345 W Sand Lake Rd Ste 210 Office 4464</p>
+                <p>Orlando, FL 32819</p>
+                <p>
+                  <a href="mailto:support@usvitalcertificates.org">
+                    support@usvitalcertificates.org
+                  </a>
+                </p>
+                <p>(689) 367-5431</p>
+                <p>
+                  <em>(Mailing &amp; Correspondence)</em>
+                </p>
+              </div>
             </aside>
           </div>
         </div>

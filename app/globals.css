@@ -579,27 +579,21 @@ h3 {
   align-content: start;
   gap: 16px;
 }
-.support-row {
-  display: flex;
-  gap: 12px;
-  padding: 20px;
-  border: 1px solid var(--border);
+.contact-address-block {
+  padding: 32px;
   border-radius: 6px;
+  background: #f4f6f9;
+  color: #5f5f5f;
+  font-size: 18px;
+  line-height: 2;
 }
-.support-row > svg {
-  width: 24px;
-  height: 24px;
-  flex: 0 0 auto;
+.contact-address-block p {
+  margin: 0;
+}
+.contact-address-block a {
   color: var(--red);
 }
-.support-row h3 {
-  font-size: 18px;
-}
-.support-row p {
-  margin: 4px 0 0;
-  font-size: 17px;
-}
-.support-row a:hover {
+.contact-address-block a:hover {
   text-decoration: underline;
 }
 .contact-column {
