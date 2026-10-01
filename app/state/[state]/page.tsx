@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Disclaimer, PageHeader } from "../../usvc-ui";
+import { PageHeader } from "../../usvc-ui";
 
 const STATES: Array<readonly [string, string]> = [
   ["Alabama", "AL"],
@@ -189,8 +189,6 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
               <p>{ELIGIBILITY}</p>
             </section>
           </div>
-
-          <Disclaimer className="page-disclaimer" />
         </div>
       </section>
     </main>

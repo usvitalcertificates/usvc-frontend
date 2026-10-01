@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Disclaimer, PageHeader } from "../usvc-ui";
+import { PageHeader } from "../usvc-ui";
 import { LEGAL_DOCUMENTS } from "./legal-data";
 
 export async function generateMetadata({
@@ -51,7 +51,6 @@ export default async function Legal({ params }: { params: Promise<{ legal: strin
                 )}
               </div>
             ))}
-            <Disclaimer className="page-disclaimer" />
           </div>
         </div>
       </section>

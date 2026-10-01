@@ -46,9 +46,7 @@ export interface CreateOrderPayload {
     terms: boolean;
     privacy: boolean;
     refund: boolean;
-    independent: boolean;
     processingPayment: boolean;
-    openAiEmailMatching?: boolean;
   };
   processingAuthorization: { accepted: true; text: string; acceptedAt: string };
   signature: string;
