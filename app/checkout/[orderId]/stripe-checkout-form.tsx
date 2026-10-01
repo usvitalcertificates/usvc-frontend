@@ -123,8 +123,7 @@ export function StripeCheckoutForm({
             <strong>One secure payment</strong>
           </p>
           <p>
-            Your complete order total is processed through Stripe. USVC never stores your full card
-            number, expiration date, or security code.
+            Your complete order total is processed through Stripe. Your card details are encrypted.
           </p>
         </div>
         <label className="checkout-authorize">
