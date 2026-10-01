@@ -15,9 +15,6 @@ const DOMAIN = "USVitalCertificates.org";
 const SUPPORT_EMAIL = "support@usvitalcertificates.org";
 const DISCLAIMER_FULL =
   "USVC is an independent service that assists individuals with requesting vital records from government agencies. We are not a government agency and are not affiliated with or endorsed by any federal or state office. Official records may be available directly from the issuing agency, potentially at a lower cost. Our fees cover online ordering, guided assistance, application review, and related processing support.";
-const REVIEW_NOTE =
-  "LEGAL REVIEW REQUIRED: This section contains placeholder language prepared for development purposes only. Final policy language must be reviewed and approved by a qualified attorney before launch.";
-
 export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
   "privacy-policy": {
     slug: "privacy-policy",
@@ -138,7 +135,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
     title: "Terms of Service",
     description:
       "The terms that apply when you use USVC to prepare, review, and submit a vital certificate request.",
-    lastUpdated: "May 19, 2025",
+    lastUpdated: "October 1, 2026",
     sections: [
       {
         heading: "1. Introduction and agreement to terms",
@@ -260,7 +257,6 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
       {
         heading: "14. Dispute resolution, governing law, and jurisdiction",
         body: [
-          REVIEW_NOTE,
           "NOTICE OF ARBITRATION AGREEMENT AND CLASS ACTION WAIVER: UNLESS YOU OPT OUT AS PROVIDED BELOW, AND EXCEPT FOR CERTAIN DISPUTES (E.G., INTELLECTUAL PROPERTY, SMALL CLAIMS COURT), YOU AGREE THAT DISPUTES BETWEEN YOU AND USVC WILL BE RESOLVED BY BINDING, INDIVIDUAL ARBITRATION, WAIVING YOUR RIGHT TO A JURY TRIAL OR TO PARTICIPATE IN A CLASS ACTION.",
           "14.1. Initial dispute resolution. Contact client support first to resolve concerns. Parties shall attempt good faith negotiation before initiating formal proceedings.",
           "14.2. Governing law. This Agreement is governed by the laws of the State of Delaware, without regard to conflict of law principles. The UN Convention on Contracts for the International Sale of Goods does not apply.",
@@ -294,7 +290,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
     title: "Accessibility Statement",
     description:
       "USVC is committed to making its website usable by as many people as possible, including people using assistive technology.",
-    lastUpdated: "Pending legal review",
+    lastUpdated: "October 1, 2026",
     sections: [
       {
         heading: "Our commitment",
