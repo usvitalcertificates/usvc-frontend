@@ -788,6 +788,7 @@ div.application-field > span {
 .application-section h2,
 .application-section legend,
 .contact-heading,
+.spouse-heading,
 label.application-field,
 .application-field > span,
 .group-note strong,
@@ -867,6 +868,13 @@ label.application-field,
 .address-fields {
   display: grid;
   gap: 16px;
+}
+/* Spouse sub-headings inside the subject section (marriage): big navy titles. */
+.spouse-heading {
+  margin: 8px 0 0;
+  color: var(--navy);
+  font-size: 20px;
+  font-weight: 700;
 }
 /* Divider separating the contact block from the address blocks above it. */
 .application-section fieldset.contact-block {

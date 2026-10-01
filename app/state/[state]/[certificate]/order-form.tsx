@@ -10,6 +10,9 @@ import { getAnalyticsAttribution, getOpenAIAttribution, trackAnalytics } from "@
 import { isCountyTemporarilyUnavailable } from "@/lib/county-availability";
 import {
   BIRTH_MIN_YEAR,
+  DEATH_MIN_YEAR,
+  DIVORCE_MIN_YEAR,
+  MARRIAGE_MIN_YEAR,
   PROCESSING_CLARIFICATION_NOTE,
   resolveFormConfig,
   SUFFIX_OPTIONS,
@@ -217,18 +220,33 @@ function inputNamesForError(key: string): string[] {
   return [];
 }
 
-/** Backend error key -> owning section number (scroll fallback). */
-function sectionForError(key: string): number {
-  if (key === "county" || key === "reasonOther") return 1;
-  if (key === "requestorSsn" || key.startsWith("applicant.")) return 2;
-  if (key.startsWith("subject.")) return 3;
-  if (key.startsWith("family.")) return 4;
-  if (key.startsWith("addresses.home.") || key.startsWith("addresses.shipping.")) return 5;
-  if (key === "totalCents") return 6;
-  if (key.startsWith("addresses.billing.")) return 7;
-  if (key.startsWith("paymentCard.")) return 8;
-  if (key === "consents" || key === "signature") return 10;
-  return 10;
+/** Stable section keys used for scroll anchors (independent of numbering). */
+type SectionKey =
+  | "certificate"
+  | "requestor"
+  | "subject"
+  | "family"
+  | "shipping"
+  | "copies"
+  | "billing"
+  | "card"
+  | "summary"
+  | "submit";
+
+/** Backend error key -> owning section key (scroll fallback). When the family
+ *  section is merged into the subject section (marriage "Spouse 2"),
+ *  family errors scroll to the subject section instead. */
+function sectionForError(key: string, familyVisible: boolean): SectionKey {
+  if (key === "county" || key === "reasonOther") return "certificate";
+  if (key === "requestorSsn" || key.startsWith("applicant.")) return "requestor";
+  if (key.startsWith("subject.")) return "subject";
+  if (key.startsWith("family.")) return familyVisible ? "family" : "subject";
+  if (key.startsWith("addresses.home.") || key.startsWith("addresses.shipping.")) return "shipping";
+  if (key === "totalCents") return "copies";
+  if (key.startsWith("addresses.billing.")) return "billing";
+  if (key.startsWith("paymentCard.")) return "card";
+  if (key === "consents" || key === "signature") return "submit";
+  return "submit";
 }
 
 /** Rank for picking the first error in form order (lower = earlier). */
@@ -360,16 +378,18 @@ function Field({
 }
 
 function FormSection({
+  sectionKey,
   number,
   title,
   children,
 }: {
+  sectionKey: SectionKey;
   number: number;
   title: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="application-section" id={`application-section-${number}`}>
+    <section className="application-section" id={`application-section-${sectionKey}`}>
       <h2>
         <span>{number}.</span> {title}
       </h2>
@@ -578,7 +598,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       }
     }
     document
-      .getElementById(`application-section-${sectionForError(key)}`)
+      .getElementById(`application-section-${sectionForError(key, hasFamilySection)}`)
       ?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
@@ -653,6 +673,31 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const relationship = values.relationship ?? draft.relationship ?? "";
   const reason = values.reason ?? draft.reason ?? "";
   const isBirth = certSlug === "birth-certificate";
+  const isDeath = certSlug === "death-certificate";
+  const isMarriage = certSlug === "marriage-certificate";
+  const isDivorce = certSlug === "divorce-certificate";
+  const spousesTogether = isMarriage || isDivorce;
+  const hasFamilySection =
+    !config.familyInSubjectSection &&
+    (config.family.length > 0 || Boolean(config.familySecondLegend));
+  /** Display numbers follow the visible sections only, so a hidden family
+   *  section never leaves a numbering gap (death flows 1,2,3,4… instead of
+   *  1,2,3,5…). Certificates with a family section keep 1–10 as before. */
+  const sectionNumber = (key: SectionKey): number => {
+    const order: SectionKey[] = [
+      "certificate",
+      "requestor",
+      "subject",
+      ...(hasFamilySection ? (["family"] as SectionKey[]) : []),
+      "shipping",
+      "copies",
+      "billing",
+      "card",
+      "summary",
+      "submit",
+    ];
+    return order.indexOf(key) + 1;
+  };
   const sexValue = values.sex ?? draft.sex ?? "";
   const valueOf = (key: string) => values[key] ?? draft[key] ?? "";
 
@@ -731,7 +776,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority. Please select a different ${noun}.`,
       );
       document
-        .getElementById("application-section-1")
+        .getElementById("application-section-certificate")
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -739,7 +784,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       setError("Email addresses do not match.");
       setFieldErrors({ "applicant.email": "Email addresses do not match." });
       document
-        .getElementById("application-section-5")
+        .getElementById("application-section-shipping")
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
       (formRef.current?.querySelector('[name="email"]') as HTMLInputElement | null)?.focus?.({
         preventScroll: true,
@@ -749,7 +794,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     if (!get("signature")) {
       setError("Please type your full name as your signature before continuing.");
       document
-        .getElementById("application-section-10")
+        .getElementById("application-section-submit")
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -938,7 +983,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         </p>
       </div>
 
-      <FormSection number={1} title="Information About the Certificate">
+      <FormSection
+        sectionKey="certificate"
+        number={sectionNumber("certificate")}
+        title="Information About the Certificate"
+      >
         <div className="application-grid">
           <label className="application-field">
             Certificate Type <span>*</span>
@@ -1007,7 +1056,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </option>
               ))}
             </select>
-            {isBirth ? null : <small>{config.eventLocationHelp}</small>}
           </label>
           {isBirth ? (
             <p className="restriction-note">
@@ -1018,8 +1066,35 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </em>
             </p>
           ) : null}
+          {isDeath ? (
+            <p className="restriction-note">
+              <strong>City/County of Death:</strong>{" "}
+              <em>
+                Please select the exact city and county of death for the subject of the certificate.{" "}
+                {config.eventLocationHelp}
+              </em>
+            </p>
+          ) : null}
+          {isMarriage ? (
+            <p className="restriction-note">
+              <strong>City/County of Marriage:</strong>{" "}
+              <em>
+                Please select the exact city and county the marriage license was purchased and
+                registered. {config.eventLocationHelp}
+              </em>
+            </p>
+          ) : null}
+          {isDivorce ? (
+            <p className="restriction-note">
+              <strong>City/County of Divorce:</strong>{" "}
+              <em>
+                Please select the exact city and county of divorce for the subjects of the
+                certificate. {config.eventLocationHelp}
+              </em>
+            </p>
+          ) : null}
           <label className="application-field wide">
-            {isBirth ? "Reason for Request" : "Reason for requesting this certificate"}{" "}
+            {isBirth || isDeath ? "Reason for Request" : "Reason for requesting this certificate"}{" "}
             <span>*</span>
             <select name="reason" required defaultValue={draft.reason ?? ""}>
               <option value="">Please select…</option>
@@ -1048,12 +1123,43 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </em>
             </p>
           ) : null}
+          {isDeath ? (
+            <p className="restriction-note">
+              <strong>Year of Death Restriction:</strong>{" "}
+              <em>
+                For the selected county we can only accept orders for deaths that occurred from{" "}
+                {DEATH_MIN_YEAR} to today.
+              </em>
+            </p>
+          ) : null}
+          {isMarriage ? (
+            <p className="restriction-note">
+              <strong>Year of Marriage Restriction:</strong>{" "}
+              <em>
+                For the selected county we can only accept orders for marriages that occurred from{" "}
+                {MARRIAGE_MIN_YEAR} to today.
+              </em>
+            </p>
+          ) : null}
+          {isDivorce ? (
+            <p className="restriction-note">
+              <strong>Year of Divorce Restriction:</strong>{" "}
+              <em>
+                For the selected county we can only accept orders for divorces that occurred from{" "}
+                {DIVORCE_MIN_YEAR} to today.
+              </em>
+            </p>
+          ) : null}
         </div>
       </FormSection>
 
       <fieldset className="county-blocked-fields">
-        <FormSection number={2} title="Information About the Requestor">
-          {isBirth ? (
+        <FormSection
+          sectionKey="requestor"
+          number={sectionNumber("requestor")}
+          title="Information About the Requestor"
+        >
+          {isBirth || isMarriage || isDivorce ? (
             <p className="hint">
               <strong className="important-note">Important:</strong>{" "}
               <em>
@@ -1061,6 +1167,15 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 certificate. If you are ordering your own certificate, you are both the requestor
                 and the subject. The name of the credit card holder must be the same as the
                 requestor.
+              </em>
+            </p>
+          ) : null}
+          {isDeath ? (
+            <p className="hint">
+              <strong className="important-note">Important:</strong>{" "}
+              <em>
+                The requestor is the person ordering the certificate. The name of the credit card
+                holder must be the same as the requestor.
               </em>
             </p>
           ) : null}
@@ -1073,23 +1188,19 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                   <option key={item}>{item}</option>
                 ))}
               </select>
-              {isBirth ? (
-                <small>
-                  <em>
-                    If you are not named on the record you may be required to provide proof of
-                    Relationship, Entitlement, and/or Court Documents.
-                  </em>
-                </small>
-              ) : null}
-            </label>
-            {isBirth ? (
-              <p className="hint application-field wide">
-                <strong className="important-note">Important:</strong>{" "}
+              <small>
                 <em>
-                  The relationship selected must match your relationship to the subject exactly.
+                  If you are not named on the record you may be required to provide proof of
+                  Relationship, Entitlement, and/or Court Documents.
                 </em>
-              </p>
-            ) : null}
+              </small>
+            </label>
+            <p className="hint application-field wide">
+              <strong className="important-note">Important:</strong>{" "}
+              <em>
+                The relationship selected must match your relationship to the subject exactly.
+              </em>
+            </p>
             {relationship === "Other" ? (
               <label className="application-field wide">
                 Please describe your relationship <span>*</span>
@@ -1190,7 +1301,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </div>
         </FormSection>
 
-        <FormSection number={3} title="Information About the Subject">
+        <FormSection
+          sectionKey="subject"
+          number={sectionNumber("subject")}
+          title="Information About the Subject"
+        >
           {certSlug === "birth-certificate" ? (
             <p className="adoption-note">
               <strong>ADOPTED?</strong> If the person named on the record was adopted, the record on
@@ -1199,10 +1314,19 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               section.
             </p>
           ) : null}
-          <p className="restriction-note">
-            <strong>{config.personLegend}.</strong>{" "}
-            {config.personNote ? <em>{config.personNote.body}</em> : null}
-          </p>
+          {spousesTogether ? (
+            config.personNote ? (
+              <p className="restriction-note">
+                <em>{config.personNote.body}</em>
+              </p>
+            ) : null
+          ) : (
+            <p className="restriction-note">
+              <strong>{config.personLegend}.</strong>{" "}
+              {config.personNote ? <em>{config.personNote.body}</em> : null}
+            </p>
+          )}
+          {spousesTogether ? <h3 className="spouse-heading">Spouse 1</h3> : null}
           <div className="application-grid">
             {config.person.map((field) => {
               // Birth: maiden name only applies to a Female subject — hidden
@@ -1221,62 +1345,40 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               );
             })}
           </div>
+          {spousesTogether ? (
+            <>
+              <h3 className="spouse-heading">Spouse 2</h3>
+              <div className="application-grid">
+                {(config.family ?? []).map((field) => (
+                  <Field
+                    key={field.key}
+                    def={field}
+                    defaultValue={draft[field.key]}
+                    error={fieldErrors[`family.${field.key}`]}
+                  />
+                ))}
+              </div>
+            </>
+          ) : null}
         </FormSection>
 
-        <FormSection number={4} title="Parent / Family Information">
-          <fieldset>
-            <legend>{config.familyLegend}</legend>
-            {config.familyNote ? (
-              <p className="restriction-note">
-                <strong>{config.familyNote.title}</strong> <em>{config.familyNote.body}</em>
-              </p>
-            ) : null}
-            <div className="application-grid">
-              {config.family.map((field) => (
-                <Field
-                  key={field.key}
-                  def={field}
-                  defaultValue={draft[field.key]}
-                  error={fieldErrors[`family.${field.key}`]}
-                />
-              ))}
-            </div>
-          </fieldset>
-          {config.familySecondLegend ? (
-            <fieldset>
-              <legend>{config.familySecondLegend}</legend>
-              {config.familySecondNote ? (
-                <p className="restriction-note">
-                  <strong>{config.familySecondNote.title}</strong>{" "}
-                  <em>{config.familySecondNote.body}</em>
-                </p>
-              ) : null}
-              {config.familySecondStatus ? (
+        {!config.familyInSubjectSection &&
+        (config.family.length > 0 || config.familySecondLegend) ? (
+          <FormSection
+            sectionKey="family"
+            number={sectionNumber("family")}
+            title="Parent / Family Information"
+          >
+            {config.family.length > 0 ? (
+              <fieldset>
+                <legend>{config.familyLegend}</legend>
+                {config.familyNote ? (
+                  <p className="restriction-note">
+                    <strong>{config.familyNote.title}</strong> <em>{config.familyNote.body}</em>
+                  </p>
+                ) : null}
                 <div className="application-grid">
-                  <label className="application-field">
-                    {config.familySecondStatus.label}{" "}
-                    {config.familySecondStatus.required ? <span>*</span> : null}
-                    <select
-                      name={config.familySecondStatus.key}
-                      required={config.familySecondStatus.required}
-                      defaultValue={draft[config.familySecondStatus.key] ?? ""}
-                    >
-                      <option value="">Please select…</option>
-                      {config.familySecondStatus.options.map((option) => (
-                        <option key={option}>{option}</option>
-                      ))}
-                    </select>
-                    {fieldErrors[`family.${config.familySecondStatus.key}`] ? (
-                      <small className="application-error" role="alert">
-                        {fieldErrors[`family.${config.familySecondStatus.key}`]}
-                      </small>
-                    ) : null}
-                  </label>
-                </div>
-              ) : null}
-              {fatherRequired || !config.familySecondStatus ? (
-                <div className="application-grid">
-                  {(config.familySecond ?? []).map((field) => (
+                  {config.family.map((field) => (
                     <Field
                       key={field.key}
                       def={field}
@@ -1285,12 +1387,62 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                     />
                   ))}
                 </div>
-              ) : null}
-            </fieldset>
-          ) : null}
-        </FormSection>
+              </fieldset>
+            ) : null}
+            {config.familySecondLegend ? (
+              <fieldset>
+                <legend>{config.familySecondLegend}</legend>
+                {config.familySecondNote ? (
+                  <p className="restriction-note">
+                    <strong>{config.familySecondNote.title}</strong>{" "}
+                    <em>{config.familySecondNote.body}</em>
+                  </p>
+                ) : null}
+                {config.familySecondStatus ? (
+                  <div className="application-grid">
+                    <label className="application-field">
+                      {config.familySecondStatus.label}{" "}
+                      {config.familySecondStatus.required ? <span>*</span> : null}
+                      <select
+                        name={config.familySecondStatus.key}
+                        required={config.familySecondStatus.required}
+                        defaultValue={draft[config.familySecondStatus.key] ?? ""}
+                      >
+                        <option value="">Please select…</option>
+                        {config.familySecondStatus.options.map((option) => (
+                          <option key={option}>{option}</option>
+                        ))}
+                      </select>
+                      {fieldErrors[`family.${config.familySecondStatus.key}`] ? (
+                        <small className="application-error" role="alert">
+                          {fieldErrors[`family.${config.familySecondStatus.key}`]}
+                        </small>
+                      ) : null}
+                    </label>
+                  </div>
+                ) : null}
+                {fatherRequired || !config.familySecondStatus ? (
+                  <div className="application-grid">
+                    {(config.familySecond ?? []).map((field) => (
+                      <Field
+                        key={field.key}
+                        def={field}
+                        defaultValue={draft[field.key]}
+                        error={fieldErrors[`family.${field.key}`]}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+              </fieldset>
+            ) : null}
+          </FormSection>
+        ) : null}
 
-        <FormSection number={5} title="Shipping & Contact Information">
+        <FormSection
+          sectionKey="shipping"
+          number={sectionNumber("shipping")}
+          title="Shipping & Contact Information"
+        >
           <p className="hint">
             <strong className="important-note">Requirements:</strong>{" "}
             <em>The Shipping Address Name must match the Requestor Name.</em>
@@ -1392,7 +1544,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </fieldset>
         </FormSection>
 
-        <FormSection number={6} title="Copies & Processing">
+        <FormSection
+          sectionKey="copies"
+          number={sectionNumber("copies")}
+          title="Copies & Processing"
+        >
           <label className="application-field wide">
             Number of Copies <span>*</span>
             <select
@@ -1462,7 +1618,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           <p className="hint">{PROCESSING_CLARIFICATION_NOTE}</p>
         </FormSection>
 
-        <FormSection number={7} title="Billing Details">
+        <FormSection sectionKey="billing" number={sectionNumber("billing")} title="Billing Details">
           <p className="hint">
             <strong className="important-note">Requirements:</strong>{" "}
             <em>The Billing Address Name must match the Requestor Name.</em>
@@ -1515,7 +1671,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           />
         </FormSection>
 
-        <FormSection number={8} title="Credit Card Details">
+        <FormSection sectionKey="card" number={sectionNumber("card")} title="Credit Card Details">
           <p className="hint">
             <strong className="important-note">Important:</strong>{" "}
             <em>
@@ -1609,7 +1765,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </div>
         </FormSection>
 
-        <FormSection number={9} title="Order Summary">
+        <FormSection sectionKey="summary" number={sectionNumber("summary")} title="Order Summary">
           <div className="order-summary">
             <h3>{certificateName}</h3>
             <p>
@@ -1645,7 +1801,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </div>
         </FormSection>
 
-        <FormSection number={10} title="Submit Your Order">
+        <FormSection sectionKey="submit" number={sectionNumber("submit")} title="Submit Your Order">
           <div className="verify-panel">
             <h3>Verify Order</h3>
             <ol className="verify-list">

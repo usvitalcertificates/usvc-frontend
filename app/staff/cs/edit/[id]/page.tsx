@@ -53,6 +53,7 @@ interface EditForm {
     firstName: string;
     middleName: string;
     lastName: string;
+    suffix: string;
     dateOfBirth: string;
     phone: string;
     email: string;
@@ -73,17 +74,19 @@ interface EditForm {
   note: string;
 }
 
+/** Mirrors backend REQUIRED (markers only — the server re-validates on save).
+ *  Conditional rules (e.g. birth maiden-when-Female) surface as server errors. */
 const REQUIRED_SUBJECT: Record<string, string[]> = {
-  BIRTH: ["firstName", "lastName", "eventDate"],
-  DEATH: ["firstName", "lastName", "eventDate"],
-  MARRIAGE: ["firstName", "lastName", "eventDate"],
+  BIRTH: ["firstName", "middleName", "lastName", "eventDate", "sex", "stillLiving"],
+  DEATH: ["firstName", "middleName", "lastName", "eventDate", "sex"],
+  MARRIAGE: ["firstName", "lastName", "eventDate", "sex", "maidenLastName"],
   DIVORCE: ["firstName", "lastName"],
 };
 
 const REQUIRED_FAMILY: Record<string, string[]> = {
   BIRTH: ["motherFirstName", "motherCurrentLastName", "motherLastName"],
   DEATH: [],
-  MARRIAGE: ["spouseFirstName", "spouseLastName"],
+  MARRIAGE: ["spouseFirstName", "spouseLastName", "spouseSex", "spouseMaidenLastName"],
   DIVORCE: ["spouseFirstName", "spouseLastName"],
 };
 
@@ -174,6 +177,7 @@ function formFromOrder(order: EditOrder): EditForm {
       firstName: get(order.applicant, "firstName"),
       middleName: get(order.applicant, "middleName"),
       lastName: get(order.applicant, "lastName"),
+      suffix: get(order.applicant, "suffix"),
       dateOfBirth: get(order.applicant, "dateOfBirth"),
       phone: get(order.applicant, "phone"),
       email: get(order.applicant, "email"),
@@ -675,6 +679,15 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
                     autoComplete="off"
                   />
                 </Field>
+                <Field label="Suffix" error={errors["applicant.suffix"]}>
+                  <input
+                    style={inputStyle}
+                    value={form.applicant.suffix}
+                    onChange={(e) => setApplicant("suffix", e.target.value)}
+                    maxLength={20}
+                    autoComplete="off"
+                  />
+                </Field>
               </div>
               <Field label="Date of birth (YYYY-MM-DD)" error={errors["applicant.dateOfBirth"]}>
                 <input
@@ -803,7 +816,9 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
                     autoComplete="off"
                   />
                 </Field>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
+                <div
+                  style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "10px" }}
+                >
                   <Field label="City" error={errors[`addresses.${kind}.city`]}>
                     <input
                       style={inputStyle}
