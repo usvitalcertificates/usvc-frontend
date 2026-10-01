@@ -9,8 +9,13 @@ import { createOrder, verifyOrderBeforePayment, type Certificate } from "@/lib/a
 import { getAnalyticsAttribution, getOpenAIAttribution, trackAnalytics } from "@/app/analytics";
 import { isCountyTemporarilyUnavailable } from "@/lib/county-availability";
 import {
+  BIRTH_MIN_YEAR,
+  DEATH_MIN_YEAR,
+  DIVORCE_MIN_YEAR,
+  MARRIAGE_MIN_YEAR,
   PROCESSING_CLARIFICATION_NOTE,
   resolveFormConfig,
+  SUFFIX_OPTIONS,
   type CertificateSlug,
   type FieldDef,
 } from "@/lib/form-config";
@@ -215,18 +220,33 @@ function inputNamesForError(key: string): string[] {
   return [];
 }
 
-/** Backend error key -> owning section number (scroll fallback). */
-function sectionForError(key: string): number {
-  if (key === "county" || key === "reasonOther") return 1;
-  if (key === "requestorSsn" || key.startsWith("applicant.")) return 2;
-  if (key.startsWith("subject.")) return 3;
-  if (key.startsWith("family.")) return 4;
-  if (key.startsWith("addresses.home.") || key.startsWith("addresses.shipping.")) return 5;
-  if (key === "totalCents") return 6;
-  if (key.startsWith("addresses.billing.")) return 7;
-  if (key.startsWith("paymentCard.")) return 8;
-  if (key === "consents" || key === "signature") return 10;
-  return 10;
+/** Stable section keys used for scroll anchors (independent of numbering). */
+type SectionKey =
+  | "certificate"
+  | "requestor"
+  | "subject"
+  | "family"
+  | "shipping"
+  | "copies"
+  | "billing"
+  | "card"
+  | "summary"
+  | "submit";
+
+/** Backend error key -> owning section key (scroll fallback). When the family
+ *  section is merged into the subject section (marriage "Spouse 2"),
+ *  family errors scroll to the subject section instead. */
+function sectionForError(key: string, familyVisible: boolean): SectionKey {
+  if (key === "county" || key === "reasonOther") return "certificate";
+  if (key === "requestorSsn" || key.startsWith("applicant.")) return "requestor";
+  if (key.startsWith("subject.")) return "subject";
+  if (key.startsWith("family.")) return familyVisible ? "family" : "subject";
+  if (key.startsWith("addresses.home.") || key.startsWith("addresses.shipping.")) return "shipping";
+  if (key === "totalCents") return "copies";
+  if (key.startsWith("addresses.billing.")) return "billing";
+  if (key.startsWith("paymentCard.")) return "card";
+  if (key === "consents" || key === "signature") return "submit";
+  return "submit";
 }
 
 /** Rank for picking the first error in form order (lower = earlier). */
@@ -358,16 +378,18 @@ function Field({
 }
 
 function FormSection({
+  sectionKey,
   number,
   title,
   children,
 }: {
+  sectionKey: SectionKey;
   number: number;
   title: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="application-section" id={`application-section-${number}`}>
+    <section className="application-section" id={`application-section-${sectionKey}`}>
       <h2>
         <span>{number}.</span> {title}
       </h2>
@@ -576,7 +598,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       }
     }
     document
-      .getElementById(`application-section-${sectionForError(key)}`)
+      .getElementById(`application-section-${sectionForError(key, hasFamilySection)}`)
       ?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
@@ -639,6 +661,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
 
   const copies = Math.min(20, Math.max(1, Number(values.copies ?? draft.copies ?? 1) || 1));
   const rush = (values.processing ?? draft.processing ?? "standard") === "rush";
+  const delivery = values.delivery ?? draft.delivery ?? "Regular";
   const shippingIntl =
     addressTypeOf(values.shippingType ?? draft.shippingType ?? ADDRESS_TYPE_OPTIONS[0].label) ===
     "international";
@@ -649,6 +672,34 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
   const relationship = values.relationship ?? draft.relationship ?? "";
   const reason = values.reason ?? draft.reason ?? "";
+  const isBirth = certSlug === "birth-certificate";
+  const isDeath = certSlug === "death-certificate";
+  const isMarriage = certSlug === "marriage-certificate";
+  const isDivorce = certSlug === "divorce-certificate";
+  const spousesTogether = isMarriage || isDivorce;
+  const hasFamilySection =
+    !config.familyInSubjectSection &&
+    (config.family.length > 0 || Boolean(config.familySecondLegend));
+  /** Display numbers follow the visible sections only, so a hidden family
+   *  section never leaves a numbering gap (death flows 1,2,3,4… instead of
+   *  1,2,3,5…). Certificates with a family section keep 1–10 as before. */
+  const sectionNumber = (key: SectionKey): number => {
+    const order: SectionKey[] = [
+      "certificate",
+      "requestor",
+      "subject",
+      ...(hasFamilySection ? (["family"] as SectionKey[]) : []),
+      "shipping",
+      "copies",
+      "billing",
+      "card",
+      "summary",
+      "submit",
+    ];
+    return order.indexOf(key) + 1;
+  };
+  const sexValue = values.sex ?? draft.sex ?? "";
+  const valueOf = (key: string) => values[key] ?? draft[key] ?? "";
 
   function syncForm(event?: { target?: EventTarget | null }) {
     const changed = (event?.target as HTMLElement | null)?.getAttribute("name");
@@ -725,7 +776,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority. Please select a different ${noun}.`,
       );
       document
-        .getElementById("application-section-1")
+        .getElementById("application-section-certificate")
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -733,7 +784,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       setError("Email addresses do not match.");
       setFieldErrors({ "applicant.email": "Email addresses do not match." });
       document
-        .getElementById("application-section-5")
+        .getElementById("application-section-shipping")
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
       (formRef.current?.querySelector('[name="email"]') as HTMLInputElement | null)?.focus?.({
         preventScroll: true,
@@ -743,7 +794,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     if (!get("signature")) {
       setError("Please type your full name as your signature before continuing.");
       document
-        .getElementById("application-section-10")
+        .getElementById("application-section-submit")
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -754,6 +805,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     try {
       const subject: Record<string, string> = {};
       for (const field of config.person) subject[field.key] = get(field.key);
+      // The maiden field is hidden for a Male subject — never submit a stale value.
+      if (certSlug === "birth-certificate" && get("sex") === "Male")
+        subject["subjectMaidenLastName"] = "";
       const family: Record<string, string> = {};
       for (const field of [...config.family, ...(config.familySecond ?? [])])
         family[field.key] = get(field.key);
@@ -789,7 +843,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           relationship: get("relationship"),
           relationshipOther: get("relationshipOther"),
           firstName: get("applicantFirstName"),
+          middleName: get("applicantMiddleName"),
           lastName: get("applicantLastName"),
+          suffix: get("applicantSuffix"),
           dateOfBirth: get("applicantDob"),
           phone: get("phone"),
           email: get("email"),
@@ -862,6 +918,38 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const cardBrand = cardBrandOf(values.cardNumber ?? "");
   const expiryMonthOk = isPlausibleExpiryMonth(values.cardExpiry ?? "");
 
+  /** USVR-style soft cross-checks (birth only): warnings, never blockers. */
+  const maidenWarnings: string[] = [];
+  if (isBirth) {
+    const same = (a: string, b: string) => {
+      const x = a.trim().toLowerCase();
+      const y = b.trim().toLowerCase();
+      return x !== "" && y !== "" && x === y;
+    };
+    const different = (a: string, b: string) => {
+      const x = a.trim().toLowerCase();
+      const y = b.trim().toLowerCase();
+      return x !== "" && y !== "" && x !== y;
+    };
+    const motherMaiden = valueOf("motherLastName");
+    const motherCurrent = valueOf("motherCurrentLastName");
+    const fatherLast = valueOf("fatherLastName");
+    const subjectLast = valueOf("lastName");
+    const subjectMaiden = sexValue === "Male" ? "" : valueOf("subjectMaidenLastName");
+    if (same(motherMaiden, fatherLast))
+      maidenWarnings.push("Mother maiden name is the same as father's last name.");
+    if (different(subjectMaiden, subjectLast))
+      maidenWarnings.push("The Subject's maiden name is different than their last name.");
+    if (
+      different(subjectMaiden, motherCurrent) &&
+      different(subjectMaiden, motherMaiden) &&
+      different(subjectMaiden, fatherLast)
+    )
+      maidenWarnings.push("The Subject's maiden name is different than either parent's last name.");
+    if (same(motherMaiden, motherCurrent))
+      maidenWarnings.push("Mother maiden name is the same as last name.");
+  }
+
   return (
     <form
       ref={formRef}
@@ -895,7 +983,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         </p>
       </div>
 
-      <FormSection number={1} title="Information About the Certificate">
+      <FormSection
+        sectionKey="certificate"
+        number={sectionNumber("certificate")}
+        title="Information About the Certificate"
+      >
         <div className="application-grid">
           <label className="application-field">
             Certificate Type <span>*</span>
@@ -964,10 +1056,46 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </option>
               ))}
             </select>
-            <small>{config.eventLocationHelp}</small>
           </label>
+          {isBirth ? (
+            <p className="restriction-note">
+              <strong>City/County of Birth:</strong>{" "}
+              <em>
+                Please select the exact city and county of birth for the subject of the certificate.{" "}
+                {config.eventLocationHelp}
+              </em>
+            </p>
+          ) : null}
+          {isDeath ? (
+            <p className="restriction-note">
+              <strong>City/County of Death:</strong>{" "}
+              <em>
+                Please select the exact city and county of death for the subject of the certificate.{" "}
+                {config.eventLocationHelp}
+              </em>
+            </p>
+          ) : null}
+          {isMarriage ? (
+            <p className="restriction-note">
+              <strong>City/County of Marriage:</strong>{" "}
+              <em>
+                Please select the exact city and county the marriage license was purchased and
+                registered. {config.eventLocationHelp}
+              </em>
+            </p>
+          ) : null}
+          {isDivorce ? (
+            <p className="restriction-note">
+              <strong>City/County of Divorce:</strong>{" "}
+              <em>
+                Please select the exact city and county of divorce for the subjects of the
+                certificate. {config.eventLocationHelp}
+              </em>
+            </p>
+          ) : null}
           <label className="application-field wide">
-            Reason for requesting this certificate <span>*</span>
+            {isBirth || isDeath ? "Reason for Request" : "Reason for requesting this certificate"}{" "}
+            <span>*</span>
             <select name="reason" required defaultValue={draft.reason ?? ""}>
               <option value="">Please select…</option>
               {config.reasons.map((item) => (
@@ -986,11 +1114,71 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               ) : null}
             </label>
           ) : null}
+          {isBirth ? (
+            <p className="restriction-note">
+              <strong>Year of Birth Restriction:</strong>{" "}
+              <em>
+                For the selected county we can only accept orders for births that occurred in the
+                year {BIRTH_MIN_YEAR} or later.
+              </em>
+            </p>
+          ) : null}
+          {isDeath ? (
+            <p className="restriction-note">
+              <strong>Year of Death Restriction:</strong>{" "}
+              <em>
+                For the selected county we can only accept orders for deaths that occurred from{" "}
+                {DEATH_MIN_YEAR} to today.
+              </em>
+            </p>
+          ) : null}
+          {isMarriage ? (
+            <p className="restriction-note">
+              <strong>Year of Marriage Restriction:</strong>{" "}
+              <em>
+                For the selected county we can only accept orders for marriages that occurred from{" "}
+                {MARRIAGE_MIN_YEAR} to today.
+              </em>
+            </p>
+          ) : null}
+          {isDivorce ? (
+            <p className="restriction-note">
+              <strong>Year of Divorce Restriction:</strong>{" "}
+              <em>
+                For the selected county we can only accept orders for divorces that occurred from{" "}
+                {DIVORCE_MIN_YEAR} to today.
+              </em>
+            </p>
+          ) : null}
         </div>
       </FormSection>
 
       <fieldset className="county-blocked-fields">
-        <FormSection number={2} title="Information About the Requestor">
+        <FormSection
+          sectionKey="requestor"
+          number={sectionNumber("requestor")}
+          title="Information About the Requestor"
+        >
+          {isBirth || isMarriage || isDivorce ? (
+            <p className="hint">
+              <strong className="important-note">Important:</strong>{" "}
+              <em>
+                The requestor is the person ordering the certificate, not the person named on the
+                certificate. If you are ordering your own certificate, you are both the requestor
+                and the subject. The name of the credit card holder must be the same as the
+                requestor.
+              </em>
+            </p>
+          ) : null}
+          {isDeath ? (
+            <p className="hint">
+              <strong className="important-note">Important:</strong>{" "}
+              <em>
+                The requestor is the person ordering the certificate. The name of the credit card
+                holder must be the same as the requestor.
+              </em>
+            </p>
+          ) : null}
           <div className="application-grid">
             <label className="application-field wide">
               Your relationship to the person named on the certificate <span>*</span>
@@ -1000,7 +1188,19 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                   <option key={item}>{item}</option>
                 ))}
               </select>
+              <small>
+                <em>
+                  If you are not named on the record you may be required to provide proof of
+                  Relationship, Entitlement, and/or Court Documents.
+                </em>
+              </small>
             </label>
+            <p className="hint application-field wide">
+              <strong className="important-note">Important:</strong>{" "}
+              <em>
+                The relationship selected must match your relationship to the subject exactly.
+              </em>
+            </p>
             {relationship === "Other" ? (
               <label className="application-field wide">
                 Please describe your relationship <span>*</span>
@@ -1017,7 +1217,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </label>
             ) : null}
             <label className="application-field">
-              Your first name <span>*</span>
+              First Name of Requestor <span>*</span>
               <input
                 name="applicantFirstName"
                 required
@@ -1025,16 +1225,27 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               />
             </label>
             <label className="application-field">
-              Your middle name
+              Middle Name of Requestor
               <input name="applicantMiddleName" defaultValue={draft.applicantMiddleName ?? ""} />
             </label>
             <label className="application-field">
-              Your last name <span>*</span>
+              Current Last Name of Requestor <span>*</span>
               <input
                 name="applicantLastName"
                 required
                 defaultValue={draft.applicantLastName ?? ""}
               />
+            </label>
+            <label className="application-field">
+              Suffix
+              <select name="applicantSuffix" defaultValue={draft.applicantSuffix ?? ""}>
+                <option value="">Please select…</option>
+                {SUFFIX_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
           {config.requestor.note ? (
@@ -1074,6 +1285,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                   onChange={(event) => applyMask(event, formatSsnInput)}
                 />
                 <small>Shown only while you type. Never stored on this device.</small>
+                <small>
+                  <em>Valid SSN only, no ITINs or temporary SSNs permitted.</em>
+                </small>
                 {ssnLiveError ? (
                   <small className="application-error" role="alert">
                     {ssnLiveError}
@@ -1087,7 +1301,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </div>
         </FormSection>
 
-        <FormSection number={3} title="Information About the Subject">
+        <FormSection
+          sectionKey="subject"
+          number={sectionNumber("subject")}
+          title="Information About the Subject"
+        >
           {certSlug === "birth-certificate" ? (
             <p className="adoption-note">
               <strong>ADOPTED?</strong> If the person named on the record was adopted, the record on
@@ -1096,14 +1314,27 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               section.
             </p>
           ) : null}
-          <p>
-            {config.personLegend}. {config.personNote ? <em>{config.personNote.body}</em> : null}
-          </p>
+          {spousesTogether ? (
+            config.personNote ? (
+              <p className="restriction-note">
+                <em>{config.personNote.body}</em>
+              </p>
+            ) : null
+          ) : (
+            <p className="restriction-note">
+              <strong>{config.personLegend}.</strong>{" "}
+              {config.personNote ? <em>{config.personNote.body}</em> : null}
+            </p>
+          )}
+          {spousesTogether ? <h3 className="spouse-heading">Spouse 1</h3> : null}
           <div className="application-grid">
             {config.person.map((field) => {
+              // Birth: maiden name only applies to a Female subject — hidden
+              // for Male, compulsory for Female.
+              if (isBirth && field.key === "subjectMaidenLastName" && sexValue === "Male")
+                return null;
               const requiredWhenFemale =
-                field.key === "subjectMaidenLastName" &&
-                (values.sex ?? draft.sex ?? "") === "Female";
+                isBirth && field.key === "subjectMaidenLastName" && sexValue === "Female";
               return (
                 <Field
                   key={field.key}
@@ -1114,63 +1345,40 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               );
             })}
           </div>
+          {spousesTogether ? (
+            <>
+              <h3 className="spouse-heading">Spouse 2</h3>
+              <div className="application-grid">
+                {(config.family ?? []).map((field) => (
+                  <Field
+                    key={field.key}
+                    def={field}
+                    defaultValue={draft[field.key]}
+                    error={fieldErrors[`family.${field.key}`]}
+                  />
+                ))}
+              </div>
+            </>
+          ) : null}
         </FormSection>
 
-        <FormSection number={4} title="Parent / Family Information">
-          <fieldset>
-            <legend>{config.familyLegend}</legend>
-            {config.familyNote ? (
-              <p>
-                <strong>{config.familyNote.title}</strong>
-              </p>
-            ) : null}
-            {config.familyNote ? <em>{config.familyNote.body}</em> : null}
-            <div className="application-grid">
-              {config.family.map((field) => (
-                <Field
-                  key={field.key}
-                  def={field}
-                  defaultValue={draft[field.key]}
-                  error={fieldErrors[`family.${field.key}`]}
-                />
-              ))}
-            </div>
-          </fieldset>
-          {config.familySecondLegend ? (
-            <fieldset>
-              <legend>{config.familySecondLegend}</legend>
-              {config.familySecondNote ? (
-                <p>
-                  <strong>{config.familySecondNote.title}</strong>
-                </p>
-              ) : null}
-              {config.familySecondNote ? <em>{config.familySecondNote.body}</em> : null}
-              {config.familySecondStatus ? (
+        {!config.familyInSubjectSection &&
+        (config.family.length > 0 || config.familySecondLegend) ? (
+          <FormSection
+            sectionKey="family"
+            number={sectionNumber("family")}
+            title="Parent / Family Information"
+          >
+            {config.family.length > 0 ? (
+              <fieldset>
+                <legend>{config.familyLegend}</legend>
+                {config.familyNote ? (
+                  <p className="restriction-note">
+                    <strong>{config.familyNote.title}</strong> <em>{config.familyNote.body}</em>
+                  </p>
+                ) : null}
                 <div className="application-grid">
-                  <label className="application-field">
-                    {config.familySecondStatus.label}{" "}
-                    {config.familySecondStatus.required ? <span>*</span> : null}
-                    <select
-                      name={config.familySecondStatus.key}
-                      required={config.familySecondStatus.required}
-                      defaultValue={draft[config.familySecondStatus.key] ?? ""}
-                    >
-                      <option value="">Please select…</option>
-                      {config.familySecondStatus.options.map((option) => (
-                        <option key={option}>{option}</option>
-                      ))}
-                    </select>
-                    {fieldErrors[`family.${config.familySecondStatus.key}`] ? (
-                      <small className="application-error" role="alert">
-                        {fieldErrors[`family.${config.familySecondStatus.key}`]}
-                      </small>
-                    ) : null}
-                  </label>
-                </div>
-              ) : null}
-              {fatherRequired || !config.familySecondStatus ? (
-                <div className="application-grid">
-                  {(config.familySecond ?? []).map((field) => (
+                  {config.family.map((field) => (
                     <Field
                       key={field.key}
                       def={field}
@@ -1179,12 +1387,62 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                     />
                   ))}
                 </div>
-              ) : null}
-            </fieldset>
-          ) : null}
-        </FormSection>
+              </fieldset>
+            ) : null}
+            {config.familySecondLegend ? (
+              <fieldset>
+                <legend>{config.familySecondLegend}</legend>
+                {config.familySecondNote ? (
+                  <p className="restriction-note">
+                    <strong>{config.familySecondNote.title}</strong>{" "}
+                    <em>{config.familySecondNote.body}</em>
+                  </p>
+                ) : null}
+                {config.familySecondStatus ? (
+                  <div className="application-grid">
+                    <label className="application-field">
+                      {config.familySecondStatus.label}{" "}
+                      {config.familySecondStatus.required ? <span>*</span> : null}
+                      <select
+                        name={config.familySecondStatus.key}
+                        required={config.familySecondStatus.required}
+                        defaultValue={draft[config.familySecondStatus.key] ?? ""}
+                      >
+                        <option value="">Please select…</option>
+                        {config.familySecondStatus.options.map((option) => (
+                          <option key={option}>{option}</option>
+                        ))}
+                      </select>
+                      {fieldErrors[`family.${config.familySecondStatus.key}`] ? (
+                        <small className="application-error" role="alert">
+                          {fieldErrors[`family.${config.familySecondStatus.key}`]}
+                        </small>
+                      ) : null}
+                    </label>
+                  </div>
+                ) : null}
+                {fatherRequired || !config.familySecondStatus ? (
+                  <div className="application-grid">
+                    {(config.familySecond ?? []).map((field) => (
+                      <Field
+                        key={field.key}
+                        def={field}
+                        defaultValue={draft[field.key]}
+                        error={fieldErrors[`family.${field.key}`]}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+              </fieldset>
+            ) : null}
+          </FormSection>
+        ) : null}
 
-        <FormSection number={5} title="Shipping & Contact Information">
+        <FormSection
+          sectionKey="shipping"
+          number={sectionNumber("shipping")}
+          title="Shipping & Contact Information"
+        >
           <p className="hint">
             <strong className="important-note">Requirements:</strong>{" "}
             <em>The Shipping Address Name must match the Requestor Name.</em>
@@ -1228,11 +1486,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             requestorLast={requestorLast}
             errors={fieldErrors}
           />
-          <fieldset>
-            <legend>Contact information</legend>
+          <fieldset className="contact-block">
+            <p className="contact-heading">Contact Information</p>
             <div className="application-grid">
-              <label className="application-field">
-                Phone number <span>*</span>
+              <label className="application-field wide">
+                Phone Number <span>*</span>
                 <PhoneInput
                   defaultCountry="us"
                   preferredCountries={["us"]}
@@ -1244,7 +1502,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                     name: "phoneVisible",
                     required: true,
                     autoComplete: "tel",
-                    placeholder: "Daytime Phone Number",
+                    placeholder: "Phone Number",
                   }}
                 />
                 <input type="hidden" name="phone" value={phoneValue} />
@@ -1254,7 +1512,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                   </small>
                 ) : null}
               </label>
-              <div />
               <label className="application-field">
                 Email address <span>*</span>
                 <input name="email" type="email" required defaultValue={draft.email ?? ""} />
@@ -1287,7 +1544,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </fieldset>
         </FormSection>
 
-        <FormSection number={6} title="Copies & Processing">
+        <FormSection
+          sectionKey="copies"
+          number={sectionNumber("copies")}
+          title="Copies & Processing"
+        >
           <label className="application-field wide">
             Number of Copies <span>*</span>
             <select
@@ -1357,12 +1618,12 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           <p className="hint">{PROCESSING_CLARIFICATION_NOTE}</p>
         </FormSection>
 
-        <FormSection number={7} title="Billing Details">
+        <FormSection sectionKey="billing" number={sectionNumber("billing")} title="Billing Details">
           <p className="hint">
             <strong className="important-note">Requirements:</strong>{" "}
             <em>The Billing Address Name must match the Requestor Name.</em>
           </p>
-          <p>
+          <p className="hint">
             Your billing address is used to verify your payment. Card details are collected in the
             Credit Card Details section below.
           </p>
@@ -1410,7 +1671,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           />
         </FormSection>
 
-        <FormSection number={8} title="Credit Card Details">
+        <FormSection sectionKey="card" number={sectionNumber("card")} title="Credit Card Details">
           <p className="hint">
             <strong className="important-note">Important:</strong>{" "}
             <em>
@@ -1504,12 +1765,13 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </div>
         </FormSection>
 
-        <FormSection number={9} title="Order Summary">
+        <FormSection sectionKey="summary" number={sectionNumber("summary")} title="Order Summary">
           <div className="order-summary">
             <h3>{certificateName}</h3>
             <p>
               Number of copies: {copies} certified {copies === 1 ? "copy" : "copies"}
             </p>
+            <p>Delivery method: {delivery}</p>
             <hr />
             <div>
               <span>
@@ -1524,7 +1786,14 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </span>
                 <b>$45.00</b>
               </div>
-            ) : null}
+            ) : (
+              <div>
+                <span>
+                  Standard Processing<small>5–7 business days</small>
+                </span>
+                <b>Included</b>
+              </div>
+            )}
             <div className="total">
               <strong>TOTAL</strong>
               <strong>${total.toFixed(2)}</strong>
@@ -1532,7 +1801,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </div>
         </FormSection>
 
-        <FormSection number={10} title="Submit Your Order">
+        <FormSection sectionKey="submit" number={sectionNumber("submit")} title="Submit Your Order">
           <div className="verify-panel">
             <h3>Verify Order</h3>
             <ol className="verify-list">
@@ -1571,6 +1840,25 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <p>
               <strong>Type your full name in the field below to submit your order.</strong>
             </p>
+            {isBirth && maidenWarnings.length > 0 ? (
+              <div className="possible-issues" role="status">
+                <h4>Possible Issues Detected</h4>
+                <p>
+                  <em>
+                    Hi there! Our system detected one or more potential issues with your submission.
+                    Please review each issue below. Once you are satisfied with your submission, you
+                    may continue by submitting the form again.
+                  </em>
+                </p>
+                <ul>
+                  {maidenWarnings.map((warning) => (
+                    <li key={warning}>
+                      {warning} If this is correct, then please ignore this warning.
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
             <input
               className="verify-signature"
               name="signature"

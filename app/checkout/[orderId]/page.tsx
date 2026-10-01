@@ -245,8 +245,19 @@ export default function Checkout({ params }: { params: Promise<{ orderId: string
                       <strong>{formatUSD(order.pricing.rushCents)}</strong>
                     </span>
                   </div>
+                  <p className="muted">Per order</p>
                 </li>
-              ) : null}
+              ) : (
+                <li>
+                  <div>
+                    <span>Standard Processing</span>
+                    <span>
+                      <strong>Included</strong>
+                    </span>
+                  </div>
+                  <p className="muted">5–7 business days</p>
+                </li>
+              )}
               <li className="total-row">
                 <div>
                   <span>

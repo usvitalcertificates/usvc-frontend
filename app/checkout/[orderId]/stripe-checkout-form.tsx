@@ -120,7 +120,7 @@ export function StripeCheckoutForm({
         </p>
         <button
           type="submit"
-          className="button button-primary button-full"
+          className="button button-success button-full"
           disabled={processing || !session.canConfirm}
         >
           {processing ? "Processing your payment…" : `Pay ${formatUSD(amountCents)}`}
