@@ -42,7 +42,6 @@ export default function Certificates() {
         title="Certificate Types"
         subtitle="USVC provides application assistance for four categories of vital records. Availability depends on the state you select."
       />
-      <p className="independence-note">USVC is an independent service, not a government agency.</p>
       <section className="page-section certificate-page">
         <div className="container">
           <div className="certificate-type-grid">

@@ -154,8 +154,6 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
         title={`Your ${name} Vital Records Request, Simplified.`}
         subtitle={`Request assistance with your ${name} birth, death, marriage, or divorce certificate application.`}
       />
-      <p className="independence-note">USVC is an independent service, not a government agency.</p>
-
       <section className="page-section">
         <div className="container">
           <div className="certificate-type-grid">

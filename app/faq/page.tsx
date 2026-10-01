@@ -36,7 +36,6 @@ export default function FaqPage() {
         title="Frequently Asked Questions"
         subtitle="Clear answers about our fees, timelines, eligibility rules, and what USVC does and does not do."
       />
-      <p className="independence-note">USVC is an independent service, not a government agency.</p>
       <section className="page-section">
         <div className="container">
           <FaqAccordion items={FAQ_ITEMS} />
