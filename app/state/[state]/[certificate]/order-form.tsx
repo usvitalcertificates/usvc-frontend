@@ -1312,15 +1312,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             </select>
           </label>
           <p className="hint">
-            <strong className="important-note">Important:</strong>{" "}
-            <em>
-              The online Vital Certificate Processing Fee is payable upon ordering and the relevant
-              Vital Statistics Agency Fee and any other shipping fees are payable upon review and
-              acceptance by the State Agency and will appear on your credit card statement
-              separately.
-            </em>
-          </p>
-          <p className="hint">
             <em>
               Regular mail delivery is available, however, we recommend you choose a more secure
               shipping method that provides faster delivery and tracking of your order.
@@ -1538,12 +1529,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               <strong>TOTAL</strong>
               <strong>${total.toFixed(2)}</strong>
             </div>
-            <p>
-              This total includes the USVC Processing Fee and Rush Processing when selected. The
-              relevant Vital Statistics Agency Fee and any other shipping fees are payable upon
-              review and acceptance by the State Agency and will appear on your credit card
-              statement separately.
-            </p>
           </div>
         </FormSection>
 
