@@ -43,7 +43,6 @@ export function StripeCheckoutForm({
   onPaid: (input: { sessionId: string }) => Promise<void>;
 }) {
   const checkout = useCheckout();
-  const [authorized, setAuthorized] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,10 +66,6 @@ export function StripeCheckoutForm({
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (processing || checkout.type !== "success") return;
-    if (!authorized) {
-      setError("Please authorize the charge to continue.");
-      return;
-    }
     setProcessing(true);
     trackAnalytics("add_payment_info", {
       currency: "USD",
@@ -118,25 +113,11 @@ export function StripeCheckoutForm({
           <p>Enter your card information below to securely pay your online processing fees.</p>
         </div>
         <PaymentElement options={{ layout: "tabs" }} />
-        <div className="secure-payment-note">
-          <p>
-            <strong>One secure payment</strong>
-          </p>
-          <p>
-            Your complete order total is processed through Stripe. Your card details are encrypted.
-          </p>
-        </div>
-        <label className="checkout-authorize">
-          <input
-            type="checkbox"
-            checked={authorized}
-            onChange={(event) => setAuthorized(event.target.checked)}
-          />
-          <span>
-            I authorize USVC to charge the complete total of {formatUSD(amountCents)}, and I have
-            read the <Link href="/terms-of-service">Refund &amp; Cancellation Policy</Link>.
-          </span>
-        </label>
+        <p className="checkout-terms">
+          By paying, you agree to the{" "}
+          <Link href="/terms-of-service">Refund &amp; Cancellation Policy</Link>. Agency and
+          shipping fees, if any, are billed separately.
+        </p>
         <button
           type="submit"
           className="button button-primary button-full"

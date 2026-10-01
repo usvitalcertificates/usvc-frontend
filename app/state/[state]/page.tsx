@@ -151,10 +151,9 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
 
       <PageHeader
         eyebrow="Available Certificates"
-        title={`Your ${name} Vital Records. Simplified.`}
+        title={`Your ${name} Vital Records Request, Simplified.`}
         subtitle={`Request assistance with your ${name} birth, death, marriage, or divorce certificate application.`}
       />
-
       <section className="page-section">
         <div className="container">
           <div className="certificate-type-grid">

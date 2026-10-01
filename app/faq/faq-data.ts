@@ -24,7 +24,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: "How much does it cost to order a vital record and what type of payment is accepted?",
     answer:
-      "To find the cost of your order, select the relevant state and the vital certificate type (birth, death, marriage or divorce). The payment information is provided on that page, including additional certificates.\n\nWe accept payment by Visa, Mastercard, and debit credit cards.",
+      "To find the cost of your order, select the relevant state and the vital certificate type (birth, death, marriage or divorce). The payment information is provided on that page, including additional certificates.\n\nWe accept payment by Visa and Mastercard (including debit).",
   },
   {
     question: "Can I cancel and/or get a refund?",
@@ -64,7 +64,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     question:
       "How long will it take to receive my vital certificate and how many copies can I obtain?",
     answer:
-      "Processing and delivery times vary by state and certificate type. Detailed delivery times are listed on the order form. Depending on the state and certificate type you may request a minimum of 1 to a maximum of 20 certificates at one time. Additional fees apply per copy ordered.",
+      "Processing and delivery times vary by state and certificate type. The order form shows our processing estimates; agency processing and certificate delivery times may vary. Depending on the state and certificate type you may request a minimum of 1 to a maximum of 20 certificates at one time. Additional fees apply per copy ordered.",
   },
   {
     question: "Adoption – What last name do I use?",

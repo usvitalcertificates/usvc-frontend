@@ -219,6 +219,11 @@ h3 {
   background: var(--red);
   color: #fff;
 }
+.button-success {
+  border-color: #16a34a;
+  background: #16a34a;
+  color: #fff;
+}
 .button:hover,
 .button:active {
   background: var(--red);
@@ -829,7 +834,6 @@ h3 {
   font-weight: 400;
 }
 .same-address input,
-.agreements input,
 .processing-options input {
   width: 20px;
   height: 20px;
@@ -927,74 +931,6 @@ h3 {
   margin-top: 18px;
   color: #000;
 }
-.review-block {
-  padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--muted);
-}
-.review-block + .review-block {
-  margin-top: 16px;
-}
-.review-block > div {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-}
-.review-block h3 {
-  font-size: 18px;
-}
-.review-block button {
-  padding: 5px 14px;
-  border: 1px solid var(--red);
-  border-radius: 5px;
-  background: var(--red);
-  color: #fff;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-.review-block button:hover,
-.review-block button:active {
-  opacity: 0.88;
-}
-.review-block button:focus-visible {
-  outline: 3px solid rgb(178 34 52 / 30%);
-  outline-offset: 2px;
-}
-.review-block p {
-  display: grid;
-  grid-template-columns: 45% 1fr;
-  gap: 16px;
-  margin-top: 8px;
-  color: var(--muted-text);
-}
-.review-block p b {
-  color: #000;
-  font-weight: 400;
-}
-.review-block dl {
-  display: grid;
-  gap: 8px;
-  margin: 12px 0 0;
-}
-.review-row {
-  display: grid;
-  grid-template-columns: 45% 1fr;
-  gap: 16px;
-}
-.review-row dt {
-  color: var(--muted-text);
-  font-size: 15.2px;
-  line-height: 1.65;
-}
-.review-row dd {
-  margin: 0;
-  color: #000;
-  font-size: 16px;
-  line-height: 1.65;
-}
 .readonly-name {
   min-height: 40px;
   margin: 8px 0 0;
@@ -1055,26 +991,66 @@ h3 {
   color: var(--red);
   font-weight: 700;
 }
-.agreements {
+.verify-panel {
   display: grid;
   gap: 16px;
+  margin-top: 24px;
+  padding: 28px;
+  border-radius: 6px;
+  background: #f4f6f9;
 }
-.agreements label {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  color: #000;
+.verify-panel h3 {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #d9d8de;
+  color: #3c3b3b;
+  font-size: 24px;
+  font-weight: 400;
+}
+.verify-list {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: verify;
+  color: #3c3b3b;
   font-size: 16px;
+  line-height: 1.65;
 }
-.agreements label a {
+.verify-list li {
+  counter-increment: verify;
+}
+.verify-list li::before {
+  content: counter(verify) ". ";
+  font-weight: 400;
+}
+.verify-signature {
+  width: 100%;
+  max-width: 480px;
+  min-height: 48px;
+  padding: 8px 16px;
+  border: 1px solid #d9d8de;
+  border-radius: 6px;
+  font-size: 17px;
+  font-family: inherit;
+}
+.verify-payment {
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid #d9d8de;
+}
+.verify-payment .payment-action {
+  margin-top: 20px;
+}
+.verify-list a {
   color: var(--navy);
   text-decoration: underline;
 }
-.agreements .all-agreement {
-  padding: 16px;
-  border-left: 4px solid rgb(60 59 110 / 30%);
-  border-radius: 6px;
-  background: var(--muted);
+.verify-warning {
+  color: #3c3b3b;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.65;
 }
 .application-error {
   color: var(--red);
@@ -1186,9 +1162,6 @@ small.application-error {
   flex-wrap: wrap;
   align-items: center;
   gap: 16px;
-}
-.payment-action strong {
-  color: var(--navy);
 }
 .state-certificate-choices {
   display: grid;
@@ -1476,36 +1449,12 @@ small.application-error {
   font-size: 17px;
   line-height: 1.65;
 }
-.secure-payment-note {
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-.secure-payment-note p {
-  margin: 0;
-  font-size: 16px;
-}
-.secure-payment-note p strong {
-  color: var(--navy);
-}
-.secure-payment-note p + p {
-  margin-top: 4px;
+.checkout-terms {
+  color: var(--muted-text);
   font-size: 15px;
+  text-align: center;
 }
-.checkout-authorize {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  color: #000;
-  font-size: 16px;
-}
-.checkout-authorize input {
-  width: 20px;
-  height: 20px;
-  flex: 0 0 auto;
-  accent-color: var(--navy);
-}
-.checkout-authorize a {
+.checkout-terms a {
   color: var(--navy);
   text-decoration: underline;
 }
@@ -2052,14 +2001,6 @@ textarea {
   }
   .processing-options label b {
     grid-column: 2;
-  }
-  .review-block p {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
-  .review-row {
-    grid-template-columns: 1fr;
-    gap: 2px;
   }
   .certificate-type-card {
     min-height: 0;

@@ -58,7 +58,7 @@ const steps = [
   {
     icon: PackageCheck,
     title: "Your application is submitted",
-    body: "Once your request is reviewed it gets submitted to the applicable govt agency.",
+    body: "Once your request is reviewed and payment is confirmed, it is submitted to the applicable govt agency, subject to eligibility.",
   },
 ] as const;
 
@@ -108,11 +108,11 @@ export default function Home() {
         <div className="container hero-grid">
           <div className="hero-copy">
             <p className="eyebrow">Trusted Help for US Vital Certificates</p>
-            <h1>Order Your Vital Certificate With Confidence</h1>
+            <h1>Order Your Vital Certificate With Guided Help</h1>
             <div className="patriotic-rule hero-rule" aria-hidden="true" />
             <p className="hero-description">
               Birth, death, marriage, and divorce certificate applications — guided step by step,
-              reviewed for accuracy, and tracked from submission to delivery.
+              reviewed for completeness, and tracked from submission until sent to the agency.
             </p>
             <div className="button-row">
               <Link className="button button-primary button-large" href="/find-your-state">

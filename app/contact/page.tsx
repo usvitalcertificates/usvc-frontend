@@ -71,42 +71,62 @@ export default function Contact() {
       <PageHeader
         eyebrow="Client Support"
         title="Contact USVC Support"
-        subtitle="Questions before you order, or need an update on a request already submitted? Send us a message."
+        subtitle="Need an update on a request already submitted? Send us a message."
       />
       <section className="page-section contact-page">
         <div className="container contact-column">
           <div className="contact-info-panel">
             <p>
-              Welcome to the Client Support Center. To help us support an existing order, please
-              have your <strong>Order Number</strong> ready — you can find it in the confirmation
-              email you received shortly after placing your order.
+              Welcome to the Client Support Center. This page and contact form are{" "}
+              <strong>
+                exclusively for individuals who have already placed an order through our platform.
+              </strong>
             </p>
             <p>
-              For quick answers to many common questions, please first consult our comprehensive{" "}
+              usvitalcertificates.org is an ordering platform designed to assist you in obtaining
+              your official vital records. To ensure we can provide focused support for your
+              existing order, please have your Order Number ready. You can find your Order Number in
+              the confirmation email you received shortly after placing your order.
+            </p>
+            <p>
+              For quick answers to many common questions (both general and order-related), please
+              first consult our comprehensive{" "}
               <Link href="/faq">Frequently Asked Questions (FAQ)</Link> page.
             </p>
             <p>
-              Still have a general question after checking our FAQ? Detailed information on
-              eligibility requirements, fees, and delivery options is presented{" "}
+              <strong>
+                Still have a general question (not about an existing order with
+                usvitalcertificates.org) after checking our FAQ?
+              </strong>
+            </p>
+            <p>
+              Detailed information on eligibility requirements, fees, and delivery options is
+              presented{" "}
               <strong>
                 directly within our online order form pages as you select your state and document
-                type (before any payment is required)
-              </strong>
-              . We strongly encourage you to begin this process on our website to find this
+                type (before any payment is required).
+              </strong>{" "}
+              We strongly encourage you to begin this process on our website to find this
               information first.
             </p>
-            <p>If your inquiry still relates to topics such as:</p>
+            <p>
+              If, after reviewing the information provided during our online ordering process and in
+              the FAQ, your inquiry still relates to topics such as:
+            </p>
             <ul>
               <li>Specifics not covered on our website about eligibility or requirements.</li>
               <li>
                 Details about vital records in a particular state not found on our platform during
                 the order preparation.
               </li>
-              <li>Other questions you cannot find the answers to on our site.</li>
+              <li>
+                Other questions if you have <strong>not yet placed an order</strong> with us and
+                cannot find the answers on our site.
+              </li>
             </ul>
             <p>
-              Then please contact the vital records issuing agency (e.g., the State Department of
-              Health or County Clerk&apos;s Office) for your state or county directly.{" "}
+              Then please contact the <strong>vital records issuing</strong> agency (e.g., the State
+              Department of Health or County Clerk&apos;s Office) for your state or county directly.{" "}
               <strong>This form is only for support related to existing orders.</strong>
             </p>
           </div>
@@ -166,13 +186,16 @@ export default function Contact() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="contact-order">Order Number</label>
+                  <label htmlFor="contact-order">
+                    Order Number <span>*</span>
+                  </label>
                   <input
                     id="contact-order"
                     name="orderNumber"
                     placeholder="Order Number"
                     value={form.orderNumber}
                     onChange={(event) => setForm({ ...form, orderNumber: event.target.value })}
+                    required
                   />
                 </div>
                 <div>
