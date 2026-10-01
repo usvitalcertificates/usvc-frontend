@@ -1524,20 +1524,12 @@ small.application-error {
   font-size: 17px;
   line-height: 1.65;
 }
-.checkout-authorize {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  color: #000;
-  font-size: 16px;
+.checkout-terms {
+  color: var(--muted-text);
+  font-size: 15px;
+  text-align: center;
 }
-.checkout-authorize input {
-  width: 20px;
-  height: 20px;
-  flex: 0 0 auto;
-  accent-color: var(--navy);
-}
-.checkout-authorize a {
+.checkout-terms a {
   color: var(--navy);
   text-decoration: underline;
 }
