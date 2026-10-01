@@ -1617,12 +1617,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </p>
               ) : null}
               <div className="payment-action">
-                <button className="button button-primary" disabled={busy || Boolean(blockedCounty)}>
-                  {busy ? "Saving your application…" : "Continue to Secure Payment"}
+                <button className="button button-success" disabled={busy || Boolean(blockedCounty)}>
+                  {busy
+                    ? "Saving your application…"
+                    : `Continue to Secure Payment — Total $${total.toFixed(2)}`}
                 </button>
-                <strong>
-                  Total ${total.toFixed(2)} — one USVC payment (agency fees billed separately)
-                </strong>
               </div>
             </div>
           </div>

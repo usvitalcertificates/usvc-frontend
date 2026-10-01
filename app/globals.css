@@ -219,6 +219,11 @@ h3 {
   background: var(--red);
   color: #fff;
 }
+.button-success {
+  border-color: #16a34a;
+  background: #16a34a;
+  color: #fff;
+}
 .button:hover,
 .button:active {
   background: var(--red);
@@ -1157,9 +1162,6 @@ small.application-error {
   flex-wrap: wrap;
   align-items: center;
   gap: 16px;
-}
-.payment-action strong {
-  color: var(--navy);
 }
 .state-certificate-choices {
   display: grid;
