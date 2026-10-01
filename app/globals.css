@@ -838,8 +838,8 @@ h3 {
   font-weight: 400;
 }
 .same-address input,
-.agreements input,
-.processing-options input {
+.processing-options input,
+.verify-list input {
   width: 20px;
   height: 20px;
   accent-color: var(--navy);
@@ -1064,26 +1064,55 @@ h3 {
   color: var(--red);
   font-weight: 700;
 }
-.agreements {
+.verify-panel {
   display: grid;
   gap: 16px;
+  margin-top: 24px;
+  padding: 28px;
+  border-radius: 6px;
+  background: #f4f6f9;
 }
-.agreements label {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  color: #000;
+.verify-panel h3 {
+  color: #3c3b3b;
+  font-size: 22px;
+  font-weight: 400;
+}
+.verify-list {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: verify;
+  color: #3c3b3b;
   font-size: 16px;
+  line-height: 1.65;
 }
-.agreements label a {
+.verify-list li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  counter-increment: verify;
+}
+.verify-list li::before {
+  content: counter(verify) ".";
+  flex: 0 0 auto;
+  font-weight: 700;
+}
+.verify-list input {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  cursor: not-allowed;
+}
+.verify-list a {
   color: var(--navy);
   text-decoration: underline;
 }
-.agreements .all-agreement {
-  padding: 16px;
-  border-left: 4px solid rgb(60 59 110 / 30%);
-  border-radius: 6px;
-  background: var(--muted);
+.verify-warning {
+  color: #3c3b3b;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.65;
 }
 .application-error {
   color: var(--red);

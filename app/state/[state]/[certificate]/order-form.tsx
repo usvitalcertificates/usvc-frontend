@@ -603,15 +603,14 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     setPhoneValue(value);
     setValues((current) => ({ ...current, phone: value }));
   }
-  const [consents, setConsents] = useState<Record<(typeof CONSENT_KEYS)[number], boolean>>({
-    accurate: false,
-    govtId: false,
-    terms: false,
-    privacy: false,
-    refund: false,
-    processingPayment: false,
-  });
-  const allConsents = CONSENT_KEYS.every((key) => consents[key]);
+  const consents: Record<(typeof CONSENT_KEYS)[number], boolean> = {
+    accurate: true,
+    govtId: true,
+    terms: true,
+    privacy: true,
+    refund: true,
+    processingPayment: true,
+  };
   const [geo, setGeo] = useState<StateGeography>({ state: abbr, counties: [] });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -775,17 +774,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     else if (billingSource === "shipping") copyAddress("shipping", "billing");
   }
 
-  function toggleAll(checked: boolean) {
-    setConsents({
-      accurate: checked,
-      govtId: checked,
-      terms: checked,
-      privacy: checked,
-      refund: checked,
-      processingPayment: checked,
-    });
-  }
-
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -812,8 +800,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       });
       return;
     }
-    if (!allConsents || !get("signature")) {
-      setError("Please sign and accept the required certification statements before continuing.");
+    if (!get("signature")) {
+      setError("Please type your full name as your signature before continuing.");
       document
         .getElementById("application-section-10")
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1695,93 +1683,71 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           <label className="application-field wide">
             Electronic Signature <span>*</span>
             <input name="signature" required defaultValue={draft.signature ?? ""} />
-            <small>Typing your name serves as your electronic signature for this order.</small>
+            <small>
+              Type your full name in the field below. Typing your full name constitutes a signature
+              and an agreement that you have read and agreed to all the provisions above. It
+              additionally affirms that all information provided on this order form is complete and
+              accurate and that you are an authorized individual to obtain the requested vital
+              certificate.
+            </small>
             {fieldErrors.signature ? (
               <small className="application-error" role="alert">
                 {fieldErrors.signature}
               </small>
             ) : null}
           </label>
-          <div className="agreements">
-            <label className="all-agreement">
-              <input
-                type="checkbox"
-                name="agreement"
-                checked={allConsents}
-                onChange={(event) => toggleAll(event.target.checked)}
-              />
-              <span>
-                <strong>I agree to all of the statements below.</strong> Selecting this checks every
-                item; you may also review and select them individually.
-              </span>
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreeAccurate"
-                required={!allConsents}
-                checked={consents.accurate}
-                onChange={(event) => setConsents((c) => ({ ...c, accurate: event.target.checked }))}
-              />{" "}
-              I certify that the information provided is accurate to the best of my knowledge and
-              that I am authorized to request this record.
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreeGovtId"
-                required={!allConsents}
-                checked={consents.govtId}
-                onChange={(event) => setConsents((c) => ({ ...c, govtId: event.target.checked }))}
-              />{" "}
-              I understand ID verification instructions will be emailed to me with steps on how to
-              send a copy of my government-issued picture ID for verification.
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreeTerms"
-                required={!allConsents}
-                checked={consents.terms}
-                onChange={(event) => setConsents((c) => ({ ...c, terms: event.target.checked }))}
-              />{" "}
-              I agree to the <Link href="/terms-of-service">Terms of Service</Link>.
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreePrivacy"
-                required={!allConsents}
-                checked={consents.privacy}
-                onChange={(event) => setConsents((c) => ({ ...c, privacy: event.target.checked }))}
-              />{" "}
-              I have read the <Link href="/privacy-policy">Privacy Policy</Link>.
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreeRefund"
-                required={!allConsents}
-                checked={consents.refund}
-                onChange={(event) => setConsents((c) => ({ ...c, refund: event.target.checked }))}
-              />{" "}
-              I accept the <Link href="/terms-of-service">Refund &amp; Cancellation terms</Link>.
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                name="agreeProcessingPayment"
-                required={!allConsents}
-                checked={consents.processingPayment}
-                onChange={(event) =>
-                  setConsents((c) => ({ ...c, processingPayment: event.target.checked }))
-                }
-              />{" "}
-              <span>
-                <strong>Authorization for the complete order payment.</strong>{" "}
-                {PROCESSING_PAYMENT_AUTHORIZATION_TEXT}
-              </span>
-            </label>
+          <div className="verify-panel">
+            <h3>Verify Order</h3>
+            <ol className="verify-list">
+              <li>
+                <input type="checkbox" checked disabled aria-hidden="true" tabIndex={-1} />{" "}
+                <span>
+                  I certify that the information provided is accurate to the best of my knowledge
+                  and that I am authorized to request this record.
+                </span>
+              </li>
+              <li>
+                <input type="checkbox" checked disabled aria-hidden="true" tabIndex={-1} />{" "}
+                <span>
+                  I understand ID verification instructions will be emailed to me with steps on how
+                  to send a copy of my government-issued picture ID for verification.
+                </span>
+              </li>
+              <li>
+                <input type="checkbox" checked disabled aria-hidden="true" tabIndex={-1} />{" "}
+                <span>
+                  I accept the <Link href="/terms-of-service">Terms of Service</Link>, including the
+                  refund and cancellation policies.
+                </span>
+              </li>
+              <li>
+                <input type="checkbox" checked disabled aria-hidden="true" tabIndex={-1} />{" "}
+                <span>
+                  I have read the <Link href="/privacy-policy">Privacy Policy</Link>.
+                </span>
+              </li>
+              <li>
+                <input type="checkbox" checked disabled aria-hidden="true" tabIndex={-1} />{" "}
+                <span>
+                  I accept the <Link href="/terms-of-service">Refund &amp; Cancellation terms</Link>
+                  .
+                </span>
+              </li>
+              <li>
+                <input type="checkbox" checked disabled aria-hidden="true" tabIndex={-1} />{" "}
+                <span>
+                  <strong>Authorization for the complete order payment.</strong>{" "}
+                  {PROCESSING_PAYMENT_AUTHORIZATION_TEXT}
+                </span>
+              </li>
+            </ol>
+            <p className="verify-warning">
+              <em>
+                Before submitting your order, please take a moment to review your information.
+                Incorrect information provided will lead to delays and could possibly cancel your
+                order.
+              </em>
+            </p>
           </div>
           {fieldErrors.consents ? (
             <small className="application-error" role="alert">
