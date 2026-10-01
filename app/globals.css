@@ -602,6 +602,63 @@ h3 {
 .support-row a:hover {
   text-decoration: underline;
 }
+.contact-column {
+  display: grid;
+  gap: 32px;
+  max-width: 1020px;
+}
+.contact-info-panel {
+  padding: 32px;
+  border-radius: 6px;
+  background: #f4f6f9;
+  color: #5a5a5a;
+  font-size: 17px;
+  line-height: 1.65;
+}
+.contact-info-panel p {
+  margin: 0 0 16px;
+}
+.contact-info-panel p:last-child,
+.contact-info-panel ul:last-child {
+  margin-bottom: 0;
+}
+.contact-info-panel strong {
+  color: #3c3b3b;
+  font-weight: 700;
+}
+.contact-info-panel a {
+  color: var(--red);
+}
+.contact-info-panel a:hover {
+  text-decoration: underline;
+}
+.contact-info-panel ul {
+  margin: 0 0 16px;
+  padding-left: 24px;
+  list-style: disc;
+}
+.contact-info-panel li {
+  margin-bottom: 8px;
+}
+.contact-name-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+}
+.contact-form select {
+  min-height: 48px;
+  margin-top: 8px;
+  padding: 8px 16px;
+  border: 1px solid #d9d8de;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 17px;
+  font-family: inherit;
+}
+.contact-form .required-note {
+  margin: 8px 0 0;
+  color: #5a5a5a;
+}
 
 .application-page {
   padding: 56px 24px 80px;
@@ -1929,7 +1986,8 @@ textarea {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .track-grid,
-  .contact-grid {
+  .contact-grid,
+  .contact-name-row {
     grid-template-columns: 1fr;
   }
   .checkout-grid {
