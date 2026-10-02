@@ -23,7 +23,7 @@ export function SiteHeader() {
       <div className="container header-row">
         <Link href="/" className="logo" aria-label="US Vital Certificates — home">
           <Image
-            src="/assets/usvc-logo.png"
+            src="/assets/usvc-logo.webp"
             alt="US Vital Certificates logo"
             width={52}
             height={52}

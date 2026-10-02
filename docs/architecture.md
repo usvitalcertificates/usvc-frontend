@@ -8,7 +8,7 @@ Next.js 16 App Router, React 19, Node 24. Vercel deploy of `usvc-frontend/`. No 
 
 Public (apex/`www`):
 
-- `page.tsx` — home (hero `/assets/usvc-hero.png`, cert cards, state grid, trust, FAQ callout). `Important disclosure` box renders on homepage only.
+- `page.tsx` — home (hero `/assets/usvc-hero.webp`, cert cards, state grid, trust, FAQ callout). `Important disclosure` box renders on homepage only.
 - `certificates/`, `find-your-state/`, `state/[state]/` (4 cert cards, $149/copy note), `state/[state]/order/[certificate]/` (canonical 11-section form) + legacy `state/[state]/[certificate]/`.
 - `checkout/[orderId]/` (+ `stripe-checkout-form.tsx`, embedded Checkout Sessions tabs), `order/confirmation/[orderId]/` (verifies `session_id` with backend).
 - `track-order/` (customer-safe timeline), `contact/` (API-backed, honeypot), `faq/` (+ `faq-accordion.tsx`, `faq-data.ts`, 29 items, JSON-LD), `[legal]/` (exact slugs `privacy-policy`, `terms-of-service`, `accessibility` via `legal-data.ts`).

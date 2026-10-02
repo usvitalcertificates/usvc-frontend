@@ -125,11 +125,13 @@ export default function Home() {
           </div>
           <Image
             className="hero-image"
-            src="/assets/usvc-hero.png"
+            src="/assets/usvc-hero.webp"
             alt="A secure navy document folder holding a vital certificate beside a laptop showing an application form"
             width={1024}
             height={768}
             priority
+            fetchPriority="high"
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
         </div>
       </section>

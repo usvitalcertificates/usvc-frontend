@@ -14,7 +14,7 @@ export const organizationLd = {
   "@type": "Organization",
   name: "US Vital Certificates",
   url: SITE_URL,
-  logo: `${SITE_URL}/assets/usvc-logo.png`,
+  logo: `${SITE_URL}/assets/usvc-logo.webp`,
   contactPoint: {
     "@type": "ContactPoint",
     email: "support@usvitalcertificates.org",

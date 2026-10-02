@@ -92,7 +92,7 @@ function AuthForm() {
       <div className="staff-auth-card">
         <div className="staff-auth-brandmark">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/usvc-logo-light.png" alt="USVC" width={44} height={44} />
+          <img src="/assets/usvc-logo-light.webp" alt="USVC" width={44} height={44} />
           <span>
             <strong>USVC Flow</strong>
             <span>Fulfillment Center</span>
