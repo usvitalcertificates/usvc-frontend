@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { Inter } from "next/font/google";
 
 import "./globals.css";
-import "./staff.css";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 import { Analytics } from "./analytics";
@@ -13,16 +11,6 @@ import { SITE_URL } from "@/lib/seo";
 import { organizationLd, SeoJsonLd } from "./seo-json-ld";
 
 const GTM_ID = "GTM-KC8LVCXR";
-
-/**
- * Modern sans for the staff portal only. The variable is referenced solely by
- * staff.css selectors, so public pages keep Times New Roman.
- */
-const flowFont = Inter({
-  subsets: ["latin"],
-  variable: "--font-flow",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -47,7 +35,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const staffArea = (await headers()).get("x-staff-area") === "1";
 
   return (
-    <html lang="en" className={flowFont.variable}>
+    <html lang="en">
       {analyticsEnabled ? (
         <head>
           <script
