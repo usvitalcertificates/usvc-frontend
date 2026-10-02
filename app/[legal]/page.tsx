@@ -10,8 +10,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { legal } = await params;
   const doc = LEGAL_DOCUMENTS[legal];
-  const title = `${doc?.title ?? "Legal"} | USVC Vital Certificates`;
-  const description = doc?.description ?? "USVC legal information.";
+  const title = doc ? `${doc.title} for USVC Orders` : "Legal Information for USVC Orders";
+  const description = doc?.description ?? "USVC legal information and policies for orders.";
   return {
     title,
     description,
@@ -22,6 +22,7 @@ export async function generateMetadata({
       url: `https://usvitalcertificates.org/${legal}`,
       type: "website",
     },
+    twitter: { card: "summary_large_image" },
   };
 }
 

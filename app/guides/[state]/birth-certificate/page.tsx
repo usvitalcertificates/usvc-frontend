@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SeoJsonLd } from "@/app/seo-json-ld";
 import { PageHeader } from "@/app/usvc-ui";
-import { BIRTH_GUIDE_SOURCES, SITE_URL } from "@/lib/seo";
+import { assertSeoLength, BIRTH_GUIDE_SOURCES, SITE_URL } from "@/lib/seo";
 
 const CHECKED = "September 30, 2026";
 
@@ -15,16 +15,21 @@ export async function generateMetadata({
   const { state } = await params;
   const guide = BIRTH_GUIDE_SOURCES[state];
   if (!guide) return {};
-  const title = `How to Get a ${guide.state} Birth Certificate`;
+  const title = assertSeoLength("title", `How to Get a ${guide.state} Birth Certificate`);
+  const description = assertSeoLength(
+    "description",
+    `Official guidance plus USVC help for a ${guide.state} birth certificate request. Eligibility, fees, steps.`,
+  );
   return {
     title,
-    description: `Official-resource guidance and USVC request help for a ${guide.state} birth certificate.`,
+    description,
     alternates: { canonical: `${SITE_URL}/guides/${state}/birth-certificate` },
     openGraph: {
       title,
-      description: `Official-resource guidance for requesting a ${guide.state} birth certificate.`,
+      description,
       type: "article",
     },
+    twitter: { card: "summary_large_image" },
   };
 }
 

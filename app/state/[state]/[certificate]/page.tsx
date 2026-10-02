@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { assertSeoLength } from "@/lib/seo";
 import { OrderForm } from "./order-form";
 import { PageHeader } from "../../../usvc-ui";
 
@@ -21,8 +22,16 @@ export async function generateMetadata({
   params: Promise<{ state: string; certificate: string }>;
 }) {
   const { state, certificate } = await params;
+  const title = assertSeoLength(
+    "title",
+    `${titleCase(state)} ${labels[certificate] ?? "Vital"} Certificate Application`,
+  );
   return {
-    title: `${titleCase(state)} ${labels[certificate] ?? "Vital"} Certificate Application | USVC`,
+    title,
+    description: assertSeoLength(
+      "description",
+      `Start a guided ${titleCase(state)} ${(labels[certificate] ?? "vital").toLowerCase()} certificate request with USVC review.`,
+    ),
     robots: { index: false, follow: true },
     alternates: {
       canonical: `https://usvitalcertificates.org/state/${state}/order/${certificate}`,
