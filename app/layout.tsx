@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { Inter } from "next/font/google";
 
 import "./globals.css";
 import { SiteFooter } from "./site-footer";
@@ -11,6 +12,18 @@ import { SITE_URL } from "@/lib/seo";
 import { organizationLd, SeoJsonLd } from "./seo-json-ld";
 
 const GTM_ID = "GTM-KC8LVCXR";
+
+/**
+ * Inter is staff-only in practice (referenced solely by staff.css), but the
+ * variable must live on <html> so it scopes the whole staff tree including
+ * StaffShell chrome. Font files download only when used, so public pages
+ * pay nothing for this.
+ */
+const flowFont = Inter({
+  subsets: ["latin"],
+  variable: "--font-flow",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -35,7 +48,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const staffArea = (await headers()).get("x-staff-area") === "1";
 
   return (
-    <html lang="en">
+    <html lang="en" className={flowFont.variable}>
       {analyticsEnabled ? (
         <head>
           <script
