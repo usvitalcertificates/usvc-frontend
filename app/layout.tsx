@@ -28,14 +28,14 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "USVC — Trusted Help for US Vital Certificates", template: "%s | USVC" },
   description:
-    "USVC helps Americans apply for birth, death, marriage, and divorce certificates with clear instructions, secure handling, and order tracking. Independent service, not a government agency.",
+    "Guided help for US birth, death, marriage, and divorce certificates. Clear steps, secure handling, and order tracking.",
   alternates: { canonical: SITE_URL },
   openGraph: {
     type: "website",
     url: SITE_URL,
     title: "USVC — Trusted Help for US Vital Certificates",
     description:
-      "Guided help for US vital certificate requests. Independent service, not a government agency.",
+      "Guided help for US birth, death, marriage, and divorce certificates. Clear steps, secure handling, and order tracking.",
   },
   twitter: { card: "summary_large_image" },
 };

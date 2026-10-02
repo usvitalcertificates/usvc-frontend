@@ -1,5 +1,24 @@
 export const SITE_URL = "https://usvitalcertificates.org";
 
+/**
+ * Boss rule: keep rendered `<title>` and `meta[name=description]` / `og:*`
+ * strictly between 25–150 characters so SERP + social + AI citations
+ * never truncate (`...`) and thin pages never waste the slot.
+ */
+export const SEO_TITLE_MIN = 25;
+export const SEO_TITLE_MAX = 150;
+export const SEO_DESCRIPTION_MIN = 25;
+export const SEO_DESCRIPTION_MAX = 150;
+
+export function assertSeoLength(kind: "title" | "description", value: string): string {
+  const min = kind === "title" ? SEO_TITLE_MIN : SEO_DESCRIPTION_MIN;
+  const max = kind === "title" ? SEO_TITLE_MAX : SEO_DESCRIPTION_MAX;
+  if (value.length < min || value.length > max) {
+    throw new Error(`SEO ${kind} must be ${min}-${max} chars, got ${value.length}: ${value}`);
+  }
+  return value;
+}
+
 export const BIRTH_GUIDE_SOURCES: Record<string, { state: string; url: string }> = {
   california: {
     state: "California",

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { assertSeoLength } from "@/lib/seo";
 import { PageHeader } from "../../usvc-ui";
 
 const STATES: Array<readonly [string, string]> = [
@@ -110,8 +111,14 @@ export async function generateMetadata({
   const { state } = await params;
   const found = STATES.find(([name]) => slugify(name) === state);
   const name = found ? found[0] : state;
-  const title = `${name} Vital Records | Birth, Death, Marriage & Divorce Certificates | USVC`;
-  const description = `How to request ${name} birth, death, marriage, and divorce certificate copies: eligibility, information needed, fees, and processing options, with guided help from USVC, an independent document assistance service.`;
+  const title = assertSeoLength(
+    "title",
+    `${name} Vital Records: birth, death, marriage, divorce help`,
+  );
+  const description = assertSeoLength(
+    "description",
+    `${name} birth, death, marriage, divorce guide: eligibility, fees, and how to request with USVC help.`,
+  );
   return {
     title,
     description,
@@ -122,6 +129,7 @@ export async function generateMetadata({
       url: `https://usvitalcertificates.org/state/${state}`,
       type: "website",
     },
+    twitter: { card: "summary_large_image" },
   };
 }
 
