@@ -1,17 +1,9 @@
-import { Inter } from "next/font/google";
-
 import "../staff.css";
 
 /**
- * Staff-only chrome: Inter + staff.css load solely for /staff/* routes,
- * keeping public pages on a single stylesheet (Times stack).
+ * Staff routes load staff.css only. The Inter variable (--font-flow) lives on
+ * <html> in the root layout so it scopes the whole staff tree.
  */
-const flowFont = Inter({
-  subsets: ["latin"],
-  variable: "--font-flow",
-  display: "swap",
-});
-
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
-  return <div className={flowFont.variable}>{children}</div>;
+  return <>{children}</>;
 }
