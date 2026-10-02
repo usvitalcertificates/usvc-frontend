@@ -29,9 +29,18 @@ const certificates = [
 ] as const;
 
 export const metadata = {
-  title: "Vital Certificate Types",
+  title: "Vital Certificate Types Explained",
   description:
-    "Learn how USVC helps with birth, death, marriage, and divorce certificate requests.",
+    "Learn how USVC helps with birth, death, marriage, and divorce certificate requests. Guided, secure, tracked.",
+  alternates: { canonical: "https://usvitalcertificates.org/certificates" },
+  openGraph: {
+    title: "Vital Certificate Types Explained",
+    description:
+      "Birth, death, marriage, and divorce certificate help: guided requests, secure handling, and tracking with USVC.",
+    url: "https://usvitalcertificates.org/certificates",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function Certificates() {

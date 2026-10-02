@@ -5,17 +5,18 @@ import { FaqAccordion } from "./faq-accordion";
 import { FAQ_ITEMS, faqAnswerToPlainText } from "./faq-data";
 
 export const metadata: Metadata = {
-  title: "Frequently Asked Questions | USVC Vital Certificates",
+  title: "Frequently Asked Questions",
   description:
-    "Answers about USVC fees, processing times, eligibility, shipping, refunds, and how our independent vital certificate assistance service works.",
+    "Answers about USVC fees, processing times, eligibility, shipping, refunds, and how our independent service works.",
   alternates: { canonical: "https://usvitalcertificates.org/faq" },
   openGraph: {
-    title: "Frequently Asked Questions | USVC Vital Certificates",
+    title: "Frequently Asked Questions",
     description:
-      "Answers about USVC fees, processing times, eligibility, shipping, refunds, and how our independent vital certificate assistance service works.",
+      "USVC fees, timelines, eligibility, shipping, and refunds: clear answers about our certificate help.",
     url: "https://usvitalcertificates.org/faq",
     type: "website",
   },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function FaqPage() {

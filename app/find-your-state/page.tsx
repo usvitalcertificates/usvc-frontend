@@ -2,9 +2,18 @@ import { StateSelector } from "../state-selector";
 import { PageHeader } from "../usvc-ui";
 
 export const metadata = {
-  title: "Find Your State",
+  title: "Find Your State to Start Request",
   description:
-    "Choose the state where the vital record was created to begin a USVC certificate request.",
+    "Choose the state where your vital record was issued to start a guided USVC certificate request.",
+  alternates: { canonical: "https://usvitalcertificates.org/find-your-state" },
+  openGraph: {
+    title: "Find Your State to Start Request",
+    description:
+      "Select your state to see eligibility, fees, and start a guided vital certificate request with USVC.",
+    url: "https://usvitalcertificates.org/find-your-state",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function FindState() {

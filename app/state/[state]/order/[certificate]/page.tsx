@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { assertSeoLength } from "@/lib/seo";
 import Page from "../../[certificate]/page";
 
 export async function generateMetadata({
@@ -14,12 +15,20 @@ export async function generateMetadata({
   const type = certificate
     .replace("-certificate", "")
     .replace(/^./, (letter) => letter.toUpperCase());
+  const title = assertSeoLength("title", `${name} ${type} Certificate Application`);
+  const description = assertSeoLength(
+    "description",
+    `Start a guided ${name} ${type.toLowerCase()} certificate request with USVC review and tracking.`,
+  );
+  const url = `https://usvitalcertificates.org/state/${state}/order/${certificate}`;
   return {
-    title: `${name} ${type} Certificate Application`,
-    description: `Start a guided ${name} ${type.toLowerCase()} certificate request with USVC.`,
+    title,
+    description,
     alternates: {
-      canonical: `https://usvitalcertificates.org/state/${state}/order/${certificate}`,
+      canonical: url,
     },
+    openGraph: { title, description, url, type: "website" },
+    twitter: { card: "summary_large_image" },
   };
 }
 
