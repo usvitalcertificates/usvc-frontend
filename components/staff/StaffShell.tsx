@@ -137,7 +137,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
       <aside className="staff-sidebar" aria-label="Fulfillment navigation">
         <div className="staff-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/assets/usvc-logo-light.png" alt="USVC" width={36} height={36} />
+          <img src="/assets/usvc-logo-light.webp" alt="USVC" width={36} height={36} />
           <div>
             <span className="staff-brand-name">USVC</span>
             <span className="staff-brand-sub">Fulfillment Center</span>

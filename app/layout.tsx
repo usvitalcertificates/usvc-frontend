@@ -3,7 +3,6 @@ import { headers } from "next/headers";
 import { Inter } from "next/font/google";
 
 import "./globals.css";
-import "./staff.css";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 import { Analytics } from "./analytics";
@@ -15,8 +14,10 @@ import { organizationLd, SeoJsonLd } from "./seo-json-ld";
 const GTM_ID = "GTM-KC8LVCXR";
 
 /**
- * Modern sans for the staff portal only. The variable is referenced solely by
- * staff.css selectors, so public pages keep Times New Roman.
+ * Inter is staff-only in practice (referenced solely by staff.css), but the
+ * variable must live on <html> so it scopes the whole staff tree including
+ * StaffShell chrome. Font files download only when used, so public pages
+ * pay nothing for this.
  */
 const flowFont = Inter({
   subsets: ["latin"],
