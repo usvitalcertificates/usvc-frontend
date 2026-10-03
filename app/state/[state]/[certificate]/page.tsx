@@ -53,7 +53,7 @@ export default async function CertificatePage({
       <PageHeader
         eyebrow={`${stateName} · ${type} Certificate`}
         title={`${stateName} ${type} Certificate Application`}
-        subtitle="Complete this application in one page. Review your order summary near the end, then continue to secure payment."
+        subtitle="Complete this application in one page, then submit payment."
       />
       <section className="application-page">
         <div className="application-container">

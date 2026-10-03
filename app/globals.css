@@ -1125,6 +1125,8 @@ label.application-field,
   border-top: 1px solid #d9d8de;
 }
 .verify-payment .payment-action {
+  display: flex;
+  justify-content: flex-end;
   margin-top: 20px;
 }
 .verify-list a {

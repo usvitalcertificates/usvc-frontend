@@ -51,6 +51,15 @@ export interface CreateOrderPayload {
   processingAuthorization: { accepted: true; text: string; acceptedAt: string };
   signature: string;
   paymentCard: { number: string; expiry: string; securityCode: string };
+  /** Idempotency key per form fill: retries update the same order instead
+   *  of creating a duplicate. New key per fill (cleared with the draft). */
+  submissionKey?: string;
+  /** Browser-minted single-use Stripe token (tok_...) for the card, via
+   *  Stripe's publishable-key token endpoint (no Stripe.js dependency — its
+   *  types only expose Element-based flows). Needs the tokenization surface
+   *  enabled in the Stripe dashboard; absent that (or on any mint failure)
+   *  the field is omitted and the backend falls back to the stored card. */
+  stripeCardToken?: string;
   analytics?: {
     clientId?: string;
     sessionId?: string;
@@ -79,22 +88,33 @@ async function post<T>(path: string, payload: unknown): Promise<T> {
     const error = new Error(body.message ?? "Request failed") as Error & {
       errors?: Record<string, string>;
       status?: number;
+      orderId?: string;
     };
     error.errors = body.errors;
     error.status = r.status;
+    error.orderId = body.orderId;
     throw error;
   }
   return body as T;
 }
 
-export async function createOrder(payload: CreateOrderPayload) {
-  return post<{ id: string; publicNumber: string; amountCents: number; openAiEventId: string }>(
-    "/orders",
-    payload,
-  );
+export interface CreateOrderResult {
+  id: string;
+  publicNumber: string;
+  amountCents: number;
+  openAiEventId: string;
+  /** Synchronous service-fee charge result. Always present: paid orders
+   *  route to confirmation, anything else stays on the form. */
+  paid?: boolean;
+  paymentFailureCode?: string;
+  paymentFailureMessage?: string;
 }
 
-export async function verifyOrderBeforePayment(payload: CreateOrderPayload) {
+export async function createOrder(payload: CreateOrderPayload) {
+  return post<CreateOrderResult>("/orders", payload);
+}
+
+export async function verifyOrderBeforePayment(payload: Omit<CreateOrderPayload, "paymentCard">) {
   return post<{ ok: boolean; amountCents: number }>("/orders/verify-before-payment", payload);
 }
 

@@ -261,11 +261,13 @@ export default function Contact() {
           <div className="contact-address-block">
             <h2>Disclaimer</h2>
             <p>
-              This site is available for use by the general public and legal profession to obtain
-              government approved and official certificates issued by the government agency. We act
-              as agents for expediting vital certificate applications. We are not affiliated with
-              any government agency. Vital certificates and forms may be ordered from the relevant
-              government agency for free or a lesser cost.
+              This site is available for use by the general public and legal profession to request
+              official certificates issued by government agencies. USVC provides expediting
+              assistance — guided ordering, application review, and order tracking — as an
+              independent service. We are not a government agency and are not affiliated with or
+              endorsed by any federal or state office. Vital certificates and forms may be ordered
+              directly from the relevant government agency, potentially for free or at a lesser
+              cost.
             </p>
             <div className="contact-address-details">
               <p>usvitalcertificates.org</p>
