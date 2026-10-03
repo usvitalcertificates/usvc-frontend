@@ -1129,12 +1129,6 @@ label.application-field,
   justify-content: flex-end;
   margin-top: 20px;
 }
-.verify-payment .payment-action .button {
-  width: 100%;
-  max-width: 560px;
-  min-height: 40px;
-  padding: 8px 24px;
-}
 .verify-list a {
   color: var(--navy);
   text-decoration: underline;
