@@ -87,11 +87,19 @@ async function post<T>(path: string, payload: unknown): Promise<T> {
   return body as T;
 }
 
+export interface CreateOrderResult {
+  id: string;
+  publicNumber: string;
+  amountCents: number;
+  openAiEventId: string;
+  /** Synchronous service-fee charge result. Absent on older backends (falls back to checkout). */
+  paid?: boolean;
+  paymentFailureCode?: string;
+  paymentFailureMessage?: string;
+}
+
 export async function createOrder(payload: CreateOrderPayload) {
-  return post<{ id: string; publicNumber: string; amountCents: number; openAiEventId: string }>(
-    "/orders",
-    payload,
-  );
+  return post<CreateOrderResult>("/orders", payload);
 }
 
 export async function verifyOrderBeforePayment(payload: CreateOrderPayload) {
