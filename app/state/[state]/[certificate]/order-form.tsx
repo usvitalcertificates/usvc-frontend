@@ -1050,7 +1050,9 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   }
 
   /** Charge failure: never retain PAN — clear card inputs + state (draft already
-   *  excludes card fields), pin the error to the card section for re-entry. */
+   *  excludes card fields), pin the error to the card section for re-entry.
+   *  Uses fieldErrors only (not the generic error box) so the message shows
+   *  once, in the error summary with a link that scrolls to the card. */
   function failCardPayment(message: string) {
     const form = formRef.current;
     for (const name of ["cardNumber", "cardExpiry", "cardSecurityCode"]) {
@@ -1065,7 +1067,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       return next;
     });
     setFieldErrors({ "paymentCard.number": message });
-    setError(message);
     scrollToErrorKey("paymentCard.number");
   }
 
