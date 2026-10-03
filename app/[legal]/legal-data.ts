@@ -1,5 +1,3 @@
-import { SITE_DISCLAIMER } from "@/lib/seo";
-
 export interface LegalSection {
   heading: string;
   body: string[];
@@ -15,9 +13,6 @@ export interface LegalDocument {
 
 const DOMAIN = "USVitalCertificates.org";
 const SUPPORT_EMAIL = "support@usvitalcertificates.org";
-// Legal pages carry the same standard site disclaimer as every other page
-// (the About-USVC independence text lives only in the homepage footer).
-const DISCLAIMER_FULL = SITE_DISCLAIMER;
 export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
   "privacy-policy": {
     slug: "privacy-policy",
@@ -107,7 +102,6 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
         heading: "How individuals can ask questions, ask for access or make a complaint",
         body: [`For all other inquiries, contact us at ${SUPPORT_EMAIL}.`],
       },
-      { heading: "Disclaimer", body: [DISCLAIMER_FULL] },
     ],
   },
   "terms-of-service": {
@@ -262,7 +256,6 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
           `16.7. Contact information: for questions about this Agreement, contact US Vital Certificates, Attn: Legal Department / Terms of Service, ${SUPPORT_EMAIL}.`,
         ],
       },
-      { heading: "Disclaimer", body: [DISCLAIMER_FULL] },
     ],
   },
   accessibility: {
