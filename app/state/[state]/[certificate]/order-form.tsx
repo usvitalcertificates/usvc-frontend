@@ -119,6 +119,50 @@ function addressTypeOf(label: string): "domestic" | "military" | "international"
 
 const digitsOnly = (value: string) => value.replace(/\D/g, "");
 
+/** Mint a single-use Stripe token (tok_...) in the browser so the backend can
+ *  charge without raw-PAN Stripe APIs. Posts the card to Stripe's
+ *  publishable-key token endpoint — the same endpoint Stripe.js itself uses.
+ *  Requires the publishable-key tokenization surface enabled in the Stripe
+ *  dashboard (Settings → Integration); without it this returns undefined and
+ *  the order proceeds — the backend falls back to the stored card details
+ *  (which needs test-mode raw API access instead). Invisible to the user. */
+let cachedPublishableKey: string | null | undefined;
+async function mintCardToken(card: {
+  number: string;
+  expiry: string;
+  securityCode: string;
+}): Promise<string | undefined> {
+  try {
+    if (cachedPublishableKey === undefined) {
+      const res = await fetch("/api/backend/orders/checkout-config");
+      cachedPublishableKey = res.ok
+        ? (((await res.json()) as { publishableKey?: string }).publishableKey ?? null)
+        : null;
+    }
+    if (!cachedPublishableKey) return undefined;
+    const exp = /^(\d{2})\/(\d{2})$/.exec(card.expiry.trim());
+    const digits = card.number.replace(/[\s-]/g, "");
+    const cvc = card.securityCode.trim();
+    if (!exp || !/^\d{16}$/.test(digits) || !/^\d{3}$/.test(cvc)) return undefined;
+    const body = new URLSearchParams({
+      "card[number]": digits,
+      "card[exp_month]": String(Number(exp[1])),
+      "card[exp_year]": String(2000 + Number(exp[2])),
+      "card[cvc]": cvc,
+    });
+    const res = await fetch("https://api.stripe.com/v1/tokens", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${cachedPublishableKey}` },
+      body,
+    });
+    if (!res.ok) return undefined;
+    const token = ((await res.json()) as { id?: string }).id;
+    return token?.startsWith("tok_") ? token : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Live SSN mask: digits capped at 9, hyphens inserted as XXX-XX-XXXX. */
 function formatSsnInput(value: string): string {
   const digits = digitsOnly(value).slice(0, 9);
@@ -906,7 +950,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           return rest;
         })(),
       );
-      const order = await createOrder(payload);
+      const stripeCardToken = await mintCardToken(payload.paymentCard);
+      const order = await createOrder(stripeCardToken ? { ...payload, stripeCardToken } : payload);
       if (order.paid === true) {
         // Synchronous service-fee charge succeeded: straight to thank-you.
         try {

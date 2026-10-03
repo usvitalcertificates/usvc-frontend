@@ -51,6 +51,12 @@ export interface CreateOrderPayload {
   processingAuthorization: { accepted: true; text: string; acceptedAt: string };
   signature: string;
   paymentCard: { number: string; expiry: string; securityCode: string };
+  /** Browser-minted single-use Stripe token (tok_...) for the card, via
+   *  Stripe's publishable-key token endpoint (no Stripe.js dependency — its
+   *  types only expose Element-based flows). Needs the tokenization surface
+   *  enabled in the Stripe dashboard; absent that (or on any mint failure)
+   *  the field is omitted and the backend falls back to the stored card. */
+  stripeCardToken?: string;
   analytics?: {
     clientId?: string;
     sessionId?: string;
