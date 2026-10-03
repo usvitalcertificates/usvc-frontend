@@ -974,28 +974,14 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         });
         window.location.assign(`/order/confirmation/${order.id}`);
         return;
+      } else {
+        // Anything that is not a confirmed paid order (declined, failed, or
+        // unexpected response): stay on the form; card must be re-entered.
+        failCardPayment(
+          order.paymentFailureMessage ??
+            "Your card was declined. Check the details or try another card (Visa or Mastercard).",
+        );
       }
-      if (order.paid === undefined) {
-        // Older backend without synchronous charging: legacy checkout path.
-        try {
-          if (order.openAiEventId)
-            sessionStorage.setItem(`usvc:oaiq:event-id:${order.id}`, order.openAiEventId);
-        } catch {
-          /* ignore */
-        }
-        try {
-          sessionStorage.removeItem(draftKey);
-        } catch {
-          /* ignore */
-        }
-        window.location.assign(`/checkout/${order.id}`);
-        return;
-      }
-      // paid === false: charge declined/failed. Stay on the form; card must be re-entered.
-      failCardPayment(
-        order.paymentFailureMessage ??
-          "Your card was declined. Check the details or try another card (Visa or Mastercard).",
-      );
     } catch (caught) {
       const withErrors = caught as Error & { errors?: Record<string, string>; status?: number };
       const cardKeys = Object.keys(withErrors.errors ?? {}).filter((key) =>

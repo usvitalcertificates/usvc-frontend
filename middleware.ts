@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const FLOW_PREFIX = "flow.";
 const STAFF_PATHS = ["/auth", "/staff", "/api"];
-const PUBLIC_FUNNEL = ["/checkout", "/track-order", "/order", "/state", "/contact", "/faq"];
+const PUBLIC_FUNNEL = ["/track-order", "/order", "/state", "/contact", "/faq"];
 
 function isFlowHost(host: string): boolean {
   const name = host.split(":")[0].toLowerCase();

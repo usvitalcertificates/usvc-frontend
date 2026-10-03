@@ -98,7 +98,8 @@ export interface CreateOrderResult {
   publicNumber: string;
   amountCents: number;
   openAiEventId: string;
-  /** Synchronous service-fee charge result. Absent on older backends (falls back to checkout). */
+  /** Synchronous service-fee charge result. Always present: paid orders
+   *  route to confirmation, anything else stays on the form. */
   paid?: boolean;
   paymentFailureCode?: string;
   paymentFailureMessage?: string;
