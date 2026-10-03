@@ -91,14 +91,15 @@ function ConfirmationBody({ orderId }: { orderId: string }) {
           ) : (
             <>
               <h1>Thank you for your order</h1>
-              <p>
-                Your payment is being verified. We’ll email your order number and tracking link when
-                verification is complete.
-              </p>
-              <p className="notice">Your payment is being verified.</p>
-              <Link className="button" href="/track-order">
-                Track an order
-              </Link>
+              <p>Your payment didn&apos;t complete — return to the form to try again.</p>
+              <div className="button-row">
+                <Link className="button button-primary" href="/find-your-state">
+                  Start a new request
+                </Link>
+                <Link className="button button-secondary" href="/track-order">
+                  Track an order
+                </Link>
+              </div>
               <p>Reference: {orderId}</p>
             </>
           )}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
 import { submitContactMessage } from "../../lib/api";
+import { SITE_DISCLAIMER } from "@/lib/seo";
 import { PageHeader } from "../usvc-ui";
 import { trackAnalytics } from "../analytics";
 
@@ -259,16 +260,7 @@ export default function Contact() {
             )}
           </div>
           <div className="contact-address-block">
-            <h2>Disclaimer</h2>
-            <p>
-              This site is available for use by the general public and legal profession to request
-              official certificates issued by government agencies. USVC provides expediting
-              assistance — guided ordering, application review, and order tracking — as an
-              independent service. We are not a government agency and are not affiliated with or
-              endorsed by any federal or state office. Vital certificates and forms may be ordered
-              directly from the relevant government agency, potentially for free or at a lesser
-              cost.
-            </p>
+            <p className="site-disclaimer">{SITE_DISCLAIMER}</p>
             <div className="contact-address-details">
               <p>usvitalcertificates.org</p>
               <p>US VITAL CERTIFICATES, LLC</p>
