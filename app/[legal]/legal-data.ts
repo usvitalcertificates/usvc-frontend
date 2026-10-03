@@ -1,3 +1,5 @@
+import { SITE_DISCLAIMER } from "@/lib/seo";
+
 export interface LegalSection {
   heading: string;
   body: string[];
@@ -13,8 +15,9 @@ export interface LegalDocument {
 
 const DOMAIN = "USVitalCertificates.org";
 const SUPPORT_EMAIL = "support@usvitalcertificates.org";
-const DISCLAIMER_FULL =
-  "USVC is an independent service that assists individuals with requesting vital records from government agencies. We are not a government agency and are not affiliated with or endorsed by any federal or state office. Official records may be available directly from the issuing agency, potentially at a lower cost. Our fees cover online ordering, guided assistance, application review, and related processing support.";
+// Legal pages carry the same standard site disclaimer as every other page
+// (the About-USVC independence text lives only in the homepage footer).
+const DISCLAIMER_FULL = SITE_DISCLAIMER;
 export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
   "privacy-policy": {
     slug: "privacy-policy",
