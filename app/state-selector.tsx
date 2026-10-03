@@ -4,6 +4,7 @@ import { ChevronRight, Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { trackAnalytics } from "./analytics";
+import { isStateUnsupported } from "@/lib/state-availability";
 
 const states = [
   ["Alabama", "AL"],
@@ -102,17 +103,30 @@ export function StateSelector({ showHeading = true }: { showHeading?: boolean })
       </div>
       {results.length ? (
         <ul className="state-grid">
-          {results.map(([name, abbr]) => (
-            <li key={name}>
-              <Link
-                href={`/state/${slugify(name)}`}
-                onClick={() => trackAnalytics("select_state", { state_code: abbr })}
-              >
-                <span>{name}</span>
-                <ChevronRight aria-hidden="true" />
-              </Link>
-            </li>
-          ))}
+          {results.map(([name, abbr]) => {
+            const slug = slugify(name);
+            if (isStateUnsupported(slug)) {
+              return (
+                <li key={name}>
+                  <button type="button" disabled aria-disabled="true" className="state-disabled">
+                    <span>{name}</span>
+                    <em>Not available yet</em>
+                  </button>
+                </li>
+              );
+            }
+            return (
+              <li key={name}>
+                <Link
+                  href={`/state/${slug}`}
+                  onClick={() => trackAnalytics("select_state", { state_code: abbr })}
+                >
+                  <span>{name}</span>
+                  <ChevronRight aria-hidden="true" />
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       ) : (
         <p className="no-states">

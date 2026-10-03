@@ -313,7 +313,7 @@ type SectionKey =
  *  section is merged into the subject section (marriage "Spouse 2"),
  *  family errors scroll to the subject section instead. */
 function sectionForError(key: string, familyVisible: boolean): SectionKey {
-  if (key === "county" || key === "reasonOther") return "certificate";
+  if (key === "county" || key === "reasonOther" || key === "state") return "certificate";
   if (key === "requestorSsn" || key.startsWith("applicant.")) return "requestor";
   if (key.startsWith("subject.")) return "subject";
   if (key.startsWith("family.")) return familyVisible ? "family" : "subject";

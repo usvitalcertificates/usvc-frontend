@@ -76,7 +76,10 @@ test("builds a direct Google Ads conversion only for a valid paid order", () => 
 });
 
 test("SEO inventory contains canonical application and pilot guide coverage", () => {
-  assert.equal(INDEXABLE_STATES.length, 52);
+  // 52 directory states minus Vermont + Wyoming (listed but not orderable).
+  assert.equal(INDEXABLE_STATES.length, 50);
+  assert.ok(!INDEXABLE_STATES.includes("vermont"));
+  assert.ok(!INDEXABLE_STATES.includes("wyoming"));
   assert.deepEqual(CERTIFICATE_SLUGS, [
     "birth-certificate",
     "death-certificate",

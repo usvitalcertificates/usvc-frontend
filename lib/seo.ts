@@ -102,12 +102,12 @@ export const INDEXABLE_STATES = [
   "tennessee",
   "texas",
   "utah",
-  "vermont",
+  // Vermont + Wyoming listed in the directory but not accepting orders:
+  // excluded from the sitemap and detail pages carry noindex.
   "virginia",
   "washington",
   "west-virginia",
   "wisconsin",
-  "wyoming",
 ] as const;
 
 export const CERTIFICATE_SLUGS = [
