@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { SITE_DISCLAIMER } from "@/lib/seo";
+
 const columns = [
   {
     title: "Services",
@@ -48,14 +50,7 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="footer-about">
-          <h2>About USVC</h2>
-          <p>
-            USVC is an independent service that assists individuals with requesting vital records
-            from government agencies. We are not a government agency and are not affiliated with or
-            endorsed by any federal or state office. Official records may be available directly from
-            the issuing agency, potentially at a lower cost. Our fees cover online ordering, guided
-            assistance, application review, and related processing support.
-          </p>
+          <p className="site-disclaimer">{SITE_DISCLAIMER}</p>
         </div>
         <div className="footer-copyright">
           © {new Date().getFullYear()} US Vital Certificates via VitalChek processing.

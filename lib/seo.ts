@@ -1,5 +1,10 @@
 export const SITE_URL = "https://usvitalcertificates.org";
 
+/** Standard site disclaimer: one consistent voice on every public page
+ *  except the homepage (which carries no disclaimer box). */
+export const SITE_DISCLAIMER =
+  "Our online service provides convenient access to official vital records for both the public and legal professionals. While you may obtain these records directly from government agencies, our platform offers a faster, more convenient alternative, eliminating the need for in-person visits. Our fees cover secure online ordering, expert assistance, and a thorough review to ensure compliance with all regulations.";
+
 /**
  * Boss rule: keep rendered `<title>` and `meta[name=description]` / `og:*`
  * strictly between 25–150 characters so SERP + social + AI citations
