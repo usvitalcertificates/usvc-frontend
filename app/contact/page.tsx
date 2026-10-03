@@ -10,11 +10,7 @@ import { trackAnalytics } from "../analytics";
 const sensitiveContentPattern = /\b\d{3}[- ]?\d{2}[- ]?\d{4}\b|\b(?:\d[ -]?){12,18}\d\b/;
 
 const CONTACT_REASONS = [
-  "Order Status Inquiry",
   "Correction to My Order Information",
-  "Issue with Document Delivery",
-  "Billing Question",
-  "Cancel Order",
   "Other (Please specify in message below)",
 ] as const;
 
@@ -260,6 +256,7 @@ export default function Contact() {
             )}
           </div>
           <div className="contact-address-block">
+            <h2 className="site-disclaimer-heading">Disclaimer:</h2>
             <p className="site-disclaimer">{SITE_DISCLAIMER}</p>
             <div className="contact-address-details">
               <p>usvitalcertificates.org</p>

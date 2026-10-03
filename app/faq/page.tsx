@@ -41,6 +41,7 @@ export default function FaqPage() {
       <section className="page-section">
         <div className="container">
           <FaqAccordion items={FAQ_ITEMS} />
+          <h2 className="site-disclaimer-heading">Disclaimer:</h2>
           <p className="site-disclaimer">{SITE_DISCLAIMER}</p>
           <div className="faq-support">
             <h2>Still have a question?</h2>
