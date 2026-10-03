@@ -3,7 +3,6 @@ import Link from "next/link";
 import { PageHeader } from "../usvc-ui";
 import { FaqAccordion } from "./faq-accordion";
 import { FAQ_ITEMS, faqAnswerToPlainText } from "./faq-data";
-import { SITE_DISCLAIMER } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Frequently Asked Questions",
@@ -41,7 +40,6 @@ export default function FaqPage() {
       <section className="page-section">
         <div className="container">
           <FaqAccordion items={FAQ_ITEMS} />
-          <p className="site-disclaimer">{SITE_DISCLAIMER}</p>
           <div className="faq-support">
             <h2>Still have a question?</h2>
             <p>
