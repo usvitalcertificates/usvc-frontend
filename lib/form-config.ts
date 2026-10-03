@@ -190,7 +190,7 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
     },
     person: [
       { key: "firstName", label: "First Name of Subject", required: true },
-      { key: "middleName", label: "Middle Name of Subject", required: true },
+      { key: "middleName", label: "Middle Name of Subject" },
       { key: "lastName", label: "Current Last Name of Subject", required: true },
       { key: "suffix", label: "Suffix", type: "select", options: SUFFIX_OPTIONS },
       {
@@ -265,7 +265,7 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
     },
     person: [
       { key: "firstName", label: "First Name of Subject", required: true },
-      { key: "middleName", label: "Middle Name of Subject", required: true },
+      { key: "middleName", label: "Middle Name of Subject" },
       { key: "lastName", label: "Current Last Name of Subject", required: true },
       { key: "suffix", label: "Suffix", type: "select", options: SUFFIX_OPTIONS },
       {
