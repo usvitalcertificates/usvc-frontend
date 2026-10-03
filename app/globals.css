@@ -591,7 +591,7 @@ h3 {
   padding: 24px;
   border-radius: 6px;
   background: #f4f6f9;
-  color: #5f5f5f;
+  color: #767676;
   font-size: 16px;
   line-height: 1.8;
 }
@@ -599,14 +599,6 @@ h3 {
   margin-top: 20px;
   padding-top: 20px;
   border-top: 1px solid #d9d8de;
-}
-.contact-address-block h2 {
-  margin-bottom: 16px;
-  color: #3c3b3b;
-  font-size: 24px;
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 .contact-address-block p {
   margin: 0;
@@ -626,7 +618,7 @@ h3 {
   padding: 32px;
   border-radius: 6px;
   background: #f4f6f9;
-  color: #5a5a5a;
+  color: #767676;
   font-size: 17px;
   line-height: 1.65;
 }
@@ -1469,14 +1461,14 @@ small.application-error {
 }
 .faq-answer-body p {
   margin: 0;
-  color: #000;
+  color: #767676;
   font-size: 17px;
   line-height: 1.65;
 }
 .faq-answer-body ol {
   margin: 0;
   padding-left: 24px;
-  color: #000;
+  color: #767676;
   font-size: 17px;
   line-height: 1.65;
 }
@@ -1493,22 +1485,6 @@ small.application-error {
   color: var(--red);
   opacity: 0.8;
 }
-.faq-disclaimer {
-  margin-top: 48px;
-  padding: 24px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: #fff;
-}
-.faq-disclaimer h2 {
-  font-size: 22px;
-}
-.faq-disclaimer p {
-  margin: 12px 0 0;
-  color: #000;
-  font-size: 17px;
-  line-height: 1.65;
-}
 .faq-support {
   margin-top: 32px;
   padding: 24px;
@@ -1516,6 +1492,9 @@ small.application-error {
   border-radius: 6px;
   background: var(--muted);
   text-align: center;
+}
+.faq-support p {
+  color: #767676;
 }
 .faq-support h2 {
   font-size: 22px;
@@ -1722,6 +1701,15 @@ small.application-error {
   margin-top: 8px;
   padding-left: 24px;
   text-indent: -16px;
+}
+/* Legal docs: quiet reading surface — small muted paragraphs, no rules. */
+.legal-body.legal-soft .legal-section p {
+  color: #767676;
+  font-size: 15px;
+  font-weight: 400;
+}
+.legal-body.legal-soft .legal-section h2 {
+  font-weight: 400;
 }
 
 .certificate-grid,
@@ -1988,16 +1976,34 @@ small.application-error {
   color: var(--red);
   text-decoration: underline;
 }
+/* Standard site disclaimer: small, muted, unboxed. One voice everywhere
+ *  except the homepage (which carries no disclaimer). #767676 keeps AA
+ *  contrast at small sizes — lighter greys fail it. */
+.site-disclaimer,
+.footer-about .site-disclaimer,
+.contact-address-block .site-disclaimer {
+  margin: 8px 0 0;
+  color: #767676;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.site-disclaimer-heading,
+.footer-about .site-disclaimer-heading,
+.contact-address-block .site-disclaimer-heading {
+  margin: 0;
+  color: #767676;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+}
 .footer-about {
   margin-top: 40px;
   padding-top: 24px;
   border-top: 1px solid var(--border);
-}
-.footer-about p {
-  max-width: 1024px;
-  margin: 8px 0 0;
-  font-size: 14px;
-  line-height: 1.65;
 }
 .footer-copyright {
   margin-top: 24px;
@@ -2178,7 +2184,6 @@ textarea {
   .button-row .button {
     width: 100%;
   }
-  .faq-disclaimer,
   .faq-support {
     padding: 20px;
   }

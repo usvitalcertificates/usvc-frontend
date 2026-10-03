@@ -35,12 +35,11 @@ export default async function Legal({ params }: { params: Promise<{ legal: strin
       <PageHeader eyebrow="Legal" title={doc.title} subtitle={doc.description} />
       <section className="page-section">
         <div className="container">
-          <div className="legal-body">
+          <div className="legal-body legal-soft">
             <p className="legal-updated">Last updated: {doc.lastUpdated}</p>
             {doc.sections.map((section) => (
               <div key={section.heading} className="legal-section">
                 <h2>{section.heading}</h2>
-                <div className="patriotic-rule" aria-hidden="true" />
                 {section.body.map((paragraph) =>
                   paragraph.startsWith("• ") ? (
                     <p key={paragraph} className="legal-bullet">
