@@ -7,6 +7,7 @@ import "react-international-phone/style.css";
 
 import { createOrder, verifyOrderBeforePayment, type Certificate } from "@/lib/api";
 import { getAnalyticsAttribution, getOpenAIAttribution, trackAnalytics } from "@/app/analytics";
+import { trackOpenAICheckoutStarted } from "@/app/openai-analytics";
 import { isCountyTemporarilyUnavailable } from "@/lib/county-availability";
 import {
   BIRTH_MIN_YEAR,
@@ -117,6 +118,50 @@ function addressTypeOf(label: string): "domestic" | "military" | "international"
 }
 
 const digitsOnly = (value: string) => value.replace(/\D/g, "");
+
+/** Mint a single-use Stripe token (tok_...) in the browser so the backend can
+ *  charge without raw-PAN Stripe APIs. Posts the card to Stripe's
+ *  publishable-key token endpoint — the same endpoint Stripe.js itself uses.
+ *  Requires the publishable-key tokenization surface enabled in the Stripe
+ *  dashboard (Settings → Integration); without it this returns undefined and
+ *  the order proceeds — the backend falls back to the stored card details
+ *  (which needs test-mode raw API access instead). Invisible to the user. */
+let cachedPublishableKey: string | null | undefined;
+async function mintCardToken(card: {
+  number: string;
+  expiry: string;
+  securityCode: string;
+}): Promise<string | undefined> {
+  try {
+    if (cachedPublishableKey === undefined) {
+      const res = await fetch("/api/backend/orders/checkout-config");
+      cachedPublishableKey = res.ok
+        ? (((await res.json()) as { publishableKey?: string }).publishableKey ?? null)
+        : null;
+    }
+    if (!cachedPublishableKey) return undefined;
+    const exp = /^(\d{2})\/(\d{2})$/.exec(card.expiry.trim());
+    const digits = card.number.replace(/[\s-]/g, "");
+    const cvc = card.securityCode.trim();
+    if (!exp || !/^\d{16}$/.test(digits) || !/^\d{3}$/.test(cvc)) return undefined;
+    const body = new URLSearchParams({
+      "card[number]": digits,
+      "card[exp_month]": String(Number(exp[1])),
+      "card[exp_year]": String(2000 + Number(exp[2])),
+      "card[cvc]": cvc,
+    });
+    const res = await fetch("https://api.stripe.com/v1/tokens", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${cachedPublishableKey}` },
+      body,
+    });
+    if (!res.ok) return undefined;
+    const token = ((await res.json()) as { id?: string }).id;
+    return token?.startsWith("tok_") ? token : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 /** Live SSN mask: digits capped at 9, hyphens inserted as XXX-XX-XXXX. */
 function formatSsnInput(value: string): string {
@@ -800,6 +845,27 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     }
     setBusy(true);
     trackAnalytics("order_started", { certificate: certificateMap[certificate], state_code: abbr });
+    const chargeCents = Math.round(total * 100);
+    const certLabel = `${readable(certificate.replace("-certificate", ""))} Certificate`;
+    trackAnalytics("begin_checkout", {
+      currency: "USD",
+      value: chargeCents / 100,
+      state_code: abbr,
+      certificate: certificateMap[certificate],
+      items: [
+        {
+          item_id: `usvc-${certificate}`,
+          item_name: certLabel,
+          quantity: copies,
+          price: chargeCents / copies / 100,
+        },
+      ],
+    });
+    trackOpenAICheckoutStarted({
+      amountCents: chargeCents,
+      certificate: certificateMap[certificate],
+      copies,
+    });
     setError("");
     setFieldErrors({});
     try {
@@ -877,30 +943,100 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         analytics: { ...getAnalyticsAttribution(), ...getOpenAIAttribution() },
         totalCents: Math.round(total * 100),
       };
-      await verifyOrderBeforePayment(payload);
-      const order = await createOrder(payload);
-      try {
-        if (order.openAiEventId)
-          sessionStorage.setItem(`usvc:oaiq:event-id:${order.id}`, order.openAiEventId);
-      } catch {
-        /* ignore */
+      await verifyOrderBeforePayment(
+        (() => {
+          // Card travels exactly once (in createOrder below) — never in verify.
+          const { paymentCard: _stripped, ...rest } = payload;
+          return rest;
+        })(),
+      );
+      const stripeCardToken = await mintCardToken(payload.paymentCard);
+      const order = await createOrder(stripeCardToken ? { ...payload, stripeCardToken } : payload);
+      if (order.paid === true) {
+        // Synchronous service-fee charge succeeded: straight to thank-you.
+        try {
+          if (order.openAiEventId)
+            sessionStorage.setItem(`usvc:oaiq:event-id:${order.id}`, order.openAiEventId);
+        } catch {
+          /* ignore */
+        }
+        try {
+          sessionStorage.removeItem(draftKey);
+        } catch {
+          /* ignore */
+        }
+        trackAnalytics("add_payment_info", {
+          currency: "USD",
+          value: order.amountCents / 100,
+          payment_type: "card",
+          state_code: abbr,
+          certificate: certificateMap[certificate],
+        });
+        window.location.assign(`/order/confirmation/${order.id}`);
+        return;
       }
-      try {
-        sessionStorage.removeItem(draftKey);
-      } catch {
-        /* ignore */
+      if (order.paid === undefined) {
+        // Older backend without synchronous charging: legacy checkout path.
+        try {
+          if (order.openAiEventId)
+            sessionStorage.setItem(`usvc:oaiq:event-id:${order.id}`, order.openAiEventId);
+        } catch {
+          /* ignore */
+        }
+        try {
+          sessionStorage.removeItem(draftKey);
+        } catch {
+          /* ignore */
+        }
+        window.location.assign(`/checkout/${order.id}`);
+        return;
       }
-      window.location.assign(`/checkout/${order.id}`);
+      // paid === false: charge declined/failed. Stay on the form; card must be re-entered.
+      failCardPayment(
+        order.paymentFailureMessage ??
+          "Your card was declined. Check the details or try another card (Visa or Mastercard).",
+      );
     } catch (caught) {
-      const withErrors = caught as Error & { errors?: Record<string, string> };
-      if (withErrors.errors) {
-        setFieldErrors(withErrors.errors);
-        scrollToFirstError(withErrors.errors);
+      const withErrors = caught as Error & { errors?: Record<string, string>; status?: number };
+      const cardKeys = Object.keys(withErrors.errors ?? {}).filter((key) =>
+        key.startsWith("paymentCard."),
+      );
+      if (withErrors.status === 402 || cardKeys.length > 0) {
+        failCardPayment(
+          withErrors.errors?.["paymentCard.number"] ??
+            (caught instanceof Error ? caught.message : "") ??
+            "Your card was declined. Check the details or try another card (Visa or Mastercard).",
+        );
+      } else {
+        if (withErrors.errors) {
+          setFieldErrors(withErrors.errors);
+          scrollToFirstError(withErrors.errors);
+        }
+        setError(caught instanceof Error ? caught.message : "Unable to submit your order.");
       }
-      setError(caught instanceof Error ? caught.message : "Unable to continue to secure payment.");
     } finally {
       setBusy(false);
     }
+  }
+
+  /** Charge failure: never retain PAN — clear card inputs + state (draft already
+   *  excludes card fields), pin the error to the card section for re-entry. */
+  function failCardPayment(message: string) {
+    const form = formRef.current;
+    for (const name of ["cardNumber", "cardExpiry", "cardSecurityCode"]) {
+      const input = form?.querySelector(`[name="${name}"]`) as HTMLInputElement | null;
+      if (input) input.value = "";
+    }
+    setValues((prev) => {
+      const next = { ...prev };
+      delete next.cardNumber;
+      delete next.cardExpiry;
+      delete next.cardSecurityCode;
+      return next;
+    });
+    setFieldErrors({ "paymentCard.number": message });
+    setError(message);
+    scrollToErrorKey("paymentCard.number");
   }
 
   const fatherStatus = values[config.familySecondStatus?.key ?? ""] ?? "";
@@ -1881,7 +2017,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             </p>
             <div className="verify-payment">
               <p>
-                Continue to the secure payment step to complete your order. Your card details are
+                Your card is charged the order total when you submit. Your card details are
                 encrypted. Your payment is processed safely through Stripe.
               </p>
               {error ? (
@@ -1891,9 +2027,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               ) : null}
               <div className="payment-action">
                 <button className="button button-success" disabled={busy || Boolean(blockedCounty)}>
-                  {busy
-                    ? "Saving your application…"
-                    : `Continue to Secure Payment — Total $${total.toFixed(2)}`}
+                  {busy ? "Processing payment…" : `Submit Form & Pay — Total $${total.toFixed(2)}`}
                 </button>
               </div>
             </div>

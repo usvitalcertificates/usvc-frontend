@@ -16,15 +16,44 @@ function formatUSD(cents: number): string {
 function ConfirmationBody({ orderId }: { orderId: string }) {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
-  const [state, setState] = useState<"verifying" | "paid" | "unverified">(
-    sessionId ? "verifying" : "unverified",
-  );
+  const [state, setState] = useState<"verifying" | "paid" | "unverified">("verifying");
   const [receipt, setReceipt] = useState<{ publicNumber: string; amountCents: number } | null>(
     null,
   );
 
   useEffect(() => {
-    if (!sessionId) return;
+    // Straight-through flow: no session_id — resolve the paid receipt by order id.
+    if (!sessionId) {
+      if (!orderId) return;
+      let cancelled = false;
+      (async () => {
+        try {
+          const res = await fetch(`${api}/orders/${orderId}/summary`);
+          const body = (await res.json()) as {
+            paid?: boolean;
+            paymentStatus?: string;
+            publicNumber?: string;
+            amountCents?: number;
+          };
+          if (cancelled) return;
+          const paid = body.paid === true || body.paymentStatus?.toLowerCase() === "paid";
+          if (res.ok && paid) {
+            setReceipt({
+              publicNumber: body.publicNumber ?? orderId,
+              amountCents: body.amountCents ?? 0,
+            });
+            setState("paid");
+          } else {
+            setState("unverified");
+          }
+        } catch {
+          if (!cancelled) setState("unverified");
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }
     let cancelled = false;
     (async () => {
       try {
