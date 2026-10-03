@@ -119,6 +119,37 @@ function addressTypeOf(label: string): "domestic" | "military" | "international"
 
 const digitsOnly = (value: string) => value.replace(/\D/g, "");
 
+/** Idempotency key per form fill: retries update the same order instead of
+ *  creating a duplicate. Persisted separately from the draft (which rebuilds
+ *  from FormData), cleared together with the draft on success. */
+function submissionKeyFor(draftKey: string): string {
+  const storageKey = `usvc:submission-key:${draftKey}`;
+  try {
+    const saved = sessionStorage.getItem(storageKey);
+    if (saved) return saved;
+  } catch {
+    /* ignore */
+  }
+  const fresh =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  try {
+    sessionStorage.setItem(storageKey, fresh);
+  } catch {
+    /* ignore */
+  }
+  return fresh;
+}
+
+function clearSubmissionKey(draftKey: string): void {
+  try {
+    sessionStorage.removeItem(`usvc:submission-key:${draftKey}`);
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Mint a single-use Stripe token (tok_...) in the browser so the backend can
  *  charge without raw-PAN Stripe APIs. Posts the card to Stripe's
  *  publishable-key token endpoint — the same endpoint Stripe.js itself uses.
@@ -942,6 +973,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         },
         analytics: { ...getAnalyticsAttribution(), ...getOpenAIAttribution() },
         totalCents: Math.round(total * 100),
+        submissionKey: submissionKeyFor(draftKey),
       };
       await verifyOrderBeforePayment(
         (() => {
@@ -962,6 +994,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         }
         try {
           sessionStorage.removeItem(draftKey);
+          clearSubmissionKey(draftKey);
         } catch {
           /* ignore */
         }
@@ -983,7 +1016,18 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         );
       }
     } catch (caught) {
-      const withErrors = caught as Error & { errors?: Record<string, string>; status?: number };
+      const withErrors = caught as Error & {
+        errors?: Record<string, string>;
+        status?: number;
+        orderId?: string;
+      };
+      // Retry of an already-paid order (or a create-race winner): resolve on
+      // the existing confirmation instead of duplicating. Draft/key are kept
+      // so an unpaid race can still be retried from the form.
+      if (withErrors.status === 409 && withErrors.orderId) {
+        window.location.assign(`/order/confirmation/${withErrors.orderId}`);
+        return;
+      }
       const cardKeys = Object.keys(withErrors.errors ?? {}).filter((key) =>
         key.startsWith("paymentCard."),
       );
