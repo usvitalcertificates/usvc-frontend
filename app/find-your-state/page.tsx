@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { StateSelector } from "../state-selector";
 import { PageHeader } from "../usvc-ui";
 
@@ -28,8 +30,9 @@ export default function FindState() {
         <div className="container">
           <StateSelector showHeading={false} />
           <p className="state-help">
-            Not sure which state to choose? Contact USVC support at support@usvitalcertificates.org
-            and we will help you decide before you start.
+            Not sure which state to choose? Select the state where the vital event — birth, death,
+            marriage, or divorce — occurred; that is where the record is held. See the{" "}
+            <Link href="/faq">FAQ</Link> for common cases.
           </p>
         </div>
       </section>
