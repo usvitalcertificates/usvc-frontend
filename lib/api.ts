@@ -102,7 +102,7 @@ export async function createOrder(payload: CreateOrderPayload) {
   return post<CreateOrderResult>("/orders", payload);
 }
 
-export async function verifyOrderBeforePayment(payload: CreateOrderPayload) {
+export async function verifyOrderBeforePayment(payload: Omit<CreateOrderPayload, "paymentCard">) {
   return post<{ ok: boolean; amountCents: number }>("/orders/verify-before-payment", payload);
 }
 

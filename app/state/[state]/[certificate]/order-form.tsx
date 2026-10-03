@@ -899,7 +899,13 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         analytics: { ...getAnalyticsAttribution(), ...getOpenAIAttribution() },
         totalCents: Math.round(total * 100),
       };
-      await verifyOrderBeforePayment(payload);
+      await verifyOrderBeforePayment(
+        (() => {
+          // Card travels exactly once (in createOrder below) — never in verify.
+          const { paymentCard: _stripped, ...rest } = payload;
+          return rest;
+        })(),
+      );
       const order = await createOrder(payload);
       if (order.paid === true) {
         // Synchronous service-fee charge succeeded: straight to thank-you.
