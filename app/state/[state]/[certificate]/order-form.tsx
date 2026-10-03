@@ -2002,10 +2002,6 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </em>
             </p>
             <div className="verify-payment">
-              <p>
-                Your card is charged the order total when you submit. Your card details are
-                encrypted. Your payment is processed safely through Stripe.
-              </p>
               {error ? (
                 <p className="application-error" role="alert">
                   {error}
@@ -2013,7 +2009,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               ) : null}
               <div className="payment-action">
                 <button className="button button-success" disabled={busy || Boolean(blockedCounty)}>
-                  {busy ? "Processing payment…" : `Submit Form & Pay — Total $${total.toFixed(2)}`}
+                  {busy ? "Submitting…" : "Submit"}
                 </button>
               </div>
             </div>

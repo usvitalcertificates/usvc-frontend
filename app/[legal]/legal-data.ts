@@ -179,7 +179,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
           "• Our service is generally rendered once your application is processed and submitted by us to the government agency.",
           "• Quoted processing and shipping times are estimates and subject to change due to external factors (government agencies, carriers) beyond our control.",
           "• You must promptly respond to requests for additional information.",
-          "5.4. Use of third-party platforms. You authorize USVC to input your information into third-party state-affiliated or government-authorized platforms, or submit via other approved channels, as necessary to fulfill the Service.",
+          "5.4. Use of third-party platforms. You authorize USVC to input your information into third-party government agency websites and portals, or submit via other approved channels, as necessary to fulfill the Service.",
         ],
       },
       {
