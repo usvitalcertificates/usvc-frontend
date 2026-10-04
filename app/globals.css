@@ -1168,6 +1168,61 @@ small.application-error {
   outline: 2px solid rgb(178 34 52 / 25%);
   outline-offset: 1px;
 }
+/* Searchable dropdown: plain text search box + dropdown listbox. The search
+ *  input inherits the standard field styles above; the list floats below. */
+.combobox-wrap {
+  position: relative;
+}
+.combobox-wrap > input[type="text"] {
+  padding-right: 40px;
+}
+.combobox-wrap::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--red);
+  border-bottom: 2px solid var(--red);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+.combobox-list {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  max-height: 240px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  border: 1px solid #dedde3;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+  list-style: none;
+}
+.combobox-list li {
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.combobox-list li[data-combobox-active] {
+  background: var(--muted);
+}
+.combobox-list li[data-combobox-disabled] {
+  color: var(--muted-text);
+  cursor: not-allowed;
+}
+.combobox-list .combobox-empty {
+  color: var(--muted-text);
+  font-size: 14px;
+  cursor: default;
+}
 /* Blocked-county alert: state-driven banner, independent of field errors. */
 .county-blocked-alert {
   display: block;
