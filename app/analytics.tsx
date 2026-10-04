@@ -1,7 +1,5 @@
 "use client";
 
-import Script from "next/script";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
@@ -13,8 +11,7 @@ import {
 
 declare global {
   interface Window {
-    dataLayer?: unknown[];
-    gtag?: (...args: unknown[]) => void;
+    dataLayer?: Array<Record<string, unknown>>;
   }
 }
 
@@ -28,14 +25,20 @@ const pendingEvents: Array<{ event: string; params: Record<string, unknown> }> =
 const pendingGoogleAdsPurchases: GoogleAdsPurchaseEvent[] = [];
 const recordedGoogleAdsPurchases = new Set<string>();
 
+/** Universal GTM contract: every event is a plain dataLayer object. Tags,
+ *  triggers, and destinations all live in the GTM dashboard — code only
+ *  declares *when* something happened and *what* data travels with it. */
 function sendEvent(event: string, params: Record<string, unknown>) {
   window.dataLayer ??= [];
-  window.gtag ??= (...args: unknown[]) => window.dataLayer?.push(args);
-  window.gtag("event", event, params);
+  window.dataLayer.push({ event, ...params });
 }
 
+/** Google Ads purchase, fired through GTM: the `Purchase` custom event (exact
+ *  casing) triggers both the GA4 Purchase tag and the Microsoft UET tag.
+ *  Payment truth and value come only from the server-verified confirmation
+ *  response. */
 function sendGoogleAdsPurchase(data: GoogleAdsPurchaseEvent) {
-  sendEvent("conversion_event_purchase_2", data);
+  sendEvent("Purchase", data);
 }
 
 function isProductionHost(): boolean {
@@ -55,9 +58,9 @@ export function trackAnalytics(event: string, params: Record<string, unknown> = 
 }
 
 /**
- * Direct Google Ads purchase goal. This is intentionally browser-side so the
- * Google tag/GTM container can attribute the paid visit; payment truth and
- * value come only from the server-verified confirmation response.
+ * Sale attribution for the GTM purchase goal. Browser-side so the GTM
+ * container (Google tag + UET) can attribute the paid visit; payment truth
+ * and value come only from the server-verified confirmation response.
  */
 export function trackGoogleAdsPurchase(publicNumber: string, amountCents: number) {
   if (typeof window === "undefined" || !isGoogleAdsProductionHost(window.location.hostname)) return;
@@ -115,20 +118,12 @@ export function getOpenAIAttribution():
   };
 }
 
-export function Analytics({
-  enabled,
-  measurementId,
-}: {
-  enabled: boolean;
-  measurementId?: string;
-}) {
-  const pathname = usePathname();
-  const validMeasurementId = /^G-[A-Z0-9]+$/.test(measurementId ?? "");
+export function Analytics({ enabled }: { enabled: boolean }) {
   const [active, setActive] = useState(false);
 
   useEffect(() => {
-    setActive(enabled && validMeasurementId && isProductionHost());
-  }, [enabled, validMeasurementId]);
+    setActive(enabled && isProductionHost());
+  }, [enabled]);
 
   useEffect(() => {
     analyticsActive = active;
@@ -136,24 +131,16 @@ export function Analytics({
     if (active) {
       for (const queued of pendingEvents.splice(0)) sendEvent(queued.event, queued.params);
       for (const purchase of pendingGoogleAdsPurchases.splice(0)) sendGoogleAdsPurchase(purchase);
-      if (!pathname.startsWith("/staff")) trackAnalytics("page_view", { page_path: pathname });
+      // No manual page_view: the GTM Google tag sends one automatically on
+      // container load — pushing our own would double-count every pageview.
     }
     return () => {
       analyticsActive = false;
       googleAdsActive = false;
     };
-  }, [active, pathname]);
+  }, [active]);
 
-  if (!active || !measurementId) return null;
-  return (
-    <>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
-        strategy="afterInteractive"
-      />
-      <Script id="usvc-ga4" strategy="afterInteractive">
-        {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}window.gtag=gtag;gtag('js',new Date());gtag('config','${measurementId}',{send_page_view:false,url_passthrough:true});`}
-      </Script>
-    </>
-  );
+  // GTM container (layout) owns all loading. This component only flips the
+  // gates that release queued events.
+  return null;
 }

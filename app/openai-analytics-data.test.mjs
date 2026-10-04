@@ -56,7 +56,7 @@ test("completed-order data contains no order or customer identifier", () => {
   assert.equal(orderCreatedData(-1), null);
 });
 
-test("builds a direct Google Ads conversion only for a valid paid order", () => {
+test("builds a GTM purchase payload only for a valid paid order", () => {
   assert.equal(isGoogleAdsProductionHost("usvitalcertificates.org"), true);
   assert.equal(isGoogleAdsProductionHost("www.usvitalcertificates.org"), true);
   assert.equal(isGoogleAdsProductionHost("flow.usvitalcertificates.org"), false);
