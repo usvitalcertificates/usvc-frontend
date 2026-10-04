@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 
@@ -480,6 +480,8 @@ function AddressFields({
   prefix,
   legend,
   draft,
+  values,
+  setValues,
   typeLabel,
   requestorFirst,
   requestorLast,
@@ -488,6 +490,8 @@ function AddressFields({
   prefix: string;
   legend: string;
   draft: Record<string, string>;
+  values: Record<string, string>;
+  setValues: Dispatch<SetStateAction<Record<string, string>>>;
   typeLabel: string;
   requestorFirst: string;
   requestorLast: string;
@@ -510,12 +514,13 @@ function AddressFields({
           <SearchableSelect
             name={`${prefix}Type`}
             required
-            defaultValue={draft[`${prefix}Type`] ?? ADDRESS_TYPE_OPTIONS[0].label}
+            value={values[`${prefix}Type`] ?? draft[`${prefix}Type`] ?? ""}
             options={ADDRESS_TYPE_OPTIONS.map((option) => ({
               value: option.label,
               label: option.label,
             }))}
             placeholder="Select…"
+            onSelect={(value) => setValues((v) => ({ ...v, [`${prefix}Type`]: value }))}
           />
         </label>
         <div className="application-field">
@@ -554,9 +559,10 @@ function AddressFields({
             <SearchableSelect
               name={`${prefix}State`}
               required
-              defaultValue={get("State")}
+              value={values[`${prefix}State`] ?? draft[`${prefix}State`] ?? ""}
               options={STATES.map((state) => ({ value: state.name, label: state.name }))}
               placeholder="Select state…"
+              onSelect={(value) => setValues((v) => ({ ...v, [`${prefix}State`]: value }))}
             />
           </label>
         ) : type === "military" ? (
@@ -565,9 +571,10 @@ function AddressFields({
             <SearchableSelect
               name={`${prefix}State`}
               required
-              defaultValue={get("State")}
+              value={values[`${prefix}State`] ?? draft[`${prefix}State`] ?? ""}
               options={APO_FPO_OPTIONS.map((option) => ({ value: option, label: option }))}
               placeholder="Select"
+              onSelect={(value) => setValues((v) => ({ ...v, [`${prefix}State`]: value }))}
             />
           </label>
         ) : (
@@ -591,12 +598,13 @@ function AddressFields({
             <SearchableSelect
               name={`${prefix}Country`}
               required
-              defaultValue={get("Country")}
+              value={values[`${prefix}Country`] ?? draft[`${prefix}Country`] ?? ""}
               options={INTERNATIONAL_COUNTRIES.map((country) => ({
                 value: country,
                 label: country,
               }))}
               placeholder="Select"
+              onSelect={(value) => setValues((v) => ({ ...v, [`${prefix}Country`]: value }))}
             />
           </label>
         ) : null}
@@ -1635,6 +1643,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             prefix="home"
             legend="Home Address"
             draft={draft}
+            values={values}
+            setValues={setValues}
             typeLabel={values.homeType ?? draft.homeType ?? ""}
             requestorFirst={requestorFirst}
             requestorLast={requestorLast}
@@ -1665,6 +1675,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             prefix="shipping"
             legend="Shipping Address"
             draft={draft}
+            values={values}
+            setValues={setValues}
             typeLabel={values.shippingType ?? draft.shippingType ?? ""}
             requestorFirst={requestorFirst}
             requestorLast={requestorLast}
@@ -1857,6 +1869,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             prefix="billing"
             legend="Billing Address"
             draft={draft}
+            values={values}
+            setValues={setValues}
             typeLabel={values.billingType ?? draft.billingType ?? ""}
             requestorFirst={requestorFirst}
             requestorLast={requestorLast}
