@@ -72,7 +72,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             />
           </noscript>
         ) : null}
-        <Analytics enabled={analyticsEnabled} measurementId={process.env.GA_MEASUREMENT_ID} />
+        <Analytics enabled={analyticsEnabled} />
         <OpenAIAnalytics
           enabled={analyticsEnabled && !staffArea}
           pixelId={process.env.OPENAI_ADS_PIXEL_ID}
