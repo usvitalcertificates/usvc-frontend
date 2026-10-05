@@ -1168,6 +1168,61 @@ small.application-error {
   outline: 2px solid rgb(178 34 52 / 25%);
   outline-offset: 1px;
 }
+/* Searchable dropdown: plain text search box + dropdown listbox. The search
+ *  input inherits the standard field styles above; the list floats below. */
+.combobox-wrap {
+  position: relative;
+}
+.combobox-wrap > input[type="text"] {
+  padding-right: 40px;
+}
+.combobox-wrap::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--red);
+  border-bottom: 2px solid var(--red);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+.combobox-list {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  max-height: 240px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  border: 1px solid #dedde3;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+  list-style: none;
+}
+.combobox-list li {
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.combobox-list li[data-combobox-active] {
+  background: var(--muted);
+}
+.combobox-list li[data-combobox-disabled] {
+  color: var(--muted-text);
+  cursor: not-allowed;
+}
+.combobox-list .combobox-empty {
+  color: var(--muted-text);
+  font-size: 14px;
+  cursor: default;
+}
 /* Blocked-county alert: state-driven banner, independent of field errors. */
 .county-blocked-alert {
   display: block;
@@ -1850,17 +1905,24 @@ small.application-error {
   color: var(--muted-text);
   font-size: 14.4px;
 }
+/* Newspaper order: DOM stays alphabetical (screen-reader/tab order correct),
+ *  visual reads down each column: Alabama, Alaska below it, and so on. */
 .state-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
   margin: 32px 0 0;
   padding: 0;
   list-style: none;
+  columns: 4;
+  column-gap: 12px;
 }
-.state-grid a {
+.state-grid li {
+  margin: 0 0 12px;
+  break-inside: avoid;
+}
+.state-grid a,
+.state-grid button.state-disabled {
   display: flex;
   min-height: 56px;
+  width: 100%;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -1870,6 +1932,8 @@ small.application-error {
   background: #fff;
   box-shadow: var(--shadow-card);
   transition: border-color 0.15s ease;
+  font: inherit;
+  text-align: left;
 }
 .state-grid a:hover {
   border-color: var(--navy);
@@ -1887,6 +1951,18 @@ small.application-error {
 }
 .state-grid a:hover svg {
   transform: translateX(2px);
+}
+.state-grid button.state-disabled {
+  border-style: dashed;
+  background: #fafafb;
+  color: var(--muted-text);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.state-grid button.state-disabled em {
+  font-size: 13px;
+  font-style: normal;
+  white-space: nowrap;
 }
 .no-states {
   margin-top: 40px;
@@ -2094,9 +2170,11 @@ textarea {
     grid-template-columns: 1fr;
   }
   .four-column,
-  .four-column.trust-grid,
-  .state-grid {
+  .four-column.trust-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .state-grid {
+    columns: 2;
   }
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2131,9 +2209,11 @@ textarea {
   }
   .four-column,
   .four-column.trust-grid,
-  .state-grid,
   .footer-columns {
     grid-template-columns: 1fr;
+  }
+  .state-grid {
+    columns: 1;
   }
   .grid {
     grid-template-columns: 1fr;

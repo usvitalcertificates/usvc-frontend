@@ -3,6 +3,7 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { assertSeoLength } from "@/lib/seo";
+import { isStateUnsupported, STATE_UNAVAILABLE_MESSAGE } from "@/lib/state-availability";
 import { PageHeader } from "../../usvc-ui";
 
 const STATES: Array<readonly [string, string]> = [
@@ -119,9 +120,11 @@ export async function generateMetadata({
     "description",
     `${name} birth, death, marriage, divorce guide: eligibility, fees, and how to request with USVC help.`,
   );
+  const unavailable = isStateUnsupported(state);
   return {
     title,
     description,
+    ...(unavailable ? { robots: { index: false, follow: true } as const } : {}),
     alternates: { canonical: `https://usvitalcertificates.org/state/${state}` },
     openGraph: {
       title,
@@ -138,6 +141,7 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
   const found = STATES.find(([name]) => slugify(name) === state);
   if (!found) notFound();
   const name = found[0];
+  const unavailable = isStateUnsupported(state);
 
   return (
     <main>
@@ -164,6 +168,12 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
       />
       <section className="page-section">
         <div className="container">
+          {unavailable ? (
+            <p className="notice" role="status">
+              {STATE_UNAVAILABLE_MESSAGE} See{" "}
+              <Link href="/find-your-state">all available states</Link>.
+            </p>
+          ) : null}
           <div className="certificate-type-grid">
             {CERTIFICATES.map((cert) => (
               <article key={cert.slug} className="certificate-type-card">
@@ -176,12 +186,28 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                 <p className="fee-note">
                   Agency fees are charged separately upon review and acceptance by the State Agency.
                 </p>
-                <Link href={`/state/${state}/order/${cert.slug}`} className="button button-primary">
-                  Start This Request
-                </Link>
-                <Link href={`/state/${state}/${cert.slug}`} className="howto-link">
-                  How to get a {name} {cert.short} certificate
-                </Link>
+                {unavailable ? (
+                  <button
+                    type="button"
+                    className="button button-primary"
+                    disabled
+                    aria-disabled="true"
+                  >
+                    Not available yet
+                  </button>
+                ) : (
+                  <Link
+                    href={`/state/${state}/order/${cert.slug}`}
+                    className="button button-primary"
+                  >
+                    Start This Request
+                  </Link>
+                )}
+                {unavailable ? null : (
+                  <Link href={`/state/${state}/${cert.slug}`} className="howto-link">
+                    How to get a {name} {cert.short} certificate
+                  </Link>
+                )}
               </article>
             ))}
           </div>

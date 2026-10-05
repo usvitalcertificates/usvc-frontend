@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 
 import { createOrder, verifyOrderBeforePayment, type Certificate } from "@/lib/api";
+import { SearchableSelect } from "./searchable-select";
 import { getAnalyticsAttribution, getOpenAIAttribution, trackAnalytics } from "@/app/analytics";
 import { trackOpenAICheckoutStarted } from "@/app/openai-analytics";
 import { isCountyTemporarilyUnavailable } from "@/lib/county-availability";
@@ -313,7 +314,7 @@ type SectionKey =
  *  section is merged into the subject section (marriage "Spouse 2"),
  *  family errors scroll to the subject section instead. */
 function sectionForError(key: string, familyVisible: boolean): SectionKey {
-  if (key === "county" || key === "reasonOther") return "certificate";
+  if (key === "county" || key === "reasonOther" || key === "state") return "certificate";
   if (key === "requestorSsn" || key.startsWith("applicant.")) return "requestor";
   if (key.startsWith("subject.")) return "subject";
   if (key.startsWith("family.")) return familyVisible ? "family" : "subject";
@@ -426,14 +427,14 @@ function Field({
     <label className={`application-field${def.wide ? " wide" : ""}`} htmlFor={id}>
       {def.label} {def.required ? <span>*</span> : null}
       {def.type === "select" ? (
-        <select id={id} name={def.key} required={def.required} defaultValue={defaultValue ?? ""}>
-          <option value="">Please select…</option>
-          {(def.options ?? []).map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
+        <SearchableSelect
+          name={def.key}
+          inputId={id}
+          options={(def.options ?? []).map((option) => ({ value: option, label: option }))}
+          defaultValue={defaultValue ?? ""}
+          required={def.required}
+          placeholder="Please select…"
+        />
       ) : (
         <input
           id={id}
@@ -479,6 +480,8 @@ function AddressFields({
   prefix,
   legend,
   draft,
+  values,
+  setValues,
   typeLabel,
   requestorFirst,
   requestorLast,
@@ -487,6 +490,8 @@ function AddressFields({
   prefix: string;
   legend: string;
   draft: Record<string, string>;
+  values: Record<string, string>;
+  setValues: Dispatch<SetStateAction<Record<string, string>>>;
   typeLabel: string;
   requestorFirst: string;
   requestorLast: string;
@@ -506,17 +511,17 @@ function AddressFields({
       <div className="application-grid">
         <label className="application-field wide">
           {legend} Type <span>*</span>
-          <select
+          <SearchableSelect
             name={`${prefix}Type`}
             required
-            defaultValue={draft[`${prefix}Type`] ?? ADDRESS_TYPE_OPTIONS[0].label}
-          >
-            {ADDRESS_TYPE_OPTIONS.map((option) => (
-              <option key={option.value} value={option.label}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            value={values[`${prefix}Type`] ?? draft[`${prefix}Type`] ?? ""}
+            options={ADDRESS_TYPE_OPTIONS.map((option) => ({
+              value: option.label,
+              label: option.label,
+            }))}
+            placeholder="Select…"
+            onSelect={(value) => setValues((v) => ({ ...v, [`${prefix}Type`]: value }))}
+          />
         </label>
         <div className="application-field">
           <span>First Name</span>
@@ -551,24 +556,26 @@ function AddressFields({
         {type === "domestic" ? (
           <label className="application-field">
             State <span>*</span>
-            <select name={`${prefix}State`} required defaultValue={get("State")}>
-              <option value="">Select state…</option>
-              {STATES.map((state) => (
-                <option key={state.abbreviation} value={state.name}>
-                  {state.name}
-                </option>
-              ))}
-            </select>
+            <SearchableSelect
+              name={`${prefix}State`}
+              required
+              value={values[`${prefix}State`] ?? draft[`${prefix}State`] ?? ""}
+              options={STATES.map((state) => ({ value: state.name, label: state.name }))}
+              placeholder="Select state…"
+              onSelect={(value) => setValues((v) => ({ ...v, [`${prefix}State`]: value }))}
+            />
           </label>
         ) : type === "military" ? (
           <label className="application-field">
             APO/FPO <span>*</span>
-            <select name={`${prefix}State`} required defaultValue={get("State")}>
-              <option value="">Select</option>
-              {APO_FPO_OPTIONS.map((option) => (
-                <option key={option}>{option}</option>
-              ))}
-            </select>
+            <SearchableSelect
+              name={`${prefix}State`}
+              required
+              value={values[`${prefix}State`] ?? draft[`${prefix}State`] ?? ""}
+              options={APO_FPO_OPTIONS.map((option) => ({ value: option, label: option }))}
+              placeholder="Select"
+              onSelect={(value) => setValues((v) => ({ ...v, [`${prefix}State`]: value }))}
+            />
           </label>
         ) : (
           <label className="application-field">
@@ -588,12 +595,17 @@ function AddressFields({
         {type === "international" ? (
           <label className="application-field">
             Country <span>*</span>
-            <select name={`${prefix}Country`} required defaultValue={get("Country")}>
-              <option value="">Select</option>
-              {INTERNATIONAL_COUNTRIES.map((country) => (
-                <option key={country}>{country}</option>
-              ))}
-            </select>
+            <SearchableSelect
+              name={`${prefix}Country`}
+              required
+              value={values[`${prefix}Country`] ?? draft[`${prefix}Country`] ?? ""}
+              options={INTERNATIONAL_COUNTRIES.map((country) => ({
+                value: country,
+                label: country,
+              }))}
+              placeholder="Select"
+              onSelect={(value) => setValues((v) => ({ ...v, [`${prefix}Country`]: value }))}
+            />
           </label>
         ) : null}
       </div>
@@ -662,10 +674,20 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     return county && isCountyTemporarilyUnavailable(abbr, county) ? county : null;
   })();
 
-  /** Scroll to and focus the input for an error key, falling back to its section. */
+  /** Scroll to and focus the input for an error key, falling back to its section.
+   *  Searchable dropdowns render a visible search box paired with their hidden
+   *  value input — focus the visible box, never the hidden one. */
   function scrollToErrorKey(key: string) {
     const form = formRef.current;
     for (const name of inputNamesForError(key)) {
+      const searchBox = form?.querySelector(
+        `[data-combobox-search="${CSS.escape(name)}"]`,
+      ) as HTMLElement | null;
+      if (searchBox) {
+        searchBox.scrollIntoView({ behavior: "smooth", block: "center" });
+        (searchBox as HTMLInputElement).focus?.({ preventScroll: true });
+        return;
+      }
       const target = form?.querySelector(`[name="${CSS.escape(name)}"]`) as HTMLElement | null;
       if (target) {
         target.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -699,6 +721,22 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       } else {
         element.removeAttribute("data-invalid");
         element.removeAttribute("aria-invalid");
+      }
+    });
+    // Mirror invalid styling onto searchable-dropdown search boxes: the
+    // hidden value inputs match [name] above (invisible), so copy their flags
+    // to the paired visible box.
+    form.querySelectorAll("input[data-combobox]").forEach((hidden) => {
+      const pair = form.querySelector(
+        `[data-combobox-search="${CSS.escape(hidden.getAttribute("data-combobox") ?? "")}"]`,
+      );
+      if (!pair) return;
+      if (hidden.getAttribute("data-invalid") === "true") {
+        pair.setAttribute("data-invalid", "true");
+        pair.setAttribute("aria-invalid", "true");
+      } else {
+        pair.removeAttribute("data-invalid");
+        pair.removeAttribute("aria-invalid");
       }
     });
     // The phone picker renders its own inner input; mirror the phone state there.
@@ -1171,28 +1209,20 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           <label className="application-field">
             {`${noun.charAt(0).toUpperCase()}${noun.slice(1)} where the ${config.eventLocationLabel} occurred`}{" "}
             <span>*</span>
-            <select
+            <SearchableSelect
               name="county"
               required
               value={values.county ?? draft.county ?? ""}
-              onChange={(event) => {
-                const county = event.target.value;
+              options={counties.map((c) => ({ value: c.name, label: jurisdictionLabel(c) }))}
+              placeholder={`Select ${stateName} ${noun}`}
+              onSelect={(county) => {
                 setFieldErrors((current) => {
                   const { county: _county, ...remaining } = current;
                   return remaining;
                 });
                 setValues((v) => ({ ...v, county, city: "" }));
               }}
-            >
-              <option value="">
-                Select {stateName} {noun}
-              </option>
-              {counties.map((c) => (
-                <option key={c.id} value={c.name}>
-                  {jurisdictionLabel(c)}
-                </option>
-              ))}
-            </select>
+            />
             {blockedCounty ? (
               <div className="county-blocked-alert" role="alert">
                 <strong>Certificate issuance is currently unavailable</strong> through{" "}
@@ -1207,22 +1237,17 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           </label>
           <label className="application-field">
             {`City / town where the ${config.eventLocationLabel} occurred`} <span>*</span>
-            <select
+            <SearchableSelect
               name="city"
               required
               value={values.city ?? draft.city ?? ""}
-              onChange={(event) => setValues((v) => ({ ...v, city: event.target.value }))}
+              options={cities.map((city) => ({ value: city, label: city }))}
+              placeholder={
+                (values.county ?? draft.county) ? "Select city or town" : `Select ${noun} first`
+              }
               disabled={!values.county && !draft.county}
-            >
-              <option value="">
-                {(values.county ?? draft.county) ? "Select city or town" : `Select ${noun} first`}
-              </option>
-              {cities.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
-            </select>
+              onSelect={(city) => setValues((v) => ({ ...v, city }))}
+            />
           </label>
           {isBirth ? (
             <p className="restriction-note">
@@ -1263,12 +1288,13 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           <label className="application-field wide">
             {isBirth || isDeath ? "Reason for Request" : "Reason for requesting this certificate"}{" "}
             <span>*</span>
-            <select name="reason" required defaultValue={draft.reason ?? ""}>
-              <option value="">Please select…</option>
-              {config.reasons.map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
+            <SearchableSelect
+              name="reason"
+              required
+              defaultValue={draft.reason ?? ""}
+              options={config.reasons.map((item) => ({ value: item, label: item }))}
+              placeholder="Please select…"
+            />
           </label>
           {reason === "Other" ? (
             <label className="application-field wide">
@@ -1349,12 +1375,13 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           <div className="application-grid">
             <label className="application-field wide">
               Your relationship to the person named on the certificate <span>*</span>
-              <select name="relationship" required defaultValue={draft.relationship ?? ""}>
-                <option value="">Please select…</option>
-                {config.relationships.map((item) => (
-                  <option key={item}>{item}</option>
-                ))}
-              </select>
+              <SearchableSelect
+                name="relationship"
+                required
+                defaultValue={draft.relationship ?? ""}
+                options={config.relationships.map((item) => ({ value: item, label: item }))}
+                placeholder="Please select…"
+              />
               <small>
                 <em>
                   If you are not named on the record you may be required to provide proof of
@@ -1405,14 +1432,12 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             </label>
             <label className="application-field">
               Suffix
-              <select name="applicantSuffix" defaultValue={draft.applicantSuffix ?? ""}>
-                <option value="">Please select…</option>
-                {SUFFIX_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+              <SearchableSelect
+                name="applicantSuffix"
+                defaultValue={draft.applicantSuffix ?? ""}
+                options={SUFFIX_OPTIONS.map((option) => ({ value: option, label: option }))}
+                placeholder="Please select…"
+              />
             </label>
           </div>
           {config.requestor.note ? (
@@ -1570,16 +1595,16 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                     <label className="application-field">
                       {config.familySecondStatus.label}{" "}
                       {config.familySecondStatus.required ? <span>*</span> : null}
-                      <select
+                      <SearchableSelect
                         name={config.familySecondStatus.key}
                         required={config.familySecondStatus.required}
                         defaultValue={draft[config.familySecondStatus.key] ?? ""}
-                      >
-                        <option value="">Please select…</option>
-                        {config.familySecondStatus.options.map((option) => (
-                          <option key={option}>{option}</option>
-                        ))}
-                      </select>
+                        options={config.familySecondStatus.options.map((option) => ({
+                          value: option,
+                          label: option,
+                        }))}
+                        placeholder="Please select…"
+                      />
                       {fieldErrors[`family.${config.familySecondStatus.key}`] ? (
                         <small className="application-error" role="alert">
                           {fieldErrors[`family.${config.familySecondStatus.key}`]}
@@ -1618,6 +1643,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             prefix="home"
             legend="Home Address"
             draft={draft}
+            values={values}
+            setValues={setValues}
             typeLabel={values.homeType ?? draft.homeType ?? ""}
             requestorFirst={requestorFirst}
             requestorLast={requestorLast}
@@ -1648,6 +1675,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             prefix="shipping"
             legend="Shipping Address"
             draft={draft}
+            values={values}
+            setValues={setValues}
             typeLabel={values.shippingType ?? draft.shippingType ?? ""}
             requestorFirst={requestorFirst}
             requestorLast={requestorLast}
@@ -1718,26 +1747,35 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         >
           <label className="application-field wide">
             Number of Copies <span>*</span>
-            <select
+            <SearchableSelect
               name="copies"
+              required
               value={String(copies)}
-              onChange={(event) => setValues((v) => ({ ...v, copies: event.target.value }))}
-            >
-              {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>
-                  {n} {n === 1 ? "copy" : "copies"}
-                </option>
-              ))}
-            </select>
+              options={Array.from({ length: 20 }, (_, i) => i + 1).map((n) => ({
+                value: String(n),
+                label: `${n} ${n === 1 ? "copy" : "copies"}`,
+              }))}
+              placeholder="Select…"
+              onSelect={(value) => setValues((v) => ({ ...v, copies: value }))}
+            />
             <small>Each copy includes the $149.00 USVC Processing Fee.</small>
           </label>
           <label className="application-field wide">
             Delivery Method <span>*</span>
-            <select name="delivery" required defaultValue={draft.delivery ?? "Regular"}>
-              <option>Regular</option>
-              <option>UPS Air</option>
-              <option>UPS Worldwide Expedited, Up to 5 Business Days</option>
-            </select>
+            <SearchableSelect
+              name="delivery"
+              required
+              defaultValue={draft.delivery ?? "Regular"}
+              options={[
+                { value: "Regular", label: "Regular" },
+                { value: "UPS Air", label: "UPS Air" },
+                {
+                  value: "UPS Worldwide Expedited, Up to 5 Business Days",
+                  label: "UPS Worldwide Expedited, Up to 5 Business Days",
+                },
+              ]}
+              placeholder="Select…"
+            />
           </label>
           <p className="hint">
             <em>
@@ -1831,6 +1869,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             prefix="billing"
             legend="Billing Address"
             draft={draft}
+            values={values}
+            setValues={setValues}
             typeLabel={values.billingType ?? draft.billingType ?? ""}
             requestorFirst={requestorFirst}
             requestorLast={requestorLast}

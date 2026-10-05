@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { assertSeoLength } from "@/lib/seo";
+import { isStateUnsupported, STATE_UNAVAILABLE_MESSAGE } from "@/lib/state-availability";
 import { OrderForm } from "./order-form";
 import { PageHeader } from "../../../usvc-ui";
 
@@ -48,6 +50,25 @@ export default async function CertificatePage({
   const type = labels[certificate];
   if (!type) notFound();
   const stateName = titleCase(state);
+  if (isStateUnsupported(state)) {
+    return (
+      <main>
+        <PageHeader
+          eyebrow={`${stateName} · ${type} Certificate`}
+          title={`${stateName} ${type} Certificate Application`}
+          subtitle="Check availability for this state."
+        />
+        <section className="page-section">
+          <div className="container">
+            <p className="notice" role="status">
+              {STATE_UNAVAILABLE_MESSAGE} See{" "}
+              <Link href="/find-your-state">all available states</Link>.
+            </p>
+          </div>
+        </section>
+      </main>
+    );
+  }
   return (
     <main>
       <PageHeader
