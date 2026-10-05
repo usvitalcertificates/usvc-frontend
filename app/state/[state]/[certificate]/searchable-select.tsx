@@ -105,11 +105,20 @@ export function SearchableSelect({
     onSelect?.(value);
   }
 
+  function openWithFullList() {
+    // Always open unfiltered: the list shows every record, the search box
+    // only narrows it. Pre-highlight the current selection for keyboard users.
+    setQuery("");
+    setOpen(true);
+    const enabled = options.filter((option) => !option.disabled);
+    setHighlight(enabled.findIndex((option) => option.value === selected));
+  }
+
   function onSearchKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       if (!open) {
-        setOpen(true);
+        openWithFullList();
         return;
       }
       if (!navigable.length) return;
@@ -153,8 +162,13 @@ export function SearchableSelect({
           setHighlight(-1);
         }}
         onFocus={() => {
-          setQuery(labelFor(options, selected));
-          setOpen(true);
+          if (!disabled) openWithFullList();
+        }}
+        onBlur={() => {
+          // Option picks commit on mousedown (before blur), so reaching here
+          // means focus truly left: close and revert to the selection.
+          setOpen(false);
+          setQuery(null);
         }}
         onKeyDown={onSearchKeyDown}
       />
