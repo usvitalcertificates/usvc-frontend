@@ -570,6 +570,25 @@ h3 {
   border-radius: 6px;
   background: #fff;
   box-shadow: var(--shadow-card);
+  transition: border-color 0.15s ease;
+}
+.certificate-type-card:hover {
+  border-color: var(--navy);
+}
+.type-icon {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--navy);
+  margin-bottom: 16px;
+}
+.type-icon svg {
+  width: 22px;
+  height: 22px;
+  color: #fff;
 }
 .certificate-type-card h2 {
   font-size: 24px;
@@ -599,6 +618,22 @@ h3 {
 }
 .find-state-page .state-grid {
   margin-top: 32px;
+}
+.funnel-steps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 20px;
+  margin: 0 0 28px;
+  padding: 0 0 20px;
+  border-bottom: 1px solid var(--border);
+  list-style: none;
+  color: var(--muted-text);
+  font-size: 15px;
+  font-weight: 700;
+}
+.funnel-steps [aria-current="step"] {
+  color: var(--navy);
 }
 .state-help {
   margin: 24px 0 0;
