@@ -28,12 +28,19 @@ export default function FindState() {
       />
       <section className="page-section find-state-page">
         <div className="container">
-          <StateSelector showHeading={false} />
-          <p className="state-help">
-            Not sure which state to choose? Select the state where the vital event — birth, death,
-            marriage, or divorce — occurred; that is where the record is held. See the{" "}
-            <Link href="/faq">FAQ</Link> for common cases.
-          </p>
+          <div className="state-card">
+            <ol className="funnel-steps" aria-label="Request progress">
+              <li aria-current="step">1 · Find your state</li>
+              <li>2 · Application</li>
+              <li>3 · Review &amp; track</li>
+            </ol>
+            <StateSelector showHeading={false} />
+            <p className="state-help">
+              Not sure which state to choose? Select the state where the vital event — birth, death,
+              marriage, or divorce — occurred; that is where the record is held. See the{" "}
+              <Link href="/faq">FAQ</Link> for common cases.
+            </p>
+          </div>
         </div>
       </section>
     </main>
