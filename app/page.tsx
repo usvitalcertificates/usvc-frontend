@@ -5,6 +5,7 @@ import {
   BadgeCheck,
   Check,
   ChevronRight,
+  ClipboardCheck,
   FileBadge,
   FileText,
   Gem,
@@ -184,7 +185,7 @@ export default function Home() {
           </p>
           <ul className="hero-trust">
             <li>
-              <ShieldCheck aria-hidden="true" /> Secure checkout
+              <ClipboardCheck aria-hidden="true" /> Expert review
             </li>
             <li>
               <Lock aria-hidden="true" /> SSL Encrypted
