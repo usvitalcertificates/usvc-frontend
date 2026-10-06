@@ -14,6 +14,12 @@ async function proxy(request: NextRequest, context: RouteContext<"/api/backend/[
   // on the staff pages and is attached here; it never touches a cookie or URL.
   const authorization = request.headers.get("authorization");
   if (authorization) headers.set("authorization", authorization);
+  // Forward the client IP chain untouched: Vercel's edge puts the true
+  // client IP first, and the API resolves device city/region from it
+  // (city/region only — the raw IP is never stored). Without this the API
+  // would only see the Vercel egress address.
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) headers.set("x-forwarded-for", forwardedFor);
 
   let response: Response;
   try {
