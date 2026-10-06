@@ -226,7 +226,7 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
               </Link>
             </p>
             <p className="state-payment">
-              <Lock aria-hidden="true" /> 256-bit SSL encrypted &amp; PCI compliant checkout{" "}
+              <Lock aria-hidden="true" /> 256-bit SSL encrypted checkout{" "}
               <Image src="/assets/visa.svg" alt="Visa" width={34} height={21} />
               <Image src="/assets/mastercard.svg" alt="Mastercard" width={34} height={21} />
             </p>

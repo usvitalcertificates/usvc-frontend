@@ -56,8 +56,8 @@ const steps = [
 const protections = [
   {
     icon: Lock,
-    title: "PCI DSS Compliant",
-    body: "Secure payments, processed to bank-level standards.",
+    title: "Secure card payments",
+    body: "Payments run over an encrypted checkout.",
   },
   {
     icon: ShieldCheck,
@@ -184,7 +184,7 @@ export default function Home() {
           </p>
           <ul className="hero-trust">
             <li>
-              <ShieldCheck aria-hidden="true" /> PCI Compliant
+              <ShieldCheck aria-hidden="true" /> Secure checkout
             </li>
             <li>
               <Lock aria-hidden="true" /> SSL Encrypted
