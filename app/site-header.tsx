@@ -21,7 +21,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="container header-row">
-        <Link href="/" className="logo" aria-label="US Vital Certificates — home">
+        <Link href="/" className="logo" aria-label="US Vital Certificates: home">
           <Image
             src="/assets/usvc-logo.webp"
             alt="US Vital Certificates logo"

@@ -91,7 +91,7 @@ function ConfirmationBody({ orderId }: { orderId: string }) {
           ) : (
             <>
               <h1>Thank you for your order</h1>
-              <p>Your payment didn&apos;t complete — return to the form to try again.</p>
+              <p>Your payment didn&apos;t complete. Return to the form to try again.</p>
               <div className="button-row">
                 <Link className="button button-primary" href="/find-your-state">
                   Start a new request

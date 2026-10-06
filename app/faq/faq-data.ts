@@ -29,7 +29,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Can I cancel and/or get a refund?",
     answer:
-      "You may cancel and receive a full refund of the USVC service fee if your application has not yet been sent to the government agency — contact support immediately. After submission, refunds follow the Cancellation and refund section of the Terms of Service.",
+      "You may cancel and receive a full refund of the USVC service fee if your application has not yet been sent to the government agency. Contact support immediately. After submission, refunds follow the Cancellation and refund section of the Terms of Service.",
   },
   {
     question:
@@ -67,7 +67,7 @@ export const FAQ_ITEMS: FaqItem[] = [
       "Processing and delivery times vary by state and certificate type. The order form shows our processing estimates; agency processing and certificate delivery times may vary. Depending on the state and certificate type you may request a minimum of 1 to a maximum of 20 certificates at one time. Additional fees apply per copy ordered.",
   },
   {
-    question: "Adoption – What last name do I use?",
+    question: "Adoption: What last name do I use?",
     answer:
       "If the last name was legally changed to the adoptive parent's name use that name, unless there has been a legal name change after adoption.",
   },

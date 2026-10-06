@@ -525,11 +525,11 @@ function AddressFields({
         </label>
         <div className="application-field">
           <span>First Name</span>
-          <p className="readonly-name">{requestorFirst.trim() || "—"}</p>
+          <p className="readonly-name">{requestorFirst.trim() || "Not provided"}</p>
         </div>
         <div className="application-field">
           <span>Last Name</span>
-          <p className="readonly-name">{requestorLast.trim() || "—"}</p>
+          <p className="readonly-name">{requestorLast.trim() || "Not provided"}</p>
         </div>
         <label className="application-field wide">
           Address Line 1 <span>*</span>
@@ -1797,7 +1797,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 <strong>Standard Processing</strong>
                 <small>
                   Your application is prepared and processed using our standard service workflow.
-                  Processing typically takes 5–7 business days.
+                  Processing typically takes 5-7 business days.
                 </small>
               </span>
               <b>Included</b>
@@ -1860,8 +1860,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               Same as Shipping Address
             </label>
             <label>
-              <input type="radio" name="billingSource" value="none" /> Neither — Enter Billing
-              Address
+              <input type="radio" name="billingSource" value="none" /> Neither: enter a billing
+              address below
             </label>
             <small>The selected address has been copied below. You can still edit it.</small>
           </div>
@@ -1996,7 +1996,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             ) : (
               <div>
                 <span>
-                  Standard Processing<small>5–7 business days</small>
+                  Standard Processing<small>5-7 business days</small>
                 </span>
                 <b>Included</b>
               </div>
@@ -2070,7 +2070,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               className="verify-signature"
               name="signature"
               placeholder="Signature"
-              aria-label="Signature — type your full name"
+              aria-label="Signature: type your full name"
               required
               defaultValue={draft.signature ?? ""}
             />

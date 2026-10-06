@@ -191,7 +191,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
           "• Government/shipping fees: typically non-refundable by those entities (and thus us) once submitted or dispatched.",
           "• Requesting refunds/addressing issues: contact client support first with your order number and details. We urge direct contact before initiating a chargeback.",
           "• Chargebacks: you agree to this policy and to contact us before a chargeback. Our service fee is for services rendered upon application processing and submission. We reserve the right to dispute improper chargebacks. You may be responsible for associated costs.",
-          "• Refund processing time: approved refunds typically within 7–10 business days.",
+          "• Refund processing time: approved refunds typically within 7-10 business days.",
           "• Policy discretion: USVC may make exceptions in its sole discretion.",
         ],
       },
