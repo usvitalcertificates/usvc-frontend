@@ -85,12 +85,12 @@ const homeFaqs = [
   {
     question: "Is this an official certificate?",
     answer:
-      "If the agency approves your request, it sends an official copy. Most offices accept it for passport, ID, and similar uses — the receiving office decides.",
+      "If the agency approves your request, it sends an official copy. Most offices accept it for passport, ID, and similar uses. The receiving office decides.",
   },
   {
     question: "Do I need to visit an office?",
     answer:
-      "No. There is no walk-in service and no office visit needed — you order online and track it.",
+      "No. There is no walk-in service and no office visit needed. You order online and track it.",
   },
 ] as const;
 
@@ -170,20 +170,17 @@ export default function Home() {
               className="hero-card-mark"
               src="/assets/visa.svg"
               alt="Visa"
-              width={34}
-              height={21}
+              width={44}
+              height={28}
             />
             <Image
               className="hero-card-mark"
               src="/assets/mastercard.svg"
               alt="Mastercard"
-              width={34}
-              height={21}
+              width={44}
+              height={28}
             />{" "}
-            · No office visit needed ·{" "}
-            <Link className="hero-track-link" href="/track-order">
-              Track your order
-            </Link>
+            · No office visit needed
           </p>
           <ul className="hero-trust">
             <li>
@@ -231,7 +228,7 @@ export default function Home() {
             <SectionHeading
               eyebrow="Get started"
               title="Find your state"
-              subtitle="Choose where the event happened — not where you live now."
+              subtitle="Choose where the event happened, not where you live now."
             />
             <div className="popular-states">
               <span>Popular:</span>

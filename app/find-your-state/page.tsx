@@ -36,8 +36,8 @@ export default function FindState() {
             </ol>
             <StateSelector showHeading={false} />
             <p className="state-help">
-              Not sure which state to choose? Select the state where the vital event — birth, death,
-              marriage, or divorce — occurred; that is where the record is held. See the{" "}
+              Not sure which state to choose? Select the state where the vital event (birth, death,
+              marriage, or divorce) occurred; that is where the record is held. See the{" "}
               <Link href="/faq">FAQ</Link> for common cases.
             </p>
           </div>

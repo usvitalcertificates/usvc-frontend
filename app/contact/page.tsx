@@ -132,7 +132,7 @@ export default function Contact() {
             <p className="required-note">Items with an *asterisk are required fields.</p>
             {sent ? (
               <div className="contact-success" role="status">
-                <strong>Thank you — message received.</strong>
+                <strong>Thank you. Message received.</strong>
                 <p>
                   A USVC representative usually replies to your email within one business day,
                   excluding weekends and holidays.
