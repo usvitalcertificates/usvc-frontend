@@ -68,17 +68,25 @@ function slugify(value: string) {
     .replace(/(^-|-$)/g, "");
 }
 
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const LETTERS_WITH_STATES = new Set(states.map(([name]) => name[0].toUpperCase()));
+
 export function StateSelector({ showHeading = true }: { showHeading?: boolean }) {
   const [query, setQuery] = useState("");
+  const [letter, setLetter] = useState<string | null>(null);
   const results = useMemo(() => {
     const normalized = query.trim().toLowerCase();
+    if (!normalized && letter) {
+      return states.filter(([name]) => name.startsWith(letter));
+    }
     if (!normalized) return states;
     return states.filter(
       ([name, abbreviation]) =>
         name.toLowerCase().includes(normalized) ||
         abbreviation.toLowerCase().startsWith(normalized),
     );
-  }, [query]);
+  }, [query, letter]);
+  const filtering = query.trim() !== "" || letter !== null;
 
   return (
     <div>
@@ -91,15 +99,40 @@ export function StateSelector({ showHeading = true }: { showHeading?: boolean })
             id="state-search"
             type="search"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setLetter(null);
+            }}
             placeholder="Search for your state…"
             autoComplete="off"
           />
         </div>
         <p aria-live="polite">
-          {results.length} of {states.length} jurisdictions match. You can type a full name or an
-          abbreviation such as “CA”.
+          {filtering
+            ? `${results.length} of ${states.length} match. `
+            : `${states.length} jurisdictions. `}
+          Type a full name or an abbreviation such as “CA”.
         </p>
+      </div>
+      <div className="state-az" role="group" aria-label="Filter states by first letter">
+        {LETTERS.map((item) => {
+          const available = LETTERS_WITH_STATES.has(item);
+          const active = letter === item;
+          return (
+            <button
+              key={item}
+              type="button"
+              disabled={!available}
+              aria-pressed={available ? active : undefined}
+              aria-label={
+                active ? `Clear letter ${item} filter` : `Show states starting with ${item}`
+              }
+              onClick={() => setLetter(active ? null : item)}
+            >
+              {item}
+            </button>
+          );
+        })}
       </div>
       {results.length ? (
         <ul className="state-grid">
@@ -109,7 +142,10 @@ export function StateSelector({ showHeading = true }: { showHeading?: boolean })
               return (
                 <li key={name}>
                   <button type="button" disabled aria-disabled="true" className="state-disabled">
-                    <span>{name}</span>
+                    <span className="state-name">{name}</span>
+                    <span className="state-abbr" aria-hidden="true">
+                      {abbr}
+                    </span>
                     <em>Not available yet</em>
                   </button>
                 </li>
@@ -121,7 +157,10 @@ export function StateSelector({ showHeading = true }: { showHeading?: boolean })
                   href={`/state/${slug}`}
                   onClick={() => trackAnalytics("select_state", { state_code: abbr })}
                 >
-                  <span>{name}</span>
+                  <span className="state-name">{name}</span>
+                  <span className="state-abbr" aria-hidden="true">
+                    {abbr}
+                  </span>
                   <ChevronRight aria-hidden="true" />
                 </Link>
               </li>

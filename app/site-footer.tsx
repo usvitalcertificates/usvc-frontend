@@ -58,7 +58,7 @@ export function SiteFooter() {
         <div className="footer-about">
           {isHome ? (
             <>
-              <h2 className="site-disclaimer-heading">About USVC</h2>
+              <h2 className="site-disclaimer-heading">Disclaimer</h2>
               <p className="site-disclaimer">
                 USVC is an independent service that assists individuals with requesting vital
                 records from government agencies. We are not a government agency and are not

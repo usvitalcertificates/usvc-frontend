@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { ChevronRight } from "lucide-react";
+import { Check, ChevronRight, Lock } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { assertSeoLength } from "@/lib/seo";
@@ -73,29 +74,21 @@ const CERTIFICATES = [
     slug: "birth-certificate",
     name: "Birth Certificate",
     short: "birth",
-    description:
-      "Assistance preparing and submitting a request for a birth record held by the issuing state agency.",
   },
   {
     slug: "death-certificate",
     name: "Death Certificate",
     short: "death",
-    description:
-      "Assistance preparing and submitting a request for a death record held by the issuing state agency.",
   },
   {
     slug: "marriage-certificate",
     name: "Marriage Certificate",
     short: "marriage",
-    description:
-      "Assistance preparing and submitting a request for a marriage record held by the issuing state agency.",
   },
   {
     slug: "divorce-certificate",
     name: "Divorce Certificate",
     short: "divorce",
-    description:
-      "Assistance preparing and submitting a request for a divorce record or certificate held by the issuing state agency.",
   },
 ] as const;
 
@@ -181,7 +174,6 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                   {name} {cert.name}
                 </h2>
                 <div className="patriotic-rule" aria-hidden="true" />
-                <p className="type-description">{cert.description}</p>
                 <p className="fee-line">Online Processing Fee $149.00 per copy</p>
                 <p className="fee-note">
                   Agency fees are charged separately upon review and acceptance by the State Agency.
@@ -210,6 +202,34 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                 )}
               </article>
             ))}
+          </div>
+
+          <div className="state-benefits">
+            <ul className="assurance-list">
+              <li>
+                <Check aria-hidden="true" /> Secure online ordering
+              </li>
+              <li>
+                <Check aria-hidden="true" /> Expert application review
+              </li>
+              <li>
+                <Check aria-hidden="true" /> Filed with the state agency
+              </li>
+              <li>
+                <Check aria-hidden="true" /> Track your order online
+              </li>
+            </ul>
+            <p className="state-help">
+              Ordering from a different state?{" "}
+              <Link className="howto-link" href="/find-your-state">
+                Find your state
+              </Link>
+            </p>
+            <p className="state-payment">
+              <Lock aria-hidden="true" /> 256-bit SSL encrypted checkout{" "}
+              <Image src="/assets/visa.svg" alt="Visa" width={44} height={28} />
+              <Image src="/assets/mastercard.svg" alt="Mastercard" width={44} height={28} />
+            </p>
           </div>
 
           <div className="info-grid">

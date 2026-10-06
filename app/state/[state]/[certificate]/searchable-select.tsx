@@ -201,7 +201,7 @@ export function SearchableSelect({
             })
           ) : (
             <li className="combobox-empty" aria-disabled="true">
-              No matches — clear the search to see all options.
+              No matches. Clear the search to see all options.
             </li>
           )}
         </ul>

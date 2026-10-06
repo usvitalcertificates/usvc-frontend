@@ -27,14 +27,14 @@ const flowFont = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "USVC — Trusted Help for US Vital Certificates", template: "%s | USVC" },
+  title: { default: "USVC - Trusted Help for US Vital Certificates", template: "%s | USVC" },
   description:
     "Guided help for US birth, death, marriage, and divorce certificates. Clear steps, secure handling, and order tracking.",
   alternates: { canonical: SITE_URL },
   openGraph: {
     type: "website",
     url: SITE_URL,
-    title: "USVC — Trusted Help for US Vital Certificates",
+    title: "USVC - Trusted Help for US Vital Certificates",
     description:
       "Guided help for US birth, death, marriage, and divorce certificates. Clear steps, secure handling, and order tracking.",
   },

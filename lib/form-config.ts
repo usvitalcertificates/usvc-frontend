@@ -432,7 +432,7 @@ export const PROCESSING_OPTIONS = [
     name: "Standard Processing",
     priceLabel: "Included",
     description:
-      "Your application is prepared and processed using our standard service workflow. Processing typically takes 5–7 business days.",
+      "Your application is prepared and processed using our standard service workflow. Processing typically takes 5-7 business days.",
   },
   {
     id: "rush",
