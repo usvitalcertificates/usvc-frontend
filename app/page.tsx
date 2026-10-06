@@ -170,20 +170,17 @@ export default function Home() {
               className="hero-card-mark"
               src="/assets/visa.svg"
               alt="Visa"
-              width={34}
-              height={21}
+              width={44}
+              height={28}
             />
             <Image
               className="hero-card-mark"
               src="/assets/mastercard.svg"
               alt="Mastercard"
-              width={34}
-              height={21}
+              width={44}
+              height={28}
             />{" "}
-            · No office visit needed ·{" "}
-            <Link className="hero-track-link" href="/track-order">
-              Track your order
-            </Link>
+            · No office visit needed
           </p>
           <ul className="hero-trust">
             <li>

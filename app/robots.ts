@@ -7,7 +7,9 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/auth", "/staff/", "/order/confirmation/", "/track-order"],
+        // /order/confirmation/ and /track-order stay crawlable for ads/policy
+        // review but carry noindex layouts, so customer receipts never index.
+        disallow: ["/api/", "/auth", "/staff/"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
