@@ -1736,7 +1736,7 @@ small.application-error {
   gap: 10px;
   margin: 16px 0 0;
   color: var(--navy);
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
 }
 .state-payment svg {
@@ -1746,6 +1746,7 @@ small.application-error {
 }
 .state-payment img {
   border-radius: 3px;
+  vertical-align: -8px;
 }
 .info-card {
   padding: 24px;
