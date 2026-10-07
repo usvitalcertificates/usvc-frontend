@@ -196,7 +196,7 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                   </Link>
                 )}
                 {unavailable ? null : (
-                  <Link href={`/state/${state}/${cert.slug}`} className="howto-link">
+                  <Link href={`/state/${state}/order/${cert.slug}`} className="howto-link">
                     How to get a {name} {cert.short} certificate
                   </Link>
                 )}
