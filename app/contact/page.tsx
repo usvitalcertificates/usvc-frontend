@@ -266,7 +266,9 @@ export default function Contact() {
               <p>
                 <a href="mailto:support@usvitalcertificates.org">support@usvitalcertificates.org</a>
               </p>
-              <p>(689) 367-5431</p>
+              <p>
+                <a href="tel:+12015349279">(201) 534-9279</a>
+              </p>
               <p>
                 <em>(Mailing &amp; Correspondence)</em>
               </p>

@@ -49,6 +49,7 @@ Last updated: 2026-10-02. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 - Hero payment de-duplication (2026-10-06): hero badge renamed to `Expert review` so `Secure checkout` appears once (micro-line with card marks); state payment strip text 15px → 17px with 44×28 badges matching the hero. Render verified (home + Illinois).
 - Footer social icons (2026-10-06): LinkedIn + Facebook links beside the copyright (new tab, labeled, navy circle buttons turning navy-fill on hover); brand icons inlined as SVG (lucide-react 1.47 dropped brand icons). Render verified.
 - Forward client IP to API (2026-10-06): the `/api/backend` proxy rebuilt headers from scratch, dropping `x-forwarded-for` — so the API only ever saw the Vercel egress IP (geolocated to Washington DC instead of the customer). The proxy now forwards the incoming chain untouched (Vercel edge puts the true client IP first); backend leftmost-public parsing needed no change. Verified end-to-end against a local echo server (client IP arrives intact; loopback correctly absent without it).
+- Support phone update (2026-10-07): old `(689) 367-5431` replaced sitewide with `(201) 534-9279`; contact page now uses clickable `tel:+12015349279` link; Organization JSON-LD `telephone` updated to `+1-201-534-9279`.
 
 Limits: display totals non-authoritative (backend recalculates). Per-state fee/rules port remains. Staff lists show masked rows.
 
