@@ -34,6 +34,17 @@ function isStagingHost(host: string): boolean {
  */
 export function middleware(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
+  const hostname = host.split(":")[0].toLowerCase();
+  // Canonical host: apex is the SEO master (SITE_URL + sitemap + canonicals).
+  // www serves only as a 308 to apex so Google never sees two copies.
+  // Local/preview/staging/flow hosts are untouched for testing.
+  if (hostname === "www.usvitalcertificates.org") {
+    const redirectUrl = new URL(request.url);
+    redirectUrl.hostname = "usvitalcertificates.org";
+    redirectUrl.port = "";
+    redirectUrl.protocol = "https:";
+    return NextResponse.redirect(redirectUrl, 308);
+  }
   const { pathname } = request.nextUrl;
   const staffArea = pathname === "/auth" || pathname === "/staff" || pathname.startsWith("/staff/");
   /**

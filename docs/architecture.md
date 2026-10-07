@@ -9,7 +9,7 @@ Next.js 16 App Router, React 19, Node 24. Vercel deploy of `usvc-frontend/`. No 
 Public (apex/`www`):
 
 - `page.tsx` — home (stacked centered White House hero with choice bar, 3-step timeline, full-width state panel with A–Z selector + popular chips, Data Protections, FAQ preview, assurance strip). `Important disclosure` box renders on homepage only.
-- `certificates/`, `find-your-state/`, `state/[state]/` (4 cert cards, $149/copy note), `state/[state]/order/[certificate]/` (canonical 11-section form) + legacy `state/[state]/[certificate]/`.
+- `certificates/`, `find-your-state/`, `state/[state]/` (4 cert cards, $149/copy note), `state/[state]/order/[certificate]/` (canonical 11-section form) + legacy `state/[state]/[certificate]/` (308 to the `/order/` URL).
 - `checkout/[orderId]/` (+ `stripe-checkout-form.tsx`, embedded Checkout Sessions tabs), `order/confirmation/[orderId]/` (verifies `session_id` with backend).
 - `track-order/` (customer-safe timeline), `contact/` (API-backed, honeypot), `faq/` (+ `faq-accordion.tsx`, `faq-data.ts`, 29 items, JSON-LD), `[legal]/` (exact slugs `privacy-policy`, `terms-of-service`, `accessibility` via `legal-data.ts`).
 
@@ -22,7 +22,7 @@ Shared: `layout.tsx` (swaps public header/footer for `StaffShell` via `x-staff-a
 
 ## Host-split middleware (`middleware.ts`)
 
-- Helpers: `isFlowHost` (`flow.*`, exact `flow.localtest`), `isLocalOrPreview` (localhost, `127.0.0.1`, `*.vercel.app`, `*.localtest`), `isStagingHost` (`staging.*` incl. exact `staging.usvitalcertificates.org`).
+- Helpers: `isFlowHost` (`flow.*`, exact `flow.localtest`), `isLocalOrPreview` (localhost, `127.0.0.1`, `*.vercel.app`, `*.localtest`), `isStagingHost` (`staging.*` incl. exact `staging.usvitalcertificates.org`). Canonical host: exact `www.usvitalcertificates.org` 308-redirects to apex (untouched: local/preview/staging/flow).
 - `flow.*`: `/` rewrites to `/staff` (+ `x-staff-area:1`, noindex); allowed = `STAFF_PATHS` (`/auth`, `/staff`, `/api`) + `/_next*` + `/assets*` + `/favicon.ico`, else 404.
 - Public host: 404s `/auth,/staff*`; `PUBLIC_FUNNEL` (checkout, track-order, order, state, contact, faq) and everything else passes.
 - Local/preview/staging: allow all paths by path. `x-robots-tag: noindex, nofollow` is set only on staff-area responses (`/auth`, `/staff*`). Matcher excludes `_next/static|_next/image|favicon.ico`.
@@ -43,7 +43,7 @@ Shared: `layout.tsx` (swaps public header/footer for `StaffShell` via `x-staff-a
 
 ## Funnel + order form
 
-`/` → `/find-your-state` or `/state/[state]` → `/state/[state]/order/[certificate]` (canonical; legacy `/state/[state]/[certificate]` kept) → `POST /orders` (create unpaid) → `/checkout/[orderId]` (Stripe Elements tabs) → `/order/confirmation/[orderId]` (verifies `session_id` with backend, prints paid receipt) → `/track-order` (customer-safe timeline: Payment Successful → Order Received → Order Processing → `Order Processed – Sent to the Government Agency`; exceptions show a neutral support message only).
+`/` → `/find-your-state` or `/state/[state]` → `/state/[state]/order/[certificate]` (canonical; legacy `/state/[state]/[certificate]` 308-redirects) → `POST /orders` (create unpaid) → `/checkout/[orderId]` (Stripe Elements tabs) → `/order/confirmation/[orderId]` (verifies `session_id` with backend, prints paid receipt) → `/track-order` (customer-safe timeline: Payment Successful → Order Received → Order Processing → `Order Processed – Sent to the Government Agency`; exceptions show a neutral support message only).
 
 Order form (11 sections, config-driven): copies 1–20; Standard 5–7 days, Rush next-day; Section 9 review + master consent auto-checks 6 required incl. payment authorization; address State = 52-state dropdown (APO/FPO, international region+country); shipping/billing name must match requestor; confirm-email paste-blocked. Server 422s scroll to first invalid input, focus + `data-invalid` red highlight + inline message + clickable error summary (`county` owns its lifecycle for the blocked-county banner). County/city from `lib/geo.ts` + `public/geo/`; 9 CA counties blocked (San Francisco, San Bernardino, Yolo, Riverside, Del Norte, Lake, Sutter, Kings, Santa Barbara).
 
