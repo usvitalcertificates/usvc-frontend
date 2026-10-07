@@ -1,6 +1,6 @@
 # Frontend status + remaining work
 
-Last updated: 2026-10-02. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
+Last updated: 2026-10-07. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 
 ## Implemented
 
@@ -50,6 +50,7 @@ Last updated: 2026-10-02. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 - Footer social icons (2026-10-06): LinkedIn + Facebook links beside the copyright (new tab, labeled, navy circle buttons turning navy-fill on hover); brand icons inlined as SVG (lucide-react 1.47 dropped brand icons). Render verified.
 - Forward client IP to API (2026-10-06): the `/api/backend` proxy rebuilt headers from scratch, dropping `x-forwarded-for` — so the API only ever saw the Vercel egress IP (geolocated to Washington DC instead of the customer). The proxy now forwards the incoming chain untouched (Vercel edge puts the true client IP first); backend leftmost-public parsing needed no change. Verified end-to-end against a local echo server (client IP arrives intact; loopback correctly absent without it).
 - Support phone update (2026-10-07): old `(689) 367-5431` replaced sitewide with plain-text `(201) 534-9279`; Organization JSON-LD `telephone` updated to `+1-201-534-9279`.
+- SEO canonical consolidation (2026-10-07): `www` now 308-redirects to apex (`middleware.ts`) matching `SITE_URL`/sitemap/canonicals, clearing `Duplicate, Google chose different canonical`; legacy `state/[state]/[certificate]` changed from 200+noindex to `permanentRedirect` to `/order/` (invalid slugs 404, VT/WY handled by canonical page); state-page `How to get...` links point to canonical `/order/` URLs; sitemap entries carry `lastModified` for recrawl. Resubmit sitemap + Validate Fix in GSC post-deploy.
 
 Limits: display totals non-authoritative (backend recalculates). Per-state fee/rules port remains. Staff lists show masked rows.
 
