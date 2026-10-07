@@ -18,7 +18,7 @@ export const organizationLd = {
   contactPoint: {
     "@type": "ContactPoint",
     email: "support@usvitalcertificates.org",
-    telephone: "+1-689-367-5431",
+    telephone: "+1-201-534-9279",
     contactType: "customer support",
   },
   address: {
