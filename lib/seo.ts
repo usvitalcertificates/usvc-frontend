@@ -118,8 +118,23 @@ export const CERTIFICATE_SLUGS = [
 ] as const;
 
 export function titleCase(value: string) {
+  const small = new Set(["of", "and", "de", "del"]);
   return value
     .split("-")
-    .map((part) => part[0].toUpperCase() + part.slice(1))
+    .map((part, index) => {
+      const lower = part.toLowerCase();
+      if (index > 0 && small.has(lower)) return lower;
+      return part[0].toUpperCase() + part.slice(1);
+    })
     .join(" ");
 }
+
+/**
+ * Stable sitemap dates (P0 SEO). `new Date()` on every request makes
+ * `<lastmod>` churn daily, so Google ignores it for recrawl priority.
+ * Update these only when that section's content actually changes.
+ */
+export const SITEMAP_STATIC_LAST_MODIFIED = "2026-10-07";
+export const SITEMAP_STATES_LAST_MODIFIED = "2026-10-07";
+export const SITEMAP_ORDERS_LAST_MODIFIED = "2026-10-07";
+export const SITEMAP_GUIDES_LAST_MODIFIED = "2026-09-30";
