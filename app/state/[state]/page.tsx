@@ -97,6 +97,13 @@ const INSTRUCTIONS =
 const ELIGIBILITY =
   "Eligibility to receive a certified record is determined by the issuing agency and may be limited to the person named on the record or specific qualifying relatives and representatives.";
 
+/** Prerender all 52 state hubs (P0 SEO) so crawlers get static HTML
+ *  instead of relying on the JS StateSelector grid. VT/WY prerender
+ *  with noindex via generateMetadata. */
+export async function generateStaticParams() {
+  return STATES.map(([name]) => ({ state: slugify(name) }));
+}
+
 export async function generateMetadata({
   params,
 }: {

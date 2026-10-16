@@ -7,6 +7,12 @@ import { assertSeoLength, BIRTH_GUIDE_SOURCES, SITE_URL } from "@/lib/seo";
 
 const CHECKED = "September 30, 2026";
 
+/** Prerender the 10 pilot guides (P0 SEO) so they are static HTML,
+ *  not dependent on sitemap-only discovery. */
+export async function generateStaticParams() {
+  return Object.keys(BIRTH_GUIDE_SOURCES).map((state) => ({ state }));
+}
+
 export async function generateMetadata({
   params,
 }: {
