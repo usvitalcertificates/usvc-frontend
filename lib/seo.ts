@@ -135,6 +135,110 @@ export function titleCase(value: string) {
  * Update these only when that section's content actually changes.
  */
 export const SITEMAP_STATIC_LAST_MODIFIED = "2026-10-07";
-export const SITEMAP_STATES_LAST_MODIFIED = "2026-10-07";
-export const SITEMAP_ORDERS_LAST_MODIFIED = "2026-10-07";
-export const SITEMAP_GUIDES_LAST_MODIFIED = "2026-09-30";
+export const SITEMAP_STATES_LAST_MODIFIED = "2026-10-16";
+export const SITEMAP_ORDERS_LAST_MODIFIED = "2026-10-16";
+export const SITEMAP_GUIDES_LAST_MODIFIED = "2026-10-16";
+
+/**
+ * P1 SEO: cert-type content slots so the 200 order pages and 50 state
+ * hubs are not byte-identical shells. Copy is deliberately generic and
+ * truthful (no invented state fees, timelines, or eligibility rules —
+ * those stay "confirm with the issuing agency" per YMYL policy).
+ */
+export const CERTIFICATE_DETAILS: Record<
+  string,
+  { label: string; uses: string; checklist: string[]; faq: { q: string; a: string }[] }
+> = {
+  "birth-certificate": {
+    label: "Birth",
+    uses: "A certified birth certificate is most often requested as proof of identity, age, citizenship, and parentage — for passports, REAL ID, school enrollment, and benefits claims.",
+    checklist: [
+      "Subject's full name at birth, date of birth, and place of birth",
+      "Parents' names as shown on the record",
+      "Requestor contact details and a deliverable shipping address",
+    ],
+    faq: [
+      {
+        q: "What is a birth certificate used for?",
+        a: "Common uses include passports, REAL ID or driver's licenses, school enrollment, and Social Security or benefits claims. The receiving office decides whether a copy is accepted.",
+      },
+      {
+        q: "What does USVC review before filing?",
+        a: "We check your application for missing details and inconsistencies, then file it with the issuing agency. Agency fees are charged separately upon review and acceptance.",
+      },
+      {
+        q: "How long does the USVC part take?",
+        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state — confirm current times with the issuing agency.",
+      },
+    ],
+  },
+  "death-certificate": {
+    label: "Death",
+    uses: "A certified death certificate is most often requested to settle estates, claim insurance, close accounts, and notify government agencies.",
+    checklist: [
+      "Decedent's full name, date of death, and place of death",
+      "Your relationship to the person named on the record",
+      "Requestor contact details and a deliverable shipping address",
+    ],
+    faq: [
+      {
+        q: "What is a death certificate used for?",
+        a: "Common uses include insurance claims, probate and property transfers, closing accounts, and notifying Social Security. The receiving office decides whether a copy is accepted.",
+      },
+      {
+        q: "What does USVC review before filing?",
+        a: "We check your application for missing details and inconsistencies, then file it with the issuing agency. Agency fees are charged separately upon review and acceptance.",
+      },
+      {
+        q: "How long does the USVC part take?",
+        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state — confirm current times with the issuing agency.",
+      },
+    ],
+  },
+  "marriage-certificate": {
+    label: "Marriage",
+    uses: "A certified marriage certificate is most often requested for name changes, spousal benefits, immigration filings, and joint tax or property matters.",
+    checklist: [
+      "Both spouses' names and the date of marriage",
+      "Place of marriage as shown on the record",
+      "Requestor contact details and a deliverable shipping address",
+    ],
+    faq: [
+      {
+        q: "What is a marriage certificate used for?",
+        a: "Common uses include name changes with Social Security and the DMV, adding a spouse to benefits, and spousal immigration petitions. The receiving office decides whether a copy is accepted.",
+      },
+      {
+        q: "What does USVC review before filing?",
+        a: "We check your application for missing details and inconsistencies, then file it with the issuing agency. Agency fees are charged separately upon review and acceptance.",
+      },
+      {
+        q: "How long does the USVC part take?",
+        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state — confirm current times with the issuing agency.",
+      },
+    ],
+  },
+  "divorce-certificate": {
+    label: "Divorce",
+    uses: "A divorce certificate or certified decree is most often requested to remarry, restore a former name, or update benefits and property records.",
+    checklist: [
+      "Both spouses' names and the date of divorce",
+      "Place of divorce as shown on the record",
+      "Requestor contact details and a deliverable shipping address",
+    ],
+    faq: [
+      {
+        q: "What is a divorce certificate used for?",
+        a: "Common uses include obtaining a new marriage license, restoring a former name on identity documents, and updating beneficiaries. The receiving office decides whether a copy is accepted.",
+      },
+      {
+        q: "What does USVC review before filing?",
+        a: "We check your application for missing details and inconsistencies, then file it with the issuing agency. Agency fees are charged separately upon review and acceptance.",
+      },
+      {
+        q: "How long does the USVC part take?",
+        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state — confirm current times with the issuing agency.",
+      },
+    ],
+  },
+};
