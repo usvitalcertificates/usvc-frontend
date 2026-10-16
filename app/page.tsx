@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 import { StateSelector } from "./state-selector";
+import { BIRTH_GUIDE_SOURCES } from "@/lib/seo";
 
 const certificates = [
   { name: "Birth", icon: Baby },
@@ -245,6 +246,18 @@ export default function Home() {
               <Link className="howto-link" href="/faq">
                 FAQ
               </Link>
+            </p>
+            <p className="state-help">
+              Step-by-step official-resource guides:{" "}
+              {Object.keys(BIRTH_GUIDE_SOURCES).map((slug, index) => (
+                <span key={slug}>
+                  {index > 0 ? ", " : null}
+                  <Link className="howto-link" href={`/guides/${slug}/birth-certificate`}>
+                    {BIRTH_GUIDE_SOURCES[slug].state}
+                  </Link>
+                </span>
+              ))}
+              .
             </p>
           </div>
         </div>
