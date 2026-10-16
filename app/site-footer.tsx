@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { SITE_DISCLAIMER } from "@/lib/seo";
+import { BIRTH_GUIDE_SOURCES, INDEXABLE_STATES, SITE_DISCLAIMER, titleCase } from "@/lib/seo";
 
 function LinkedinIcon() {
   return (
@@ -93,6 +93,24 @@ export function SiteFooter() {
             </div>
           ))}
         </div>
+        <nav className="footer-states" aria-label="States and guides">
+          <h2>States</h2>
+          <p>
+            {INDEXABLE_STATES.map((slug) => (
+              <Link key={slug} href={`/state/${slug}`}>
+                {titleCase(slug)}
+              </Link>
+            ))}
+          </p>
+          <h2>Birth certificate guides</h2>
+          <p>
+            {Object.keys(BIRTH_GUIDE_SOURCES).map((slug) => (
+              <Link key={slug} href={`/guides/${slug}/birth-certificate`}>
+                {BIRTH_GUIDE_SOURCES[slug].state}
+              </Link>
+            ))}
+          </p>
+        </nav>
         <div className="footer-about">
           {isHome ? (
             <>
