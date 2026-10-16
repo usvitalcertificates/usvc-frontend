@@ -3,7 +3,8 @@ import { Check, ChevronRight, Lock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { assertSeoLength } from "@/lib/seo";
+import { SeoJsonLd } from "@/app/seo-json-ld";
+import { assertSeoLength, BIRTH_GUIDE_SOURCES, CERTIFICATE_DETAILS, SITE_URL } from "@/lib/seo";
 import { isStateUnsupported, STATE_UNAVAILABLE_MESSAGE } from "@/lib/state-availability";
 import { PageHeader } from "../../usvc-ui";
 
@@ -142,9 +143,57 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
   if (!found) notFound();
   const name = found[0];
   const unavailable = isStateUnsupported(state);
+  const url = `${SITE_URL}/state/${state}`;
+  const guideSlug = BIRTH_GUIDE_SOURCES[state] ? state : null;
+  const certUses = CERTIFICATES.map((cert) => CERTIFICATE_DETAILS[cert.slug].uses);
+  const faqs = [
+    {
+      q: `How do I request a ${name} vital record with USVC?`,
+      a: `Choose one of the four certificate types above, complete the guided ${name} application (most people finish in about 10 minutes), and submit payment. We review your information for missing details, file it with the issuing agency, and you track the request online.`,
+    },
+    {
+      q: `How much does a ${name} request cost through USVC?`,
+      a: "Our online processing fee is $149.00 per copy. Agency fees are charged separately upon review and acceptance by the state agency and will appear separately.",
+    },
+    {
+      q: `Who can receive a certified ${name} record?`,
+      a: "The issuing agency decides eligibility — usually the person named on the record or specific qualifying relatives and representatives. Confirm your eligibility with the official agency resource before you apply.",
+    },
+    {
+      q: "Do I need to visit an office in person?",
+      a: "No. There is no walk-in service and no office visit needed. You order online with USVC and track the request.",
+    },
+  ];
+  const ld = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Find Your State",
+            item: `${SITE_URL}/find-your-state`,
+          },
+          { "@type": "ListItem", position: 3, name: name, item: url },
+        ],
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.q,
+          acceptedAnswer: { "@type": "Answer", text: faq.a },
+        })),
+      },
+    ],
+  };
 
   return (
     <main>
+      <SeoJsonLd value={ld} />
       <nav aria-label="Breadcrumb" className="breadcrumbs">
         <ol>
           <li>
@@ -168,6 +217,24 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
       />
       <section className="page-section">
         <div className="container">
+          <div className="legal-body">
+            <p>
+              {name} vital records — birth, death, marriage, and divorce certificates — are issued
+              under {name === "District of Columbia" ? "District" : "state"} rules, so the agency
+              holding your record depends on where the event happened, not where you live now. Below
+              you can start a guided {name} request for any of the four record types with USVC
+              review and online tracking.
+            </p>
+            {guideSlug ? (
+              <p>
+                Planning a birth-certificate request? Read the{" "}
+                <Link className="howto-link" href={`/guides/${guideSlug}/birth-certificate`}>
+                  official {name} birth-certificate guide
+                </Link>{" "}
+                first — it points to the issuing agency&apos;s current instructions.
+              </p>
+            ) : null}
+          </div>
           {unavailable ? (
             <p className="notice" role="status">
               {STATE_UNAVAILABLE_MESSAGE} See{" "}
@@ -247,6 +314,24 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
             <section className="info-card">
               <h2>Who may request a record</h2>
               <p>{ELIGIBILITY}</p>
+            </section>
+          </div>
+
+          <div className="info-grid">
+            <section className="info-card">
+              <h2>What each {name} record is used for</h2>
+              {certUses.map((uses) => (
+                <p key={uses}>{uses}</p>
+              ))}
+            </section>
+            <section className="info-card">
+              <h2>{name} questions, answered</h2>
+              {faqs.map((faq) => (
+                <div key={faq.q}>
+                  <h3>{faq.q}</h3>
+                  <p>{faq.a}</p>
+                </div>
+              ))}
             </section>
           </div>
         </div>
