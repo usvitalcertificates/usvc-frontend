@@ -437,7 +437,7 @@ export const PROCESSING_OPTIONS = [
   {
     id: "rush",
     name: "Rush Processing",
-    priceLabel: "+$45.00",
+    priceLabel: "$12.00",
     description: "Your application will be processed the next day.",
   },
 ] as const;

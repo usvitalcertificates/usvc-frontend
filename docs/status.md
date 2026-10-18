@@ -57,6 +57,8 @@ Last updated: 2026-10-07. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 - SEO P2 link mesh (2026-10-16): footer gains sitewide States nav (50 indexable slugs) + birth-guide nav (10 guides) with new `.footer-states` CSS — every page now links deep content in one hop (verified 50 + 10 unique hrefs on `/`); homepage, `/certificates`, and `/faq` gain guide panels linking the 10 guides + state pages. Guides are no longer sitemap-only orphans. Gates green. Post-deploy: resubmit sitemap + Validate Fix for Discovered.
 - SEO final sweep (2026-10-16, same PR): `[legal]` pages gain `generateStaticParams` (all 4 dynamic SEO routes now prerendered); `/find-your-state` gains official-resource guide panel (last page missing guide links); noindex audit clean (VT/WY hubs+orders `noindex,follow`, receipts/track `noindex,nofollow`, staff via `x-robots-tag`); title cannibalization map holds (hubs commercial, guides informational, orders transactional — no shared primary keywords). Gates green (`format:check`, `lint`, `tsc --noEmit`, `build` 296 pages, `test` 6/6). Remaining SEO work needs real-world data, not code: guides 10→50 (40 agency URLs), per-state fees/rules, GSC Validate Fix monitoring.
 
+- Rush fee change (2026-10-17): order form Rush Processing now $12.00 per order (was $45.00) — Processing Speed option shows plain `$12.00` (dropped `+` and `per order`), Order Summary rush row shows `Rush Processing` + `$12.00` (dropped `Per order` subtitle), browser `total` uses `copies × 149 + 12`, and `PROCESSING_OPTIONS.priceLabel` is `$12.00`. Backend remains authoritative and updated in sync.
+
 Limits: display totals non-authoritative (backend recalculates). Per-state fee/rules port remains. Staff lists show masked rows.
 
 ## Remaining (Phase 3)
