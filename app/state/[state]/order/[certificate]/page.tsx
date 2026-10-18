@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { SeoJsonLd } from "@/app/seo-json-ld";
 import {
   assertSeoLength,
-  BIRTH_GUIDE_SOURCES,
   CERTIFICATE_DETAILS,
   CERTIFICATE_SLUGS,
   INDEXABLE_STATES,
@@ -82,10 +81,6 @@ export default async function CertificateOrderPage({
   const details = CERTIFICATE_DETAILS[certificate];
   const stateName = titleCase(state);
   const url = `${SITE_URL}/state/${state}/order/${certificate}`;
-  const guideUrl =
-    certificate === "birth-certificate" && BIRTH_GUIDE_SOURCES[state]
-      ? `/guides/${state}/birth-certificate`
-      : null;
   const ld = {
     "@context": "https://schema.org",
     "@graph": [
@@ -177,29 +172,6 @@ export default async function CertificateOrderPage({
         title={`${stateName} ${type} Certificate Application`}
         subtitle="Complete this application in one page, then submit payment."
       />
-      <section className="page-section">
-        <div className="container legal-body">
-          <p>{details.uses}</p>
-          <p>
-            This guided {stateName} {type.toLowerCase()} request covers the details the issuing
-            agency needs: {details.checklist.join("; ").toLowerCase()}. Our online processing fee is
-            $149.00 per copy; agency fees are charged separately upon review and acceptance.{" "}
-            <Link className="howto-link" href={`/state/${state}`}>
-              Back to all {stateName} record options
-            </Link>
-            {guideUrl ? (
-              <>
-                {" "}
-                or read the{" "}
-                <Link className="howto-link" href={guideUrl}>
-                  official {stateName} guide
-                </Link>
-              </>
-            ) : null}
-            .
-          </p>
-        </div>
-      </section>
       <section className="application-page">
         <div className="application-container">
           <OrderForm stateCode={state} certificate={certificate} />
