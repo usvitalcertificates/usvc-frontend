@@ -1,6 +1,6 @@
 # Frontend status + remaining work
 
-Last updated: 2026-10-07. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
+Last updated: 2026-10-17. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 
 ## Implemented
 
@@ -58,6 +58,7 @@ Last updated: 2026-10-07. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 - SEO final sweep (2026-10-16, same PR): `[legal]` pages gain `generateStaticParams` (all 4 dynamic SEO routes now prerendered); `/find-your-state` gains official-resource guide panel (last page missing guide links); noindex audit clean (VT/WY hubs+orders `noindex,follow`, receipts/track `noindex,nofollow`, staff via `x-robots-tag`); title cannibalization map holds (hubs commercial, guides informational, orders transactional — no shared primary keywords). Gates green (`format:check`, `lint`, `tsc --noEmit`, `build` 296 pages, `test` 6/6). Remaining SEO work needs real-world data, not code: guides 10→50 (40 agency URLs), per-state fees/rules, GSC Validate Fix monitoring.
 
 - Rush fee change (2026-10-17): order form Rush Processing now $12.00 per order (was $45.00) — Processing Speed option shows plain `$12.00` (dropped `+` and `per order`), Order Summary rush row shows `Rush Processing` + `$12.00` (dropped `Per order` subtitle), browser `total` uses `copies × 149 + 12`, and `PROCESSING_OPTIONS.priceLabel` is `$12.00`. Backend remains authoritative and updated in sync.
+- Trim guide links + FAQ sizing (2026-10-17): removed the state-hub `Planning a birth-certificate request? …` sentence and the order-page intro block (`A certified {cert}…` uses line + `This guided {state}… Back to all {state} record options or read the official {state} guide.`) across all states/certificates; dropped the now-unused `guideSlug`/`guideUrl` and `BIRTH_GUIDE_SOURCES` imports (other guide links — footer, home, `/certificates`, `/faq`, `/find-your-state` — stay). FAQ questions (`<h3>`) inside `.info-card` (state hubs + order pages) and `.legal-body` (birth guides) now render at 17px bold navy so they match their neighbouring box instead of the oversized global `clamp()` heading; answers unchanged. JSON-LD, breadcrumbs, and the `Have on hand` / `questions, answered` cards untouched. Render verified (`/state/florida`, `/state/florida/order/birth-certificate`, `/guides/florida/birth-certificate`, `/state/alabama`, removed text absent, FAQ present). Gates green (`format:check`, `lint`, `tsc --noEmit`, `build` 296 pages, `test` 6/6).
 
 Limits: display totals non-authoritative (backend recalculates). Per-state fee/rules port remains. Staff lists show masked rows.
 

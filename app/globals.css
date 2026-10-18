@@ -1763,6 +1763,19 @@ small.application-error {
   font-size: 17px;
   line-height: 1.65;
 }
+/* FAQ questions inside info cards (state hubs + order pages): keep them the
+ * same text size as the surrounding card body so the FAQ reads like its
+ * neighbouring box instead of towering over it. */
+.info-card h3 {
+  margin: 16px 0 0;
+  color: var(--navy);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.info-card h3 + p {
+  margin-top: 4px;
+}
 
 .faq-accordion {
   max-width: 816px;
@@ -2027,6 +2040,18 @@ small.application-error {
 
 .legal-body {
   max-width: 768px;
+}
+/* Guide-page FAQ questions live directly in .legal-body (no card wrapper);
+ * match the surrounding body text size like the info-card FAQ. */
+.legal-body h3 {
+  margin: 16px 0 0;
+  color: var(--navy);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.legal-body h3 + p {
+  margin-top: 4px;
 }
 .legal-updated {
   margin: 0;
