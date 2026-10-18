@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SeoJsonLd } from "@/app/seo-json-ld";
-import { assertSeoLength, BIRTH_GUIDE_SOURCES, CERTIFICATE_DETAILS, SITE_URL } from "@/lib/seo";
+import { assertSeoLength, CERTIFICATE_DETAILS, SITE_URL } from "@/lib/seo";
 import { isStateUnsupported, STATE_UNAVAILABLE_MESSAGE } from "@/lib/state-availability";
 import { PageHeader } from "../../usvc-ui";
 
@@ -144,7 +144,6 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
   const name = found[0];
   const unavailable = isStateUnsupported(state);
   const url = `${SITE_URL}/state/${state}`;
-  const guideSlug = BIRTH_GUIDE_SOURCES[state] ? state : null;
   const certUses = CERTIFICATES.map((cert) => CERTIFICATE_DETAILS[cert.slug].uses);
   const faqs = [
     {
@@ -225,15 +224,6 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
               you can start a guided {name} request for any of the four record types with USVC
               review and online tracking.
             </p>
-            {guideSlug ? (
-              <p>
-                Planning a birth-certificate request? Read the{" "}
-                <Link className="howto-link" href={`/guides/${guideSlug}/birth-certificate`}>
-                  official {name} birth-certificate guide
-                </Link>{" "}
-                first — it points to the issuing agency&apos;s current instructions.
-              </p>
-            ) : null}
           </div>
           {unavailable ? (
             <p className="notice" role="status">
