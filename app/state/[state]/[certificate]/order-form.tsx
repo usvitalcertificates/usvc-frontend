@@ -780,7 +780,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
     addressTypeOf(values.shippingType ?? draft.shippingType ?? ADDRESS_TYPE_OPTIONS[0].label) ===
     "international";
   // Two-fee model: only the Online Processing Fee (+ rush) is charged now.
-  const total = copies * 149 + (rush ? 45 : 0);
+  const total = copies * 149 + (rush ? 12 : 0);
 
   const requestorFirst = values.applicantFirstName ?? draft.applicantFirstName ?? "";
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
@@ -1817,7 +1817,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                   delivery time is extra.
                 </small>
               </span>
-              <b>+$45.00 per order</b>
+              <b>$12.00</b>
             </label>
           </fieldset>
           <p className="hint">{PROCESSING_CLARIFICATION_NOTE}</p>
@@ -1988,10 +1988,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             </div>
             {rush ? (
               <div>
-                <span>
-                  Rush Processing<small>Per order</small>
-                </span>
-                <b>$45.00</b>
+                <span>Rush Processing</span>
+                <b>$12.00</b>
               </div>
             ) : (
               <div>
