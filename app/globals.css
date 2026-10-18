@@ -2058,9 +2058,9 @@ small.application-error {
   color: var(--muted-text);
   font-size: 15.2px;
 }
-/* State hub intro: quiet small copy, matching the site's muted info text. */
+/* State hub intro: full-width quiet small copy, matching the site's muted info text. */
 .state-intro {
-  margin: 0;
+  margin: 0 0 24px;
   color: var(--muted-text);
   font-size: 15px;
   line-height: 1.6;
