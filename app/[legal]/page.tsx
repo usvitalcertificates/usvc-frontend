@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "../usvc-ui";
 import { LEGAL_DOCUMENTS } from "./legal-data";
 
+export async function generateStaticParams() {
+  return Object.keys(LEGAL_DOCUMENTS).map((legal) => ({ legal }));
+}
+
 export async function generateMetadata({
   params,
 }: {

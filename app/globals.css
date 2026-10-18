@@ -2517,6 +2517,28 @@ small.application-error {
   padding-top: 24px;
   border-top: 1px solid var(--border);
 }
+/* P2 SEO link mesh: sitewide state + guide index so deep pages are one
+ * hop from every page instead of sitemap-only orphans. */
+.footer-states {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.footer-states h2 {
+  margin: 16px 0 0;
+}
+.footer-states h2:first-child {
+  margin-top: 0;
+}
+.footer-states p {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 8px 0 0;
+}
+.footer-states p a {
+  font-size: 14px;
+}
 .footer-bottom {
   display: flex;
   align-items: center;

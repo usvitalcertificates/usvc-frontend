@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BIRTH_GUIDE_SOURCES } from "@/lib/seo";
 import { PageHeader } from "../usvc-ui";
 import { FaqAccordion } from "./faq-accordion";
 import { FAQ_ITEMS, faqAnswerToPlainText } from "./faq-data";
@@ -40,6 +41,25 @@ export default function FaqPage() {
       <section className="page-section">
         <div className="container">
           <FaqAccordion items={FAQ_ITEMS} />
+          <div className="faq-support">
+            <h2>Looking for state-specific steps?</h2>
+            <p>
+              Start from{" "}
+              <Link className="howto-link" href="/find-your-state">
+                your state page
+              </Link>{" "}
+              or read an official-resource birth-certificate guide:{" "}
+              {Object.keys(BIRTH_GUIDE_SOURCES).map((slug, index) => (
+                <span key={slug}>
+                  {index > 0 ? ", " : null}
+                  <Link className="howto-link" href={`/guides/${slug}/birth-certificate`}>
+                    {BIRTH_GUIDE_SOURCES[slug].state}
+                  </Link>
+                </span>
+              ))}
+              .
+            </p>
+          </div>
           <div className="faq-support">
             <h2>Still have a question?</h2>
             <p>

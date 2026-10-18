@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Baby, FileBadge, Gem, Ribbon } from "lucide-react";
 
+import { BIRTH_GUIDE_SOURCES } from "@/lib/seo";
 import { PageHeader } from "../usvc-ui";
 
 const certificates = [
@@ -106,6 +107,22 @@ export default function Certificates() {
               );
             })}
           </div>
+          <p className="state-help">
+            Start by state:{" "}
+            <Link className="howto-link" href="/find-your-state">
+              find your state
+            </Link>
+            . Step-by-step birth-certificate guides:{" "}
+            {Object.keys(BIRTH_GUIDE_SOURCES).map((slug, index) => (
+              <span key={slug}>
+                {index > 0 ? ", " : null}
+                <Link className="howto-link" href={`/guides/${slug}/birth-certificate`}>
+                  {BIRTH_GUIDE_SOURCES[slug].state}
+                </Link>
+              </span>
+            ))}
+            .
+          </p>
         </div>
       </section>
     </main>
