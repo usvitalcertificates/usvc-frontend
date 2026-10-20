@@ -152,7 +152,7 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
     },
     {
       q: `How much does a ${name} request cost through USVC?`,
-      a: "Our online processing fee is $149.00 per copy. Agency fees are charged separately upon review and acceptance by the state agency and will appear separately.",
+      a: "Our online processing fee is $149.00 for the first certificate and $70.00 for each additional certificate. Agency fees are charged separately upon review and acceptance by the state agency and will appear separately.",
     },
     {
       q: `Who can receive a certified ${name} record?`,
@@ -236,7 +236,10 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                   {name} {cert.name}
                 </h2>
                 <div className="patriotic-rule" aria-hidden="true" />
-                <p className="fee-line">Online Processing Fee $149.00 per copy</p>
+                <p className="fee-line">
+                  Online Processing Fee $149.00 for the first certificate and $70.00 for each
+                  additional certificate
+                </p>
                 <p className="fee-note">
                   Agency fees are charged separately upon review and acceptance by the State Agency.
                 </p>
@@ -255,11 +258,6 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                     className="button button-primary"
                   >
                     Start This Request
-                  </Link>
-                )}
-                {unavailable ? null : (
-                  <Link href={`/state/${state}/order/${cert.slug}`} className="howto-link">
-                    How to get a {name} {cert.short} certificate
                   </Link>
                 )}
               </article>

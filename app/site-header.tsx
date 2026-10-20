@@ -12,6 +12,7 @@ const navigation = [
   ["Find Your State", "/find-your-state"],
   ["FAQ", "/faq"],
   ["Track Order", "/track-order"],
+  ["Resume Application", "/resume"],
   ["Contact", "/contact"],
 ] as const;
 
@@ -33,9 +34,9 @@ export function SiteHeader() {
         </Link>
         <nav className="desktop-nav" aria-label="Main navigation">
           {navigation.map(([label, href]) => (
-            <Link key={href} href={href} className={pathname === href ? "active" : ""}>
+            <a key={href} href={href} className={pathname === href ? "active" : ""}>
               {label}
-            </Link>
+            </a>
           ))}
           <Link href="/find-your-state" className="button button-primary header-button">
             Start Your Order
@@ -55,9 +56,9 @@ export function SiteHeader() {
       {open ? (
         <nav id="mobile-nav" className="mobile-nav" aria-label="Mobile navigation">
           {navigation.map(([label, href]) => (
-            <Link key={href} href={href} onClick={() => setOpen(false)}>
+            <a key={href} href={href} onClick={() => setOpen(false)}>
               {label}
-            </Link>
+            </a>
           ))}
           <Link
             href="/find-your-state"

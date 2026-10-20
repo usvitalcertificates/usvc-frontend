@@ -1,6 +1,10 @@
 "use client";
 
+import { CopyQuantity } from "./copy-quantity";
+import { copyPricing, copyMoney } from "@/lib/copy-pricing";
 import Link from "next/link";
+import { Clock3, CircleAlert } from "lucide-react";
+import { recoveryJson, type RecoveryApplication } from "@/lib/recovery-client";
 import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
@@ -622,7 +626,25 @@ const CONSENT_KEYS = [
   "processingPayment",
 ] as const;
 
-export function OrderForm({ stateCode, certificate }: { stateCode: string; certificate: string }) {
+interface RecoveryFormContext {
+  id: string;
+  revision: number;
+  publicNumber: string;
+  hasStoredSsn: boolean;
+  initialDraft: Record<string, string>;
+  paymentOnly: boolean;
+  processing: boolean;
+  onUpdated: (order: RecoveryApplication) => void;
+}
+export function OrderForm({
+  stateCode,
+  certificate,
+  recovery,
+}: {
+  stateCode: string;
+  certificate: string;
+  recovery?: RecoveryFormContext;
+}) {
   const stateSlug = stateCode.toLowerCase();
   const certSlug = certificate as CertificateSlug;
   const config = useMemo(() => resolveFormConfig(stateSlug, certSlug), [stateSlug, certSlug]);
@@ -633,6 +655,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const draftKey = `usvc.orderDraft.v1:${stateSlug}:${certSlug}`;
 
   const [draft] = useState<Record<string, string>>(() => {
+    if (recovery) return recovery.initialDraft;
     try {
       const raw = sessionStorage.getItem(draftKey);
       return raw ? (JSON.parse(raw) as Record<string, string>) : {};
@@ -640,6 +663,76 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       return {};
     }
   });
+  const [paymentFailure, setPaymentFailure] = useState("");
+  const [paymentProcessing, setPaymentProcessing] = useState(recovery?.processing ?? false);
+  const [orderReference, setOrderReference] = useState(recovery?.publicNumber ?? "");
+  const [recoveryRevision, setRecoveryRevision] = useState(recovery?.revision ?? 0);
+  const [saveOnly, setSaveOnly] = useState(false);
+  const saveOnlyRef = useRef(false);
+  const [geographyReady, setGeographyReady] = useState(false);
+  useEffect(() => {
+    if (!recovery?.paymentOnly || !geographyReady) return;
+    // Wait for restored geography and the committed form layout. Explicit
+    // instant scrolling avoids inherited smooth scrolling being interrupted
+    // by the form's initial layout updates.
+    let nextFrame = 0;
+    const frame = requestAnimationFrame(() => {
+      nextFrame = requestAnimationFrame(() => {
+        const section = document.getElementById("application-section-card");
+        section
+          ?.querySelector<HTMLInputElement>('input[name="cardNumber"]')
+          ?.focus({ preventScroll: true });
+        section?.scrollIntoView({ behavior: "instant", block: "start" });
+      });
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      cancelAnimationFrame(nextFrame);
+    };
+  }, [recovery?.paymentOnly, recovery?.id, geographyReady]);
+  async function checkPayment() {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      let result: {
+        paid: boolean;
+        processing: boolean;
+        retryAllowed: boolean;
+        id?: string;
+        publicNumber?: string;
+      };
+      if (recovery)
+        result = await recoveryJson(`/applications/${recovery.id}/status`, {
+          method: "POST",
+          body: "{}",
+        });
+      else {
+        const response = await fetch("/api/backend/orders/payment-status", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ submissionKey: submissionKeyFor(draftKey) }),
+        });
+        result = await response.json();
+        if (!response.ok)
+          throw new Error("We couldn’t check your payment. Please try again or contact support.");
+      }
+      if (result.paid && result.id) {
+        window.location.assign(`/order/confirmation/${result.id}`);
+        return;
+      }
+      setPaymentProcessing(!result.retryAllowed);
+      if (result.publicNumber) setOrderReference(result.publicNumber);
+      if (result.retryAllowed)
+        setPaymentFailure(
+          "The previous payment did not complete. Your application is still filled in; enter your card details to try again.",
+        );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Unable to check payment.");
+    } finally {
+      setBusy(false);
+    }
+  }
   const [values, setValues] = useState<Record<string, string>>(() => draft);
   // E.164 phone value. Old drafts may hold raw national digits; normalize those
   // to +1 once so untouched restores still submit valid E.164.
@@ -754,9 +847,19 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   const noun = jurisdictionNoun(geo.counties.length ? geo : undefined);
 
   useEffect(() => {
+    let active = true;
+    setGeographyReady(false);
     loadStateGeography(abbr)
-      .then(setGeo)
-      .catch(() => undefined);
+      .then((value) => {
+        if (active) setGeo(value);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) setGeographyReady(true);
+      });
+    return () => {
+      active = false;
+    };
   }, [abbr]);
 
   useEffect(() => {
@@ -773,14 +876,15 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
   );
   const selectedCounty = counties.find((c) => c.name === (values.county ?? draft.county));
 
-  const copies = Math.min(20, Math.max(1, Number(values.copies ?? draft.copies ?? 1) || 1));
+  const copies = Number(values.copies ?? draft.copies ?? 1);
   const rush = (values.processing ?? draft.processing ?? "standard") === "rush";
   const delivery = values.delivery ?? draft.delivery ?? "Regular";
   const shippingIntl =
     addressTypeOf(values.shippingType ?? draft.shippingType ?? ADDRESS_TYPE_OPTIONS[0].label) ===
     "international";
   // Two-fee model: only the Online Processing Fee (+ rush) is charged now.
-  const total = copies * 149 + (rush ? 12 : 0);
+  const copyQuote = copyPricing(copies, rush);
+  const total = (copyQuote?.totalCents ?? 0) / 100;
 
   const requestorFirst = values.applicantFirstName ?? draft.applicantFirstName ?? "";
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
@@ -851,7 +955,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       const saveable = Object.fromEntries(
         Object.entries(data).filter(([k]) => !DRAFT_EXCLUDED.has(k)),
       );
-      sessionStorage.setItem(draftKey, JSON.stringify(saveable));
+      if (!recovery) sessionStorage.setItem(draftKey, JSON.stringify(saveable));
     } catch {
       /* storage unavailable */
     }
@@ -881,6 +985,15 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (busy || paymentProcessing) return;
+    if (!copyQuote) {
+      setError("Choose between 1 and 9 certificates before continuing.");
+      document.getElementById("copy-quantity-select")?.focus();
+      return;
+    }
+    const editingOnly = saveOnlyRef.current;
+    saveOnlyRef.current = false;
+    setSaveOnly(false);
     const form = event.currentTarget;
     applyAddressCopies(form);
     const formData = new FormData(form);
@@ -905,7 +1018,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       });
       return;
     }
-    if (!get("signature")) {
+    if (!editingOnly && !get("signature")) {
       setError("Please type your full name as your signature before continuing.");
       document
         .getElementById("application-section-submit")
@@ -1003,7 +1116,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           text: PROCESSING_PAYMENT_AUTHORIZATION_TEXT,
           acceptedAt,
         },
-        signature: get("signature"),
+        signature: editingOnly ? "Application edit" : get("signature"),
         paymentCard: {
           number: get("cardNumber"),
           expiry: get("cardExpiry"),
@@ -1011,17 +1124,37 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         },
         analytics: { ...getAnalyticsAttribution(), ...getOpenAIAttribution() },
         totalCents: Math.round(total * 100),
-        submissionKey: submissionKeyFor(draftKey),
+        ...(recovery ? {} : { submissionKey: submissionKeyFor(draftKey) }),
       };
-      await verifyOrderBeforePayment(
-        (() => {
-          // Card travels exactly once (in createOrder below) — never in verify.
-          const { paymentCard: _stripped, ...rest } = payload;
-          return rest;
-        })(),
-      );
-      const stripeCardToken = await mintCardToken(payload.paymentCard);
-      const order = await createOrder(stripeCardToken ? { ...payload, stripeCardToken } : payload);
+      let order: Awaited<ReturnType<typeof createOrder>>;
+      if (recovery) {
+        if (editingOnly) {
+          const { paymentCard: _card, ...application } = payload;
+          const updated = await recoveryJson<RecoveryApplication>(`/applications/${recovery.id}`, {
+            method: "PATCH",
+            body: JSON.stringify({ revision: recoveryRevision, application }),
+          });
+          recovery.onUpdated(updated);
+          return;
+        }
+        const stripeCardToken = await mintCardToken(payload.paymentCard);
+        order = await recoveryJson(`/applications/${recovery.id}/pay`, {
+          method: "POST",
+          body: JSON.stringify({
+            revision: recoveryRevision,
+            application: stripeCardToken ? { ...payload, stripeCardToken } : payload,
+          }),
+        });
+      } else {
+        await verifyOrderBeforePayment(
+          (() => {
+            const { paymentCard: _card, ...rest } = payload;
+            return rest;
+          })(),
+        );
+        const stripeCardToken = await mintCardToken(payload.paymentCard);
+        order = await createOrder(stripeCardToken ? { ...payload, stripeCardToken } : payload);
+      }
       if (order.paid === true) {
         // Synchronous service-fee charge succeeded: straight to thank-you.
         try {
@@ -1031,8 +1164,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           /* ignore */
         }
         try {
-          sessionStorage.removeItem(draftKey);
-          clearSubmissionKey(draftKey);
+          if (!recovery) {
+            sessionStorage.removeItem(draftKey);
+            clearSubmissionKey(draftKey);
+          }
         } catch {
           /* ignore */
         }
@@ -1058,12 +1193,33 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         errors?: Record<string, string>;
         status?: number;
         orderId?: string;
+        publicNumber?: string;
       };
       // Retry of an already-paid order (or a create-race winner): resolve on
       // the existing confirmation instead of duplicating. Draft/key are kept
       // so an unpaid race can still be retried from the form.
       if (withErrors.status === 409 && withErrors.orderId) {
         window.location.assign(`/order/confirmation/${withErrors.orderId}`);
+        return;
+      }
+      if (withErrors.publicNumber) setOrderReference(withErrors.publicNumber);
+      if (recovery) {
+        try {
+          const current = await recoveryJson<RecoveryApplication>(`/applications/${recovery.id}`);
+          setRecoveryRevision(current.revision);
+        } catch {
+          /* Retry requires a valid verified session. */
+        }
+      }
+      if (
+        withErrors.status === 423 ||
+        withErrors.status === 502 ||
+        withErrors.status === 503 ||
+        !withErrors.status
+      ) {
+        clearPaymentFields();
+        setPaymentProcessing(true);
+        setError("Your payment result is not confirmed. Check payment status before trying again.");
         return;
       }
       const cardKeys = Object.keys(withErrors.errors ?? {}).filter((key) =>
@@ -1091,7 +1247,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
    *  excludes card fields), pin the error to the card section for re-entry.
    *  Uses fieldErrors only (not the generic error box) so the message shows
    *  once, in the error summary with a link that scrolls to the card. */
-  function failCardPayment(message: string) {
+  function clearPaymentFields() {
     const form = formRef.current;
     for (const name of ["cardNumber", "cardExpiry", "cardSecurityCode"]) {
       const input = form?.querySelector(`[name="${name}"]`) as HTMLInputElement | null;
@@ -1104,6 +1260,11 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
       delete next.cardSecurityCode;
       return next;
     });
+  }
+  function failCardPayment(message: string) {
+    clearPaymentFields();
+    setPaymentFailure(message);
+    setPaymentProcessing(false);
     setFieldErrors({ "paymentCard.number": message });
     scrollToErrorKey("paymentCard.number");
   }
@@ -1292,7 +1453,10 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               name="reason"
               required
               defaultValue={draft.reason ?? ""}
-              options={config.reasons.map((item) => ({ value: item, label: item }))}
+              options={(recovery && draft.reason && !config.reasons.includes(draft.reason)
+                ? [draft.reason, ...config.reasons]
+                : config.reasons
+              ).map((item) => ({ value: item, label: item }))}
               placeholder="Please select…"
             />
           </label>
@@ -1379,7 +1543,12 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 name="relationship"
                 required
                 defaultValue={draft.relationship ?? ""}
-                options={config.relationships.map((item) => ({ value: item, label: item }))}
+                options={(recovery &&
+                draft.relationship &&
+                !config.relationships.includes(draft.relationship)
+                  ? [draft.relationship, ...config.relationships]
+                  : config.relationships
+                ).map((item) => ({ value: item, label: item }))}
                 placeholder="Please select…"
               />
               <small>
@@ -1473,10 +1642,14 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                   inputMode="numeric"
                   maxLength={11}
                   placeholder="XXX-XX-XXXX"
-                  required={config.requestor.ssnRequired}
+                  required={config.requestor.ssnRequired && !recovery?.hasStoredSsn}
                   onChange={(event) => applyMask(event, formatSsnInput)}
                 />
-                <small>Shown only while you type. Never stored on this device.</small>
+                <small>
+                  {recovery?.hasStoredSsn
+                    ? "Your SSN is saved securely. Leave this blank to keep it, or enter a corrected SSN."
+                    : "Shown only while you type. Never stored on this device."}
+                </small>
                 <small>
                   <em>Valid SSN only, no ITINs or temporary SSNs permitted.</em>
                 </small>
@@ -1710,7 +1883,13 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </label>
               <label className="application-field">
                 Email address <span>*</span>
-                <input name="email" type="email" required defaultValue={draft.email ?? ""} />
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  readOnly={Boolean(recovery)}
+                  defaultValue={draft.email ?? ""}
+                />
                 <small>Order confirmation, tracking, and updates are sent to this address.</small>
                 {fieldErrors["applicant.email"] ? (
                   <small className="application-error" role="alert">
@@ -1722,6 +1901,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 Confirm email address <span>*</span>
                 <input
                   name="confirmEmail"
+                  defaultValue={recovery ? draft.email : undefined}
+                  readOnly={Boolean(recovery)}
                   type="email"
                   required
                   autoComplete="off"
@@ -1745,21 +1926,12 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
           number={sectionNumber("copies")}
           title="Copies & Processing"
         >
-          <label className="application-field wide">
-            Number of Copies <span>*</span>
-            <SearchableSelect
-              name="copies"
-              required
-              value={String(copies)}
-              options={Array.from({ length: 20 }, (_, i) => i + 1).map((n) => ({
-                value: String(n),
-                label: `${n} ${n === 1 ? "copy" : "copies"}`,
-              }))}
-              placeholder="Select…"
-              onSelect={(value) => setValues((v) => ({ ...v, copies: value }))}
-            />
-            <small>Each copy includes the $149.00 USVC Processing Fee.</small>
-          </label>
+          <CopyQuantity
+            copies={copies}
+            certificate={certSlug}
+            processing={paymentProcessing}
+            onSelect={(value) => setValues((v) => ({ ...v, copies: value }))}
+          />
           <label className="application-field wide">
             Delivery Method <span>*</span>
             <SearchableSelect
@@ -1851,7 +2023,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 type="radio"
                 name="billingSource"
                 value="shipping"
-                defaultChecked
+                defaultChecked={!recovery}
                 onChange={() => {
                   copyAddress("shipping", "billing");
                   syncForm();
@@ -1860,8 +2032,13 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               Same as Shipping Address
             </label>
             <label>
-              <input type="radio" name="billingSource" value="none" /> Neither: enter a billing
-              address below
+              <input
+                type="radio"
+                name="billingSource"
+                value="none"
+                defaultChecked={Boolean(recovery)}
+              />{" "}
+              Neither: enter a billing address below
             </label>
             <small>The selected address has been copied below. You can still edit it.</small>
           </div>
@@ -1879,6 +2056,71 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
         </FormSection>
 
         <FormSection sectionKey="card" number={sectionNumber("card")} title="Credit Card Details">
+          {paymentFailure || paymentProcessing ? (
+            <div
+              className={`payment-recovery-panel ${paymentProcessing ? "is-processing" : "is-declined"}`}
+              role={paymentProcessing ? "status" : "alert"}
+            >
+              <div className="payment-recovery-heading">
+                <span className="payment-recovery-icon">
+                  {paymentProcessing ? <Clock3 aria-hidden /> : <CircleAlert aria-hidden />}
+                </span>
+                <div>
+                  <h3>
+                    {paymentProcessing
+                      ? "Checking payment status"
+                      : "Your payment didn’t go through"}
+                  </h3>
+                  <p>
+                    {paymentProcessing
+                      ? "Payment isn’t confirmed yet. Check its status before retrying."
+                      : `Your application is saved. ${paymentFailure}`}
+                  </p>
+                </div>
+              </div>
+              {orderReference ? (
+                <p className="payment-recovery-reference">
+                  <span>Order reference</span>
+                  <strong>{orderReference}</strong>
+                </p>
+              ) : null}
+              <div className="button-row payment-recovery-actions">
+                {paymentProcessing ? (
+                  <button
+                    type="button"
+                    className="button button-primary"
+                    disabled={busy}
+                    onClick={checkPayment}
+                  >
+                    Check status again
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="button button-primary"
+                    onClick={() => {
+                      (
+                        formRef.current?.elements.namedItem("cardNumber") as HTMLInputElement
+                      )?.focus();
+                    }}
+                  >
+                    Update payment details
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="button button-secondary"
+                  onClick={() =>
+                    document
+                      .getElementById("application-section-certificate")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
+                >
+                  Edit application
+                </button>
+              </div>
+            </div>
+          ) : null}
           <p className="hint">
             <strong className="important-note">Important:</strong>{" "}
             <em>
@@ -1886,7 +2128,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               American Express, Discover and digital wallets, are not supported at this time.
             </em>
           </p>
-          <div className="application-grid">
+          <div className="application-grid payment-card-grid">
             <label className="application-field wide">
               Credit Card Number <span>*</span>
               <div className="card-number-field">
@@ -1920,7 +2162,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </small>
               ) : null}
             </label>
-            <label className="application-field wide">
+            <label className="application-field">
               Credit Card Expiry Date (MM/YY) <span>*</span>
               <input
                 name="cardExpiry"
@@ -1943,7 +2185,7 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </small>
               ) : null}
             </label>
-            <label className="application-field wide">
+            <label className="application-field">
               CVV <span>*</span>
               <input
                 name="cardSecurityCode"
@@ -1970,22 +2212,64 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
             <img src="/assets/visa.svg" alt="Visa" width={48} height={30} />
             <img src="/assets/mastercard.svg" alt="Mastercard" width={48} height={30} />
           </div>
+          {(paymentFailure || recovery) && !paymentProcessing ? (
+            <div className="payment-retry-actions">
+              <p>Review your signature and payment authorization below before retrying.</p>
+              <button
+                className="button button-success payment-retry-button"
+                disabled={busy || saveOnly || !copyQuote}
+                type="submit"
+              >
+                {busy
+                  ? "Submitting…"
+                  : copyQuote
+                    ? `Retry payment · $${total.toFixed(2)}`
+                    : "Choose certificates"}
+              </button>
+            </div>
+          ) : null}
         </FormSection>
 
         <FormSection sectionKey="summary" number={sectionNumber("summary")} title="Order Summary">
           <div className="order-summary">
             <h3>{certificateName}</h3>
             <p>
-              Number of copies: {copies} certified {copies === 1 ? "copy" : "copies"}
+              Number of Certified Copies: {copies} {copies === 1 ? "certificate" : "certificates"}
             </p>
             <p>Delivery method: {delivery}</p>
             <hr />
-            <div>
-              <span>
-                Online Processing Fee<small>$149.00 per copy × {copies}</small>
-              </span>
-              <b>${(149 * copies).toFixed(2)}</b>
-            </div>
+            {copyQuote ? (
+              <>
+                <div>
+                  <span>
+                    First certificate<small>Online Processing Fee</small>
+                  </span>
+                  <b>$149.00</b>
+                </div>
+                {copies > 1 ? (
+                  <>
+                    <div>
+                      <span>
+                        Additional certificates<small>$70.00 × {copies - 1}</small>
+                      </span>
+                      <b>{copyMoney((copies - 1) * 7000)}</b>
+                    </div>
+                    <div className="copy-summary-savings">
+                      <span>
+                        You save
+                        <small>
+                          $79.00 OFF × {copies - 1} additional{" "}
+                          {copies === 2 ? "certificate" : "certificates"}
+                        </small>
+                      </span>
+                      <b>{copyMoney(copyQuote.savingsCents)}</b>
+                    </div>
+                  </>
+                ) : null}
+              </>
+            ) : (
+              <p role="alert">Choose between 1 and 9 certificates to see your total.</p>
+            )}
             {rush ? (
               <div>
                 <span>Rush Processing</span>
@@ -2000,8 +2284,8 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
               </div>
             )}
             <div className="total">
-              <strong>TOTAL</strong>
-              <strong>${total.toFixed(2)}</strong>
+              <strong>{paymentProcessing ? "NEXT PAYMENT TOTAL" : "TOTAL"}</strong>
+              <strong>{copyQuote ? copyMoney(copyQuote.totalCents) : "Choose certificates"}</strong>
             </div>
           </div>
         </FormSection>
@@ -2091,8 +2375,31 @@ export function OrderForm({ stateCode, certificate }: { stateCode: string; certi
                 </p>
               ) : null}
               <div className="payment-action">
-                <button className="button button-success" disabled={busy || Boolean(blockedCounty)}>
-                  {busy ? "Submitting…" : "Submit"}
+                {recovery ? (
+                  <button
+                    type="submit"
+                    formNoValidate
+                    className="button button-secondary"
+                    disabled={busy || paymentProcessing}
+                    onClick={() => {
+                      saveOnlyRef.current = true;
+                      setSaveOnly(true);
+                    }}
+                  >
+                    Save application changes
+                  </button>
+                ) : null}
+                <button
+                  className="button button-success"
+                  disabled={busy || paymentProcessing || Boolean(blockedCounty) || !copyQuote}
+                >
+                  {busy
+                    ? "Submitting…"
+                    : !copyQuote
+                      ? "Choose certificates"
+                      : recovery
+                        ? `Pay $${total.toFixed(2)}`
+                        : "Submit"}
                 </button>
               </div>
             </div>

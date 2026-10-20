@@ -21,6 +21,16 @@ async function proxy(request: NextRequest, context: RouteContext<"/api/backend/[
   const forwardedFor = request.headers.get("x-forwarded-for");
   if (forwardedFor) headers.set("x-forwarded-for", forwardedFor);
 
+  if (path[0] === "recovery") {
+    const cookie = request.headers.get("cookie");
+    const recoveryCookie = cookie
+      ?.split(";")
+      .map((v) => v.trim())
+      .find((v) => v.startsWith("usvc-recovery="));
+    if (recoveryCookie) headers.set("cookie", recoveryCookie);
+    const origin = request.headers.get("origin");
+    if (origin) headers.set("origin", origin);
+  }
   let response: Response;
   try {
     response = await fetch(target, {
@@ -48,6 +58,11 @@ async function proxy(request: NextRequest, context: RouteContext<"/api/backend/[
   // Pass through so file downloads keep their server filename.
   const disposition = response.headers.get("content-disposition");
   if (disposition) responseHeaders.set("content-disposition", disposition);
+  if (path[0] === "recovery") {
+    for (const cookie of response.headers.getSetCookie())
+      responseHeaders.append("set-cookie", cookie);
+    responseHeaders.set("cache-control", "no-store");
+  }
   return new Response(response.body, { status: response.status, headers: responseHeaders });
 }
 

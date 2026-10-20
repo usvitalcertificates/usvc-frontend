@@ -89,10 +89,12 @@ async function post<T>(path: string, payload: unknown): Promise<T> {
       errors?: Record<string, string>;
       status?: number;
       orderId?: string;
+      publicNumber?: string;
     };
     error.errors = body.errors;
     error.status = r.status;
     error.orderId = body.orderId;
+    (error as Error & { publicNumber?: string }).publicNumber = body.publicNumber;
     throw error;
   }
   return body as T;

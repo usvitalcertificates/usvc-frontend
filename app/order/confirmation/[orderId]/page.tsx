@@ -14,6 +14,7 @@ function formatUSD(cents: number): string {
 
 function ConfirmationBody({ orderId }: { orderId: string }) {
   const [state, setState] = useState<"verifying" | "paid" | "unverified">("verifying");
+  const [version, setVersion] = useState(0);
   const [receipt, setReceipt] = useState<{ publicNumber: string; amountCents: number } | null>(
     null,
   );
@@ -21,10 +22,11 @@ function ConfirmationBody({ orderId }: { orderId: string }) {
   useEffect(() => {
     // Straight-through flow: resolve the paid receipt by order id.
     if (!orderId) return;
+    setState("verifying");
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`${api}/orders/${orderId}/summary`);
+        const res = await fetch(`${api}/orders/${orderId}/summary`, { cache: "no-store" });
         const body = (await res.json()) as {
           paid?: boolean;
           paymentStatus?: string;
@@ -49,7 +51,7 @@ function ConfirmationBody({ orderId }: { orderId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [orderId]);
+  }, [orderId, version]);
 
   useEffect(() => {
     if (state === "paid" && receipt && orderId) {
@@ -90,12 +92,18 @@ function ConfirmationBody({ orderId }: { orderId: string }) {
             </>
           ) : (
             <>
-              <h1>Thank you for your order</h1>
-              <p>Your payment didn&apos;t complete. Return to the form to try again.</p>
+              <h1>Payment is not confirmed</h1>
+              <p>
+                We couldn’t confirm payment for this order. Check its status again or securely
+                resume your saved application.
+              </p>
               <div className="button-row">
-                <Link className="button button-primary" href="/find-your-state">
-                  Start a new request
-                </Link>
+                <button className="button button-primary" onClick={() => setVersion((v) => v + 1)}>
+                  Check status again
+                </button>
+                <a className="button button-secondary" href="/resume">
+                  Resume application
+                </a>
                 <Link className="button button-secondary" href="/track-order">
                   Track an order
                 </Link>

@@ -62,7 +62,21 @@ export function middleware(request: NextRequest) {
     return response;
   };
   const withStaffFlag = () => {
-    if (!staffArea) return NextResponse.next();
+    if (!staffArea) {
+      const headers = new Headers(request.headers);
+      headers.delete("x-staff-area");
+      headers.set(
+        "x-private-recovery",
+        pathname === "/resume" || pathname.startsWith("/resume/") ? "1" : "0",
+      );
+      const response = NextResponse.next({ request: { headers } });
+      if (headers.get("x-private-recovery") === "1") {
+        response.headers.set("cache-control", "no-store");
+        response.headers.set("referrer-policy", "no-referrer");
+        response.headers.set("x-robots-tag", "noindex, nofollow");
+      }
+      return response;
+    }
     const headers = new Headers(request.headers);
     headers.set("x-staff-area", "1");
     const response = NextResponse.next({ request: { headers } });
@@ -96,9 +110,9 @@ export function middleware(request: NextRequest) {
     return new NextResponse("Not found", { status: 404 });
   }
   if (PUBLIC_FUNNEL.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))) {
-    return NextResponse.next();
+    return withStaffFlag();
   }
-  return NextResponse.next();
+  return withStaffFlag();
 }
 
 export const config = {
