@@ -4,6 +4,9 @@ Last updated: 2026-10-20. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 
 ## Implemented
 
+- Recognizable resume routes (2026-10-20): middleware rewrites descriptive `/resume-{state}-{certificate}-certificate` paths to the existing recovery UI without redirects or authority from path labels. All `/resume-*` paths, including invalid labels, inherit no-store/noindex/no-referrer headers and server/client analytics exclusions. Existing fragment consumption, OTP verification, generic email recovery and old links remain compatible.
+- Verification: frontend tests/typecheck/build/lint/format pass. Synthetic browser flow covered emailed link → fragment removal → explicit code → single correct saved application → prefilled form with blank SSN/card fields. Changing state/type in the URL and returning to legacy `/resume` did not broaden the verified session. Valid/invalid descriptive paths returned privacy headers; no Google/OpenAI scripts loaded. Backend email previews cover all six customer templates on desktop/320px, including the approved website/dynamic-year footer. No deployment, production edits, real emails, PRs or push.
+
 - Copy guidance placement (2026-10-20): moved certificate-specific guidance above the Number of Certified Copies label on all forms and recovery, using the existing muted italic info style and red Important label.
 
 - Certificate guidance refinement (2026-10-20): capitalized quantity labels (1 Certificate, 2 Certificates) and added concise, certificate-specific guidance above the selector explaining separate uses and that recipients may retain submitted copies. Guidance is associated with the selector for screen readers.
