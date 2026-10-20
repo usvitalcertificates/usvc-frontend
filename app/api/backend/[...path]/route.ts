@@ -42,6 +42,9 @@ async function proxy(request: NextRequest, context: RouteContext<"/api/backend/[
   const responseHeaders = new Headers();
   const responseContentType = response.headers.get("content-type");
   if (responseContentType) responseHeaders.set("content-type", responseContentType);
+  // Preserve no-store on audited customer/payment responses through the proxy.
+  const cacheControl = response.headers.get("cache-control");
+  if (cacheControl) responseHeaders.set("cache-control", cacheControl);
   // Pass through so file downloads keep their server filename.
   const disposition = response.headers.get("content-disposition");
   if (disposition) responseHeaders.set("content-disposition", disposition);

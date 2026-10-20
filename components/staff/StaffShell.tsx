@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Archive,
+  CreditCard,
+  PhoneCall,
   ChartNoAxesCombined,
   Inbox,
   LogOut,
@@ -124,7 +126,17 @@ export function StaffShell({ children }: { children: ReactNode }) {
   if (authState !== "signed-in") return null;
 
   const link = (href: string, label: string, Icon: LucideIcon) => (
-    <Link key={href} href={href} aria-current={pathname === href ? "page" : undefined}>
+    <Link
+      key={href}
+      href={href}
+      aria-current={
+        pathname === href ||
+        ((href === "/staff/unpaid-orders" || href === "/staff/payments") &&
+          pathname.startsWith(`${href}/`))
+          ? "page"
+          : undefined
+      }
+    >
       <Icon aria-hidden />
       {label}
     </Link>
@@ -157,6 +169,12 @@ export function StaffShell({ children }: { children: ReactNode }) {
           {role === "ADMIN" || role === "CS"
             ? link("/staff/cs", "CS Corrections", UserCheck)
             : null}
+          {role === "ADMIN" || role === "CS" ? (
+            <>
+              {link("/staff/unpaid-orders", "Unpaid Orders", PhoneCall)}
+              {link("/staff/payments", "Stripe Payments", CreditCard)}
+            </>
+          ) : null}
           {link("/staff/settings", "Settings", Settings)}
         </nav>
         <div className="staff-userbox">

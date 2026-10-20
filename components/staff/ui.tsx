@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 
 export const STATUS_LABELS: Record<string, string> = {
+  DRAFT: "Draft",
+  AWAITING_PAYMENT: "Awaiting payment",
   PAID: "Payment Successful",
   IN_REVIEW: "Order Processing",
   TO_CS: "To CS",
