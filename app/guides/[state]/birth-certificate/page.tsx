@@ -169,9 +169,9 @@ export default async function BirthCertificateGuide({
             USVC is an independent document assistance service, not a government agency. We provide
             a guided online request flow in plain language, review submitted information for
             completeness and inconsistencies, file the request with the agency, and help you track
-            the request process. Our online processing fee is $149.00 for the first copy and $70.00
-            for each additional copy; agency fees are charged separately upon review and acceptance
-            by the state agency.
+            the request process. Our online processing fee is $149.00 for the first certificate and
+            $70.00 for each additional certificate; agency fees are charged separately upon review
+            and acceptance by the state agency.
           </p>
           <p>
             <Link className="button button-primary" href={orderUrl}>

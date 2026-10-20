@@ -987,7 +987,7 @@ export function OrderForm({
     event.preventDefault();
     if (busy || paymentProcessing) return;
     if (!copyQuote) {
-      setError("Choose between 1 and 9 copies before continuing.");
+      setError("Choose between 1 and 9 certificates before continuing.");
       document.getElementById("copy-quantity-select")?.focus();
       return;
     }
@@ -2224,7 +2224,7 @@ export function OrderForm({
                   ? "Submitting…"
                   : copyQuote
                     ? `Retry payment · $${total.toFixed(2)}`
-                    : "Choose copies"}
+                    : "Choose certificates"}
               </button>
             </div>
           ) : null}
@@ -2234,7 +2234,7 @@ export function OrderForm({
           <div className="order-summary">
             <h3>{certificateName}</h3>
             <p>
-              Number of copies: {copies} certified {copies === 1 ? "copy" : "copies"}
+              Number of Certified Copies: {copies} {copies === 1 ? "certificate" : "certificates"}
             </p>
             <p>Delivery method: {delivery}</p>
             <hr />
@@ -2242,7 +2242,7 @@ export function OrderForm({
               <>
                 <div>
                   <span>
-                    First copy<small>Online Processing Fee</small>
+                    First certificate<small>Online Processing Fee</small>
                   </span>
                   <b>$149.00</b>
                 </div>
@@ -2250,7 +2250,7 @@ export function OrderForm({
                   <>
                     <div>
                       <span>
-                        Additional copies<small>$70.00 × {copies - 1}</small>
+                        Additional certificates<small>$70.00 × {copies - 1}</small>
                       </span>
                       <b>{copyMoney((copies - 1) * 7000)}</b>
                     </div>
@@ -2258,7 +2258,8 @@ export function OrderForm({
                       <span>
                         You save
                         <small>
-                          $79.00 OFF × {copies - 1} additional {copies === 2 ? "copy" : "copies"}
+                          $79.00 OFF × {copies - 1} additional{" "}
+                          {copies === 2 ? "certificate" : "certificates"}
                         </small>
                       </span>
                       <b>{copyMoney(copyQuote.savingsCents)}</b>
@@ -2267,7 +2268,7 @@ export function OrderForm({
                 ) : null}
               </>
             ) : (
-              <p role="alert">Choose between 1 and 9 copies to see your total.</p>
+              <p role="alert">Choose between 1 and 9 certificates to see your total.</p>
             )}
             {rush ? (
               <div>
@@ -2284,7 +2285,7 @@ export function OrderForm({
             )}
             <div className="total">
               <strong>{paymentProcessing ? "NEXT PAYMENT TOTAL" : "TOTAL"}</strong>
-              <strong>{copyQuote ? copyMoney(copyQuote.totalCents) : "Choose copies"}</strong>
+              <strong>{copyQuote ? copyMoney(copyQuote.totalCents) : "Choose certificates"}</strong>
             </div>
           </div>
         </FormSection>
@@ -2395,7 +2396,7 @@ export function OrderForm({
                   {busy
                     ? "Submitting…"
                     : !copyQuote
-                      ? "Choose copies"
+                      ? "Choose certificates"
                       : recovery
                         ? `Pay $${total.toFixed(2)}`
                         : "Submit"}
