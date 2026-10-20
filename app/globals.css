@@ -3361,3 +3361,38 @@ textarea {
     min-height: 44px;
   }
 }
+
+.recovery-loading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 150px;
+}
+.recovery-loading h2 {
+  font-size: 24px;
+  margin: 0 0 8px;
+}
+.recovery-loading p {
+  margin: 0;
+  color: #666477;
+  font-size: 16px;
+}
+.recovery-loading-spinner {
+  width: 26px;
+  height: 26px;
+  border: 3px solid #e1e2eb;
+  border-top-color: var(--navy);
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: recovery-spin 0.8s linear infinite;
+}
+@keyframes recovery-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .recovery-loading-spinner {
+    animation: none;
+  }
+}
