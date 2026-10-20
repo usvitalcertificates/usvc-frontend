@@ -1,4 +1,5 @@
 "use client";
+import { FileText, CalendarDays, ShieldCheck, ArrowRight } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { recoveryJson, recoveryDraft, type RecoveryApplication } from "@/lib/recovery-client";
 import { OrderForm } from "@/app/state/[state]/[certificate]/order-form";
@@ -178,29 +179,64 @@ export default function ResumePage() {
             />
           </>
         ) : orders ? (
-          <section className="recovery-card">
-            <h2>Saved applications</h2>
+          <section className="recovery-card recovery-saved-list">
+            <div className="recovery-list-heading">
+              <div>
+                <h2>Saved applications</h2>
+                <p>Choose an application to continue.</p>
+              </div>
+              <span className="recovery-private-label">
+                <ShieldCheck aria-hidden /> Verified access
+              </span>
+            </div>
             {orders.length ? (
               orders.map((order) => (
                 <article className="recovery-order" key={order.id}>
-                  <div>
-                    <h3>{order.publicNumber}</h3>
-                    <p>
-                      {order.stateName} · {order.certificate.toLowerCase()} certificate
-                    </p>
-                    <p>
-                      {new Date(order.createdAt).toLocaleDateString()} ·{" "}
-                      {(order.amountCents / 100).toLocaleString("en-US", {
-                        style: "currency",
-                        currency: order.currency,
-                      })}{" "}
-                      ·{" "}
-                      {order.processing
-                        ? "payment needs checking"
-                        : order.paymentStatus.toLowerCase()}
-                    </p>
+                  <div className="recovery-order-main">
+                    <span className="recovery-document-icon">
+                      <FileText aria-hidden />
+                    </span>
+                    <div className="recovery-order-info">
+                      <span className="recovery-order-caption">Order reference</span>
+                      <h3>{order.publicNumber}</h3>
+                      <p>
+                        {order.stateName} ·{" "}
+                        {order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()}{" "}
+                        certificate
+                      </p>
+                      <span className="recovery-order-date">
+                        <CalendarDays aria-hidden /> Created{" "}
+                        {new Date(order.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    <div className="recovery-order-payment">
+                      <span className="recovery-order-caption">Order total</span>
+                      <strong>
+                        {(order.amountCents / 100).toLocaleString("en-US", {
+                          style: "currency",
+                          currency: order.currency,
+                        })}
+                      </strong>
+                      <span
+                        className={`recovery-payment-badge ${order.processing ? "checking" : order.paymentStatus === "PAID" ? "paid" : order.paymentStatus === "FAILED" ? "failed" : "pending"}`}
+                      >
+                        {order.processing
+                          ? "Payment needs checking"
+                          : order.paymentStatus === "FAILED"
+                            ? "Payment unsuccessful"
+                            : order.paymentStatus === "PAID"
+                              ? "Paid"
+                              : order.paymentStatus === "REFUNDED"
+                                ? "Refunded"
+                                : "Awaiting payment"}
+                      </span>
+                    </div>
                   </div>
-                  <div className="button-row">
+                  <div className="button-row recovery-order-actions">
                     {order.paymentStatus === "PAID" ? (
                       <a className="button button-primary" href={`/order/confirmation/${order.id}`}>
                         View confirmation
@@ -214,7 +250,7 @@ export default function ResumePage() {
                           disabled={busy}
                           onClick={() => open(order, true)}
                         >
-                          Complete payment
+                          Complete payment <ArrowRight aria-hidden />
                         </button>
                         <button
                           className="button button-secondary"

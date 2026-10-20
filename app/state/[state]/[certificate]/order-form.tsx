@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Clock3, CircleAlert } from "lucide-react";
 import { recoveryJson, type RecoveryApplication } from "@/lib/recovery-client";
 import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { PhoneInput } from "react-international-phone";
@@ -2030,22 +2031,37 @@ export function OrderForm({
 
         <FormSection sectionKey="card" number={sectionNumber("card")} title="Credit Card Details">
           {paymentFailure || paymentProcessing ? (
-            <div className="payment-recovery-panel" role="alert">
-              <h3>
-                {paymentProcessing ? "Checking payment status" : "Your payment didn’t go through"}
-              </h3>
-              <p>
-                {paymentProcessing
-                  ? "Your payment result is not confirmed. Check its status before trying again."
-                  : "Your application details are still filled in. Check your card details or try another card."}
-              </p>
-              {!paymentProcessing ? <p>{paymentFailure}</p> : null}
+            <div
+              className={`payment-recovery-panel ${paymentProcessing ? "is-processing" : "is-declined"}`}
+              role={paymentProcessing ? "status" : "alert"}
+            >
+              <div className="payment-recovery-heading">
+                <span className="payment-recovery-icon">
+                  {paymentProcessing ? <Clock3 aria-hidden /> : <CircleAlert aria-hidden />}
+                </span>
+                <div>
+                  <h3>
+                    {paymentProcessing
+                      ? "Checking payment status"
+                      : "Your payment didn’t go through"}
+                  </h3>
+                  <p>
+                    {paymentProcessing
+                      ? "Your payment result is not confirmed. Check its status before trying again."
+                      : "Your application details are still filled in. Check your card details or try another card."}
+                  </p>
+                  {!paymentProcessing ? (
+                    <p className="payment-recovery-description">{paymentFailure}</p>
+                  ) : null}
+                </div>
+              </div>
               {orderReference ? (
-                <p>
-                  Order reference: <strong>{orderReference}</strong>
+                <p className="payment-recovery-reference">
+                  <span>Order reference</span>
+                  <strong>{orderReference}</strong>
                 </p>
               ) : null}
-              <div className="button-row">
+              <div className="button-row payment-recovery-actions">
                 {paymentProcessing ? (
                   <button
                     type="button"
@@ -2090,7 +2106,7 @@ export function OrderForm({
               American Express, Discover and digital wallets, are not supported at this time.
             </em>
           </p>
-          <div className="application-grid">
+          <div className="application-grid payment-card-grid">
             <label className="application-field wide">
               Credit Card Number <span>*</span>
               <div className="card-number-field">
@@ -2124,7 +2140,7 @@ export function OrderForm({
                 </small>
               ) : null}
             </label>
-            <label className="application-field wide">
+            <label className="application-field">
               Credit Card Expiry Date (MM/YY) <span>*</span>
               <input
                 name="cardExpiry"
@@ -2147,7 +2163,7 @@ export function OrderForm({
                 </small>
               ) : null}
             </label>
-            <label className="application-field wide">
+            <label className="application-field">
               CVV <span>*</span>
               <input
                 name="cardSecurityCode"
