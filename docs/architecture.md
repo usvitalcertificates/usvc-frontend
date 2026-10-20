@@ -78,3 +78,7 @@ ADMIN/CS-only routes: `/staff/unpaid-orders` (POST search body, filters, paginat
 `/resume` is a dynamic private public-site route: recovery links arrive in a fragment, are immediately removed from the visible URL, and are exchanged through body-only same-origin requests. Customers explicitly request an email code before listing or reading saved applications. The backend issues the scoped HttpOnly cookie; only recovery proxy requests forward it. Recovery pages omit analytics, set no-referrer/no-store/noindex, and store no credentials or prefilled application data in browser storage.
 
 The existing OrderForm accepts a verified recovery context and whitelisted initial values without using its normal browser draft. Recovery edits and retries use revision-checked backend endpoints; SSNs/cards are never fetched. Normal card declines stay on the existing filled form, while uncertain results use submission-key status checks. ADMIN/CS link controls live on the existing unpaid-order follow-up detail page.
+
+## Descriptive recovery aliases
+
+Middleware rewrites `/resume-*` to `/resume` while retaining the browser URL and applying the same private recovery headers/root-layout tracking exclusion. Analytics helpers also exclude the aliases. Path labels carry no authorization; the existing backend grant and verified cookie determine accessible orders. Invalid labels use the same safe recovery screen.

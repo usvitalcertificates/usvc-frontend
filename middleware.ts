@@ -67,9 +67,13 @@ export function middleware(request: NextRequest) {
       headers.delete("x-staff-area");
       headers.set(
         "x-private-recovery",
-        pathname === "/resume" || pathname.startsWith("/resume/") ? "1" : "0",
+        pathname === "/resume" || pathname.startsWith("/resume/") || pathname.startsWith("/resume-")
+          ? "1"
+          : "0",
       );
-      const response = NextResponse.next({ request: { headers } });
+      const response = pathname.startsWith("/resume-")
+        ? NextResponse.rewrite(new URL("/resume", request.url), { request: { headers } })
+        : NextResponse.next({ request: { headers } });
       if (headers.get("x-private-recovery") === "1") {
         response.headers.set("cache-control", "no-store");
         response.headers.set("referrer-policy", "no-referrer");
