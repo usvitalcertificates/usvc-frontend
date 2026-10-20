@@ -5,7 +5,18 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { staffData, staffJson } from "@/lib/staff-client";
 import { CopyIconButton } from "./CopyButton";
-import { Mail, Phone, UserRound, ClipboardList, MessageSquareText } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  UserRound,
+  ClipboardList,
+  MessageSquareText,
+  Link2,
+  Copy,
+  RefreshCw,
+  ShieldCheck,
+  Clock3,
+} from "lucide-react";
 import { BackLink, PageBand, SkeletonRows, StatusPill } from "./ui";
 import {
   DashboardAccess,
@@ -83,20 +94,11 @@ function DetailBody({ id }: { id: string }) {
       setLinkBusy(false);
     }
   }
-  async function copyResume(message = false) {
-    if (!resumeLink || !detail) return;
-    const state =
-      detail.order.paymentStatus === "FAILED"
-        ? "Your payment wasn’t completed."
-        : detail.order.unresolved
-          ? "Your payment status needs to be checked."
-          : "Your saved application is awaiting payment.";
-    const value = message
-      ? `${state} You can continue your saved application using this link: ${resumeLink.url} . Your application details are saved. Verify your email to review your application and payment status. This link expires in 7 days.`
-      : resumeLink.url;
+  async function copyResume() {
+    if (!resumeLink) return;
     try {
-      await navigator.clipboard.writeText(value);
-      setLinkNotice(message ? "Suggested message copied." : "Resume link copied.");
+      await navigator.clipboard.writeText(resumeLink.url);
+      setLinkNotice("Resume link copied.");
     } catch {
       setLinkNotice("Could not copy automatically. Select and copy the link below.");
     }
@@ -328,53 +330,82 @@ function DetailBody({ id }: { id: string }) {
             </section>
           </div>
           <section className="staff-panel staff-resume-panel" aria-labelledby="resume-link-heading">
-            <h2 id="resume-link-heading">Resume application</h2>
-            <p>
-              Share a secure link so the customer can review their saved application and complete
-              payment. Email verification is required. Emails are sent manually by your team.
-            </p>
+            <div className="staff-resume-header">
+              <div className="staff-resume-title">
+                <span className="staff-recovery-icon">
+                  <Link2 aria-hidden />
+                </span>
+                <div>
+                  <h2 id="resume-link-heading">Resume application</h2>
+                  <p>Share the customer’s saved application in your follow-up email.</p>
+                </div>
+              </div>
+              {detail.order.paymentStatus !== "REFUNDED" ? (
+                <span className="staff-resume-verification">
+                  <ShieldCheck aria-hidden /> Email verification required
+                </span>
+              ) : null}
+            </div>
             {detail.order.paymentStatus === "REFUNDED" ? (
-              <p>Refunded orders cannot be reopened or charged through recovery.</p>
-            ) : (
-              <>
-                <div className="staff-resume-actions">
+              <p className="staff-resume-empty">
+                Refunded orders cannot be reopened or charged through recovery.
+              </p>
+            ) : resumeLink ? (
+              <div className="staff-resume-content">
+                <label htmlFor="private-resume-link">Private resume link</label>
+                <div className="staff-resume-link-row">
+                  <input
+                    id="private-resume-link"
+                    readOnly
+                    value={resumeLink.url}
+                    onFocus={(e) => e.target.select()}
+                    aria-describedby="resume-link-help"
+                  />
+                  <button className="staff-btn" onClick={copyResume}>
+                    <Copy aria-hidden /> Copy link
+                  </button>
+                </div>
+                <div className="staff-resume-footer">
+                  <div>
+                    <p className="staff-resume-expiry">
+                      <Clock3 aria-hidden /> Expires {dateTime(resumeLink.expiresAt)}
+                    </p>
+                    <p id="resume-link-help">
+                      Send this link manually. Replacing it disables the previous link and its
+                      sessions.
+                    </p>
+                  </div>
                   <button
-                    className="staff-btn"
+                    className="staff-btn secondary"
                     disabled={linkBusy || detail.order.paymentStatus === "PAID"}
                     onClick={generateResumeLink}
                   >
-                    {linkBusy
-                      ? "Generating…"
-                      : resumeLink
-                        ? "Replace link"
-                        : "Generate resume link"}
+                    <RefreshCw aria-hidden />
+                    {linkBusy ? "Replacing…" : "Replace link"}
                   </button>
-                  {resumeLink ? (
-                    <>
-                      <button className="staff-btn secondary" onClick={() => copyResume()}>
-                        Copy link
-                      </button>
-                      <button className="staff-btn secondary" onClick={() => copyResume(true)}>
-                        Copy suggested message
-                      </button>
-                    </>
-                  ) : null}
                 </div>
-                {resumeLink ? (
-                  <>
-                    <label>
-                      Private resume link
-                      <input readOnly value={resumeLink.url} onFocus={(e) => e.target.select()} />
-                    </label>
-                    <p>
-                      Expires {dateTime(resumeLink.expiresAt)}. Replacing the link revokes previous
-                      links and their sessions.
-                    </p>
-                  </>
-                ) : null}
-              </>
+              </div>
+            ) : (
+              <div className="staff-resume-empty">
+                <div>
+                  <strong>Create a secure link for this order</strong>
+                  <p>The link is valid for 7 days. You choose what to write and send.</p>
+                </div>
+                <button
+                  className="staff-btn"
+                  disabled={linkBusy || detail.order.paymentStatus === "PAID"}
+                  onClick={generateResumeLink}
+                >
+                  <Link2 aria-hidden />
+                  {linkBusy ? "Generating…" : "Generate resume link"}
+                </button>
+              </div>
             )}
-            {linkNotice ? <p role="status">{linkNotice}</p> : null}
+            {linkNotice ? (
+              <p className="staff-resume-notice" role="status">
+                {linkNotice}
+              </p>
+            ) : null}
           </section>
           <section
             className="staff-panel staff-recovery-history"
