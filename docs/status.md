@@ -4,6 +4,8 @@ Last updated: 2026-10-20. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 
 ## Implemented
 
+- Recovery transitions (2026-10-20): explicit application-loading state prevents the email request screen flashing after OTP verification or session restoration; failed list requests remain in verified recovery with a retry action. Complete payment waits for restored geography/layout, focuses the empty card field and scrolls directly to payment without smooth-scroll interruption. Browser regression checks used delayed/failing synthetic responses: no email-form flash, list retry succeeds, and direct/repeated payment navigation places the card section at its 160px scroll margin with card input focused.
+
 - Compact payment recovery (2026-10-20): reduced notice typography, padding and action sizes; combined repetitive decline copy into one message and made the order reference inline. Removed the Resume later securely link from the payment notice. Retry payment is green, with a compact helper/action row and touch-friendly mobile controls. Build, lint, formatting and typecheck pass; synthetic browser checks verified compact notice height, green retry styling, link removal and mobile touch targets.
 
 - Customer resume UI polish (2026-10-20): compact page headings and saved-order cards separate reference, certificate/date, amount, status badge and actions. Secondary actions use an outline style. Payment checks use a calm blue panel with an icon, grouped reference/actions and responsive spacing; card expiry/CVV share a row. Payment and verification behavior stays intact. Build, lint, formatting and typecheck pass; synthetic desktop/mobile browser checks verified card actions, status checking, blocked payment and expiry/CVV alignment.

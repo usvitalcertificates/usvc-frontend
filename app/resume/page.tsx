@@ -4,6 +4,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import { recoveryJson, recoveryDraft, type RecoveryApplication } from "@/lib/recovery-client";
 import { OrderForm } from "@/app/state/[state]/[certificate]/order-form";
 export default function ResumePage() {
+  const [loadingApplications, setLoadingApplications] = useState(true);
+  const [verified, setVerified] = useState(false);
   const [token, setToken] = useState("");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -23,6 +25,8 @@ export default function ResumePage() {
       if (!secret) return false;
       linkOpened = true;
       window.history.replaceState(null, "", window.location.pathname);
+      setLoadingApplications(false);
+      setVerified(false);
       setToken(secret);
       setOrders(null);
       setSelected(null);
@@ -41,11 +45,20 @@ export default function ResumePage() {
       )
         .then((v) => {
           if (!linkOpened) {
+            setVerified(true);
             setOrders(v.applications);
             setNextCursor(v.nextCursor);
           }
         })
-        .catch(() => {});
+        .catch((e) => {
+          if (!linkOpened && !controller.signal.aborted && e.status !== 401) {
+            setVerified(true);
+            setError("We couldn’t load your saved applications. Please try again.");
+          }
+        })
+        .finally(() => {
+          if (!linkOpened && !controller.signal.aborted) setLoadingApplications(false);
+        });
     window.addEventListener("hashchange", consumeLink);
     return () => {
       controller.abort();
@@ -60,6 +73,10 @@ export default function ResumePage() {
     try {
       await work();
     } catch (e) {
+      if ((e as { status?: number }).status === 401) {
+        setVerified(false);
+        setOrders(null);
+      }
       setError(e instanceof Error ? e.message : "Please try again.");
     } finally {
       setBusy(false);
@@ -85,18 +102,27 @@ export default function ResumePage() {
       setNotice(result.message);
     });
   }
+  async function loadApplications() {
+    const result = await recoveryJson<{
+      applications: RecoveryApplication[];
+      nextCursor: string | null;
+    }>("/applications");
+    setOrders(result.applications);
+    setNextCursor(result.nextCursor);
+  }
   async function verify(event: FormEvent) {
     event.preventDefault();
     await act(async () => {
       await recoveryJson("/verify", { method: "POST", body: JSON.stringify({ token, code }) });
+      setVerified(true);
+      setLoadingApplications(true);
       setToken("");
       setCode("");
-      const result = await recoveryJson<{
-        applications: RecoveryApplication[];
-        nextCursor: string | null;
-      }>("/applications");
-      setOrders(result.applications);
-      setNextCursor(result.nextCursor);
+      try {
+        await loadApplications();
+      } finally {
+        setLoadingApplications(false);
+      }
     });
   }
   async function open(order: RecoveryApplication, payment: boolean) {
@@ -131,7 +157,20 @@ export default function ResumePage() {
             {notice}
           </p>
         ) : null}
-        {selected ? (
+        {loadingApplications ? (
+          <section
+            className="recovery-card recovery-loading"
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+          >
+            <span className="recovery-loading-spinner" aria-hidden />
+            <div>
+              <h2>Loading your saved applications…</h2>
+              <p>Please wait while we securely retrieve your application details.</p>
+            </div>
+          </section>
+        ) : selected ? (
           <>
             <button
               className="button button-secondary"
@@ -288,6 +327,27 @@ export default function ResumePage() {
                 Load more applications
               </button>
             ) : null}
+          </section>
+        ) : verified ? (
+          <section className="recovery-card">
+            <h2>Saved applications couldn’t be loaded</h2>
+            <p>Please try loading your saved applications again.</p>
+            <button
+              className="button button-primary"
+              disabled={busy}
+              onClick={() =>
+                act(async () => {
+                  setLoadingApplications(true);
+                  try {
+                    await loadApplications();
+                  } finally {
+                    setLoadingApplications(false);
+                  }
+                })
+              }
+            >
+              Load saved applications
+            </button>
           </section>
         ) : token ? (
           <section className="recovery-card">

@@ -667,10 +667,27 @@ export function OrderForm({
   const [recoveryRevision, setRecoveryRevision] = useState(recovery?.revision ?? 0);
   const [saveOnly, setSaveOnly] = useState(false);
   const saveOnlyRef = useRef(false);
+  const [geographyReady, setGeographyReady] = useState(false);
   useEffect(() => {
-    if (recovery?.paymentOnly)
-      document.getElementById("application-section-card")?.scrollIntoView({ block: "start" });
-  }, [recovery?.paymentOnly]);
+    if (!recovery?.paymentOnly || !geographyReady) return;
+    // Wait for restored geography and the committed form layout. Explicit
+    // instant scrolling avoids inherited smooth scrolling being interrupted
+    // by the form's initial layout updates.
+    let nextFrame = 0;
+    const frame = requestAnimationFrame(() => {
+      nextFrame = requestAnimationFrame(() => {
+        const section = document.getElementById("application-section-card");
+        section
+          ?.querySelector<HTMLInputElement>('input[name="cardNumber"]')
+          ?.focus({ preventScroll: true });
+        section?.scrollIntoView({ behavior: "instant", block: "start" });
+      });
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      cancelAnimationFrame(nextFrame);
+    };
+  }, [recovery?.paymentOnly, recovery?.id, geographyReady]);
   async function checkPayment() {
     if (busy) return;
     setBusy(true);
@@ -828,9 +845,19 @@ export function OrderForm({
   const noun = jurisdictionNoun(geo.counties.length ? geo : undefined);
 
   useEffect(() => {
+    let active = true;
+    setGeographyReady(false);
     loadStateGeography(abbr)
-      .then(setGeo)
-      .catch(() => undefined);
+      .then((value) => {
+        if (active) setGeo(value);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) setGeographyReady(true);
+      });
+    return () => {
+      active = false;
+    };
   }, [abbr]);
 
   useEffect(() => {
