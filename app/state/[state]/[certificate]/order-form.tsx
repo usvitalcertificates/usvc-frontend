@@ -2047,12 +2047,9 @@ export function OrderForm({
                   </h3>
                   <p>
                     {paymentProcessing
-                      ? "Your payment result is not confirmed. Check its status before trying again."
-                      : "Your application details are still filled in. Check your card details or try another card."}
+                      ? "Payment isn’t confirmed yet. Check its status before retrying."
+                      : `Your application is saved. ${paymentFailure}`}
                   </p>
-                  {!paymentProcessing ? (
-                    <p className="payment-recovery-description">{paymentFailure}</p>
-                  ) : null}
                 </div>
               </div>
               {orderReference ? (
@@ -2095,7 +2092,6 @@ export function OrderForm({
                 >
                   Edit application
                 </button>
-                <a href="/resume">Resume later securely</a>
               </div>
             </div>
           ) : null}
@@ -2193,7 +2189,11 @@ export function OrderForm({
           {(paymentFailure || recovery) && !paymentProcessing ? (
             <div className="payment-retry-actions">
               <p>Review your signature and payment authorization below before retrying.</p>
-              <button className="button button-primary" disabled={busy || saveOnly} type="submit">
+              <button
+                className="button button-success payment-retry-button"
+                disabled={busy || saveOnly}
+                type="submit"
+              >
                 {busy ? "Submitting…" : `Retry payment · $${total.toFixed(2)}`}
               </button>
             </div>

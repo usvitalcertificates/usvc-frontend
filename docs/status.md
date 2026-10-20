@@ -4,6 +4,8 @@ Last updated: 2026-10-20. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 
 ## Implemented
 
+- Compact payment recovery (2026-10-20): reduced notice typography, padding and action sizes; combined repetitive decline copy into one message and made the order reference inline. Removed the Resume later securely link from the payment notice. Retry payment is green, with a compact helper/action row and touch-friendly mobile controls. Build, lint, formatting and typecheck pass; synthetic browser checks verified compact notice height, green retry styling, link removal and mobile touch targets.
+
 - Customer resume UI polish (2026-10-20): compact page headings and saved-order cards separate reference, certificate/date, amount, status badge and actions. Secondary actions use an outline style. Payment checks use a calm blue panel with an icon, grouped reference/actions and responsive spacing; card expiry/CVV share a row. Payment and verification behavior stays intact. Build, lint, formatting and typecheck pass; synthetic desktop/mobile browser checks verified card actions, status checking, blocked payment and expiry/CVV alignment.
 
 - Resume-link panel polish (2026-10-20): aligned icon heading and verification badge, compact create state, bordered link field with adjacent primary copy action, and grouped expiry/replacement controls. Responsive stacking keeps controls usable on mobile. Removed suggested-message generation/copying; CS writes its own outreach. Build, typecheck, lint and formatting pass; ADMIN/CS browser checks verified empty/generated/replaced states, clipboard copying and mobile layout with synthetic responses.
