@@ -54,15 +54,45 @@ const PAYMENT_LABELS: Record<string, string> = {
   refunded: "Refunded",
   partially_refunded: "Partially refunded",
 };
+const PAYMENT_TONES: Record<string, string> = {
+  PAID: "mint",
+  succeeded: "mint",
+  PENDING: "amber",
+  pending: "amber",
+  FAILED: "rose",
+  failed: "rose",
+  REFUNDED: "violet",
+  refunded: "violet",
+  partially_refunded: "violet",
+  processing: "blue",
+  requires_action: "peach",
+  requires_capture: "blue",
+  requires_confirmation: "blue",
+  awaiting_payment: "amber",
+  canceled: "slate",
+};
 export function PaymentPill({ status }: { status: string }) {
-  const tone = ["PAID", "succeeded"].includes(status)
-    ? "green"
-    : ["FAILED", "failed"].includes(status)
-      ? "red"
-      : "gray";
   return (
-    <span className={`staff-pill ${tone}`}>
+    <span
+      className={`staff-pill staff-status-pill staff-status-${PAYMENT_TONES[status] ?? "slate"}`}
+    >
       {PAYMENT_LABELS[status] ?? status.replaceAll("_", " ")}
+    </span>
+  );
+}
+export const OUTCOME_TONES: Record<string, string> = {
+  NOT_CONTACTED: "slate",
+  ATTEMPTED_CONTACT: "blue",
+  CONTACTED: "mint",
+  FOLLOW_UP_LATER: "amber",
+  NOT_INTERESTED: "rose",
+};
+export function FollowUpPill({ outcome }: { outcome: string }) {
+  return (
+    <span
+      className={`staff-pill staff-status-pill staff-status-${OUTCOME_TONES[outcome] ?? "slate"}`}
+    >
+      {OUTCOME_LABELS[outcome] ?? outcome.replaceAll("_", " ")}
     </span>
   );
 }

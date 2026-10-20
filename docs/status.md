@@ -1,8 +1,10 @@
 # Frontend status + remaining work
 
-Last updated: 2026-10-17. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
+Last updated: 2026-10-20. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 
 ## Implemented
+
+- Staff dashboard polish (2026-10-20): payment, workflow, and follow-up badges use distinct pastel backgrounds with readable text and status dots. Unpaid-order details now group customer contacts and order facts, align copy actions, clarify follow-up labels and help text, show note length, and present a dated history timeline. Responsive desktop/mobile layouts verified with synthetic ADMIN/CS data through the same-origin proxy; follow-up saving, paid-during-save protection, role restrictions, and Stripe error handling remain verified. Frontend typecheck, build, lint, format, and all 6 tests pass.
 
 - Public funnel: home (disclosure box homepage-only), certificates, state selector/landing, config-driven 4-type order form (11 sections, geo county/city, 9 CA counties blocked, 6 required consents, safe draft, verify → create → checkout), Stripe Elements checkout, session-verified confirmation, sanitized tracking timeline, API-backed contact, 29-item FAQ + JSON-LD, verbatim legal pages, Times/Navy/Red theme.
 - Staff portal (`/auth`, `/staff/*`, host-split `middleware.ts`): TOTP auth + 30-min inactivity sign-out, Open/My/Closed/Search queues, tabbed order detail with stepper, `TO_CS`/`GTG` lane, CS inbox + full-form editor, completion-PDF panel, split ADMIN analytics (staff + orders), My Analytics for all roles.

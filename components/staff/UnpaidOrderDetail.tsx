@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { staffData, staffJson } from "@/lib/staff-client";
-import { CopyButton } from "./CopyButton";
+import { CopyIconButton } from "./CopyButton";
+import { Mail, Phone, UserRound, ClipboardList, MessageSquareText } from "lucide-react";
 import { BackLink, PageBand, SkeletonRows, StatusPill } from "./ui";
 import {
   DashboardAccess,
@@ -12,6 +13,7 @@ import {
   money,
   OUTCOME_LABELS,
   PaymentPill,
+  FollowUpPill,
   type UnpaidOrder,
 } from "./dashboard-shared";
 interface Detail {
@@ -84,12 +86,12 @@ function DetailBody({ id }: { id: string }) {
     }
   }
   return (
-    <>
+    <div className="staff-recovery-detail">
       <BackLink href="/staff/unpaid-orders">Unpaid Orders</BackLink>
       <PageBand
         eyebrow="Customer follow-up"
         title={detail?.order.publicNumber ?? "Order follow-up"}
-        subtitle="Customer contact and outreach history. Fulfillment ownership is unchanged."
+        subtitle="Review customer details, record your contact attempt, and track the next step."
       />
       {error ? (
         <p className="staff-alert error" role="alert">
@@ -122,85 +124,181 @@ function DetailBody({ id }: { id: string }) {
               This order was refunded. Review its payment history before following up.
             </p>
           ) : null}
-          <div className="staff-dashboard-detail-grid">
-            <section className="staff-panel staff-panel-body">
-              <h2>Customer and order</h2>
-              <dl className="staff-dashboard-facts">
-                <dt>Name</dt>
-                <dd>{detail.order.customerName}</dd>
-                <dt>Email</dt>
-                <dd>
-                  {detail.order.email || "Unavailable"}
-                  <CopyButton value={detail.order.email} label="email" />
-                </dd>
-                <dt>Phone</dt>
-                <dd>
-                  {detail.order.phone || "Unavailable"}
-                  <CopyButton value={detail.order.phone} label="phone" />
-                </dd>
-                <dt>Created</dt>
-                <dd>{dateTime(detail.order.createdAt)}</dd>
-                <dt>Certificate</dt>
-                <dd>
-                  {detail.order.stateName} · {detail.order.certificate.toLowerCase()}
-                </dd>
-                <dt>Amount</dt>
-                <dd>{money(detail.order.amountCents, detail.order.currency)}</dd>
-                <dt>Payment</dt>
-                <dd>
-                  <PaymentPill status={detail.order.paymentStatus} />
-                </dd>
-                <dt>Workflow</dt>
-                <dd>
-                  <StatusPill status={detail.order.status} />
-                </dd>
-                <dt>Order reference</dt>
-                <dd>
-                  {detail.order.publicNumber}
-                  <CopyButton value={detail.order.publicNumber} label="order number" />
-                </dd>
+          <div className="staff-dashboard-detail-grid staff-recovery-grid">
+            <section
+              className="staff-panel staff-recovery-card"
+              aria-labelledby="customer-details-heading"
+            >
+              <div className="staff-recovery-card-heading">
+                <span className="staff-recovery-icon">
+                  <UserRound aria-hidden />
+                </span>
+                <div>
+                  <h2 id="customer-details-heading">Customer details</h2>
+                  <p>Contact information and order summary</p>
+                </div>
+              </div>
+              <div className="staff-customer-identity">
+                <span className="staff-customer-avatar" aria-hidden>
+                  {detail.order.customerName.trim().charAt(0).toUpperCase() || "?"}
+                </span>
+                <div>
+                  <h3>{detail.order.customerName || "Name unavailable"}</h3>
+                  <span>Customer contact</span>
+                </div>
+              </div>
+              <dl className="staff-contact-list">
+                <div>
+                  <dt>
+                    <Mail aria-hidden />
+                    Email address
+                  </dt>
+                  <dd>
+                    <span>{detail.order.email || "Unavailable"}</span>
+                    <CopyIconButton value={detail.order.email} label="email" />
+                  </dd>
+                </div>
+                <div>
+                  <dt>
+                    <Phone aria-hidden />
+                    Phone number
+                  </dt>
+                  <dd>
+                    <span>{detail.order.phone || "Unavailable"}</span>
+                    <CopyIconButton value={detail.order.phone} label="phone" />
+                  </dd>
+                </div>
               </dl>
-              <Link href="/staff/payments" className="staff-btn secondary">
-                Check Stripe Payments
-              </Link>
+              <div className="staff-recovery-section-heading">
+                <ClipboardList aria-hidden />
+                <h3>Order overview</h3>
+              </div>
+              <dl className="staff-recovery-overview">
+                <div className="staff-recovery-reference">
+                  <dt>Order reference</dt>
+                  <dd>
+                    <span>{detail.order.publicNumber}</span>
+                    <CopyIconButton value={detail.order.publicNumber} label="order number" />
+                  </dd>
+                </div>
+                <div>
+                  <dt>Certificate</dt>
+                  <dd>
+                    {detail.order.stateName} ·{" "}
+                    {detail.order.certificate.charAt(0) +
+                      detail.order.certificate.slice(1).toLowerCase()}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Order amount</dt>
+                  <dd className="staff-recovery-amount">
+                    {money(detail.order.amountCents, detail.order.currency)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Created</dt>
+                  <dd>{dateTime(detail.order.createdAt)}</dd>
+                </div>
+                <div>
+                  <dt>Payment status</dt>
+                  <dd>
+                    <PaymentPill status={detail.order.paymentStatus} />
+                  </dd>
+                </div>
+                <div>
+                  <dt>Workflow status</dt>
+                  <dd>
+                    <StatusPill status={detail.order.status} />
+                  </dd>
+                </div>
+                <div>
+                  <dt>Current follow-up</dt>
+                  <dd>
+                    <FollowUpPill outcome={detail.order.outcome} />
+                  </dd>
+                </div>
+              </dl>
+              <div className="staff-recovery-card-footer">
+                <Link href="/staff/payments" className="staff-btn secondary">
+                  Check Stripe Payments
+                </Link>
+              </div>
             </section>
-            <section className="staff-panel staff-panel-body">
-              <h2>Record follow-up</h2>
-              <p className="staff-row-meta">
-                Contact customers manually, then record what happened. Do not enter card details or
-                SSNs in notes.
-              </p>
-              <form onSubmit={save} className="staff-dashboard-form">
+            <section
+              className="staff-panel staff-recovery-card"
+              aria-labelledby="record-follow-up-heading"
+            >
+              <div className="staff-recovery-card-heading">
+                <span className="staff-recovery-icon mint">
+                  <MessageSquareText aria-hidden />
+                </span>
+                <div>
+                  <h2 id="record-follow-up-heading">Record follow-up</h2>
+                  <p>Save the result and next step for your team.</p>
+                </div>
+              </div>
+              <form onSubmit={save} className="staff-dashboard-form staff-recovery-form">
                 <fieldset disabled={saving || detail.order.paymentStatus === "PAID"}>
-                  <label>
-                    Outcome
-                    <select value={outcome} onChange={(e) => setOutcome(e.target.value)}>
+                  <div className="staff-recovery-field">
+                    <label htmlFor="follow-up-outcome">Outcome</label>
+                    <p id="outcome-help">What happened when you contacted the customer?</p>
+                    <select
+                      id="follow-up-outcome"
+                      aria-describedby="outcome-help"
+                      value={outcome}
+                      onChange={(e) => setOutcome(e.target.value)}
+                    >
                       {Object.entries(OUTCOME_LABELS).map(([key, label]) => (
                         <option key={key} value={key}>
                           {label}
                         </option>
                       ))}
                     </select>
-                  </label>
-                  <label>
-                    Contact note
+                    <div className="staff-outcome-preview">
+                      <span>Selected outcome</span>
+                      <FollowUpPill outcome={outcome} />
+                    </div>
+                  </div>
+                  <div className="staff-recovery-field">
+                    <label htmlFor="follow-up-note">Contact note</label>
+                    <p id="note-help">Add the customer’s response and any agreed next step.</p>
                     <textarea
+                      id="follow-up-note"
+                      aria-describedby="note-help note-privacy"
                       value={note}
                       onChange={(e) => setNote(e.target.value)}
-                      rows={5}
+                      rows={6}
                       maxLength={2000}
-                      placeholder="Contact attempt, customer response, or next step"
+                      placeholder="For example: Customer requested a callback tomorrow afternoon."
                     />
-                  </label>
-                  <button type="submit" className="staff-btn" disabled={saving}>
-                    {saving ? "Saving…" : "Save follow-up"}
-                  </button>
+                    <div className="staff-recovery-note-meta">
+                      <span id="note-privacy">Keep card numbers and SSNs out of notes.</span>
+                      <span>{note.length.toLocaleString()} / 2,000</span>
+                    </div>
+                  </div>
+                  <div className="staff-recovery-save">
+                    <button type="submit" className="staff-btn" disabled={saving}>
+                      {saving ? "Saving…" : "Save follow-up"}
+                    </button>
+                    <span>Your team can view saved follow-ups below.</span>
+                  </div>
                 </fieldset>
               </form>
             </section>
           </div>
-          <section className="staff-panel staff-panel-body">
-            <h2>Follow-up history</h2>
+          <section
+            className="staff-panel staff-recovery-history"
+            aria-labelledby="follow-up-history-heading"
+          >
+            <div className="staff-recovery-history-heading">
+              <div>
+                <h2 id="follow-up-history-heading">Follow-up history</h2>
+                <p>A shared record of contact attempts and customer responses.</p>
+              </div>
+              <span className="staff-history-count">
+                {detail.history.length} {detail.history.length === 1 ? "entry" : "entries"}
+              </span>
+            </div>
             {detail.history.length ? (
               <ol className="staff-outreach-history">
                 {detail.history.map((entry) => (
@@ -208,21 +306,25 @@ function DetailBody({ id }: { id: string }) {
                     <div className="staff-dashboard-history-heading">
                       <strong>{entry.author}</strong>
                       <time dateTime={entry.createdAt}>{dateTime(entry.createdAt)}</time>
-                      {entry.outcome ? (
-                        <span className="staff-pill gray">{OUTCOME_LABELS[entry.outcome]}</span>
-                      ) : null}
+                      {entry.outcome ? <FollowUpPill outcome={entry.outcome} /> : null}
                     </div>
                     {entry.note ? <p className="staff-outreach-note">{entry.note}</p> : null}
                   </li>
                 ))}
               </ol>
             ) : (
-              <p>No follow-up has been recorded.</p>
+              <div className="staff-outreach-empty">
+                <MessageSquareText aria-hidden />
+                <div>
+                  <strong>No follow-ups yet</strong>
+                  <p>Save a contact attempt to start this customer’s history.</p>
+                </div>
+              </div>
             )}
           </section>
         </>
       ) : null}
-    </>
+    </div>
   );
 }
 export function UnpaidOrderDetail({ id }: { id: string }) {

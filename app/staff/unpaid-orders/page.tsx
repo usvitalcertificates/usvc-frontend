@@ -18,6 +18,7 @@ import {
   money,
   OUTCOME_LABELS,
   PaymentPill,
+  FollowUpPill,
   type UnpaidOrder,
 } from "@/components/staff/dashboard-shared";
 
@@ -193,7 +194,7 @@ function UnpaidOrders() {
           <SkeletonRows rows={6} />
         ) : result?.orders.length ? (
           <div className="staff-tablewrap">
-            <table className="staff-table staff-cards-fallback staff-dashboard-table">
+            <table className="staff-table staff-cards-fallback staff-dashboard-table staff-unpaid-table">
               <thead>
                 <tr>
                   <th>Order</th>
@@ -240,14 +241,22 @@ function UnpaidOrders() {
                     <td data-label="Amount">{money(order.amountCents, order.currency)}</td>
                     <td data-label="Payment / workflow">
                       <div className="staff-dashboard-pills">
-                        <PaymentPill status={order.paymentStatus} />
-                        <StatusPill status={order.status} />
+                        <div className="staff-status-line">
+                          <span className="staff-status-caption">Payment</span>
+                          <PaymentPill status={order.paymentStatus} />
+                        </div>
+                        <div className="staff-status-line">
+                          <span className="staff-status-caption">Workflow</span>
+                          <StatusPill status={order.status} />
+                        </div>
                         {order.unresolved ? (
                           <span className="staff-pill amber">Payment unresolved</span>
                         ) : null}
                       </div>
                     </td>
-                    <td data-label="Follow-up">{OUTCOME_LABELS[order.outcome]}</td>
+                    <td data-label="Follow-up">
+                      <FollowUpPill outcome={order.outcome} />
+                    </td>
                     <td data-label="Action">
                       <Link className="staff-btn" href={`/staff/unpaid-orders/${order.id}`}>
                         Follow up
