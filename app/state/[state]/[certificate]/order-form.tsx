@@ -1,5 +1,7 @@
 "use client";
 
+import { CopyQuantity } from "./copy-quantity";
+import { copyPricing, copyMoney } from "@/lib/copy-pricing";
 import Link from "next/link";
 import { Clock3, CircleAlert } from "lucide-react";
 import { recoveryJson, type RecoveryApplication } from "@/lib/recovery-client";
@@ -874,14 +876,15 @@ export function OrderForm({
   );
   const selectedCounty = counties.find((c) => c.name === (values.county ?? draft.county));
 
-  const copies = Math.min(20, Math.max(1, Number(values.copies ?? draft.copies ?? 1) || 1));
+  const copies = Number(values.copies ?? draft.copies ?? 1);
   const rush = (values.processing ?? draft.processing ?? "standard") === "rush";
   const delivery = values.delivery ?? draft.delivery ?? "Regular";
   const shippingIntl =
     addressTypeOf(values.shippingType ?? draft.shippingType ?? ADDRESS_TYPE_OPTIONS[0].label) ===
     "international";
   // Two-fee model: only the Online Processing Fee (+ rush) is charged now.
-  const total = copies * 149 + (rush ? 12 : 0);
+  const copyQuote = copyPricing(copies, rush);
+  const total = (copyQuote?.totalCents ?? 0) / 100;
 
   const requestorFirst = values.applicantFirstName ?? draft.applicantFirstName ?? "";
   const requestorLast = values.applicantLastName ?? draft.applicantLastName ?? "";
@@ -983,6 +986,11 @@ export function OrderForm({
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy || paymentProcessing) return;
+    if (!copyQuote) {
+      setError("Choose between 1 and 9 copies before continuing.");
+      document.getElementById("copy-quantity-select")?.focus();
+      return;
+    }
     const editingOnly = saveOnlyRef.current;
     saveOnlyRef.current = false;
     setSaveOnly(false);
@@ -1918,21 +1926,12 @@ export function OrderForm({
           number={sectionNumber("copies")}
           title="Copies & Processing"
         >
-          <label className="application-field wide">
-            Number of Copies <span>*</span>
-            <SearchableSelect
-              name="copies"
-              required
-              value={String(copies)}
-              options={Array.from({ length: 20 }, (_, i) => i + 1).map((n) => ({
-                value: String(n),
-                label: `${n} ${n === 1 ? "copy" : "copies"}`,
-              }))}
-              placeholder="Select…"
-              onSelect={(value) => setValues((v) => ({ ...v, copies: value }))}
-            />
-            <small>Each copy includes the $149.00 USVC Processing Fee.</small>
-          </label>
+          <CopyQuantity
+            copies={copies}
+            certificate={certSlug}
+            processing={paymentProcessing}
+            onSelect={(value) => setValues((v) => ({ ...v, copies: value }))}
+          />
           <label className="application-field wide">
             Delivery Method <span>*</span>
             <SearchableSelect
@@ -2218,10 +2217,14 @@ export function OrderForm({
               <p>Review your signature and payment authorization below before retrying.</p>
               <button
                 className="button button-success payment-retry-button"
-                disabled={busy || saveOnly}
+                disabled={busy || saveOnly || !copyQuote}
                 type="submit"
               >
-                {busy ? "Submitting…" : `Retry payment · $${total.toFixed(2)}`}
+                {busy
+                  ? "Submitting…"
+                  : copyQuote
+                    ? `Retry payment · $${total.toFixed(2)}`
+                    : "Choose copies"}
               </button>
             </div>
           ) : null}
@@ -2235,12 +2238,37 @@ export function OrderForm({
             </p>
             <p>Delivery method: {delivery}</p>
             <hr />
-            <div>
-              <span>
-                Online Processing Fee<small>$149.00 per copy × {copies}</small>
-              </span>
-              <b>${(149 * copies).toFixed(2)}</b>
-            </div>
+            {copyQuote ? (
+              <>
+                <div>
+                  <span>
+                    First copy<small>Online Processing Fee</small>
+                  </span>
+                  <b>$149.00</b>
+                </div>
+                {copies > 1 ? (
+                  <>
+                    <div>
+                      <span>
+                        Additional copies<small>$70.00 × {copies - 1}</small>
+                      </span>
+                      <b>{copyMoney((copies - 1) * 7000)}</b>
+                    </div>
+                    <div className="copy-summary-savings">
+                      <span>
+                        You save
+                        <small>
+                          $79.00 OFF × {copies - 1} additional {copies === 2 ? "copy" : "copies"}
+                        </small>
+                      </span>
+                      <b>{copyMoney(copyQuote.savingsCents)}</b>
+                    </div>
+                  </>
+                ) : null}
+              </>
+            ) : (
+              <p role="alert">Choose between 1 and 9 copies to see your total.</p>
+            )}
             {rush ? (
               <div>
                 <span>Rush Processing</span>
@@ -2255,8 +2283,8 @@ export function OrderForm({
               </div>
             )}
             <div className="total">
-              <strong>TOTAL</strong>
-              <strong>${total.toFixed(2)}</strong>
+              <strong>{paymentProcessing ? "NEXT PAYMENT TOTAL" : "TOTAL"}</strong>
+              <strong>{copyQuote ? copyMoney(copyQuote.totalCents) : "Choose copies"}</strong>
             </div>
           </div>
         </FormSection>
@@ -2362,9 +2390,15 @@ export function OrderForm({
                 ) : null}
                 <button
                   className="button button-success"
-                  disabled={busy || paymentProcessing || Boolean(blockedCounty)}
+                  disabled={busy || paymentProcessing || Boolean(blockedCounty) || !copyQuote}
                 >
-                  {busy ? "Submitting…" : recovery ? `Pay $${total.toFixed(2)}` : "Submit"}
+                  {busy
+                    ? "Submitting…"
+                    : !copyQuote
+                      ? "Choose copies"
+                      : recovery
+                        ? `Pay $${total.toFixed(2)}`
+                        : "Submit"}
                 </button>
               </div>
             </div>

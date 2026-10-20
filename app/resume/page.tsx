@@ -400,7 +400,7 @@ export default function ResumePage() {
                 {busy ? "Requesting…" : "Email me a recovery link"}
               </button>
             </form>
-            <p>Links expire in 7 days. Access expires 30 minutes after email verification.</p>
+            <p>Links expire in 48 hours. Access expires 30 minutes after email verification.</p>
           </section>
         )}
       </div>

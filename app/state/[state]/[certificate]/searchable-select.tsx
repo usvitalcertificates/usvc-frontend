@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 
 export interface SearchableOption {
   value: string;
@@ -36,6 +36,7 @@ export function SearchableSelect({
   placeholder = "Select…",
   onSelect,
   inputId,
+  renderOption,
 }: {
   name: string;
   options: readonly SearchableOption[];
@@ -47,6 +48,7 @@ export function SearchableSelect({
   onSelect?: (value: string) => void;
   /** Stable input id (explicit label htmlFor). Defaults to a unique id. */
   inputId?: string;
+  renderOption?: (option: SearchableOption) => ReactNode;
 }) {
   const rawId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const autoId = `combobox-${name}-${rawId}`;
@@ -161,6 +163,9 @@ export function SearchableSelect({
           setOpen(true);
           setHighlight(-1);
         }}
+        onClick={() => {
+          if (!disabled && !open) openWithFullList();
+        }}
         onFocus={() => {
           if (!disabled) openWithFullList();
         }}
@@ -184,6 +189,7 @@ export function SearchableSelect({
                   key={option.value || option.label}
                   id={navIndex >= 0 ? `${listId}-option-${navIndex}` : undefined}
                   role="option"
+                  aria-label={option.label}
                   aria-selected={isSelected}
                   aria-disabled={option.disabled || undefined}
                   data-combobox-active={navIndex === highlight || undefined}
@@ -194,7 +200,7 @@ export function SearchableSelect({
                     if (!option.disabled) commit(option.value);
                   }}
                 >
-                  {option.label}
+                  {renderOption ? renderOption(option) : option.label}
                   {isSelected ? <span aria-hidden="true"> ✓</span> : null}
                 </li>
               );
