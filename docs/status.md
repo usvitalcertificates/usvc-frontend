@@ -4,6 +4,8 @@ Last updated: 2026-10-20. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 
 ## Implemented
 
+- Copy guidance placement (2026-10-20): moved certificate-specific guidance above the Number of Certified Copies label on all forms and recovery, using the existing muted italic info style and red Important label.
+
 - Certificate guidance refinement (2026-10-20): capitalized quantity labels (1 Certificate, 2 Certificates) and added concise, certificate-specific guidance above the selector explaining separate uses and that recipients may retain submitted copies. Guidance is associated with the selector for screen readers.
 
 - Compact offer refinement (2026-10-20): the offer is now a 44px desktop strip reading “Flat $79.00 OFF each additional official copy,” with a small tag icon and 18px desktop/16px mobile emphasis. Removed the repeated green quantity/price/savings card; the closed selector displays each once, with one pricing/agency-fee note below. Supporting eight-item lists, dropdown behavior, historical-quantity warnings and pending-payment restrictions remain intact. Browser checks confirm no duplicate selected quantity/total/savings on all four forms, nine selectable options, and no mobile horizontal overflow. Frontend tests, typecheck, build, lint and formatting pass; no backend/payment changes.

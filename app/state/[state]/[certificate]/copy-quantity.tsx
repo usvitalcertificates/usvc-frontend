@@ -171,6 +171,9 @@ export function CopyQuantity({
           </p>
         </div>
       </div>
+      <p className="copy-quantity-guidance" id="copy-quantity-guidance">
+        <strong>Important:</strong> {copyGuidance[certificate]}
+      </p>
       <label
         id="copy-quantity-label"
         htmlFor="copy-quantity-select"
@@ -178,9 +181,6 @@ export function CopyQuantity({
       >
         Number of Certified Copies <span className="required-mark">*</span>
       </label>
-      <p className="copy-quantity-guidance" id="copy-quantity-guidance">
-        {copyGuidance[certificate]}
-      </p>
       <div
         className="copy-picker"
         ref={wrap}

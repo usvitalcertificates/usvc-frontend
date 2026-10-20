@@ -3450,10 +3450,17 @@ textarea {
   color: #b22234;
 }
 .copy-quantity-guidance {
-  margin: -8px 0 0;
-  color: #50505e;
+  margin: 0;
+  color: var(--muted-text);
   font-size: 14px;
+  font-style: italic;
+  font-weight: 400;
   line-height: 1.5;
+}
+.copy-quantity-guidance strong {
+  color: var(--red);
+  font-size: inherit;
+  font-style: italic;
 }
 .copy-picker {
   position: relative;
