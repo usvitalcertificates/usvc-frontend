@@ -28,6 +28,9 @@ interface Detail {
 }
 function DetailBody({ id }: { id: string }) {
   const router = useRouter();
+  const [resumeLink, setResumeLink] = useState<{ url: string; expiresAt: string } | null>(null);
+  const [linkBusy, setLinkBusy] = useState(false);
+  const [linkNotice, setLinkNotice] = useState("");
   const [detail, setDetail] = useState<Detail | null>(null);
   const [version, setVersion] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -60,6 +63,44 @@ function DetailBody({ id }: { id: string }) {
       });
     return () => controller.abort();
   }, [id, version]);
+  async function generateResumeLink() {
+    if (linkBusy) return;
+    setLinkBusy(true);
+    setError("");
+    setLinkNotice("");
+    try {
+      const result = await staffJson<{ url: string; expiresAt: string }>(
+        `/staff/unpaid-orders/${encodeURIComponent(id)}/resume-link`,
+        { method: "POST", body: "{}" },
+      );
+      setResumeLink(result);
+      setLinkNotice(
+        "Link created. The customer must verify their email before viewing the application.",
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not create resume link.");
+    } finally {
+      setLinkBusy(false);
+    }
+  }
+  async function copyResume(message = false) {
+    if (!resumeLink || !detail) return;
+    const state =
+      detail.order.paymentStatus === "FAILED"
+        ? "Your payment wasn’t completed."
+        : detail.order.unresolved
+          ? "Your payment status needs to be checked."
+          : "Your saved application is awaiting payment.";
+    const value = message
+      ? `${state} You can continue your saved application using this link: ${resumeLink.url} . Your application details are saved. Verify your email to review your application and payment status. This link expires in 7 days.`
+      : resumeLink.url;
+    try {
+      await navigator.clipboard.writeText(value);
+      setLinkNotice(message ? "Suggested message copied." : "Resume link copied.");
+    } catch {
+      setLinkNotice("Could not copy automatically. Select and copy the link below.");
+    }
+  }
   async function save(event: FormEvent) {
     event.preventDefault();
     if (saving) return;
@@ -286,6 +327,55 @@ function DetailBody({ id }: { id: string }) {
               </form>
             </section>
           </div>
+          <section className="staff-panel staff-resume-panel" aria-labelledby="resume-link-heading">
+            <h2 id="resume-link-heading">Resume application</h2>
+            <p>
+              Share a secure link so the customer can review their saved application and complete
+              payment. Email verification is required. Emails are sent manually by your team.
+            </p>
+            {detail.order.paymentStatus === "REFUNDED" ? (
+              <p>Refunded orders cannot be reopened or charged through recovery.</p>
+            ) : (
+              <>
+                <div className="staff-resume-actions">
+                  <button
+                    className="staff-btn"
+                    disabled={linkBusy || detail.order.paymentStatus === "PAID"}
+                    onClick={generateResumeLink}
+                  >
+                    {linkBusy
+                      ? "Generating…"
+                      : resumeLink
+                        ? "Replace link"
+                        : "Generate resume link"}
+                  </button>
+                  {resumeLink ? (
+                    <>
+                      <button className="staff-btn secondary" onClick={() => copyResume()}>
+                        Copy link
+                      </button>
+                      <button className="staff-btn secondary" onClick={() => copyResume(true)}>
+                        Copy suggested message
+                      </button>
+                    </>
+                  ) : null}
+                </div>
+                {resumeLink ? (
+                  <>
+                    <label>
+                      Private resume link
+                      <input readOnly value={resumeLink.url} onFocus={(e) => e.target.select()} />
+                    </label>
+                    <p>
+                      Expires {dateTime(resumeLink.expiresAt)}. Replacing the link revokes previous
+                      links and their sessions.
+                    </p>
+                  </>
+                ) : null}
+              </>
+            )}
+            {linkNotice ? <p role="status">{linkNotice}</p> : null}
+          </section>
           <section
             className="staff-panel staff-recovery-history"
             aria-labelledby="follow-up-history-heading"

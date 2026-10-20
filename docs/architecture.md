@@ -72,3 +72,9 @@ Hosts: local `:3000` + `:4000`; preview `*.vercel.app`; staging `staging.*`; pro
 ## Contact recovery and payment verification
 
 ADMIN/CS-only routes: `/staff/unpaid-orders` (POST search body, filters, pagination), `/staff/unpaid-orders/[id]` (minimal customer contact and append-only outreach history), `/staff/payments` (live Stripe history and exact reference lookup), and `/staff/payments/[reference]` (current payment, Flow comparison, attempts/refunds). `DashboardAccess` gates first render; backend repeats role/active/revocation checks and audits read access. Components cancel superseded requests, keep search/note values in memory, clear provider data on failed reads, and use only the existing same-origin proxy. Payment views have no mutation controls. New `staff-dashboard-*` styles stay inside staff.css; tables become labelled cards on mobile. Deep order-history scans are bounded by the backend and expose explicit continuation; Stripe has no fabricated global totals.
+
+## Secure application resume
+
+`/resume` is a dynamic private public-site route: recovery links arrive in a fragment, are immediately removed from the visible URL, and are exchanged through body-only same-origin requests. Customers explicitly request an email code before listing or reading saved applications. The backend issues the scoped HttpOnly cookie; only recovery proxy requests forward it. Recovery pages omit analytics, set no-referrer/no-store/noindex, and store no credentials or prefilled application data in browser storage.
+
+The existing OrderForm accepts a verified recovery context and whitelisted initial values without using its normal browser draft. Recovery edits and retries use revision-checked backend endpoints; SSNs/cards are never fetched. Normal card declines stay on the existing filled form, while uncertain results use submission-key status checks. ADMIN/CS link controls live on the existing unpaid-order follow-up detail page.

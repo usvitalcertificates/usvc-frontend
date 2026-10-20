@@ -3052,3 +3052,31 @@ dl.staff-lines {
     white-space: nowrap;
   }
 }
+
+.staff-resume-panel {
+  padding: 26px;
+  margin: 22px 0;
+}
+.staff-resume-panel p {
+  color: var(--flow-secondary);
+  line-height: 1.6;
+}
+.staff-resume-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0;
+}
+.staff-resume-panel label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+}
+.staff-resume-panel input {
+  min-width: 0;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--flow-line);
+  border-radius: 6px;
+  font: inherit;
+}

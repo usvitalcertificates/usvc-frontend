@@ -49,7 +49,7 @@ function isProductionHost(): boolean {
 }
 
 export function trackAnalytics(event: string, params: Record<string, unknown> = {}) {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || window.location.pathname === "/resume") return;
   if (!analyticsActive) {
     if (pendingEvents.length < 20) pendingEvents.push({ event, params });
     return;
