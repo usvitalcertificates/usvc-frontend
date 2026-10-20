@@ -2418,3 +2418,193 @@ dl.staff-lines {
   padding-bottom: 14px;
   border-bottom: 1px solid var(--flow-border);
 }
+
+/* Contact recovery and read-only payment verification. */
+.staff-dashboard-filters {
+  align-items: end;
+  flex-wrap: wrap;
+}
+.staff-dashboard-filters input[type="date"] {
+  min-width: 150px;
+}
+.staff-dashboard-table {
+  min-width: 1120px;
+}
+.staff-dashboard-table .staff-row-meta {
+  display: block;
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+}
+.staff-dashboard-contact > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+.staff-dashboard-pills {
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  gap: 6px;
+}
+.staff-dashboard-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.staff-dashboard-detail-grid > section {
+  min-width: 0;
+}
+.staff-dashboard-facts {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 12px;
+  margin: 20px 0 24px;
+}
+.staff-dashboard-facts dt {
+  color: var(--flow-secondary);
+  font-weight: 600;
+}
+.staff-dashboard-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.staff-dashboard-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.staff-dashboard-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-weight: 600;
+}
+.staff-dashboard-form textarea,
+.staff-dashboard-form select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--flow-border);
+  border-radius: 6px;
+  font: inherit;
+  background: white;
+  color: var(--flow-ink);
+}
+.staff-dashboard-form textarea {
+  resize: vertical;
+}
+.staff-dashboard-form fieldset:disabled {
+  opacity: 0.6;
+}
+.staff-dashboard-form button {
+  align-self: start;
+}
+.staff-outreach-history,
+.staff-payment-records {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.staff-outreach-history li,
+.staff-payment-records li {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--flow-border);
+}
+.staff-outreach-history li:last-child,
+.staff-payment-records li:last-child {
+  border-bottom: 0;
+}
+.staff-outreach-note {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.staff-dashboard-history-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.staff-dashboard-history-heading time {
+  color: var(--flow-secondary);
+  font-size: 0.85rem;
+}
+.staff-payment-reference {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.staff-payment-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  color: var(--flow-secondary);
+}
+.staff-payment-mismatch {
+  display: block;
+  color: #b91c1c;
+  margin-top: 7px;
+}
+.staff-dashboard-pagination {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0;
+}
+@media (max-width: 900px) {
+  .staff-dashboard-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .staff-dashboard-table {
+    min-width: 0;
+  }
+  .staff-dashboard-table td {
+    overflow-wrap: anywhere;
+  }
+  .staff-dashboard-filters > label,
+  .staff-dashboard-filters > label.search {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+}
+@media (max-width: 480px) {
+  .staff-dashboard-facts {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  .staff-dashboard-facts dd {
+    margin-bottom: 12px;
+  }
+}
+
+.staff-dashboard-contact {
+  min-width: 230px;
+}
+.staff-dashboard-contact > span:last-child {
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .staff-dashboard-table td::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--flow-secondary);
+    font-size: 0.74rem;
+    font-weight: 700;
+    margin-top: 8px;
+    margin-bottom: 3px;
+  }
+  .staff-dashboard-contact {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .staff-dashboard-table tbody tr {
+    width: calc(100% - 20px);
+  }
+}
