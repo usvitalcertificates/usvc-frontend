@@ -2418,3 +2418,637 @@ dl.staff-lines {
   padding-bottom: 14px;
   border-bottom: 1px solid var(--flow-border);
 }
+
+/* Contact recovery and read-only payment verification. */
+.staff-dashboard-filters {
+  align-items: end;
+  flex-wrap: wrap;
+}
+.staff-dashboard-filters input[type="date"] {
+  min-width: 150px;
+}
+.staff-dashboard-table {
+  min-width: 1120px;
+}
+.staff-dashboard-table .staff-row-meta {
+  display: block;
+  margin-top: 5px;
+  overflow-wrap: anywhere;
+}
+.staff-dashboard-contact > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+.staff-dashboard-pills {
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  gap: 6px;
+}
+.staff-dashboard-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.staff-dashboard-detail-grid > section {
+  min-width: 0;
+}
+.staff-dashboard-facts {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 12px;
+  margin: 20px 0 24px;
+}
+.staff-dashboard-facts dt {
+  color: var(--flow-secondary);
+  font-weight: 600;
+}
+.staff-dashboard-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.staff-dashboard-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.staff-dashboard-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-weight: 600;
+}
+.staff-dashboard-form textarea,
+.staff-dashboard-form select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--flow-border);
+  border-radius: 6px;
+  font: inherit;
+  background: white;
+  color: var(--flow-ink);
+}
+.staff-dashboard-form textarea {
+  resize: vertical;
+}
+.staff-dashboard-form fieldset:disabled {
+  opacity: 0.6;
+}
+.staff-dashboard-form button {
+  align-self: start;
+}
+.staff-outreach-history,
+.staff-payment-records {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.staff-outreach-history li,
+.staff-payment-records li {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--flow-border);
+}
+.staff-outreach-history li:last-child,
+.staff-payment-records li:last-child {
+  border-bottom: 0;
+}
+.staff-outreach-note {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.staff-dashboard-history-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.staff-dashboard-history-heading time {
+  color: var(--flow-secondary);
+  font-size: 0.85rem;
+}
+.staff-payment-reference {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.staff-payment-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  color: var(--flow-secondary);
+}
+.staff-payment-mismatch {
+  display: block;
+  color: #b91c1c;
+  margin-top: 7px;
+}
+.staff-dashboard-pagination {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0;
+}
+@media (max-width: 900px) {
+  .staff-dashboard-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .staff-dashboard-table {
+    min-width: 0;
+  }
+  .staff-dashboard-table td {
+    overflow-wrap: anywhere;
+  }
+  .staff-dashboard-filters > label,
+  .staff-dashboard-filters > label.search {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+}
+@media (max-width: 480px) {
+  .staff-dashboard-facts {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  .staff-dashboard-facts dd {
+    margin-bottom: 12px;
+  }
+}
+
+.staff-dashboard-contact {
+  min-width: 230px;
+}
+.staff-dashboard-contact > span:last-child {
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .staff-dashboard-table td::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--flow-secondary);
+    font-size: 0.74rem;
+    font-weight: 700;
+    margin-top: 8px;
+    margin-bottom: 3px;
+  }
+  .staff-dashboard-contact {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .staff-dashboard-table tbody tr {
+    width: calc(100% - 20px);
+  }
+}
+
+/* Consistent pastel status vocabulary across staff payments and workflow. */
+.staff-pill.staff-status-pill {
+  --status-bg: #eef2f7;
+  --status-ink: #475569;
+  --status-border: #d7e0eb;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border: 1px solid var(--status-border);
+  background: var(--status-bg);
+  color: var(--status-ink);
+  line-height: 1.3;
+  font-weight: 650;
+  white-space: normal;
+}
+.staff-status-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: 0 0 6px;
+  background: currentColor;
+  opacity: 0.8;
+}
+.staff-status-pill.staff-status-amber {
+  --status-bg: #fff4d9;
+  --status-ink: #805215;
+  --status-border: #f1dba4;
+}
+.staff-status-pill.staff-status-blue {
+  --status-bg: #eaf2ff;
+  --status-ink: #28518e;
+  --status-border: #cbdcf5;
+}
+.staff-status-pill.staff-status-mint {
+  --status-bg: #e6f5ec;
+  --status-ink: #236544;
+  --status-border: #bfe3cd;
+}
+.staff-status-pill.staff-status-rose {
+  --status-bg: #fcecee;
+  --status-ink: #9a3b4f;
+  --status-border: #efc8d0;
+}
+.staff-status-pill.staff-status-violet {
+  --status-bg: #f1ebfc;
+  --status-ink: #67458e;
+  --status-border: #dcd0f1;
+}
+.staff-status-pill.staff-status-teal {
+  --status-bg: #e5f5f3;
+  --status-ink: #24665f;
+  --status-border: #bce2dc;
+}
+.staff-status-pill.staff-status-peach {
+  --status-bg: #fff0e5;
+  --status-ink: #965324;
+  --status-border: #efd0b6;
+}
+.staff-status-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.staff-status-caption {
+  width: 53px;
+  color: #63758d;
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.staff-dashboard-table td[data-label="Follow-up"] {
+  min-width: 145px;
+}
+
+/* Customer follow-up: compact contact card, structured summary and aligned form. */
+.staff-recovery-detail {
+  max-width: 1480px;
+  margin: 0 auto;
+}
+.staff-recovery-grid {
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  align-items: stretch;
+  gap: 22px;
+  margin-bottom: 22px;
+}
+.staff-recovery-grid > .staff-panel {
+  margin-bottom: 0;
+}
+.staff-recovery-card {
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+}
+.staff-recovery-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.staff-recovery-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #edf3ff;
+  color: #315995;
+  flex: 0 0 42px;
+}
+.staff-recovery-icon.mint {
+  background: #e9f6ee;
+  color: #326b4d;
+}
+.staff-recovery-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.staff-recovery-card-heading h2,
+.staff-recovery-history-heading h2 {
+  padding: 0;
+  margin: 0;
+  font-size: 1.1rem;
+}
+.staff-recovery-card-heading p,
+.staff-recovery-history-heading p {
+  margin: 5px 0 0;
+  font-size: 0.83rem;
+  color: #65758c;
+  line-height: 1.5;
+}
+.staff-customer-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.staff-customer-avatar {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f0edfa;
+  color: #6b5590;
+  font-weight: 750;
+  flex: 0 0 44px;
+}
+.staff-customer-identity h3 {
+  margin: 0;
+  color: var(--flow-ink);
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+.staff-customer-identity span:not(.staff-customer-avatar) {
+  font-size: 0.78rem;
+  color: #65758c;
+}
+.staff-contact-list {
+  margin: 0 0 23px;
+  padding: 0;
+}
+.staff-contact-list > div {
+  display: grid;
+  grid-template-columns: 122px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 13px 0;
+  border-top: 1px solid #edf0f5;
+}
+.staff-contact-list dt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+.staff-contact-list dt svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+.staff-contact-list dd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  gap: 10px;
+  margin: 0;
+  font-weight: 550;
+  font-size: 0.88rem;
+}
+.staff-contact-list dd > span {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.staff-recovery-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 18px;
+  border-top: 1px solid var(--flow-border);
+}
+.staff-recovery-section-heading svg {
+  width: 16px;
+  height: 16px;
+  color: #65758c;
+}
+.staff-recovery-section-heading h3 {
+  margin: 0;
+  font-size: 0.88rem;
+}
+.staff-recovery-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px 22px;
+  margin: 20px 0 24px;
+}
+.staff-recovery-overview > div {
+  min-width: 0;
+}
+.staff-recovery-overview dt {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #65758c;
+  margin-bottom: 7px;
+}
+.staff-recovery-overview dd {
+  margin: 0;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.staff-recovery-overview .staff-recovery-reference {
+  grid-column: 1 / -1;
+}
+.staff-recovery-reference dd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 650;
+}
+.staff-recovery-reference dd > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.staff-recovery-overview .staff-recovery-amount {
+  font-size: 1.05rem;
+  font-weight: 750;
+  color: var(--flow-ink);
+}
+.staff-recovery-card-footer {
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid #edf0f5;
+}
+.staff-recovery-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.staff-recovery-form fieldset {
+  flex: 1;
+  gap: 25px;
+}
+.staff-recovery-form .staff-recovery-field > label {
+  display: block;
+  font-size: 0.88rem;
+  margin-bottom: 6px;
+}
+.staff-recovery-field > p {
+  margin: 0 0 12px;
+  color: #65758c;
+  font-size: 0.79rem;
+}
+.staff-recovery-form select {
+  min-height: 46px;
+}
+.staff-recovery-form textarea {
+  min-height: 164px;
+  line-height: 1.6;
+}
+.staff-recovery-form textarea::placeholder {
+  color: #8390a2;
+}
+.staff-recovery-form select:focus-visible,
+.staff-recovery-form textarea:focus-visible {
+  outline: 3px solid #dbe8fb;
+  outline-offset: 1px;
+  border-color: #6f97ce;
+}
+.staff-outcome-preview {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+.staff-outcome-preview > span:first-child {
+  color: #65758c;
+  font-size: 0.74rem;
+}
+.staff-recovery-note-meta {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 9px;
+  color: #65758c;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+.staff-recovery-note-meta > span:last-child {
+  white-space: nowrap;
+}
+.staff-recovery-save {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #edf0f5;
+}
+.staff-recovery-save > span {
+  color: #65758c;
+  font-size: 0.74rem;
+  max-width: 220px;
+}
+.staff-recovery-history {
+  padding: 24px 26px;
+}
+.staff-recovery-history-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.staff-history-count {
+  padding: 5px 9px;
+  color: #5f7087;
+  background: #f1f4f8;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
+.staff-recovery-history .staff-outreach-history li {
+  position: relative;
+  padding: 18px 0 18px 20px;
+  border-left: 2px solid #e2e9f3;
+  border-bottom: 0;
+  margin-left: 5px;
+}
+.staff-recovery-history .staff-outreach-history li::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 24px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #97acc8;
+  box-shadow: 0 0 0 4px #fff;
+}
+.staff-recovery-history .staff-outreach-note {
+  margin: 10px 0 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #f7f9fc;
+  font-size: 0.87rem;
+  line-height: 1.6;
+}
+.staff-outreach-empty {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 24px 0 6px;
+  color: #65758c;
+}
+.staff-outreach-empty > svg {
+  width: 24px;
+  height: 24px;
+  color: #91a3ba;
+}
+.staff-outreach-empty strong {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+.staff-outreach-empty p {
+  margin: 4px 0 0;
+  font-size: 0.81rem;
+}
+@media (max-width: 1000px) {
+  .staff-recovery-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .staff-recovery-card,
+  .staff-recovery-history {
+    padding: 20px 16px;
+  }
+  .staff-contact-list > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .staff-recovery-overview {
+    gap: 18px 12px;
+  }
+  .staff-status-line {
+    flex-wrap: wrap;
+  }
+  .staff-dashboard-table td[data-label="Follow-up"] {
+    min-width: 0;
+  }
+  .staff-recovery-history-heading {
+    flex-wrap: wrap;
+  }
+}
+
+@media (min-width: 901px) {
+  .staff-unpaid-table {
+    min-width: 1400px;
+  }
+  .staff-unpaid-table td[data-label="Order"] {
+    min-width: 230px;
+  }
+  .staff-unpaid-table td[data-label="Customer"] {
+    min-width: 150px;
+  }
+  .staff-unpaid-table td[data-label="Contact"] {
+    min-width: 250px;
+  }
+  .staff-unpaid-table td[data-label="Payment / workflow"] {
+    min-width: 220px;
+  }
+  .staff-unpaid-table .staff-status-pill {
+    white-space: nowrap;
+  }
+}

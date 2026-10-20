@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 
 export const STATUS_LABELS: Record<string, string> = {
+  DRAFT: "Draft",
+  AWAITING_PAYMENT: "Awaiting payment",
   PAID: "Payment Successful",
   IN_REVIEW: "Order Processing",
   TO_CS: "To CS",
@@ -46,18 +48,20 @@ export const TO_CS_SUBSTATUSES: readonly string[] = [
   "Completed",
 ];
 
-const STATUS_TONE: Record<string, "navy" | "red" | "gray" | "green"> = {
-  PAID: "navy",
-  IN_REVIEW: "navy",
-  TO_CS: "red",
-  GTG: "green",
-  SUBMITTED: "green",
-  CANCELLED: "gray",
+const STATUS_TONE: Record<string, string> = {
+  DRAFT: "slate",
+  AWAITING_PAYMENT: "blue",
+  PAID: "mint",
+  IN_REVIEW: "blue",
+  TO_CS: "peach",
+  GTG: "teal",
+  SUBMITTED: "violet",
+  CANCELLED: "slate",
 };
 
 export function StatusPill({ status }: { status: string }) {
   return (
-    <span className={`staff-pill ${STATUS_TONE[status] ?? "gray"}`}>
+    <span className={`staff-pill staff-status-pill staff-status-${STATUS_TONE[status] ?? "slate"}`}>
       {STATUS_LABELS[status] ?? status}
     </span>
   );
