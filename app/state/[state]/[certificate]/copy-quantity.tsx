@@ -47,9 +47,19 @@ const examples: Record<CertificateSlug, readonly string[]> = {
     "Personal files, a spare for your records",
   ],
 };
+const copyGuidance: Record<CertificateSlug, string> = {
+  "birth-certificate":
+    "Extra certified copies can help with passport, identity, school and Social Security applications. Some organizations keep the copy you submit, so separate requests may need separate copies.",
+  "death-certificate":
+    "Insurers, banks and estate administrators may each need a certified copy to process a claim or close an account. Some keep the copy you submit, so having additional copies can help with separate requests.",
+  "marriage-certificate":
+    "Name changes, benefits and immigration applications may each require a certified copy. Some organizations keep the copy you submit, so additional copies can help you complete separate updates.",
+  "divorce-certificate":
+    "Name changes, remarriage and benefits updates may require a certified copy of your divorce record. Some organizations keep the copy you submit, so additional copies can help with separate requests.",
+};
 const quantities = Array.from({ length: MAX_COPIES }, (_, i) => i + 1);
 const certificateCount = (count: number) =>
-  `${count} ${count === 1 ? "certificate" : "certificates"}`;
+  `${count} ${count === 1 ? "Certificate" : "Certificates"}`;
 
 export function CopyQuantity({
   copies,
@@ -153,14 +163,11 @@ export function CopyQuantity({
     <div className="copy-quantity application-field wide">
       <div className="copy-offer-banner">
         <span className="copy-offer-icon">
-          <Tag size={22} aria-hidden="true" />
+          <Tag size={18} aria-hidden="true" />
         </span>
         <div>
           <p className="copy-offer-title">
-            <strong>FLAT $79.00 OFF</strong> <span>each additional certificate</span>
-          </p>
-          <p className="copy-offer-detail">
-            First certificate $149.00 · Additional certificates $70.00 each.
+            <strong>Flat $79.00 OFF</strong> <span>each additional official copy</span>
           </p>
         </div>
       </div>
@@ -171,6 +178,9 @@ export function CopyQuantity({
       >
         Number of Certified Copies <span className="required-mark">*</span>
       </label>
+      <p className="copy-quantity-guidance" id="copy-quantity-guidance">
+        {copyGuidance[certificate]}
+      </p>
       <div
         className="copy-picker"
         ref={wrap}
@@ -189,7 +199,7 @@ export function CopyQuantity({
           aria-labelledby="copy-quantity-label"
           aria-required="true"
           aria-invalid={!pricing || undefined}
-          aria-describedby={!pricing ? "copy-quantity-error" : undefined}
+          aria-describedby={`copy-quantity-guidance${!pricing ? " copy-quantity-error" : ""}`}
           aria-activedescendant={expanded ? `copy-quantity-option-${active + 1}` : undefined}
           className="copy-picker-trigger"
           disabled={processing}
@@ -249,8 +259,8 @@ export function CopyQuantity({
       </div>
       {processing ? (
         <p className="copy-fee-note" role="status">
-          An existing payment is being checked. The prices below apply only if a new payment attempt
-          is allowed.
+          An existing payment is being checked. These prices apply only if a new payment attempt is
+          allowed.
         </p>
       ) : null}
       {!pricing ? (
@@ -258,26 +268,11 @@ export function CopyQuantity({
           Your saved application has {certificateCount(copies)}. Choose between 1 and 9 certificates
           to continue.
         </p>
-      ) : (
-        <div className="copy-selection" aria-live="polite">
-          <div>
-            <strong>{certificateCount(copies)}</strong>
-            <span>Processing fee</span>
-          </div>
-          <div className="copy-selection-price">
-            <span>
-              {pricing.savingsCents > 0 ? <del>{copyMoney(pricing.regularCents)}</del> : null}
-              <strong>{copyMoney(pricing.serviceCents)}</strong>
-            </span>
-            {pricing.savingsCents > 0 ? (
-              <span className="copy-savings-badge">You save {copyMoney(pricing.savingsCents)}</span>
-            ) : (
-              <span className="copy-single-note">Additional certificates are $70.00 each</span>
-            )}
-          </div>
-        </div>
-      )}
-      <p className="copy-fee-note">Agency and shipping fees are separate.</p>
+      ) : null}
+      <p className="copy-fee-note">
+        First certificate $149.00 · Additional certificates $70.00 each. Agency and shipping fees
+        are separate.
+      </p>
       <div className="copy-reasons">
         <strong>
           {certificate === "death-certificate"
