@@ -2834,3 +2834,91 @@ textarea {
     display: none !important;
   }
 }
+
+/* Secure recovery shares the public site's typography and colors. */
+.recovery-wrap {
+  max-width: 1080px;
+}
+.recovery-heading {
+  max-width: 740px;
+  margin-bottom: 28px;
+}
+.recovery-card {
+  background: #fff;
+  border: 1px solid #dce1ea;
+  border-radius: 12px;
+  padding: 28px;
+  margin: 24px 0;
+  box-shadow: 0 4px 18px #3c3b6e08;
+}
+.recovery-card h2,
+.recovery-order h3 {
+  margin-top: 0;
+}
+.recovery-card form {
+  display: grid;
+  gap: 18px;
+  max-width: 520px;
+  margin: 22px 0;
+}
+.recovery-card label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+}
+.recovery-card input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #b8bfce;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font: inherit;
+}
+.recovery-order {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 0;
+  border-top: 1px solid #dce1ea;
+}
+.recovery-order .button-row {
+  flex-wrap: wrap;
+}
+.recovery-alert,
+.payment-recovery-panel {
+  border: 1px solid #e7b3bd;
+  background: #fff2f4;
+  border-radius: 8px;
+  padding: 20px;
+  color: #762535;
+}
+.recovery-notice {
+  background: #edf5ef;
+  border: 1px solid #bfd9c4;
+  border-radius: 8px;
+  padding: 18px;
+  color: #284f35;
+}
+.payment-recovery-panel h3 {
+  margin-top: 0;
+}
+.payment-recovery-panel .button-row {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.payment-retry-actions {
+  padding: 16px 0;
+}
+@media (max-width: 700px) {
+  .recovery-card {
+    padding: 18px;
+  }
+  .recovery-order {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .recovery-order .button-row {
+    display: grid;
+  }
+}

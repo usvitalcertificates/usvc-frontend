@@ -42,7 +42,12 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const analyticsEnabled = process.env.ANALYTICS_ENABLED === "true";
+  const requestHeaders = await headers();
+  const recoveryArea = requestHeaders.get("x-private-recovery") === "1";
+  const analyticsEnabled =
+    process.env.ANALYTICS_ENABLED === "true" &&
+    !recoveryArea &&
+    requestHeaders.get("x-staff-area") !== "1";
   // Set by middleware for /auth + /staff/* on every host: staff pages use the
   // internal chrome instead of the public header/footer.
   const staffArea = (await headers()).get("x-staff-area") === "1";

@@ -38,6 +38,7 @@ function sendOpenAIEvent(
   data: OpenAIContentsEvent,
   options?: { event_id: string },
 ) {
+  if (window.location.pathname === "/resume") return;
   if (!pixelReady || !window.oaiq) {
     if (pendingEvents.length < 20) pendingEvents.push({ name, data, options });
     return;
