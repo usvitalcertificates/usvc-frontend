@@ -3396,3 +3396,127 @@ textarea {
     animation: none;
   }
 }
+
+/* Copy pricing: green savings stay local to the public application. */
+.copy-quantity {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.copy-quantity-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: baseline;
+}
+.copy-quantity-heading .required-mark {
+  color: #b22234;
+}
+.copy-offer,
+.copy-savings {
+  color: #176b3d;
+  font-weight: 700;
+}
+.copy-offer {
+  font-size: 0.9em;
+}
+.copy-option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.copy-option-prices {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px 12px;
+}
+.copy-option del,
+.copy-selection del {
+  color: #666;
+  font-size: 0.9em;
+  font-weight: 400;
+}
+.copy-selection {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid #c7e3d1;
+  background: #f0f8f3;
+  padding: 16px 18px;
+  border-radius: 8px;
+}
+.copy-selection > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.copy-selection-price {
+  align-items: flex-end;
+  text-align: right;
+}
+.copy-selection-price > strong {
+  font-size: 1.25em;
+  color: #185b36;
+}
+.copy-selection > span > span {
+  font-size: 0.9em;
+}
+.copy-fee-note,
+.copy-reasons p {
+  font-size: 0.9em;
+  line-height: 1.5;
+  margin: 0;
+  color: #555;
+}
+.copy-reasons {
+  border-top: 1px solid #dedee7;
+  padding-top: 14px;
+  font-size: 0.95em;
+}
+.copy-reasons ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 28px;
+  padding-left: 20px;
+  margin: 12px 0;
+}
+.order-summary .copy-summary-savings {
+  color: #176b3d;
+  background: #f0f8f3;
+  border-radius: 6px;
+  padding: 12px;
+}
+@media (max-width: 600px) {
+  .copy-option {
+    align-items: flex-start;
+  }
+  .copy-option-prices {
+    max-width: 72%;
+    gap: 4px 8px;
+  }
+  .copy-option .copy-savings {
+    flex-basis: 100%;
+    text-align: right;
+  }
+  .copy-selection {
+    padding: 12px;
+  }
+  .copy-reasons ul {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copy-fee-note,
+.copy-reasons p,
+.copy-reasons li,
+.copy-selection > span > span {
+  font-weight: 400;
+}
+.copy-selection .copy-savings {
+  font-weight: 700;
+}
