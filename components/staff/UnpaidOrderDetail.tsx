@@ -389,7 +389,7 @@ function DetailBody({ id }: { id: string }) {
               <div className="staff-resume-empty">
                 <div>
                   <strong>Create a secure link for this order</strong>
-                  <p>The link is valid for 7 days. You choose what to write and send.</p>
+                  <p>The link is valid for 48 hours. You choose what to write and send.</p>
                 </div>
                 <button
                   className="staff-btn"
