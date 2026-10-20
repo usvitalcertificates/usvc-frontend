@@ -3248,3 +3248,116 @@ textarea {
     margin-left: 0;
   }
 }
+
+/* Keep payment recovery guidance compact beside the card form. */
+.payment-recovery-panel {
+  padding: 14px 16px;
+  gap: 10px;
+  border-radius: 8px;
+}
+.payment-recovery-heading {
+  gap: 10px;
+}
+.payment-recovery-icon {
+  width: 28px;
+  height: 28px;
+}
+.payment-recovery-icon svg {
+  width: 17px;
+  height: 17px;
+}
+.application-section .payment-recovery-panel h3 {
+  font-size: 19px;
+  line-height: 1.3;
+  margin: 0 0 4px;
+}
+.payment-recovery-heading p {
+  font-size: 14px;
+  line-height: 1.45;
+}
+.application-section .payment-recovery-reference {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  font-size: 12px;
+  gap: 6px 10px;
+  margin-left: 38px;
+}
+.payment-recovery-panel .payment-recovery-actions {
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #e6d5dc;
+}
+.payment-recovery-panel.is-processing .payment-recovery-actions {
+  border-color: #d4ddec;
+}
+.payment-recovery-panel .button {
+  min-height: 36px;
+  font-size: 14px;
+  padding: 7px 12px;
+  box-shadow: none;
+}
+.payment-recovery-actions > a {
+  font-size: 13px;
+}
+.payment-retry-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0 0;
+  border-top: 1px solid #e1e2eb;
+}
+.application-section .payment-retry-actions p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #666477;
+  max-width: 480px;
+}
+.payment-retry-actions .payment-retry-button {
+  background: #237245;
+  border-color: #237245;
+  color: #fff;
+  min-height: 40px;
+  font-size: 16px;
+  padding: 9px 17px;
+  white-space: nowrap;
+  box-shadow: none;
+}
+.payment-retry-actions .payment-retry-button:hover,
+.payment-retry-actions .payment-retry-button:active {
+  background: #195c36;
+  border-color: #195c36;
+}
+@media (max-width: 700px) {
+  .payment-recovery-panel {
+    padding: 12px;
+    gap: 10px;
+  }
+  .application-section .payment-recovery-panel h3 {
+    font-size: 18px;
+  }
+  .payment-recovery-panel .payment-recovery-actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .payment-recovery-panel .button {
+    min-height: 44px;
+    width: auto;
+    flex: 1 1 auto;
+    padding: 8px 10px;
+  }
+  .payment-recovery-actions > a {
+    margin: 2px 0 0;
+    width: 100%;
+    text-align: left;
+  }
+  .payment-retry-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .payment-retry-actions .payment-retry-button {
+    min-height: 44px;
+  }
+}
