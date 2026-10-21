@@ -1,3 +1,5 @@
+import { MAX_COPIES } from "@/lib/copy-pricing";
+
 export interface FaqItem {
   question: string;
   answer: string;
@@ -63,8 +65,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question:
       "How long will it take to receive my vital certificate and how many copies can I obtain?",
-    answer:
-      "Processing and delivery times vary by state and certificate type. The order form shows our processing estimates; agency processing and certificate delivery times may vary. Depending on the state and certificate type you may request a minimum of 1 to a maximum of 20 certificates at one time. Additional fees apply per copy ordered.",
+    answer: `Processing and delivery times vary by state and certificate type. The order form shows our processing estimates; agency processing and certificate delivery times may vary. Depending on the state and certificate type you may request a minimum of 1 to a maximum of ${MAX_COPIES} certificates at one time. Additional fees apply per copy ordered.`,
   },
   {
     question: "Adoption: What last name do I use?",
