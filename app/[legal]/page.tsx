@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { socialMetadata } from "@/lib/seo";
 import { PageHeader } from "../usvc-ui";
 import { LEGAL_DOCUMENTS } from "./legal-data";
 
@@ -20,13 +21,12 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: `https://usvitalcertificates.org/${legal}` },
-    openGraph: {
+    ...socialMetadata({
       title,
       description,
       url: `https://usvitalcertificates.org/${legal}`,
       type: "website",
-    },
-    twitter: { card: "summary_large_image" },
+    }),
   };
 }
 

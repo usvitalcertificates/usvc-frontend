@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BIRTH_GUIDE_SOURCES } from "@/lib/seo";
+import { BIRTH_GUIDE_SOURCES, socialMetadata } from "@/lib/seo";
 import { PageHeader } from "../usvc-ui";
 import { FaqAccordion } from "./faq-accordion";
 import { FAQ_ITEMS, faqAnswerToPlainText } from "./faq-data";
@@ -10,14 +10,13 @@ export const metadata: Metadata = {
   description:
     "Answers about USVC fees, processing times, eligibility, shipping, refunds, and how our independent service works.",
   alternates: { canonical: "https://usvitalcertificates.org/faq" },
-  openGraph: {
+  ...socialMetadata({
     title: "Frequently Asked Questions",
     description:
       "USVC fees, timelines, eligibility, shipping, and refunds: clear answers about our certificate help.",
     url: "https://usvitalcertificates.org/faq",
     type: "website",
-  },
-  twitter: { card: "summary_large_image" },
+  }),
 };
 
 export default function FaqPage() {

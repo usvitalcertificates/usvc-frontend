@@ -3,7 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SeoJsonLd } from "@/app/seo-json-ld";
 import { PageHeader } from "@/app/usvc-ui";
-import { assertSeoLength, BIRTH_GUIDE_SOURCES, SITE_URL } from "@/lib/seo";
+import {
+  assertSeoLength,
+  BIRTH_GUIDE_SOURCES,
+  SITEMAP_GUIDES_LAST_MODIFIED,
+  SITE_URL,
+  socialMetadata,
+} from "@/lib/seo";
 
 const CHECKED = "September 30, 2026";
 
@@ -30,12 +36,12 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: `${SITE_URL}/guides/${state}/birth-certificate` },
-    openGraph: {
+    ...socialMetadata({
       title,
       description,
+      url: `${SITE_URL}/guides/${state}/birth-certificate`,
       type: "article",
-    },
-    twitter: { card: "summary_large_image" },
+    }),
   };
 }
 
@@ -74,7 +80,7 @@ export default async function BirthCertificateGuide({
         "@type": "Article",
         headline: `How to Get a ${guide.state} Birth Certificate`,
         mainEntityOfPage: url,
-        dateModified: "2026-09-30",
+        dateModified: SITEMAP_GUIDES_LAST_MODIFIED,
         author: { "@type": "Organization", name: "US Vital Certificates" },
         about: { "@type": "Thing", name: `${guide.state} birth certificates` },
       },

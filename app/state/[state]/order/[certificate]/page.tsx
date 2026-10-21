@@ -9,6 +9,7 @@ import {
   CERTIFICATE_SLUGS,
   isKnownStateSlug,
   SITE_URL,
+  socialMetadata,
   titleCase,
 } from "@/lib/seo";
 import { isStateUnsupported, STATE_UNAVAILABLE_MESSAGE } from "@/lib/state-availability";
@@ -55,8 +56,7 @@ export async function generateMetadata({
       description,
       robots: { index: false, follow: true },
       alternates: { canonical: url },
-      openGraph: { title, description, url, type: "website" },
-      twitter: { card: "summary_large_image" },
+      ...socialMetadata({ title, description, url }),
     };
   }
   return {
@@ -65,8 +65,7 @@ export async function generateMetadata({
     alternates: {
       canonical: url,
     },
-    openGraph: { title, description, url, type: "website" },
-    twitter: { card: "summary_large_image" },
+    ...socialMetadata({ title, description, url }),
   };
 }
 
