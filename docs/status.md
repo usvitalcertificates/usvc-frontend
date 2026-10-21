@@ -4,6 +4,8 @@ Last updated: 2026-10-21. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 
 ## Implemented
 
+- Homepage availability indicator (2026-10-21): shortened the hero pill to “Accepting orders” and added a gentle 1.5-second opacity blink to its existing decorative green dot. Reduced-motion users see a steady dot. Formatting, lint, TypeScript and production build pass. No deployment or push.
+
 - Application jurisdiction validation (2026-10-21): canonical and legacy application routes share an exact lowercase state allowlist derived from the existing sitemap inventory plus Vermont/Wyoming. Unknown and mixed-case states stop before application metadata/schema/form generation; legacy paths reject them before redirecting. Known states and VT/WY unavailable/noindex pages are preserved; sitemap membership is unchanged. Verification: 10/10 tests, formatting, lint and production build pass. Built-app HTTP checks cover all four certificate types: 24 invalid/mixed-case canonical and legacy paths return real 404s with no form/application schema or self-canonical; 12 valid/unavailable pages return 200 and 12 valid legacy paths retain 308 redirects. VT/WY retain noindex notices with no form. All 268 sitemap URLs return 200 and VT/WY remain excluded. No production deployment or production changes.
 
 - FAQ copy-limit correction (2026-10-21): the "how many copies" FAQ answer now renders `MAX_COPIES` (1–9) instead of a stale hardcoded 20, so visible text and the FAQPage JSON-LD generated from the same data stay accurate and cannot drift from the order form again. `docs/architecture.md` corrected to 1–9.
