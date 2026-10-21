@@ -443,6 +443,17 @@ h3 {
   border-radius: 50%;
   background: #34d399;
   box-shadow: 0 0 10px rgb(52 211 153 / 90%);
+  animation: hero-dot-blink 1.5s ease-in-out infinite;
+}
+@keyframes hero-dot-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-dot {
+    animation: none;
+  }
 }
 .hero-trust {
   display: flex;
