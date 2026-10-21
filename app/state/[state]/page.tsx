@@ -6,69 +6,8 @@ import { notFound } from "next/navigation";
 import { SeoJsonLd } from "@/app/seo-json-ld";
 import { assertSeoLength, CERTIFICATE_DETAILS, SITE_URL, socialMetadata } from "@/lib/seo";
 import { isStateUnsupported, STATE_UNAVAILABLE_MESSAGE } from "@/lib/state-availability";
+import { STATES } from "@/lib/states";
 import { PageHeader } from "../../usvc-ui";
-
-const STATES: Array<readonly [string, string]> = [
-  ["Alabama", "AL"],
-  ["Alaska", "AK"],
-  ["Arizona", "AZ"],
-  ["Arkansas", "AR"],
-  ["California", "CA"],
-  ["Colorado", "CO"],
-  ["Connecticut", "CT"],
-  ["Delaware", "DE"],
-  ["District of Columbia", "DC"],
-  ["Florida", "FL"],
-  ["Georgia", "GA"],
-  ["Hawaii", "HI"],
-  ["Idaho", "ID"],
-  ["Illinois", "IL"],
-  ["Indiana", "IN"],
-  ["Iowa", "IA"],
-  ["Kansas", "KS"],
-  ["Kentucky", "KY"],
-  ["Louisiana", "LA"],
-  ["Maine", "ME"],
-  ["Maryland", "MD"],
-  ["Massachusetts", "MA"],
-  ["Michigan", "MI"],
-  ["Minnesota", "MN"],
-  ["Mississippi", "MS"],
-  ["Missouri", "MO"],
-  ["Montana", "MT"],
-  ["Nebraska", "NE"],
-  ["Nevada", "NV"],
-  ["New Hampshire", "NH"],
-  ["New Jersey", "NJ"],
-  ["New Mexico", "NM"],
-  ["New York", "NY"],
-  ["North Carolina", "NC"],
-  ["North Dakota", "ND"],
-  ["Ohio", "OH"],
-  ["Oklahoma", "OK"],
-  ["Oregon", "OR"],
-  ["Pennsylvania", "PA"],
-  ["Puerto Rico", "PR"],
-  ["Rhode Island", "RI"],
-  ["South Carolina", "SC"],
-  ["South Dakota", "SD"],
-  ["Tennessee", "TN"],
-  ["Texas", "TX"],
-  ["Utah", "UT"],
-  ["Vermont", "VT"],
-  ["Virginia", "VA"],
-  ["Washington", "WA"],
-  ["West Virginia", "WV"],
-  ["Wisconsin", "WI"],
-  ["Wyoming", "WY"],
-] as const;
-
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
 
 const CERTIFICATES = [
   {
@@ -102,7 +41,7 @@ const ELIGIBILITY =
  *  instead of relying on the JS StateSelector grid. VT/WY prerender
  *  with noindex via generateMetadata. */
 export async function generateStaticParams() {
-  return STATES.map(([name]) => ({ state: slugify(name) }));
+  return STATES.map(({ slug }) => ({ state: slug }));
 }
 
 export async function generateMetadata({
@@ -111,8 +50,9 @@ export async function generateMetadata({
   params: Promise<{ state: string }>;
 }): Promise<Metadata> {
   const { state } = await params;
-  const found = STATES.find(([name]) => slugify(name) === state);
-  const name = found ? found[0] : state;
+  const found = STATES.find(({ slug }) => slug === state);
+  if (!found) return {};
+  const name = found.name;
   const title = assertSeoLength(
     "title",
     `${name} Vital Records: birth, death, marriage, divorce help`,
@@ -138,9 +78,9 @@ export async function generateMetadata({
 
 export default async function StatePage({ params }: { params: Promise<{ state: string }> }) {
   const { state } = await params;
-  const found = STATES.find(([name]) => slugify(name) === state);
+  const found = STATES.find(({ slug }) => slug === state);
   if (!found) notFound();
-  const name = found[0];
+  const name = found.name;
   const unavailable = isStateUnsupported(state);
   const url = `${SITE_URL}/state/${state}`;
   const certUses = CERTIFICATES.map((cert) => CERTIFICATE_DETAILS[cert.slug].uses);

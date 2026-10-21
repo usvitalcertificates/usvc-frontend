@@ -1,0 +1,2902 @@
+{
+  "date": "2026-10-21",
+  "target": "Live production; not a verification of local cleanup deployment",
+  "fieldData": "Not measured; Lighthouse TBT is not field INP",
+  "medians": {
+    "home": {
+      "score": 71,
+      "scoreRange": [68, 73],
+      "metrics": {
+        "first-contentful-paint": 950.7770000000002,
+        "largest-contentful-paint": 7757.8814999999995,
+        "speed-index": 3076.435628029345,
+        "total-blocking-time": 254,
+        "cumulative-layout-shift": 0
+      }
+    },
+    "nebraska": {
+      "score": 64,
+      "scoreRange": [63, 70],
+      "metrics": {
+        "first-contentful-paint": 3706.0409999999997,
+        "largest-contentful-paint": 7912.093,
+        "speed-index": 4647.563508005213,
+        "total-blocking-time": 178.99999999999955,
+        "cumulative-layout-shift": 0
+      }
+    },
+    "california-guide": {
+      "score": 61,
+      "scoreRange": [60, 67],
+      "metrics": {
+        "first-contentful-paint": 3616.4335,
+        "largest-contentful-paint": 8126.664,
+        "speed-index": 5210.558894040942,
+        "total-blocking-time": 292,
+        "cumulative-layout-shift": 0
+      }
+    },
+    "california-order": {
+      "score": 70,
+      "scoreRange": [70, 81],
+      "metrics": {
+        "first-contentful-paint": 955.1104999999999,
+        "largest-contentful-paint": 6893.647999999999,
+        "speed-index": 3066.463203307666,
+        "total-blocking-time": 263.5,
+        "cumulative-layout-shift": 0
+      }
+    }
+  },
+  "runs": [
+    {
+      "page": "home",
+      "run": 1,
+      "url": "https://usvitalcertificates.org/",
+      "fetchTime": "2026-10-21T10:03:46.227Z",
+      "lighthouseVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 4083,
+        "credits": {}
+      },
+      "configSettings": {
+        "output": ["json", "html"],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": ["file_systems", "shader_cache", "service_workers", "cache_storage"],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": ["performance"],
+        "skipAudits": null
+      },
+      "score": 73,
+      "metrics": {
+        "first-contentful-paint": 993.5100000000002,
+        "largest-contentful-paint": 6583.203000000002,
+        "speed-index": 3076.435628029345,
+        "total-blocking-time": 205,
+        "cumulative-layout-shift": 0
+      },
+      "warnings": [],
+      "lcpElements": [
+        {
+          "selector": "body > main > section.hero-background > img.hero-bg-image",
+          "nodeLabel": "White House north facade with fountain, flower bed, and United States flag"
+        }
+      ],
+      "insights": {
+        "unused-javascript": {
+          "displayValue": "Est savings of 233\u00a0KiB",
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 750
+          },
+          "items": [
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "totalBytes": 132019,
+              "wastedBytes": 64562
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "totalBytes": 199095,
+              "wastedBytes": 60831
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "totalBytes": 148602,
+              "wastedBytes": 45127
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "totalBytes": 114571,
+              "wastedBytes": 40743
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "totalBytes": 72862,
+              "wastedBytes": 27765
+            }
+          ]
+        },
+        "bootup-time": {
+          "displayValue": "1.4\u00a0s",
+          "metricSavings": {
+            "TBT": 250
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "total": 905.5800000001076,
+              "scripting": 749.7520000001066
+            },
+            {
+              "url": "Unattributable",
+              "total": 216.52000000000066,
+              "scripting": 53.824
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "total": 176.42800000000074,
+              "scripting": 134.96000000000075
+            },
+            {
+              "url": "https://usvitalcertificates.org/",
+              "total": 156.972,
+              "scripting": 7.076
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "total": 142.90800000000056,
+              "scripting": 92.10000000000055
+            },
+            {
+              "url": "https://scripts.clarity.ms/0.8.72/clarity.js",
+              "total": 86.11199999999985,
+              "scripting": 73.37999999999985
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "total": 78.68799999999989,
+              "scripting": 48.43599999999989
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "total": 77.60399999999994,
+              "scripting": 53.19999999999994
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/0hfug2rydwec1.js",
+              "total": 74.43199999999999,
+              "scripting": 65.44399999999999
+            }
+          ]
+        },
+        "mainthread-work-breakdown": {
+          "displayValue": "2.0\u00a0s",
+          "metricSavings": {
+            "TBT": 200
+          },
+          "items": [
+            {
+              "duration": 1343.616000000096,
+              "group": "scriptEvaluation",
+              "groupLabel": "Script Evaluation"
+            },
+            {
+              "duration": 316.59200000000067,
+              "group": "other",
+              "groupLabel": "Other"
+            },
+            {
+              "duration": 174.72000000000003,
+              "group": "scriptParseCompile",
+              "groupLabel": "Script Parsing & Compilation"
+            },
+            {
+              "duration": 79.87600000000002,
+              "group": "styleLayout",
+              "groupLabel": "Style & Layout"
+            },
+            {
+              "duration": 58.85999999999998,
+              "group": "garbageCollection",
+              "groupLabel": "Garbage Collection"
+            },
+            {
+              "duration": 21.8,
+              "group": "paintCompositeRender",
+              "groupLabel": "Rendering"
+            },
+            {
+              "duration": 7.656,
+              "group": "parseHTML",
+              "groupLabel": "Parse HTML & CSS"
+            }
+          ]
+        },
+        "image-delivery-insight": {
+          "displayValue": "Est savings of 30\u00a0KiB",
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/image",
+              "totalBytes": 39362,
+              "wastedBytes": 31134
+            }
+          ]
+        },
+        "render-blocking-insight": {
+          "displayValue": "Est savings of 100\u00a0ms",
+          "metricSavings": {
+            "FCP": 100,
+            "LCP": 0
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1j8t0lqx6qk4r.css",
+              "totalBytes": 13386
+            }
+          ]
+        },
+        "document-latency-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        }
+      },
+      "rawReport": "home-1.report.json",
+      "sha256": "10ed9388cd8186e4dfb8a28c003c4a4d0c671697bcc47485522634cbf01cd4ea"
+    },
+    {
+      "page": "home",
+      "run": 2,
+      "url": "https://usvitalcertificates.org/",
+      "fetchTime": "2026-10-21T10:04:44.311Z",
+      "lighthouseVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 4212,
+        "credits": {}
+      },
+      "configSettings": {
+        "output": ["json", "html"],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": ["file_systems", "shader_cache", "service_workers", "cache_storage"],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": ["performance"],
+        "skipAudits": null
+      },
+      "score": 68,
+      "metrics": {
+        "first-contentful-paint": 926.518,
+        "largest-contentful-paint": 7757.8814999999995,
+        "speed-index": 4072.097173995449,
+        "total-blocking-time": 290.5,
+        "cumulative-layout-shift": 0
+      },
+      "warnings": [],
+      "lcpElements": [
+        {
+          "selector": "body > main > section.hero-background > img.hero-bg-image",
+          "nodeLabel": "White House north facade with fountain, flower bed, and United States flag"
+        }
+      ],
+      "insights": {
+        "unused-javascript": {
+          "displayValue": "Est savings of 235\u00a0KiB",
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 1000
+          },
+          "items": [
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "totalBytes": 132024,
+              "wastedBytes": 64831
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "totalBytes": 199095,
+              "wastedBytes": 60862
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "totalBytes": 148630,
+              "wastedBytes": 44987
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "totalBytes": 114634,
+              "wastedBytes": 40808
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "totalBytes": 72862,
+              "wastedBytes": 29131
+            }
+          ]
+        },
+        "bootup-time": {
+          "displayValue": "0.9\u00a0s",
+          "metricSavings": {
+            "TBT": 350
+          },
+          "items": [
+            {
+              "url": "Unattributable",
+              "total": 290.74799999999914,
+              "scripting": 58.42399999999998
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "total": 200.01999999999708,
+              "scripting": 145.09999999999707
+            },
+            {
+              "url": "https://usvitalcertificates.org/",
+              "total": 173.38,
+              "scripting": 5.663999999999999
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "total": 151.4080000000006,
+              "scripting": 96.90800000000061
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "total": 139.24000000000078,
+              "scripting": 104.78000000000077
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "total": 114.91199999999999,
+              "scripting": 76.93599999999999
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "total": 113.80400000000037,
+              "scripting": 69.19600000000038
+            },
+            {
+              "url": "https://scripts.clarity.ms/0.8.72/clarity.js",
+              "total": 94.98799999999984,
+              "scripting": 79.18399999999984
+            },
+            {
+              "url": "https://bzrcdn.openai.com/sdk/oaiq.min.js",
+              "total": 53.107999999999976,
+              "scripting": 41.251999999999974
+            }
+          ]
+        },
+        "mainthread-work-breakdown": {
+          "displayValue": "1.5\u00a0s",
+          "metricSavings": {
+            "TBT": 300
+          },
+          "items": [
+            {
+              "duration": 764.3280000000112,
+              "group": "scriptEvaluation",
+              "groupLabel": "Script Evaluation"
+            },
+            {
+              "duration": 306.21599999999967,
+              "group": "other",
+              "groupLabel": "Other"
+            },
+            {
+              "duration": 246.33600000000007,
+              "group": "scriptParseCompile",
+              "groupLabel": "Script Parsing & Compilation"
+            },
+            {
+              "duration": 63.21600000000002,
+              "group": "styleLayout",
+              "groupLabel": "Style & Layout"
+            },
+            {
+              "duration": 44.992,
+              "group": "paintCompositeRender",
+              "groupLabel": "Rendering"
+            },
+            {
+              "duration": 20.667999999999985,
+              "group": "garbageCollection",
+              "groupLabel": "Garbage Collection"
+            },
+            {
+              "duration": 7.007999999999998,
+              "group": "parseHTML",
+              "groupLabel": "Parse HTML & CSS"
+            }
+          ]
+        },
+        "image-delivery-insight": {
+          "displayValue": "Est savings of 30\u00a0KiB",
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/image",
+              "totalBytes": 39362,
+              "wastedBytes": 31134
+            }
+          ]
+        },
+        "render-blocking-insight": {
+          "displayValue": "Est savings of 110\u00a0ms",
+          "metricSavings": {
+            "FCP": 100,
+            "LCP": 0
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1j8t0lqx6qk4r.css",
+              "totalBytes": 13409
+            }
+          ]
+        },
+        "document-latency-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        }
+      },
+      "rawReport": "home-2.report.json",
+      "sha256": "5cb1961daf5692acba40d382c4b7219c5e650060b8dfd5a286ff8ba849295e3e"
+    },
+    {
+      "page": "home",
+      "run": 3,
+      "url": "https://usvitalcertificates.org/",
+      "fetchTime": "2026-10-21T10:05:42.751Z",
+      "lighthouseVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 4214,
+        "credits": {}
+      },
+      "configSettings": {
+        "output": ["json", "html"],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": ["file_systems", "shader_cache", "service_workers", "cache_storage"],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": ["performance"],
+        "skipAudits": null
+      },
+      "score": 71,
+      "metrics": {
+        "first-contentful-paint": 950.7770000000002,
+        "largest-contentful-paint": 7789.146999999998,
+        "speed-index": 2595.151526004718,
+        "total-blocking-time": 254,
+        "cumulative-layout-shift": 0
+      },
+      "warnings": [],
+      "lcpElements": [
+        {
+          "selector": "body > main > section.hero-background > img.hero-bg-image",
+          "nodeLabel": "White House north facade with fountain, flower bed, and United States flag"
+        }
+      ],
+      "insights": {
+        "unused-javascript": {
+          "displayValue": "Est savings of 235\u00a0KiB",
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 1250
+          },
+          "items": [
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "totalBytes": 132024,
+              "wastedBytes": 64831
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "totalBytes": 199095,
+              "wastedBytes": 60862
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "totalBytes": 148630,
+              "wastedBytes": 44987
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "totalBytes": 114634,
+              "wastedBytes": 40808
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "totalBytes": 72862,
+              "wastedBytes": 29131
+            }
+          ]
+        },
+        "bootup-time": {
+          "displayValue": "0.7\u00a0s",
+          "metricSavings": {
+            "TBT": 250
+          },
+          "items": [
+            {
+              "url": "Unattributable",
+              "total": 255.74000000000018,
+              "scripting": 48.291999999999966
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "total": 172.09200000000135,
+              "scripting": 129.57600000000133
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "total": 133.94800000000072,
+              "scripting": 106.02400000000071
+            },
+            {
+              "url": "https://usvitalcertificates.org/",
+              "total": 115.428,
+              "scripting": 5.6519999999999975
+            },
+            {
+              "url": "https://scripts.clarity.ms/0.8.72/clarity.js",
+              "total": 112.73600000000049,
+              "scripting": 94.73200000000048
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "total": 106.87199999999996,
+              "scripting": 65.32799999999996
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "total": 93.47199999999982,
+              "scripting": 50.19599999999983
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "total": 89.11199999999981,
+              "scripting": 62.10799999999981
+            }
+          ]
+        },
+        "mainthread-work-breakdown": {
+          "displayValue": "1.2\u00a0s",
+          "metricSavings": {
+            "TBT": 250
+          },
+          "items": [
+            {
+              "duration": 635.4680000000102,
+              "group": "scriptEvaluation",
+              "groupLabel": "Script Evaluation"
+            },
+            {
+              "duration": 245.5159999999999,
+              "group": "other",
+              "groupLabel": "Other"
+            },
+            {
+              "duration": 204.91199999999998,
+              "group": "scriptParseCompile",
+              "groupLabel": "Script Parsing & Compilation"
+            },
+            {
+              "duration": 47.94800000000001,
+              "group": "styleLayout",
+              "groupLabel": "Style & Layout"
+            },
+            {
+              "duration": 33.44,
+              "group": "garbageCollection",
+              "groupLabel": "Garbage Collection"
+            },
+            {
+              "duration": 20.623999999999995,
+              "group": "paintCompositeRender",
+              "groupLabel": "Rendering"
+            },
+            {
+              "duration": 6.483999999999998,
+              "group": "parseHTML",
+              "groupLabel": "Parse HTML & CSS"
+            }
+          ]
+        },
+        "image-delivery-insight": {
+          "displayValue": "Est savings of 30\u00a0KiB",
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 150
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/image",
+              "totalBytes": 39362,
+              "wastedBytes": 31134
+            }
+          ]
+        },
+        "render-blocking-insight": {
+          "displayValue": "Est savings of 120\u00a0ms",
+          "metricSavings": {
+            "FCP": 100,
+            "LCP": 0
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1j8t0lqx6qk4r.css",
+              "totalBytes": 13386
+            }
+          ]
+        },
+        "document-latency-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        }
+      },
+      "rawReport": "home-3.report.json",
+      "sha256": "07998bc788511f993f8b266459d8d2c1007af876b2ee91805b0f024972a8de76"
+    },
+    {
+      "page": "nebraska",
+      "run": 1,
+      "url": "https://usvitalcertificates.org/state/nebraska",
+      "fetchTime": "2026-10-21T10:04:00.688Z",
+      "lighthouseVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 4202,
+        "credits": {}
+      },
+      "configSettings": {
+        "output": ["json", "html"],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": ["file_systems", "shader_cache", "service_workers", "cache_storage"],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": ["performance"],
+        "skipAudits": null
+      },
+      "score": 64,
+      "metrics": {
+        "first-contentful-paint": 3706.0409999999997,
+        "largest-contentful-paint": 7691.24,
+        "speed-index": 4647.563508005213,
+        "total-blocking-time": 156,
+        "cumulative-layout-shift": 0
+      },
+      "warnings": [],
+      "lcpElements": [
+        {
+          "selector": "main > section.page-section > div.container > p.state-intro",
+          "nodeLabel": "Nebraska vital records \u2014 birth, death, marriage, and divorce certificates \u2014 are\u2026"
+        }
+      ],
+      "insights": {
+        "unused-javascript": {
+          "displayValue": "Est savings of 235\u00a0KiB",
+          "metricSavings": {
+            "FCP": 700,
+            "LCP": 1150
+          },
+          "items": [
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "totalBytes": 132019,
+              "wastedBytes": 64825
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "totalBytes": 199095,
+              "wastedBytes": 60831
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "totalBytes": 148630,
+              "wastedBytes": 44987
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "totalBytes": 114634,
+              "wastedBytes": 40808
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "totalBytes": 72862,
+              "wastedBytes": 29637
+            }
+          ]
+        },
+        "bootup-time": {
+          "displayValue": "0.7\u00a0s",
+          "metricSavings": {
+            "TBT": 200
+          },
+          "items": [
+            {
+              "url": "Unattributable",
+              "total": 233.49600000000024,
+              "scripting": 45.404
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "total": 181.91600000000133,
+              "scripting": 119.12800000000132
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "total": 125.98000000000059,
+              "scripting": 85.30800000000058
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/0hfug2rydwec1.js",
+              "total": 99.78800000000004,
+              "scripting": 87.44000000000004
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "total": 76.91999999999996,
+              "scripting": 51.647999999999946
+            },
+            {
+              "url": "https://scripts.clarity.ms/0.8.72/clarity.js",
+              "total": 72.75599999999986,
+              "scripting": 59.69199999999986
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "total": 56.47600000000008,
+              "scripting": 43.47200000000008
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "total": 55.755999999999936,
+              "scripting": 33.90799999999994
+            }
+          ]
+        },
+        "mainthread-work-breakdown": {
+          "displayValue": "1.0\u00a0s",
+          "metricSavings": {
+            "TBT": 150
+          },
+          "items": [
+            {
+              "duration": 586.5640000000102,
+              "group": "scriptEvaluation",
+              "groupLabel": "Script Evaluation"
+            },
+            {
+              "duration": 184.63599999999965,
+              "group": "other",
+              "groupLabel": "Other"
+            },
+            {
+              "duration": 175.33200000000005,
+              "group": "scriptParseCompile",
+              "groupLabel": "Script Parsing & Compilation"
+            },
+            {
+              "duration": 33.032000000000004,
+              "group": "styleLayout",
+              "groupLabel": "Style & Layout"
+            },
+            {
+              "duration": 19.964000000000002,
+              "group": "garbageCollection",
+              "groupLabel": "Garbage Collection"
+            },
+            {
+              "duration": 9.263999999999992,
+              "group": "paintCompositeRender",
+              "groupLabel": "Rendering"
+            },
+            {
+              "duration": 5.155999999999999,
+              "group": "parseHTML",
+              "groupLabel": "Parse HTML & CSS"
+            }
+          ]
+        },
+        "image-delivery-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        },
+        "render-blocking-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1j8t0lqx6qk4r.css",
+              "totalBytes": 13385
+            }
+          ]
+        },
+        "document-latency-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        }
+      },
+      "rawReport": "nebraska-1.report.json",
+      "sha256": "256b9aaaa7705e3c45a477593525b92beae190f7528241cf43d568d244b6d0ee"
+    },
+    {
+      "page": "nebraska",
+      "run": 2,
+      "url": "https://usvitalcertificates.org/state/nebraska",
+      "fetchTime": "2026-10-21T10:04:59.141Z",
+      "lighthouseVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 4179.5,
+        "credits": {}
+      },
+      "configSettings": {
+        "output": ["json", "html"],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": ["file_systems", "shader_cache", "service_workers", "cache_storage"],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": ["performance"],
+        "skipAudits": null
+      },
+      "score": 70,
+      "metrics": {
+        "first-contentful-paint": 1024.5785,
+        "largest-contentful-paint": 7955.91,
+        "speed-index": 4034.9310879879226,
+        "total-blocking-time": 227.49999999999955,
+        "cumulative-layout-shift": 0
+      },
+      "warnings": [],
+      "lcpElements": [
+        {
+          "selector": "main > section.page-section > div.container > p.state-intro",
+          "nodeLabel": "Nebraska vital records \u2014 birth, death, marriage, and divorce certificates \u2014 are\u2026"
+        }
+      ],
+      "insights": {
+        "unused-javascript": {
+          "displayValue": "Est savings of 235\u00a0KiB",
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 1050
+          },
+          "items": [
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "totalBytes": 132012,
+              "wastedBytes": 64550
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "totalBytes": 199090,
+              "wastedBytes": 60334
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "totalBytes": 148630,
+              "wastedBytes": 44987
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "totalBytes": 114634,
+              "wastedBytes": 40765
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "totalBytes": 72862,
+              "wastedBytes": 29637
+            }
+          ]
+        },
+        "bootup-time": {
+          "displayValue": "0.8\u00a0s",
+          "metricSavings": {
+            "TBT": 250
+          },
+          "items": [
+            {
+              "url": "Unattributable",
+              "total": 228.5079999999997,
+              "scripting": 46.96799999999997
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "total": 176.100000000001,
+              "scripting": 131.64400000000097
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "total": 151.2920000000007,
+              "scripting": 126.90800000000073
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "total": 125.10000000000056,
+              "scripting": 84.74400000000057
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "total": 89.95999999999995,
+              "scripting": 58.12799999999994
+            },
+            {
+              "url": "https://usvitalcertificates.org/state/nebraska",
+              "total": 84.17999999999999,
+              "scripting": 6.639999999999998
+            },
+            {
+              "url": "https://scripts.clarity.ms/0.8.72/clarity.js",
+              "total": 71.85599999999985,
+              "scripting": 57.91999999999985
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "total": 63.407999999999916,
+              "scripting": 36.89199999999992
+            },
+            {
+              "url": "https://bzrcdn.openai.com/sdk/oaiq.min.js",
+              "total": 51.67199999999998,
+              "scripting": 40.59599999999999
+            }
+          ]
+        },
+        "mainthread-work-breakdown": {
+          "displayValue": "1.1\u00a0s",
+          "metricSavings": {
+            "TBT": 250
+          },
+          "items": [
+            {
+              "duration": 639.276000000009,
+              "group": "scriptEvaluation",
+              "groupLabel": "Script Evaluation"
+            },
+            {
+              "duration": 205.52,
+              "group": "scriptParseCompile",
+              "groupLabel": "Script Parsing & Compilation"
+            },
+            {
+              "duration": 181.63999999999982,
+              "group": "other",
+              "groupLabel": "Other"
+            },
+            {
+              "duration": 53.53999999999999,
+              "group": "styleLayout",
+              "groupLabel": "Style & Layout"
+            },
+            {
+              "duration": 21.01599999999998,
+              "group": "garbageCollection",
+              "groupLabel": "Garbage Collection"
+            },
+            {
+              "duration": 12.855999999999991,
+              "group": "paintCompositeRender",
+              "groupLabel": "Rendering"
+            },
+            {
+              "duration": 7.015999999999998,
+              "group": "parseHTML",
+              "groupLabel": "Parse HTML & CSS"
+            }
+          ]
+        },
+        "image-delivery-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        },
+        "render-blocking-insight": {
+          "displayValue": "Est savings of 120\u00a0ms",
+          "metricSavings": {
+            "FCP": 100,
+            "LCP": 100
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1j8t0lqx6qk4r.css",
+              "totalBytes": 13386
+            }
+          ]
+        },
+        "document-latency-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        }
+      },
+      "rawReport": "nebraska-2.report.json",
+      "sha256": "45544d38285c0d9325125b4278fbeb12c1d2cdc960da0f3b994ce5c01749d801"
+    },
+    {
+      "page": "nebraska",
+      "run": 3,
+      "url": "https://usvitalcertificates.org/state/nebraska",
+      "fetchTime": "2026-10-21T10:05:56.528Z",
+      "lighthouseVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 4197,
+        "credits": {}
+      },
+      "configSettings": {
+        "output": ["json", "html"],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": ["file_systems", "shader_cache", "service_workers", "cache_storage"],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": ["performance"],
+        "skipAudits": null
+      },
+      "score": 63,
+      "metrics": {
+        "first-contentful-paint": 3799.0544999999997,
+        "largest-contentful-paint": 7912.093,
+        "speed-index": 4739.819332045054,
+        "total-blocking-time": 178.99999999999955,
+        "cumulative-layout-shift": 0
+      },
+      "warnings": [],
+      "lcpElements": [
+        {
+          "selector": "main > section.page-section > div.container > p.state-intro",
+          "nodeLabel": "Nebraska vital records \u2014 birth, death, marriage, and divorce certificates \u2014 are\u2026"
+        }
+      ],
+      "insights": {
+        "unused-javascript": {
+          "displayValue": "Est savings of 235\u00a0KiB",
+          "metricSavings": {
+            "FCP": 700,
+            "LCP": 1250
+          },
+          "items": [
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "totalBytes": 132019,
+              "wastedBytes": 64553
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "totalBytes": 199095,
+              "wastedBytes": 60831
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "totalBytes": 148630,
+              "wastedBytes": 44987
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "totalBytes": 114634,
+              "wastedBytes": 40765
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "totalBytes": 72862,
+              "wastedBytes": 29637
+            }
+          ]
+        },
+        "bootup-time": {
+          "displayValue": "0.7\u00a0s",
+          "metricSavings": {
+            "TBT": 200
+          },
+          "items": [
+            {
+              "url": "Unattributable",
+              "total": 223.74799999999985,
+              "scripting": 39.94800000000003
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "total": 209.38799999999742,
+              "scripting": 140.67999999999742
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "total": 119.08400000000032,
+              "scripting": 102.68400000000032
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "total": 101.08800000000062,
+              "scripting": 70.65200000000061
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "total": 96.396,
+              "scripting": 61.844
+            },
+            {
+              "url": "https://scripts.clarity.ms/0.8.72/clarity.js",
+              "total": 96.15999999999988,
+              "scripting": 77.43199999999989
+            },
+            {
+              "url": "https://usvitalcertificates.org/state/nebraska",
+              "total": 58.835999999999984,
+              "scripting": 8.895999999999997
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "total": 53.71600000000006,
+              "scripting": 31.78800000000006
+            }
+          ]
+        },
+        "mainthread-work-breakdown": {
+          "displayValue": "1.1\u00a0s",
+          "metricSavings": {
+            "TBT": 200
+          },
+          "items": [
+            {
+              "duration": 613.5440000000107,
+              "group": "scriptEvaluation",
+              "groupLabel": "Script Evaluation"
+            },
+            {
+              "duration": 205.75199999999992,
+              "group": "scriptParseCompile",
+              "groupLabel": "Script Parsing & Compilation"
+            },
+            {
+              "duration": 185.92399999999978,
+              "group": "other",
+              "groupLabel": "Other"
+            },
+            {
+              "duration": 37.540000000000006,
+              "group": "styleLayout",
+              "groupLabel": "Style & Layout"
+            },
+            {
+              "duration": 18.312000000000012,
+              "group": "garbageCollection",
+              "groupLabel": "Garbage Collection"
+            },
+            {
+              "duration": 14.143999999999991,
+              "group": "paintCompositeRender",
+              "groupLabel": "Rendering"
+            },
+            {
+              "duration": 12.891999999999998,
+              "group": "parseHTML",
+              "groupLabel": "Parse HTML & CSS"
+            }
+          ]
+        },
+        "image-delivery-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        },
+        "render-blocking-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1j8t0lqx6qk4r.css",
+              "totalBytes": 13386
+            }
+          ]
+        },
+        "document-latency-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        }
+      },
+      "rawReport": "nebraska-3.report.json",
+      "sha256": "755cf932de5e3963cebca3f23905b4b87d935bb456cd761fbfd75dbc2ba5cb89"
+    },
+    {
+      "page": "california-guide",
+      "run": 1,
+      "url": "https://usvitalcertificates.org/guides/california/birth-certificate",
+      "fetchTime": "2026-10-21T10:04:14.212Z",
+      "lighthouseVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 4204,
+        "credits": {}
+      },
+      "configSettings": {
+        "output": ["json", "html"],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": ["file_systems", "shader_cache", "service_workers", "cache_storage"],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": ["performance"],
+        "skipAudits": null
+      },
+      "score": 60,
+      "metrics": {
+        "first-contentful-paint": 3844.8195,
+        "largest-contentful-paint": 6354.2074999999995,
+        "speed-index": 5210.558894040942,
+        "total-blocking-time": 292,
+        "cumulative-layout-shift": 0
+      },
+      "warnings": [],
+      "lcpElements": [
+        {
+          "selector": "main > section.page-section > div.container > p",
+          "nodeLabel": "A California birth certificate is issued under the rules of the California issu\u2026"
+        }
+      ],
+      "insights": {
+        "unused-javascript": {
+          "displayValue": "Est savings of 235\u00a0KiB",
+          "metricSavings": {
+            "FCP": 650,
+            "LCP": 850
+          },
+          "items": [
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "totalBytes": 132019,
+              "wastedBytes": 64553
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "totalBytes": 199095,
+              "wastedBytes": 60831
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "totalBytes": 148540,
+              "wastedBytes": 45108
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "totalBytes": 114571,
+              "wastedBytes": 40786
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "totalBytes": 72862,
+              "wastedBytes": 29784
+            }
+          ]
+        },
+        "bootup-time": {
+          "displayValue": "0.9\u00a0s",
+          "metricSavings": {
+            "TBT": 350
+          },
+          "items": [
+            {
+              "url": "Unattributable",
+              "total": 231.65199999999967,
+              "scripting": 43.06799999999995
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "total": 231.27599999999723,
+              "scripting": 153.79999999999723
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "total": 156.89200000000056,
+              "scripting": 99.25600000000058
+            },
+            {
+              "url": "https://scripts.clarity.ms/0.8.72/clarity.js",
+              "total": 119.99200000000009,
+              "scripting": 100.55200000000009
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "total": 112.82399999999978,
+              "scripting": 73.1919999999998
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/0hfug2rydwec1.js",
+              "total": 105.27200000000002,
+              "scripting": 90.40800000000002
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "total": 103.87599999999986,
+              "scripting": 61.57199999999985
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "total": 73.20799999999986,
+              "scripting": 51.25999999999986
+            }
+          ]
+        },
+        "mainthread-work-breakdown": {
+          "displayValue": "1.3\u00a0s",
+          "metricSavings": {
+            "TBT": 300
+          },
+          "items": [
+            {
+              "duration": 742.0200000000112,
+              "group": "scriptEvaluation",
+              "groupLabel": "Script Evaluation"
+            },
+            {
+              "duration": 263.7360000000001,
+              "group": "scriptParseCompile",
+              "groupLabel": "Script Parsing & Compilation"
+            },
+            {
+              "duration": 201.40399999999977,
+              "group": "other",
+              "groupLabel": "Other"
+            },
+            {
+              "duration": 26.607999999999997,
+              "group": "styleLayout",
+              "groupLabel": "Style & Layout"
+            },
+            {
+              "duration": 19.244,
+              "group": "garbageCollection",
+              "groupLabel": "Garbage Collection"
+            },
+            {
+              "duration": 10.019999999999996,
+              "group": "paintCompositeRender",
+              "groupLabel": "Rendering"
+            },
+            {
+              "duration": 8.559999999999999,
+              "group": "parseHTML",
+              "groupLabel": "Parse HTML & CSS"
+            }
+          ]
+        },
+        "image-delivery-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        },
+        "render-blocking-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1j8t0lqx6qk4r.css",
+              "totalBytes": 13387
+            }
+          ]
+        },
+        "document-latency-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        }
+      },
+      "rawReport": "california-guide-1.report.json",
+      "sha256": "e3d16fdad7304623124f4085a03e46bc2de6eec1a39346c5341aca85371f2f17"
+    },
+    {
+      "page": "california-guide",
+      "run": 2,
+      "url": "https://usvitalcertificates.org/guides/california/birth-certificate",
+      "fetchTime": "2026-10-21T10:05:14.579Z",
+      "lighthouseVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 4212.5,
+        "credits": {}
+      },
+      "configSettings": {
+        "output": ["json", "html"],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": ["file_systems", "shader_cache", "service_workers", "cache_storage"],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": ["performance"],
+        "skipAudits": null
+      },
+      "score": 67,
+      "metrics": {
+        "first-contentful-paint": 934.97,
+        "largest-contentful-paint": 8126.664,
+        "speed-index": 3940.425280023097,
+        "total-blocking-time": 315,
+        "cumulative-layout-shift": 0
+      },
+      "warnings": [],
+      "lcpElements": [
+        {
+          "selector": "main > section.page-section > div.container > p",
+          "nodeLabel": "A California birth certificate is issued under the rules of the California issu\u2026"
+        }
+      ],
+      "insights": {
+        "unused-javascript": {
+          "displayValue": "Est savings of 235\u00a0KiB",
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 1450
+          },
+          "items": [
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "totalBytes": 132019,
+              "wastedBytes": 64825
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "totalBytes": 199095,
+              "wastedBytes": 60335
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "totalBytes": 148606,
+              "wastedBytes": 45128
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "totalBytes": 114571,
+              "wastedBytes": 40786
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "totalBytes": 72862,
+              "wastedBytes": 29784
+            }
+          ]
+        },
+        "bootup-time": {
+          "displayValue": "0.8\u00a0s",
+          "metricSavings": {
+            "TBT": 350
+          },
+          "items": [
+            {
+              "url": "Unattributable",
+              "total": 213.2440000000006,
+              "scripting": 42.23200000000001
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "total": 201.53599999999693,
+              "scripting": 145.81599999999693
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "total": 150.7440000000006,
+              "scripting": 95.83600000000058
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "total": 140.50399999999976,
+              "scripting": 92.94799999999975
+            },
+            {
+              "url": "https://scripts.clarity.ms/0.8.72/clarity.js",
+              "total": 111.9400000000002,
+              "scripting": 95.2040000000002
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "total": 100.47599999999984,
+              "scripting": 54.383999999999844
+            },
+            {
+              "url": "https://usvitalcertificates.org/guides/california/birth-certificate",
+              "total": 77.132,
+              "scripting": 5.535999999999999
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "total": 56.35600000000004,
+              "scripting": 43.65600000000004
+            }
+          ]
+        },
+        "mainthread-work-breakdown": {
+          "displayValue": "1.2\u00a0s",
+          "metricSavings": {
+            "TBT": 300
+          },
+          "items": [
+            {
+              "duration": 722.6080000000093,
+              "group": "scriptEvaluation",
+              "groupLabel": "Script Evaluation"
+            },
+            {
+              "duration": 256.56399999999996,
+              "group": "scriptParseCompile",
+              "groupLabel": "Script Parsing & Compilation"
+            },
+            {
+              "duration": 184.79999999999944,
+              "group": "other",
+              "groupLabel": "Other"
+            },
+            {
+              "duration": 46.72,
+              "group": "styleLayout",
+              "groupLabel": "Style & Layout"
+            },
+            {
+              "duration": 16.023999999999987,
+              "group": "garbageCollection",
+              "groupLabel": "Garbage Collection"
+            },
+            {
+              "duration": 8.856,
+              "group": "paintCompositeRender",
+              "groupLabel": "Rendering"
+            },
+            {
+              "duration": 6.867999999999999,
+              "group": "parseHTML",
+              "groupLabel": "Parse HTML & CSS"
+            }
+          ]
+        },
+        "image-delivery-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        },
+        "render-blocking-insight": {
+          "displayValue": "Est savings of 120\u00a0ms",
+          "metricSavings": {
+            "FCP": 100,
+            "LCP": 100
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1j8t0lqx6qk4r.css",
+              "totalBytes": 13386
+            }
+          ]
+        },
+        "document-latency-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        }
+      },
+      "rawReport": "california-guide-2.report.json",
+      "sha256": "68e1ea492d561289ca824239100dae69d184ace5f95504c49ea5e7757cf1de39"
+    },
+    {
+      "page": "california-guide",
+      "run": 3,
+      "url": "https://usvitalcertificates.org/guides/california/birth-certificate",
+      "fetchTime": "2026-10-21T10:06:08.862Z",
+      "lighthouseVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 4201,
+        "credits": {}
+      },
+      "configSettings": {
+        "output": ["json", "html"],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": ["file_systems", "shader_cache", "service_workers", "cache_storage"],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": ["performance"],
+        "skipAudits": null
+      },
+      "score": 61,
+      "metrics": {
+        "first-contentful-paint": 3616.4335,
+        "largest-contentful-paint": 9355.113500000001,
+        "speed-index": 6046.6627640418765,
+        "total-blocking-time": 177.5,
+        "cumulative-layout-shift": 0
+      },
+      "warnings": [],
+      "lcpElements": [
+        {
+          "selector": "main > section.page-section > div.container > p",
+          "nodeLabel": "A California birth certificate is issued under the rules of the California issu\u2026"
+        }
+      ],
+      "insights": {
+        "unused-javascript": {
+          "displayValue": "Est savings of 236\u00a0KiB",
+          "metricSavings": {
+            "FCP": 700,
+            "LCP": 1350
+          },
+          "items": [
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "totalBytes": 132010,
+              "wastedBytes": 64845
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "totalBytes": 199065,
+              "wastedBytes": 60889
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "totalBytes": 148630,
+              "wastedBytes": 44987
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "totalBytes": 114634,
+              "wastedBytes": 40808
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "totalBytes": 72862,
+              "wastedBytes": 29784
+            }
+          ]
+        },
+        "bootup-time": {
+          "displayValue": "0.7\u00a0s",
+          "metricSavings": {
+            "TBT": 200
+          },
+          "items": [
+            {
+              "url": "Unattributable",
+              "total": 202.88000000000065,
+              "scripting": 43.20800000000003
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "total": 171.37200000000115,
+              "scripting": 121.60400000000116
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "total": 130.8920000000005,
+              "scripting": 111.3960000000005
+            },
+            {
+              "url": "https://scripts.clarity.ms/0.8.72/clarity.js",
+              "total": 107.12400000000002,
+              "scripting": 89.41200000000003
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "total": 97.58000000000054,
+              "scripting": 71.32800000000054
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "total": 90.39999999999999,
+              "scripting": 58.87199999999999
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "total": 64.20799999999991,
+              "scripting": 37.13999999999991
+            }
+          ]
+        },
+        "mainthread-work-breakdown": {
+          "displayValue": "1.0\u00a0s",
+          "metricSavings": {
+            "TBT": 200
+          },
+          "items": [
+            {
+              "duration": 628.5960000000075,
+              "group": "scriptEvaluation",
+              "groupLabel": "Script Evaluation"
+            },
+            {
+              "duration": 185.13999999999996,
+              "group": "scriptParseCompile",
+              "groupLabel": "Script Parsing & Compilation"
+            },
+            {
+              "duration": 180.74399999999977,
+              "group": "other",
+              "groupLabel": "Other"
+            },
+            {
+              "duration": 21.432000000000002,
+              "group": "styleLayout",
+              "groupLabel": "Style & Layout"
+            },
+            {
+              "duration": 15.383999999999995,
+              "group": "paintCompositeRender",
+              "groupLabel": "Rendering"
+            },
+            {
+              "duration": 10.511999999999995,
+              "group": "garbageCollection",
+              "groupLabel": "Garbage Collection"
+            },
+            {
+              "duration": 7.8039999999999985,
+              "group": "parseHTML",
+              "groupLabel": "Parse HTML & CSS"
+            }
+          ]
+        },
+        "image-delivery-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        },
+        "render-blocking-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1j8t0lqx6qk4r.css",
+              "totalBytes": 13418
+            }
+          ]
+        },
+        "document-latency-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        }
+      },
+      "rawReport": "california-guide-3.report.json",
+      "sha256": "7245ac3d7919f3c0a9fb5388b17ea08fc213cda1b0de4e3c84d31ecd4fe1b491"
+    },
+    {
+      "page": "california-order",
+      "run": 1,
+      "url": "https://usvitalcertificates.org/state/california/order/birth-certificate",
+      "fetchTime": "2026-10-21T10:04:27.894Z",
+      "lighthouseVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 4172.5,
+        "credits": {}
+      },
+      "configSettings": {
+        "output": ["json", "html"],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": ["file_systems", "shader_cache", "service_workers", "cache_storage"],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": ["performance"],
+        "skipAudits": null
+      },
+      "score": 81,
+      "metrics": {
+        "first-contentful-paint": 953.9875,
+        "largest-contentful-paint": 4416.023,
+        "speed-index": 3241.8015478083116,
+        "total-blocking-time": 202.5,
+        "cumulative-layout-shift": 0
+      },
+      "warnings": [],
+      "lcpElements": [
+        {
+          "selector": "div.application-container > form.application-form > div.form-head-notices > p.hint",
+          "nodeLabel": "Important: The online Vital Certificate Processing Fee is payable upon ordering\u2026"
+        }
+      ],
+      "insights": {
+        "unused-javascript": {
+          "displayValue": "Est savings of 231\u00a0KiB",
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 300
+          },
+          "items": [
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "totalBytes": 132019,
+              "wastedBytes": 64562
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "totalBytes": 199095,
+              "wastedBytes": 60862
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "totalBytes": 148630,
+              "wastedBytes": 44987
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "totalBytes": 114634,
+              "wastedBytes": 40808
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "totalBytes": 72862,
+              "wastedBytes": 25322
+            }
+          ]
+        },
+        "bootup-time": {
+          "displayValue": "1.6\u00a0s",
+          "metricSavings": {
+            "TBT": 250
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "total": 1041.7320000001114,
+              "scripting": 882.9400000001096
+            },
+            {
+              "url": "Unattributable",
+              "total": 244.05600000000098,
+              "scripting": 58.931999999999846
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "total": 154.3640000000014,
+              "scripting": 122.21200000000138
+            },
+            {
+              "url": "https://scripts.clarity.ms/0.8.72/clarity.js",
+              "total": 151.5240000000005,
+              "scripting": 130.0240000000005
+            },
+            {
+              "url": "https://usvitalcertificates.org/state/california/order/birth-certificate",
+              "total": 134.80800000000002,
+              "scripting": 23.06400000000002
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "total": 106.06400000000045,
+              "scripting": 73.74800000000045
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "total": 70.16399999999987,
+              "scripting": 47.571999999999875
+            },
+            {
+              "url": "https://bzrcdn.openai.com/sdk/oaiq.min.js",
+              "total": 70.05999999999997,
+              "scripting": 64.20399999999997
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/36k8in9a291ok.js",
+              "total": 63.00799999999998,
+              "scripting": 61.76399999999998
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "total": 50.58800000000005,
+              "scripting": 30.492000000000047
+            }
+          ]
+        },
+        "mainthread-work-breakdown": {
+          "displayValue": "2.2\u00a0s",
+          "metricSavings": {
+            "TBT": 200
+          },
+          "items": [
+            {
+              "duration": 1547.448000000068,
+              "group": "scriptEvaluation",
+              "groupLabel": "Script Evaluation"
+            },
+            {
+              "duration": 243.14399999999875,
+              "group": "other",
+              "groupLabel": "Other"
+            },
+            {
+              "duration": 180.00000000000003,
+              "group": "scriptParseCompile",
+              "groupLabel": "Script Parsing & Compilation"
+            },
+            {
+              "duration": 80.916,
+              "group": "styleLayout",
+              "groupLabel": "Style & Layout"
+            },
+            {
+              "duration": 78.52400000000003,
+              "group": "garbageCollection",
+              "groupLabel": "Garbage Collection"
+            },
+            {
+              "duration": 39.90000000000001,
+              "group": "parseHTML",
+              "groupLabel": "Parse HTML & CSS"
+            },
+            {
+              "duration": 14.511999999999993,
+              "group": "paintCompositeRender",
+              "groupLabel": "Rendering"
+            }
+          ]
+        },
+        "image-delivery-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        },
+        "render-blocking-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1ph43mu0t8ju5.css",
+              "totalBytes": 1480
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1j8t0lqx6qk4r.css",
+              "totalBytes": 13386
+            }
+          ]
+        },
+        "document-latency-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        }
+      },
+      "rawReport": "california-order-1.report.json",
+      "sha256": "c7ebf233795c6287b2c51e7716ffab97b0c26339b8111514762c90df493f1d81"
+    },
+    {
+      "page": "california-order",
+      "run": 2,
+      "url": "https://usvitalcertificates.org/state/california/order/birth-certificate",
+      "fetchTime": "2026-10-21T10:05:27.991Z",
+      "lighthouseVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 4221,
+        "credits": {}
+      },
+      "configSettings": {
+        "output": ["json", "html"],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": ["file_systems", "shader_cache", "service_workers", "cache_storage"],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": ["performance"],
+        "skipAudits": null
+      },
+      "score": 70,
+      "metrics": {
+        "first-contentful-paint": 1010.3484999999998,
+        "largest-contentful-paint": 8001.585499999999,
+        "speed-index": 3066.463203307666,
+        "total-blocking-time": 263.5,
+        "cumulative-layout-shift": 0
+      },
+      "warnings": [],
+      "lcpElements": [
+        {
+          "selector": "div.application-container > form.application-form > div.form-head-notices > p.hint",
+          "nodeLabel": "Important: The online Vital Certificate Processing Fee is payable upon ordering\u2026"
+        }
+      ],
+      "insights": {
+        "unused-javascript": {
+          "displayValue": "Est savings of 231\u00a0KiB",
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 1450
+          },
+          "items": [
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "totalBytes": 132019,
+              "wastedBytes": 64553
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "totalBytes": 199095,
+              "wastedBytes": 60862
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "totalBytes": 148630,
+              "wastedBytes": 44987
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "totalBytes": 114634,
+              "wastedBytes": 40765
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "totalBytes": 72862,
+              "wastedBytes": 24931
+            }
+          ]
+        },
+        "bootup-time": {
+          "displayValue": "1.0\u00a0s",
+          "metricSavings": {
+            "TBT": 300
+          },
+          "items": [
+            {
+              "url": "Unattributable",
+              "total": 257.2959999999997,
+              "scripting": 55.380000000000024
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "total": 221.2679999999994,
+              "scripting": 189.01999999999938
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "total": 197.64799999999693,
+              "scripting": 144.38399999999692
+            },
+            {
+              "url": "https://scripts.clarity.ms/0.8.72/clarity.js",
+              "total": 187.89199999999988,
+              "scripting": 167.4719999999999
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "total": 103.22400000000057,
+              "scripting": 72.28400000000057
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "total": 95.56800000000001,
+              "scripting": 67.97600000000001
+            },
+            {
+              "url": "https://usvitalcertificates.org/state/california/order/birth-certificate",
+              "total": 92.91999999999997,
+              "scripting": 9.699999999999992
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/0hfug2rydwec1.js",
+              "total": 85.96399999999998,
+              "scripting": 73.58399999999999
+            },
+            {
+              "url": "https://bzrcdn.openai.com/sdk/oaiq.min.js",
+              "total": 65.27199999999998,
+              "scripting": 58.20799999999998
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "total": 54.79999999999991,
+              "scripting": 32.843999999999916
+            }
+          ]
+        },
+        "mainthread-work-breakdown": {
+          "displayValue": "1.4\u00a0s",
+          "metricSavings": {
+            "TBT": 250
+          },
+          "items": [
+            {
+              "duration": 923.5720000000136,
+              "group": "scriptEvaluation",
+              "groupLabel": "Script Evaluation"
+            },
+            {
+              "duration": 205.54000000000002,
+              "group": "other",
+              "groupLabel": "Other"
+            },
+            {
+              "duration": 191.58799999999997,
+              "group": "scriptParseCompile",
+              "groupLabel": "Script Parsing & Compilation"
+            },
+            {
+              "duration": 66.544,
+              "group": "styleLayout",
+              "groupLabel": "Style & Layout"
+            },
+            {
+              "duration": 24.055999999999983,
+              "group": "garbageCollection",
+              "groupLabel": "Garbage Collection"
+            },
+            {
+              "duration": 19.192000000000004,
+              "group": "parseHTML",
+              "groupLabel": "Parse HTML & CSS"
+            },
+            {
+              "duration": 14.70399999999999,
+              "group": "paintCompositeRender",
+              "groupLabel": "Rendering"
+            }
+          ]
+        },
+        "image-delivery-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        },
+        "render-blocking-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1j8t0lqx6qk4r.css",
+              "totalBytes": 13368
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1ph43mu0t8ju5.css",
+              "totalBytes": 1493
+            }
+          ]
+        },
+        "document-latency-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        }
+      },
+      "rawReport": "california-order-2.report.json",
+      "sha256": "db9b1d0a549ba53245e55267f087722d6e5a2d340aef276168cc395c01aaecb8"
+    },
+    {
+      "page": "california-order",
+      "run": 3,
+      "url": "https://usvitalcertificates.org/state/california/order/birth-certificate",
+      "fetchTime": "2026-10-21T10:06:22.206Z",
+      "lighthouseVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 4183.5,
+        "credits": {}
+      },
+      "configSettings": {
+        "output": ["json", "html"],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": ["file_systems", "shader_cache", "service_workers", "cache_storage"],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": ["performance"],
+        "skipAudits": null
+      },
+      "score": 70,
+      "metrics": {
+        "first-contentful-paint": 955.1104999999999,
+        "largest-contentful-paint": 6893.647999999999,
+        "speed-index": 3044.1459534606056,
+        "total-blocking-time": 269,
+        "cumulative-layout-shift": 0
+      },
+      "warnings": [],
+      "lcpElements": [
+        {
+          "selector": "div.application-container > form.application-form > div.form-head-notices > p.hint",
+          "nodeLabel": "Important: The online Vital Certificate Processing Fee is payable upon ordering\u2026"
+        }
+      ],
+      "insights": {
+        "unused-javascript": {
+          "displayValue": "Est savings of 232\u00a0KiB",
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 1000
+          },
+          "items": [
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "totalBytes": 132019,
+              "wastedBytes": 64553
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "totalBytes": 199095,
+              "wastedBytes": 60335
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "totalBytes": 148540,
+              "wastedBytes": 44959
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "totalBytes": 114571,
+              "wastedBytes": 40707
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "totalBytes": 72862,
+              "wastedBytes": 26673
+            }
+          ]
+        },
+        "bootup-time": {
+          "displayValue": "1.0\u00a0s",
+          "metricSavings": {
+            "TBT": 300
+          },
+          "items": [
+            {
+              "url": "Unattributable",
+              "total": 301.0839999999992,
+              "scripting": 73.82799999999989
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtag/js",
+              "total": 194.66000000000037,
+              "scripting": 139.16000000000037
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1v3z8eyh5ygkl.js",
+              "total": 191.4599999999994,
+              "scripting": 166.9439999999994
+            },
+            {
+              "url": "https://scripts.clarity.ms/0.8.72/clarity.js",
+              "total": 173.0120000000005,
+              "scripting": 147.20800000000048
+            },
+            {
+              "url": "https://www.googletagmanager.com/gtm.js",
+              "total": 115.8599999999998,
+              "scripting": 72.97199999999981
+            },
+            {
+              "url": "https://connect.facebook.net/signals/config/1435376595327340",
+              "total": 96.30400000000051,
+              "scripting": 69.13200000000052
+            },
+            {
+              "url": "https://connect.facebook.net/en_US/fbevents.js",
+              "total": 86.30799999999988,
+              "scripting": 47.43599999999987
+            },
+            {
+              "url": "https://usvitalcertificates.org/state/california/order/birth-certificate",
+              "total": 74.368,
+              "scripting": 8.103999999999994
+            },
+            {
+              "url": "https://bzrcdn.openai.com/sdk/oaiq.min.js",
+              "total": 66.03199999999998,
+              "scripting": 58.02399999999998
+            }
+          ]
+        },
+        "mainthread-work-breakdown": {
+          "displayValue": "1.4\u00a0s",
+          "metricSavings": {
+            "TBT": 250
+          },
+          "items": [
+            {
+              "duration": 831.224000000012,
+              "group": "scriptEvaluation",
+              "groupLabel": "Script Evaluation"
+            },
+            {
+              "duration": 224.93599999999992,
+              "group": "other",
+              "groupLabel": "Other"
+            },
+            {
+              "duration": 203.42399999999998,
+              "group": "scriptParseCompile",
+              "groupLabel": "Script Parsing & Compilation"
+            },
+            {
+              "duration": 74.368,
+              "group": "styleLayout",
+              "groupLabel": "Style & Layout"
+            },
+            {
+              "duration": 20.34799999999998,
+              "group": "garbageCollection",
+              "groupLabel": "Garbage Collection"
+            },
+            {
+              "duration": 15.32,
+              "group": "parseHTML",
+              "groupLabel": "Parse HTML & CSS"
+            },
+            {
+              "duration": 10.119999999999992,
+              "group": "paintCompositeRender",
+              "groupLabel": "Rendering"
+            }
+          ]
+        },
+        "image-delivery-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        },
+        "render-blocking-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": [
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1j8t0lqx6qk4r.css",
+              "totalBytes": 13368
+            },
+            {
+              "url": "https://usvitalcertificates.org/_next/static/immutable/chunks/1ph43mu0t8ju5.css",
+              "totalBytes": 1493
+            }
+          ]
+        },
+        "document-latency-insight": {
+          "displayValue": null,
+          "metricSavings": {
+            "FCP": 0,
+            "LCP": 0
+          },
+          "items": []
+        }
+      },
+      "rawReport": "california-order-3.report.json",
+      "sha256": "b5ab437e44d2e01452d28f4fb235703a80a30c3b2af8011e7b3c98003402b370"
+    }
+  ]
+}

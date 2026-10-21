@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -18,7 +19,11 @@ import {
 } from "lucide-react";
 
 import { StateSelector } from "./state-selector";
-import { BIRTH_GUIDE_SOURCES } from "@/lib/seo";
+import { BIRTH_GUIDE_SOURCES, SITE_URL } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  alternates: { canonical: SITE_URL },
+};
 
 const certificates = [
   { name: "Birth", icon: Baby },
