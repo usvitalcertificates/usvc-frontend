@@ -1,8 +1,9 @@
 import { ImageResponse } from "next/og";
+import { SOCIAL_IMAGE } from "@/lib/seo";
 
-export const alt = "USVC - Trusted Help for US Vital Certificates";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+export const alt = SOCIAL_IMAGE.alt;
+export const size = { width: SOCIAL_IMAGE.width, height: SOCIAL_IMAGE.height };
+export const contentType = SOCIAL_IMAGE.type;
 
 export default function OpenGraphImage() {
   return new ImageResponse(

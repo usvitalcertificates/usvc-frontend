@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { BIRTH_GUIDE_SOURCES } from "@/lib/seo";
+import { BIRTH_GUIDE_SOURCES, socialMetadata } from "@/lib/seo";
 import { StateSelector } from "../state-selector";
 import { PageHeader } from "../usvc-ui";
 
@@ -9,14 +9,13 @@ export const metadata = {
   description:
     "Choose the state where your vital record was issued to start a guided USVC certificate request.",
   alternates: { canonical: "https://usvitalcertificates.org/find-your-state" },
-  openGraph: {
+  ...socialMetadata({
     title: "Find Your State to Start Request",
     description:
       "Select your state to see eligibility, fees, and start a guided vital certificate request with USVC.",
     url: "https://usvitalcertificates.org/find-your-state",
     type: "website",
-  },
-  twitter: { card: "summary_large_image" },
+  }),
 };
 
 export default function FindState() {
