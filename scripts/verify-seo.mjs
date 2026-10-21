@@ -79,6 +79,19 @@ function singleMeta(html, attribute, key) {
   return values[0];
 }
 
+async function assertNotFound(path, headers = {}) {
+  const response = await request(path, { headers });
+  assert.equal(response.status, 404, path);
+  const html = await response.text();
+  assert(
+    tagValues(html, "name", "robots").some((value) => value.includes("noindex")),
+    `${path}: missing noindex`,
+  );
+  assert(!/<link\b[^>]*rel="canonical"/.test(html), `${path}: unexpected canonical`);
+  assert(!html.includes("<form"), path);
+  assert(!html.includes('"@type":"HowTo"'), path);
+}
+
 try {
   let ready = false;
   for (let attempt = 0; attempt < 100; attempt++) {
@@ -219,16 +232,41 @@ try {
     for (const slug of ["not-a-state", "California"]) {
       for (const middle of ["", "order/"]) {
         const path = `/state/${slug}/${middle}${certificate}`;
-        const response = await request(path);
-        assert.equal(response.status, 404, path);
-        const html = await response.text();
-        assert(!html.includes("<form"), path);
-        assert(!html.includes('"@type":"HowTo"'), path);
+        await assertNotFound(path);
       }
     }
     const legacy = await request(`/state/california/${certificate}`);
     assert.equal(legacy.status, 308);
     assert.equal(legacy.headers.get("location"), `/state/california/order/${certificate}`);
+  }
+  // Exercise both blocking crawler metadata and a normal browser's streamed metadata.
+  for (const path of [
+    "/not-a-real-legal-page",
+    "/missing/nested/page",
+    "/state/not-a-state",
+    "/state/California",
+    "/guides/not-a-state/birth-certificate",
+    "/guides/California/birth-certificate",
+    "/state/california/order/not-a-certificate",
+    "/state/california/not-a-certificate",
+    "/state/not-a-state/order/birth-certificate",
+  ]) {
+    await assertNotFound(path);
+    await assertNotFound(path, { "User-Agent": "Mozilla/5.0" });
+  }
+  for (const state of ["vermont", "wyoming"]) {
+    for (const suffix of ["", "/order/birth-certificate"]) {
+      const path = `/state/${state}${suffix}`;
+      const response = await request(path);
+      assert.equal(response.status, 200, path);
+      const html = await response.text();
+      assert(
+        tagValues(html, "name", "robots").some((value) => value.includes("noindex")),
+        path,
+      );
+      assert(html.includes("We don&#x27;t currently accept orders for this state."), path);
+      assert(!html.includes("<form"), path);
+    }
   }
   for (const host of ["staging.usvitalcertificates.org", "flow.usvitalcertificates.org"]) {
     const response = await request("/", { headers: { Host: host } });
@@ -236,7 +274,7 @@ try {
     await response.arrayBuffer();
   }
   console.log(
-    `SEO HTTP checks passed: ${urls.length} public pages with complete social metadata; image bytes/dimensions, robots, llms links, private noindex, invalid-state 404s and legacy redirects verified.`,
+    `SEO HTTP checks passed: ${urls.length} public pages with complete social metadata; image bytes/dimensions, robots, llms links, private noindex, canonical-free/noindex 404s, unavailable notices and legacy redirects verified.`,
   );
 } finally {
   if (child.exitCode === null) {
