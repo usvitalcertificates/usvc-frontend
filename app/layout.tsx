@@ -30,7 +30,6 @@ export const metadata: Metadata = {
   title: { default: "USVC - Trusted Help for US Vital Certificates", template: "%s | USVC" },
   description:
     "Guided help for US birth, death, marriage, and divorce certificates. Clear steps, secure handling, and order tracking.",
-  alternates: { canonical: SITE_URL },
   ...socialMetadata({
     url: SITE_URL,
     title: "USVC - Trusted Help for US Vital Certificates",

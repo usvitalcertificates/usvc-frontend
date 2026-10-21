@@ -33,7 +33,7 @@ Shared: `layout.tsx` (swaps public header/footer for `StaffShell` via `x-staff-a
 - `lib/staff-client.ts` — `"use client"`: sessionStorage Bearer tokens (`usvc-staff-access/refresh`), `staffFetch` (attaches `authorization`, FormData-safe, single 401→refresh→`/auth`), `staffData` (text-fallback body reader — the no-bare-`.json()` rule applies inside this module).
 - `lib/staff-auth-hook.ts` — `useRequireStaffAuth`, 30-min `useInactivitySignout`.
 - `lib/form-config.ts` — per-cert (BIRTH/DEATH/MARRIAGE/DIVORCE) fields, relationships, reasons, father-status conditional, CA-birth override; `PROCESSING_OPTIONS`, `STATE_FORM_OVERRIDES`.
-- `lib/states.ts` — 50 states + APO/FPO + international; `lib/geo.ts` + `public/geo/` lazy county/city datasets; `lib/county-availability.ts` — 9 blocked CA counties gate submit (not lock form).
+- `lib/states.ts` — shared 52-jurisdiction inventory (50 states, DC, Puerto Rico) for state hubs/address dropdowns, plus APO/FPO + international; `lib/geo.ts` + `public/geo/` lazy county/city datasets; `lib/county-availability.ts` — 9 blocked CA counties gate submit (not lock form).
 - `components/staff/`: `StaffShell.tsx` (264px navy sidebar → topbar <900px), `ui.tsx` (bands, stat cards, text pills, sticky tables with card fallback <900px, pagination, stepper, timeline, toasts, skeletons, `TimedActionModal`, `ConfirmModal` — never `window.confirm`), `QueueView.tsx`, `activity.tsx`, `CopyButton.tsx` (incl. 28px row-level `CopyIconButton`).
 
 ## Design tokens
@@ -84,3 +84,5 @@ The existing OrderForm accepts a verified recovery context and whitelisted initi
 ## Descriptive recovery aliases
 
 Middleware rewrites `/resume-*` to `/resume` while retaining the browser URL and applying the same private recovery headers/root-layout tracking exclusion. Analytics helpers also exclude the aliases. Path labels carry no authorization; the existing backend grant and verified cookie determine accessible orders. Invalid labels use the same safe recovery screen.
+
+404 metadata: the homepage owns its canonical in `app/page.tsx`; the root layout supplies no canonical fallback. Unknown state hubs and legal documents return no page metadata before `notFound()`. Other valid public templates keep explicit self-canonicals. HTTP regressions cover both crawler and browser user agents and require 404 + noindex + no canonical, alongside all 268 sitemap URLs. State hubs read `lib/states.ts` directly; unit tests compare that inventory with the order allowlist and supported sitemap jurisdictions, including VT/WY exclusions. Mobile production lab evidence is recorded in `docs/mobile-performance-2026-10-21.md`; it is separate from local SEO checks and CrUX field measurements.

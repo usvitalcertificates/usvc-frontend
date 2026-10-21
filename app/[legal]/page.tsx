@@ -15,8 +15,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { legal } = await params;
   const doc = LEGAL_DOCUMENTS[legal];
-  const title = doc ? `${doc.title} for USVC Orders` : "Legal Information for USVC Orders";
-  const description = doc?.description ?? "USVC legal information and policies for orders.";
+  if (!doc) return {};
+  const title = `${doc.title} for USVC Orders`;
+  const description = doc.description;
   return {
     title,
     description,

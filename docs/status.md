@@ -1,5 +1,7 @@
 # Frontend status + remaining work
 
+- Technical SEO cleanup (2026-10-21): homepage canonical moved out of the root layout; invalid legal/state metadata stops before emitting a canonical. State hubs consume the shared 52-jurisdiction inventory, with parity/uniqueness/availability tests against the order and sitemap lists. Production HTTP regressions require real 404 + noindex + no canonical for invalid legal, state, guide and certificate URLs, testing crawler and browser user agents. All 268 sitemap pages retain 200/self-canonical/indexable output; VT/WY remain 200 unavailable/noindex notices. Node 24: 14/14 unit tests, production build, lint, TypeScript, formatting and SEO HTTP checks pass. Mobile measurement results and remaining performance recommendations are in `docs/mobile-performance-2026-10-21.md`. No public copy, service claims, Nebraska facts, guide content or profile information changed; no production deployment.
+
 Last updated: 2026-10-21. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 
 ## Implemented
