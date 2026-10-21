@@ -1,4 +1,45 @@
+import type { Metadata } from "next";
+
 export const SITE_URL = "https://usvitalcertificates.org";
+
+export const SOCIAL_IMAGE = {
+  url: `${SITE_URL}/opengraph-image`,
+  width: 1200,
+  height: 630,
+  type: "image/png",
+  alt: "US Vital Certificates. Trusted help for vital certificate requests. Independent service, not a government agency.",
+} as const;
+
+/** Page-level metadata replaces nested layout fields; include images explicitly. */
+export function socialMetadata({
+  title,
+  description,
+  url,
+  type = "website",
+}: {
+  title: string;
+  description: string;
+  url: string;
+  type?: "website" | "article";
+}): Pick<Metadata, "openGraph" | "twitter"> {
+  return {
+    openGraph: {
+      title,
+      description,
+      url,
+      type,
+      siteName: "US Vital Certificates",
+      locale: "en_US",
+      images: [{ ...SOCIAL_IMAGE }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [{ url: SOCIAL_IMAGE.url, alt: SOCIAL_IMAGE.alt }],
+    },
+  };
+}
 
 /** Standard site disclaimer: one consistent voice on every public page
  *  except the homepage (which carries no disclaimer box). */
@@ -110,6 +151,15 @@ export const INDEXABLE_STATES = [
   "wisconsin",
 ] as const;
 
+/** Exact, lowercase jurisdictions accepted by public application routes. */
+export const ALL_STATE_SLUGS = [...INDEXABLE_STATES, "vermont", "wyoming"] as const;
+
+const STATE_SLUG_SET = new Set<string>(ALL_STATE_SLUGS);
+
+export function isKnownStateSlug(value: string): boolean {
+  return STATE_SLUG_SET.has(value);
+}
+
 export const CERTIFICATE_SLUGS = [
   "birth-certificate",
   "death-certificate",
@@ -134,10 +184,12 @@ export function titleCase(value: string) {
  * `<lastmod>` churn daily, so Google ignores it for recrawl priority.
  * Update these only when that section's content actually changes.
  */
-export const SITEMAP_STATIC_LAST_MODIFIED = "2026-10-07";
-export const SITEMAP_STATES_LAST_MODIFIED = "2026-10-16";
-export const SITEMAP_ORDERS_LAST_MODIFIED = "2026-10-16";
-export const SITEMAP_GUIDES_LAST_MODIFIED = "2026-10-16";
+// All four public page groups received the social metadata update on this date.
+// These describe page modifications, not the date official sources were checked.
+export const SITEMAP_STATIC_LAST_MODIFIED = "2026-10-21";
+export const SITEMAP_STATES_LAST_MODIFIED = "2026-10-21";
+export const SITEMAP_ORDERS_LAST_MODIFIED = "2026-10-21";
+export const SITEMAP_GUIDES_LAST_MODIFIED = "2026-10-21";
 
 /**
  * P1 SEO: cert-type content slots so the 200 order pages and 50 state

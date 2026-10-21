@@ -131,7 +131,7 @@ export default function Home() {
         <div className="hero-overlay" aria-hidden="true" />
         <div className="container hero-stack">
           <p className="hero-pill">
-            <span className="hero-dot" aria-hidden="true" /> Accepting orders · All 50 states
+            <span className="hero-dot" aria-hidden="true" /> Accepting orders
           </p>
           <p className="eyebrow">Birth, Death, Marriage &amp; Divorce Certificates</p>
           <h1>

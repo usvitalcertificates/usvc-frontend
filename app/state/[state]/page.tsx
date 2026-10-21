@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SeoJsonLd } from "@/app/seo-json-ld";
-import { assertSeoLength, CERTIFICATE_DETAILS, SITE_URL } from "@/lib/seo";
+import { assertSeoLength, CERTIFICATE_DETAILS, SITE_URL, socialMetadata } from "@/lib/seo";
 import { isStateUnsupported, STATE_UNAVAILABLE_MESSAGE } from "@/lib/state-availability";
 import { PageHeader } from "../../usvc-ui";
 
@@ -127,13 +127,12 @@ export async function generateMetadata({
     description,
     ...(unavailable ? { robots: { index: false, follow: true } as const } : {}),
     alternates: { canonical: `https://usvitalcertificates.org/state/${state}` },
-    openGraph: {
+    ...socialMetadata({
       title,
       description,
       url: `https://usvitalcertificates.org/state/${state}`,
       type: "website",
-    },
-    twitter: { card: "summary_large_image" },
+    }),
   };
 }
 

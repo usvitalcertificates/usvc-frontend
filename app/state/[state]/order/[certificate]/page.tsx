@@ -4,10 +4,12 @@ import { notFound } from "next/navigation";
 import { SeoJsonLd } from "@/app/seo-json-ld";
 import {
   assertSeoLength,
+  ALL_STATE_SLUGS,
   CERTIFICATE_DETAILS,
   CERTIFICATE_SLUGS,
-  INDEXABLE_STATES,
+  isKnownStateSlug,
   SITE_URL,
+  socialMetadata,
   titleCase,
 } from "@/lib/seo";
 import { isStateUnsupported, STATE_UNAVAILABLE_MESSAGE } from "@/lib/state-availability";
@@ -24,8 +26,7 @@ const labels: Record<string, string> = {
 /** Prerender all indexable order pages + VT/WY notice variants (P0 SEO)
  *  so Google gets static HTML for the 200-URL cluster. */
 export async function generateStaticParams() {
-  const states = [...INDEXABLE_STATES, "vermont", "wyoming"];
-  return states.flatMap((state) =>
+  return ALL_STATE_SLUGS.flatMap((state) =>
     CERTIFICATE_SLUGS.map((certificate) => ({ state, certificate })),
   );
 }
@@ -36,7 +37,7 @@ export async function generateMetadata({
   params: Promise<{ state: string; certificate: string }>;
 }): Promise<Metadata> {
   const { state, certificate } = await params;
-  if (!labels[certificate]) return {};
+  if (!labels[certificate] || !isKnownStateSlug(state)) return {};
   const name = titleCase(state);
   const type = certificate
     .replace("-certificate", "")
@@ -55,8 +56,7 @@ export async function generateMetadata({
       description,
       robots: { index: false, follow: true },
       alternates: { canonical: url },
-      openGraph: { title, description, url, type: "website" },
-      twitter: { card: "summary_large_image" },
+      ...socialMetadata({ title, description, url }),
     };
   }
   return {
@@ -65,8 +65,7 @@ export async function generateMetadata({
     alternates: {
       canonical: url,
     },
-    openGraph: { title, description, url, type: "website" },
-    twitter: { card: "summary_large_image" },
+    ...socialMetadata({ title, description, url }),
   };
 }
 
@@ -77,7 +76,7 @@ export default async function CertificateOrderPage({
 }) {
   const { state, certificate } = await params;
   const type = labels[certificate];
-  if (!type) notFound();
+  if (!type || !isKnownStateSlug(state)) notFound();
   const details = CERTIFICATE_DETAILS[certificate];
   const stateName = titleCase(state);
   const url = `${SITE_URL}/state/${state}/order/${certificate}`;

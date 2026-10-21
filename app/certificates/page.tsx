@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Baby, FileBadge, Gem, Ribbon } from "lucide-react";
 
-import { BIRTH_GUIDE_SOURCES } from "@/lib/seo";
+import { BIRTH_GUIDE_SOURCES, socialMetadata } from "@/lib/seo";
 import { PageHeader } from "../usvc-ui";
 
 const certificates = [
@@ -64,14 +64,13 @@ export const metadata = {
   description:
     "Learn how USVC helps with birth, death, marriage, and divorce certificate requests. Guided, secure, tracked.",
   alternates: { canonical: "https://usvitalcertificates.org/certificates" },
-  openGraph: {
+  ...socialMetadata({
     title: "Vital Certificate Types Explained",
     description:
       "Birth, death, marriage, and divorce certificate help: guided requests, secure handling, and tracking with USVC.",
     url: "https://usvitalcertificates.org/certificates",
     type: "website",
-  },
-  twitter: { card: "summary_large_image" },
+  }),
 };
 
 export default function Certificates() {

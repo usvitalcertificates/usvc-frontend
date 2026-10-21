@@ -8,7 +8,7 @@ import { SiteHeader } from "./site-header";
 import { Analytics } from "./analytics";
 import { OpenAIAnalytics } from "./openai-analytics";
 import { StaffShell } from "@/components/staff/StaffShell";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, socialMetadata } from "@/lib/seo";
 import { organizationLd, SeoJsonLd } from "./seo-json-ld";
 
 const GTM_ID = "GTM-KC8LVCXR";
@@ -31,14 +31,12 @@ export const metadata: Metadata = {
   description:
     "Guided help for US birth, death, marriage, and divorce certificates. Clear steps, secure handling, and order tracking.",
   alternates: { canonical: SITE_URL },
-  openGraph: {
-    type: "website",
+  ...socialMetadata({
     url: SITE_URL,
     title: "USVC - Trusted Help for US Vital Certificates",
     description:
       "Guided help for US birth, death, marriage, and divorce certificates. Clear steps, secure handling, and order tracking.",
-  },
-  twitter: { card: "summary_large_image" },
+  }),
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
