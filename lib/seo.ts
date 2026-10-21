@@ -110,6 +110,15 @@ export const INDEXABLE_STATES = [
   "wisconsin",
 ] as const;
 
+/** Exact, lowercase jurisdictions accepted by public application routes. */
+export const ALL_STATE_SLUGS = [...INDEXABLE_STATES, "vermont", "wyoming"] as const;
+
+const STATE_SLUG_SET = new Set<string>(ALL_STATE_SLUGS);
+
+export function isKnownStateSlug(value: string): boolean {
+  return STATE_SLUG_SET.has(value);
+}
+
 export const CERTIFICATE_SLUGS = [
   "birth-certificate",
   "death-certificate",

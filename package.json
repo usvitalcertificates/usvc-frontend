@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --test --experimental-strip-types app/openai-analytics-data.test.mjs app/copy-pricing.test.mjs",
+    "test": "node --test --experimental-strip-types app/openai-analytics-data.test.mjs app/copy-pricing.test.mjs app/state-inventory.test.mjs",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
