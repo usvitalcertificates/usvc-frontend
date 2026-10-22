@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --test --experimental-strip-types app/application-mirror.test.mjs app/openai-analytics-data.test.mjs app/copy-pricing.test.mjs app/public-pricing-copy.test.mjs app/public-copy.test.mjs app/guide-content.test.mjs app/state-inventory.test.mjs app/social-metadata.test.mjs",
+    "test": "node --test --experimental-strip-types app/staff-action-safety.test.mjs app/county-availability.test.mjs app/application-mirror.test.mjs app/openai-analytics-data.test.mjs app/copy-pricing.test.mjs app/public-pricing-copy.test.mjs app/public-copy.test.mjs app/guide-content.test.mjs app/state-inventory.test.mjs app/social-metadata.test.mjs",
+    "test:flow-confirmations": "node scripts/verify-flow-confirmations.cjs",
     "test:seo": "node scripts/verify-seo.mjs",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -45,6 +46,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
+    "playwright": "1.62.1",
     "prettier": "^3.9.8",
     "typescript": "^7.0.2"
   }

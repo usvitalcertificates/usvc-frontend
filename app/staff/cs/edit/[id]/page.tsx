@@ -6,9 +6,11 @@ import { Eye, EyeOff } from "lucide-react";
 import { staffData, staffId, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { BackLink, PageBand, StatusPill, Toast } from "@/components/staff/ui";
+import { hasUnsavedApplicationChanges } from "@/lib/staff-action-safety";
 import { DateInput } from "@/components/DateInput";
 import { ApplicationSections } from "@/components/staff/ApplicationSections";
 import { APPLICATION_LABELS, type ApplicationField } from "@/lib/form-config";
+import { useConfirmation } from "@/components/staff/useConfirmation";
 import { CopyButton } from "@/components/staff/CopyButton";
 
 interface EditOrder {
@@ -226,7 +228,6 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
   const [toast, setToast] = useState("");
   const [busy, setBusy] = useState(false);
   const applicationRef = useRef<HTMLDivElement>(null);
-  const [gtgOpen, setGtgOpen] = useState(false);
   const [revealedSsn, setRevealedSsn] = useState<string | null>(null);
   const [revealedCard, setRevealedCard] = useState<{
     number: string;
@@ -299,6 +300,9 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
     // secret/note or changed field flips dirty.
     return JSON.stringify(form) !== initial;
   }, [form, initial]);
+
+  const confirmation = useConfirmation(JSON.stringify([id, order, form]));
+  const applicationDirty = hasUnsavedApplicationChanges(form, initial);
 
   if (!allowed) {
     return (
@@ -437,15 +441,15 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
   const errorCount = Object.keys(errors).length;
   const closed = order.status === "SUBMITTED" || order.status === "CANCELLED";
 
-  const save = async () => {
-    if (!form) return;
+  const validateCorrections = () => {
+    if (!form) return false;
     const invalidDate = applicationRef.current?.querySelector<HTMLInputElement>(
       ".usvc-date > input:invalid",
     );
     if (invalidDate) {
       invalidDate.reportValidity();
       invalidDate.focus();
-      return;
+      return false;
     }
     if (
       (form.cardNumber.trim() || form.cardExpiry.trim() || form.cardCvc.trim()) &&
@@ -457,8 +461,12 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
           "Enter all three card fields, or leave all three blank to keep the stored card.",
       }));
       setError("Card replacement needs number, expiry, and CVC together.");
-      return;
+      return false;
     }
+    return true;
+  };
+  const save = async () => {
+    if (!validateCorrections()) return false;
     setBusy(true);
     setError("");
     setErrors({});
@@ -500,12 +508,15 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save corrections");
+      throw e;
     } finally {
       setBusy(false);
     }
   };
 
   const markGtg = async () => {
+    if (applicationDirty || closed || order.status !== "TO_CS")
+      throw new Error("Save application corrections before marking GTG.");
     setBusy(true);
     setError("");
     try {
@@ -521,6 +532,7 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
       router.replace("/staff/cs");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not mark GTG");
+      throw e;
     } finally {
       setBusy(false);
     }
@@ -1067,7 +1079,15 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
           className="staff-btn"
           style={{ minWidth: "220px", height: "48px", fontSize: "1rem" }}
           disabled={busy || !dirty || closed}
-          onClick={() => void save()}
+          onClick={() => {
+            if (!validateCorrections()) return;
+            confirmation.request({
+              title: "Save application corrections?",
+              body: `Order ${order.publicNumber}: save the application changes${form.ssn.trim() ? ", including replacement of the stored SSN" : ""}${form.cardNumber.trim() ? ", including replacement of the stored payment card" : ""}${form.note.trim() ? " and the internal note" : ""}. This does not mark the order GTG.`,
+              confirmLabel: "Save corrections",
+              run: save,
+            });
+          }}
         >
           {busy ? "Saving…" : "Save corrections"}
         </button>
@@ -1098,54 +1118,39 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
               type="button"
               className="staff-btn green"
               style={{ minWidth: "200px", height: "38px" }}
-              disabled={busy}
-              onClick={() => setGtgOpen(true)}
+              disabled={busy || applicationDirty || closed}
+              onClick={() =>
+                confirmation.request({
+                  title: "Confirm Mark GTG",
+                  body: (
+                    <>
+                      <p>
+                        Order <strong>{order.publicNumber}</strong>: mark as GTG so fulfillment can
+                        continue. Your ownership will be dropped.
+                      </p>
+                      {form.note.trim() ? (
+                        <p style={{ whiteSpace: "pre-wrap" }}>
+                          Completion note: {form.note.trim()}
+                        </p>
+                      ) : null}
+                    </>
+                  ),
+                  confirmLabel: "Mark GTG",
+                  run: markGtg,
+                })
+              }
               title="Updates order status to GTG"
             >
               Mark GTG
             </button>
+            {applicationDirty ? (
+              <small>Save application corrections before marking GTG.</small>
+            ) : null}
           </span>
         ) : null}
       </div>
 
-      {gtgOpen ? (
-        <div className="staff-modal-backdrop" onClick={() => setGtgOpen(false)}>
-          <div
-            className="staff-modal"
-            role="dialog"
-            aria-label="Confirm Mark GTG"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2>Mark GTG?</h2>
-            <p style={{ color: "var(--muted-text)" }}>
-              This will change order status to GTG and fulfillment will continue and also your
-              ownership will be dropped.
-            </p>
-            <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
-              <button
-                type="button"
-                className="staff-btn green"
-                style={{ minWidth: "170px", height: "38px" }}
-                disabled={busy}
-                onClick={() => {
-                  setGtgOpen(false);
-                  void markGtg();
-                }}
-              >
-                {busy ? "Please wait…" : "Mark GTG"}
-              </button>
-              <button
-                type="button"
-                className="staff-btn secondary"
-                style={{ minWidth: "170px", height: "38px" }}
-                onClick={() => setGtgOpen(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {confirmation.dialog}
     </>
   );
 }

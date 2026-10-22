@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { formatDateUS, formatDateTimeUS } from "@/lib/date-format";
 
 export const STATUS_LABELS: Record<string, string> = {
@@ -165,44 +165,164 @@ export function Toast({
   );
 }
 
-/** Styled confirmation popup. Use this instead of window.confirm everywhere. */
+/** One explicit confirmation before a consequential request. Never use window.confirm. */
 export function ConfirmModal({
   title,
   body,
   confirmLabel,
   danger,
-  busy,
+  busy = false,
   onCancel,
   onConfirm,
+  children,
+  confirmDisabled = false,
+  scope,
+  expectedScope,
+  restoreFocusTo,
 }: {
   title: string;
-  body: string;
+  body: ReactNode;
   confirmLabel: string;
   danger?: boolean;
   busy?: boolean;
   onCancel: () => void;
-  onConfirm: () => void;
+  onConfirm: () => void | boolean | Promise<void | boolean>;
+  children?: ReactNode;
+  confirmDisabled?: boolean;
+  scope?: string;
+  expectedScope?: string;
+  restoreFocusTo?: HTMLElement | null;
 }) {
+  const titleId = useId();
+  const bodyId = useId();
+  const root = useRef<HTMLDivElement>(null);
+  const cancelButton = useRef<HTMLButtonElement>(null);
+  const inFlight = useRef(false);
+  const mounted = useRef(true);
+  const originalScope = useRef(expectedScope ?? scope);
+  const callbacks = useRef({ onCancel, busy });
+  callbacks.current = { onCancel, busy };
+  const [running, setRunning] = useState(false);
+  const [failure, setFailure] = useState("");
+  const locked = busy || running;
+  const cancel = () => {
+    if (!inFlight.current && !busy) onCancel();
+  };
+  useEffect(() => {
+    mounted.current = true;
+    const opener =
+      restoreFocusTo ??
+      (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    cancelButton.current?.focus();
+    const focusable = () =>
+      Array.from(
+        root.current?.querySelectorAll<HTMLElement>(
+          'button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex="0"]',
+        ) ?? [],
+      ).filter((node) => node.getClientRects().length > 0);
+    const keys = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!inFlight.current && !callbacks.current.busy) callbacks.current.onCancel();
+      } else if (event.key === "Tab") {
+        const nodes = focusable();
+        if (!nodes.length) {
+          event.preventDefault();
+          root.current?.focus();
+          return;
+        }
+        const first = nodes[0],
+          last = nodes[nodes.length - 1];
+        if (
+          event.shiftKey &&
+          (document.activeElement === first || !root.current?.contains(document.activeElement))
+        ) {
+          event.preventDefault();
+          last.focus();
+        } else if (
+          !event.shiftKey &&
+          (document.activeElement === last || !root.current?.contains(document.activeElement))
+        ) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    const containFocus = (event: FocusEvent) => {
+      if (!root.current?.contains(event.target as Node)) (focusable()[0] ?? root.current)?.focus();
+    };
+    document.addEventListener("keydown", keys, true);
+    document.addEventListener("focusin", containFocus);
+    return () => {
+      mounted.current = false;
+      document.removeEventListener("keydown", keys, true);
+      document.removeEventListener("focusin", containFocus);
+      document.body.style.overflow = previousOverflow;
+      if (opener?.isConnected) opener.focus({ preventScroll: true });
+    };
+  }, []);
+  useEffect(() => {
+    if (scope !== originalScope.current && !inFlight.current && !busy) onCancel();
+  }, [scope, busy, running, onCancel]);
+  const confirm = async () => {
+    if (inFlight.current || busy || confirmDisabled || scope !== originalScope.current) return;
+    inFlight.current = true;
+    setRunning(true);
+    setFailure("");
+    try {
+      const result = await onConfirm();
+      if (result !== false && mounted.current) onCancel();
+    } catch (error) {
+      if (mounted.current)
+        setFailure(error instanceof Error ? error.message : "The action failed. Please try again.");
+    } finally {
+      inFlight.current = false;
+      if (mounted.current) setRunning(false);
+    }
+  };
   return (
-    <div className="staff-modal-backdrop" onClick={onCancel}>
+    <div className="staff-modal-backdrop" onClick={cancel}>
       <div
+        ref={root}
         className="staff-modal"
         role="dialog"
+        aria-modal="true"
         aria-label={title}
-        onClick={(e) => e.stopPropagation()}
+        aria-labelledby={titleId}
+        aria-describedby={bodyId}
+        aria-busy={locked}
+        tabIndex={-1}
+        onClick={(event) => event.stopPropagation()}
       >
-        <h2>{title}</h2>
-        <p style={{ color: "var(--muted-text)" }}>{body}</p>
-        <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
+        <h2 id={titleId}>{title}</h2>
+        <div id={bodyId} className="staff-confirm-body">
+          {body}
+        </div>
+        {children}
+        {failure ? (
+          <p role="alert" className="staff-alert error">
+            {failure}
+          </p>
+        ) : null}
+        <div className="staff-confirm-actions">
           <button
             type="button"
             className={`staff-btn${danger ? " danger" : ""}`}
-            disabled={busy}
-            onClick={onConfirm}
+            disabled={locked || confirmDisabled}
+            onClick={() => void confirm()}
           >
-            {busy ? "Please wait…" : confirmLabel}
+            {locked ? "Please wait…" : confirmLabel}
           </button>
-          <button type="button" className="staff-btn secondary" onClick={onCancel}>
+          <button
+            ref={cancelButton}
+            type="button"
+            className="staff-btn secondary"
+            disabled={locked}
+            onClick={cancel}
+          >
             Cancel
           </button>
         </div>

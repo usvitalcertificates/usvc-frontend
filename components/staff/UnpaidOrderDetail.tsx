@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { staffData, staffJson } from "@/lib/staff-client";
+import { useConfirmation } from "./useConfirmation";
 import { CopyIconButton } from "./CopyButton";
 import {
   Mail,
@@ -50,6 +51,7 @@ function DetailBody({ id }: { id: string }) {
   const [notice, setNotice] = useState("");
   const [note, setNote] = useState("");
   const [outcome, setOutcome] = useState("NOT_CONTACTED");
+  const confirmation = useConfirmation(JSON.stringify([id, detail, resumeLink]));
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
@@ -75,7 +77,7 @@ function DetailBody({ id }: { id: string }) {
     return () => controller.abort();
   }, [id, version]);
   async function generateResumeLink() {
-    if (linkBusy) return;
+    if (linkBusy || !detail || detail.order.paymentStatus === "PAID") return false;
     setLinkBusy(true);
     setError("");
     setLinkNotice("");
@@ -90,6 +92,7 @@ function DetailBody({ id }: { id: string }) {
       );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not create resume link.");
+      throw e;
     } finally {
       setLinkBusy(false);
     }
@@ -378,7 +381,14 @@ function DetailBody({ id }: { id: string }) {
                   <button
                     className="staff-btn secondary"
                     disabled={linkBusy || detail.order.paymentStatus === "PAID"}
-                    onClick={generateResumeLink}
+                    onClick={() =>
+                      confirmation.request({
+                        title: "Create or replace recovery link?",
+                        body: `Order ${detail.order.publicNumber}: create a secure 48-hour resume link. Previously issued links for this order may stop working. The customer must still verify their email.`,
+                        confirmLabel: "Create recovery link",
+                        run: generateResumeLink,
+                      })
+                    }
                   >
                     <RefreshCw aria-hidden />
                     {linkBusy ? "Replacing…" : "Replace link"}
@@ -394,7 +404,14 @@ function DetailBody({ id }: { id: string }) {
                 <button
                   className="staff-btn"
                   disabled={linkBusy || detail.order.paymentStatus === "PAID"}
-                  onClick={generateResumeLink}
+                  onClick={() =>
+                    confirmation.request({
+                      title: "Create or replace recovery link?",
+                      body: `Order ${detail.order.publicNumber}: create a secure 48-hour resume link. Previously issued links and their sessions for this order will stop working. The customer must still verify their email.`,
+                      confirmLabel: "Create recovery link",
+                      run: generateResumeLink,
+                    })
+                  }
                 >
                   <Link2 aria-hidden />
                   {linkBusy ? "Generating…" : "Generate resume link"}
@@ -443,6 +460,7 @@ function DetailBody({ id }: { id: string }) {
               </div>
             )}
           </section>
+          {confirmation.dialog}
         </>
       ) : null}
     </div>
