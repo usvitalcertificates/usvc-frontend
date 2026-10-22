@@ -4,29 +4,27 @@ import { readFileSync } from "node:fs";
 import { URL } from "node:url";
 import {
   isCountyTemporarilyUnavailable,
-  isNewYorkMarriageCountyUnavailable,
+  isNewYorkCountyUnavailable,
 } from "../lib/county-availability.ts";
 
 const unavailable = ["New York", "Kings", "Bronx", "Richmond", "Queens"];
-test("only the five canonical NYC counties are unavailable for NY marriage", () => {
+test("the same five NYC counties are unavailable without any certificate-specific condition", () => {
   const geo = JSON.parse(readFileSync(new URL("../public/geo/NY.json", import.meta.url), "utf8"));
   assert.deepEqual(
     geo.counties
-      .filter((c) => isNewYorkMarriageCountyUnavailable("NY", c.name, "marriage-certificate"))
+      .filter((c) => isNewYorkCountyUnavailable("NY", c.name))
       .map((c) => c.name)
       .sort(),
     [...unavailable].sort(),
   );
-  for (const county of unavailable) {
-    assert.equal(isCountyTemporarilyUnavailable("NY", county, "marriage-certificate"), true);
-    for (const certificate of ["birth-certificate", "death-certificate", "divorce-certificate"])
-      assert.equal(isCountyTemporarilyUnavailable("NY", county, certificate), false);
-  }
+  for (const county of unavailable)
+    assert.equal(isCountyTemporarilyUnavailable("NY", county), true);
+  assert.equal(isCountyTemporarilyUnavailable("NY", "Albany"), false);
 });
-test("New York marriage checks normalize names without broadening the state rule", () => {
-  assert.equal(isNewYorkMarriageCountyUnavailable("ny", "  QUEENS  ", "MARRIAGE"), true);
-  assert.equal(isNewYorkMarriageCountyUnavailable("NY", "Queensbury", "MARRIAGE"), false);
-  assert.equal(isNewYorkMarriageCountyUnavailable("CA", "Kings", "MARRIAGE"), false);
+test("New York county checks normalize names without broadening the state rule", () => {
+  assert.equal(isNewYorkCountyUnavailable("ny", "  QUEENS  "), true);
+  assert.equal(isNewYorkCountyUnavailable("NY", "Queensbury"), false);
+  assert.equal(isNewYorkCountyUnavailable("CA", "Kings"), false);
 });
 test("California restrictions retain the same counties and certificate scope", () => {
   const counties = [
@@ -40,13 +38,6 @@ test("California restrictions retain the same counties and certificate scope", (
     "Kings",
     "Santa Barbara",
   ];
-  for (const certificate of [
-    "birth-certificate",
-    "death-certificate",
-    "marriage-certificate",
-    "divorce-certificate",
-  ])
-    for (const county of counties)
-      assert.equal(isCountyTemporarilyUnavailable("CA", county, certificate), true);
-  assert.equal(isCountyTemporarilyUnavailable("CA", "Los Angeles", "marriage-certificate"), false);
+  for (const county of counties) assert.equal(isCountyTemporarilyUnavailable("CA", county), true);
+  assert.equal(isCountyTemporarilyUnavailable("CA", "Los Angeles"), false);
 });

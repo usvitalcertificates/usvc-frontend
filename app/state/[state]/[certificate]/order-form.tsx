@@ -16,8 +16,8 @@ import { getAnalyticsAttribution, getOpenAIAttribution, trackAnalytics } from "@
 import { trackOpenAICheckoutStarted } from "@/app/openai-analytics";
 import {
   isCountyTemporarilyUnavailable,
-  isNewYorkMarriageCountyUnavailable,
-  NEW_YORK_MARRIAGE_COUNTY_UNAVAILABLE_MESSAGE,
+  isNewYorkCountyUnavailable,
+  NEW_YORK_COUNTY_UNAVAILABLE_MESSAGE,
 } from "@/lib/county-availability";
 import {
   APPLICATION_TITLES,
@@ -783,7 +783,7 @@ export function OrderForm({
   /** Includes restored unavailable selections, which must remain blocked. */
   const blockedCounty = (() => {
     const county = values.county ?? draft.county ?? "";
-    return county && isCountyTemporarilyUnavailable(abbr, county, certSlug) ? county : null;
+    return county && isCountyTemporarilyUnavailable(abbr, county) ? county : null;
   })();
 
   /** Scroll to and focus the input for an error key, falling back to its section.
@@ -945,7 +945,7 @@ export function OrderForm({
     const data = Object.fromEntries(
       [...new FormData(form).entries()].map(([k, v]) => [k, String(v)]),
     );
-    if (abbr === "CA" && isCountyTemporarilyUnavailable(abbr, data.county ?? "", certSlug)) {
+    if (abbr === "CA" && isCountyTemporarilyUnavailable(abbr, data.county ?? "")) {
       data.county = "";
       data.city = "";
     }
@@ -1012,8 +1012,8 @@ export function OrderForm({
     const formData = new FormData(form);
     const get = (key: string) => String(formData.get(key) ?? "").trim();
     if (blockedCounty) {
-      const message = isNewYorkMarriageCountyUnavailable(abbr, blockedCounty, certSlug)
-        ? NEW_YORK_MARRIAGE_COUNTY_UNAVAILABLE_MESSAGE
+      const message = isNewYorkCountyUnavailable(abbr, blockedCounty)
+        ? NEW_YORK_COUNTY_UNAVAILABLE_MESSAGE
         : `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority.`;
       setError(message);
       setFieldErrors((current) => ({ ...current, county: message }));
@@ -1389,7 +1389,7 @@ export function OrderForm({
               required
               value={values.county ?? draft.county ?? ""}
               options={counties.map((c) => {
-                const unavailable = isNewYorkMarriageCountyUnavailable(abbr, c.name, certSlug);
+                const unavailable = isNewYorkCountyUnavailable(abbr, c.name);
                 return {
                   value: c.name,
                   label: `${jurisdictionLabel(c)}${unavailable ? " (No Service Available)" : ""}`,
@@ -1407,8 +1407,8 @@ export function OrderForm({
             />
             {blockedCounty ? (
               <div className="county-blocked-alert" role="alert">
-                {isNewYorkMarriageCountyUnavailable(abbr, blockedCounty, certSlug) ? (
-                  NEW_YORK_MARRIAGE_COUNTY_UNAVAILABLE_MESSAGE
+                {isNewYorkCountyUnavailable(abbr, blockedCounty) ? (
+                  NEW_YORK_COUNTY_UNAVAILABLE_MESSAGE
                 ) : (
                   <>
                     <strong>Certificate issuance is currently unavailable</strong> through{" "}
