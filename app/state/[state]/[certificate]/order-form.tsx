@@ -14,7 +14,11 @@ import { createOrder, verifyOrderBeforePayment, type Certificate } from "@/lib/a
 import { SearchableSelect } from "./searchable-select";
 import { getAnalyticsAttribution, getOpenAIAttribution, trackAnalytics } from "@/app/analytics";
 import { trackOpenAICheckoutStarted } from "@/app/openai-analytics";
-import { isCountyTemporarilyUnavailable } from "@/lib/county-availability";
+import {
+  isCountyTemporarilyUnavailable,
+  isNewYorkMarriageCountyUnavailable,
+  NEW_YORK_MARRIAGE_COUNTY_UNAVAILABLE_MESSAGE,
+} from "@/lib/county-availability";
 import {
   APPLICATION_TITLES,
   APPLICATION_ADDRESS_TYPES as ADDRESS_TYPE_OPTIONS,
@@ -776,11 +780,10 @@ export function OrderForm({
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const formRef = useRef<HTMLFormElement>(null);
-  /** Temporarily blocked county, derived from the live selection (selectable,
-   *  but blocks payment). Null when the selection is usable. */
+  /** Includes restored unavailable selections, which must remain blocked. */
   const blockedCounty = (() => {
     const county = values.county ?? draft.county ?? "";
-    return county && isCountyTemporarilyUnavailable(abbr, county) ? county : null;
+    return county && isCountyTemporarilyUnavailable(abbr, county, certSlug) ? county : null;
   })();
 
   /** Scroll to and focus the input for an error key, falling back to its section.
@@ -942,7 +945,7 @@ export function OrderForm({
     const data = Object.fromEntries(
       [...new FormData(form).entries()].map(([k, v]) => [k, String(v)]),
     );
-    if (isCountyTemporarilyUnavailable(abbr, data.county ?? "")) {
+    if (abbr === "CA" && isCountyTemporarilyUnavailable(abbr, data.county ?? "", certSlug)) {
       data.county = "";
       data.city = "";
     }
@@ -1009,9 +1012,11 @@ export function OrderForm({
     const formData = new FormData(form);
     const get = (key: string) => String(formData.get(key) ?? "").trim();
     if (blockedCounty) {
-      setError(
-        `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority.`,
-      );
+      const message = isNewYorkMarriageCountyUnavailable(abbr, blockedCounty, certSlug)
+        ? NEW_YORK_MARRIAGE_COUNTY_UNAVAILABLE_MESSAGE
+        : `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority.`;
+      setError(message);
+      setFieldErrors((current) => ({ ...current, county: message }));
       document
         .getElementById("application-section-certificate")
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1383,7 +1388,14 @@ export function OrderForm({
               name="county"
               required
               value={values.county ?? draft.county ?? ""}
-              options={counties.map((c) => ({ value: c.name, label: jurisdictionLabel(c) }))}
+              options={counties.map((c) => {
+                const unavailable = isNewYorkMarriageCountyUnavailable(abbr, c.name, certSlug);
+                return {
+                  value: c.name,
+                  label: `${jurisdictionLabel(c)}${unavailable ? " (No Service Available)" : ""}`,
+                  disabled: unavailable,
+                };
+              })}
               placeholder={`Select ${stateName} ${noun}`}
               onSelect={(county) => {
                 setFieldErrors((current) => {
@@ -1395,8 +1407,14 @@ export function OrderForm({
             />
             {blockedCounty ? (
               <div className="county-blocked-alert" role="alert">
-                <strong>Certificate issuance is currently unavailable</strong> through{" "}
-                {blockedCounty} {noun} authority.
+                {isNewYorkMarriageCountyUnavailable(abbr, blockedCounty, certSlug) ? (
+                  NEW_YORK_MARRIAGE_COUNTY_UNAVAILABLE_MESSAGE
+                ) : (
+                  <>
+                    <strong>Certificate issuance is currently unavailable</strong> through{" "}
+                    {blockedCounty} {noun} authority.
+                  </>
+                )}
               </div>
             ) : null}
             {fieldErrors.county ? (
