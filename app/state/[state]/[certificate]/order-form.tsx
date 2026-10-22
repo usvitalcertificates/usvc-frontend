@@ -14,11 +14,7 @@ import { createOrder, verifyOrderBeforePayment, type Certificate } from "@/lib/a
 import { SearchableSelect } from "./searchable-select";
 import { getAnalyticsAttribution, getOpenAIAttribution, trackAnalytics } from "@/app/analytics";
 import { trackOpenAICheckoutStarted } from "@/app/openai-analytics";
-import {
-  isCountyTemporarilyUnavailable,
-  isNewYorkCountyUnavailable,
-  NEW_YORK_COUNTY_UNAVAILABLE_MESSAGE,
-} from "@/lib/county-availability";
+import { isCountyTemporarilyUnavailable } from "@/lib/county-availability";
 import {
   APPLICATION_TITLES,
   APPLICATION_ADDRESS_TYPES as ADDRESS_TYPE_OPTIONS,
@@ -945,7 +941,7 @@ export function OrderForm({
     const data = Object.fromEntries(
       [...new FormData(form).entries()].map(([k, v]) => [k, String(v)]),
     );
-    if (abbr === "CA" && isCountyTemporarilyUnavailable(abbr, data.county ?? "")) {
+    if (isCountyTemporarilyUnavailable(abbr, data.county ?? "")) {
       data.county = "";
       data.city = "";
     }
@@ -1012,9 +1008,7 @@ export function OrderForm({
     const formData = new FormData(form);
     const get = (key: string) => String(formData.get(key) ?? "").trim();
     if (blockedCounty) {
-      const message = isNewYorkCountyUnavailable(abbr, blockedCounty)
-        ? NEW_YORK_COUNTY_UNAVAILABLE_MESSAGE
-        : `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority.`;
+      const message = `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority.`;
       setError(message);
       setFieldErrors((current) => ({ ...current, county: message }));
       document
@@ -1388,14 +1382,7 @@ export function OrderForm({
               name="county"
               required
               value={values.county ?? draft.county ?? ""}
-              options={counties.map((c) => {
-                const unavailable = isNewYorkCountyUnavailable(abbr, c.name);
-                return {
-                  value: c.name,
-                  label: `${jurisdictionLabel(c)}${unavailable ? " (No Service Available)" : ""}`,
-                  disabled: unavailable,
-                };
-              })}
+              options={counties.map((c) => ({ value: c.name, label: jurisdictionLabel(c) }))}
               placeholder={`Select ${stateName} ${noun}`}
               onSelect={(county) => {
                 setFieldErrors((current) => {
@@ -1407,14 +1394,8 @@ export function OrderForm({
             />
             {blockedCounty ? (
               <div className="county-blocked-alert" role="alert">
-                {isNewYorkCountyUnavailable(abbr, blockedCounty) ? (
-                  NEW_YORK_COUNTY_UNAVAILABLE_MESSAGE
-                ) : (
-                  <>
-                    <strong>Certificate issuance is currently unavailable</strong> through{" "}
-                    {blockedCounty} {noun} authority.
-                  </>
-                )}
+                <strong>Certificate issuance is currently unavailable</strong> through{" "}
+                {blockedCounty} {noun} authority.
               </div>
             ) : null}
             {fieldErrors.county ? (
