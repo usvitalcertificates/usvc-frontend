@@ -20,6 +20,7 @@ const ORDER_LABELS: Record<string, string> = {
   order_reassigned: "Order reassigned",
   form_corrected: "Application form corrected",
   fulfillment_status_updated: "Status updated",
+  status_reopened: "Status reopened",
   internal_note_added: "Internal note added",
   sensitive_reveal: "Sensitive data revealed",
   confirmation_email_sent: "Confirmation email sent",
@@ -76,7 +77,7 @@ export function activityCategory(action?: string): string {
     action === "mfa_failure"
   )
     return "security";
-  if (action === "fulfillment_status_updated") return "status";
+  if (action === "fulfillment_status_updated" || action === "status_reopened") return "status";
   if (action === "internal_note_added") return "note";
   if (action === "order_claimed" || action === "order_reassigned" || action === "order_released")
     return "claim";
