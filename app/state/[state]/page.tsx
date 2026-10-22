@@ -182,7 +182,7 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                 </h2>
                 <div className="patriotic-rule" aria-hidden="true" />
                 <p className="certificate-support-intro">
-                  Request your {name} {cert.name} with guided online support.
+                  Request your official {name} {cert.name} in less than 10 minutes.
                 </p>
                 <ul className="certificate-support-points">
                   <li>Full-Service Support from Start to Finish</li>
