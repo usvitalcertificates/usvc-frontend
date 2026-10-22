@@ -78,6 +78,11 @@ function singleMeta(html, attribute, key) {
   assert(values[0], `${key} is empty`);
   return values[0];
 }
+function assertNoEmDash(text, label) {
+  for (const marker of ["—", "&mdash;", "&#8212;", "&#x2014;", "\\u2014"]) {
+    assert(!text.includes(marker), `${label}: contains em dash (${marker})`);
+  }
+}
 
 async function assertNotFound(path, headers = {}) {
   const response = await request(path, { headers });
@@ -113,9 +118,10 @@ try {
   assert.match(sitemapResponse.headers.get("content-type"), /xml/);
   const xml = await sitemapResponse.text();
   const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(([, url]) => decode(url));
-  assert.equal(urls.length, 271);
-  assert.equal(new Set(urls).size, 271);
+  assert.equal(urls.length, 74);
+  assert.equal(new Set(urls).size, 74);
   assert(urls.every((url) => new URL(url).origin === site));
+  assert(urls.includes(`${site}/guides`));
   assert(
     !urls.some((url) =>
       /\/(?:resume|staff|auth|track-order|api|llms\.txt)(?:\/|$)/.test(new URL(url).pathname),
@@ -124,6 +130,10 @@ try {
   assert(!urls.some((url) => /\/state\/(?:vermont|wyoming)(?:\/|$)/.test(url)));
   assert(
     !urls.some((url) => /\/state\/[^/]+\/(?:birth|death|marriage|divorce)-certificate$/.test(url)),
+  );
+  assert(
+    !urls.some((url) => /\/state\/[^/]+\/order\//.test(new URL(url).pathname)),
+    "Order pages stay out of the sitemap",
   );
   const imagePaths = new Set();
   const renderedPages = new Map();
@@ -136,6 +146,7 @@ try {
         assert.equal(response.status, 200, url);
         const html = await response.text();
         renderedPages.set(url, html);
+        assertNoEmDash(html, url);
         assert(!/<link\b[^>]*as="font"/.test(html), `${url}: public font preload`);
         const canonical = [...html.matchAll(/<link\b[^>]*rel="canonical"[^>]*href="([^"]+)"/g)];
         assert.deepEqual(
@@ -178,6 +189,15 @@ try {
     return match ? [match[1]] : [];
   });
   assert.equal(guideStates.length, 13);
+  const guideIndexUrl = `${site}/guides`;
+  const guideIndex = renderedPages.get(guideIndexUrl);
+  assert(guideIndex, "Guide directory must be in the sitemap");
+  const guideIndexMain = guideIndex.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1] || "";
+  assert.equal(
+    (guideIndexMain.match(/href="\/guides\/[^"/]+\/birth-certificate"/g) || []).length,
+    13,
+    "Guide directory must link all 13 guides",
+  );
   for (const url of urls.filter((url) => /^\/state\/[^/]+$/.test(new URL(url).pathname))) {
     const state = new URL(url).pathname.split("/").at(-1);
     const html = renderedPages.get(url);
@@ -188,12 +208,12 @@ try {
     assert.equal(guideLinks.length, guideStates.includes(state) ? 1 : 0, url);
     if (guideLinks.length) {
       assert(guideLinks[0][0].includes(`href="/guides/${state}/birth-certificate"`), url);
-      const faqSection = [...main.matchAll(/<section\b[^>]*>([\s\S]*?)<\/section>/g)].find(
-        (match) => /<h2>[^<]* questions, answered<\/h2>/.test(match[1].replace(/<!--.*?-->/g, "")),
+      const gridIndex = main.indexOf('class="certificate-type-grid"');
+      assert(gridIndex > -1, `${url}: missing certificate grid`);
+      assert(
+        main.indexOf(guideLinks[0][0]) < gridIndex,
+        `${url}: guide link must appear above the certificate grid`,
       );
-      assert(faqSection?.[1].includes(guideLinks[0][0]), `Guide belongs in state FAQ: ${url}`);
-      assert(faqSection[1].includes("birth certificate guide?</h3>"), url);
-      assert(faqSection[1].includes("You can read our"), url);
     }
   }
 
@@ -265,6 +285,7 @@ try {
   assert.equal(llmsResponse.status, 200);
   assert.match(llmsResponse.headers.get("content-type"), /text\/plain; charset=utf-8/);
   const llms = await llmsResponse.text();
+  assertNoEmDash(llms, "/llms.txt");
   assert(llms.startsWith("# US Vital Certificates (USVC)\n"));
   assert(llms.includes("not a government agency"));
   assert.equal((llms.match(/\/guides\//g) || []).length, 13);
@@ -278,6 +299,17 @@ try {
     assert.equal((await request(new URL(link).pathname)).status, 200, link);
   }
 
+  const noindexOrder = await request("/state/california/order/birth-certificate");
+  assert.equal(noindexOrder.status, 200);
+  const noindexOrderHtml = await noindexOrder.text();
+  assertNoEmDash(noindexOrderHtml, "order page");
+  assert(
+    tagValues(noindexOrderHtml, "name", "robots").some(
+      (value) => value.includes("noindex") && value.includes("follow"),
+    ),
+    "Order pages must be noindex, follow",
+  );
+
   for (const path of [
     "/resume",
     "/resume-california-birth-certificate",
@@ -288,6 +320,7 @@ try {
   ]) {
     const response = await request(path);
     const html = await response.text();
+    assertNoEmDash(html, path);
     assert(
       tagValues(html, "name", "robots").some((v) => v.includes("noindex")),
       path,
@@ -330,6 +363,7 @@ try {
       const response = await request(path);
       assert.equal(response.status, 200, path);
       const html = await response.text();
+      assertNoEmDash(html, path);
       assert(
         tagValues(html, "name", "robots").some((value) => value.includes("noindex")),
         path,

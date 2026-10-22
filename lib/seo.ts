@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 export const SITE_URL = "https://usvitalcertificates.org";
+export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 
 export const SOCIAL_IMAGE = {
   url: `${SITE_URL}/opengraph-image`,
@@ -198,7 +199,7 @@ export function titleCase(value: string) {
  */
 // All four public page groups received the social metadata update on this date.
 // These describe page modifications, not the date official sources were checked.
-export const SITEMAP_STATIC_LAST_MODIFIED = "2026-10-21";
+export const SITEMAP_STATIC_LAST_MODIFIED = "2026-10-22";
 export const SITEMAP_STATES_LAST_MODIFIED = "2026-10-21";
 export const SITEMAP_ORDERS_LAST_MODIFIED = "2026-10-21";
 export const SITEMAP_GUIDES_LAST_MODIFIED = "2026-10-22";
@@ -215,7 +216,7 @@ export const CERTIFICATE_DETAILS: Record<
 > = {
   "birth-certificate": {
     label: "Birth",
-    uses: "A certified birth certificate is most often requested as proof of identity, age, citizenship, and parentage — for passports, REAL ID, school enrollment, and benefits claims.",
+    uses: "A certified birth certificate is most often requested as proof of identity, age, citizenship, and parentage, including for passports, REAL ID, school enrollment, and benefits claims.",
     checklist: [
       "Subject's full name at birth, date of birth, and place of birth",
       "Parents' names as shown on the record",
@@ -232,7 +233,7 @@ export const CERTIFICATE_DETAILS: Record<
       },
       {
         q: "How long does the USVC part take?",
-        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state — confirm current times with the issuing agency.",
+        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state. Confirm current times with the issuing agency.",
       },
     ],
   },
@@ -255,7 +256,7 @@ export const CERTIFICATE_DETAILS: Record<
       },
       {
         q: "How long does the USVC part take?",
-        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state — confirm current times with the issuing agency.",
+        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state. Confirm current times with the issuing agency.",
       },
     ],
   },
@@ -278,7 +279,7 @@ export const CERTIFICATE_DETAILS: Record<
       },
       {
         q: "How long does the USVC part take?",
-        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state — confirm current times with the issuing agency.",
+        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state. Confirm current times with the issuing agency.",
       },
     ],
   },
@@ -301,7 +302,7 @@ export const CERTIFICATE_DETAILS: Record<
       },
       {
         q: "How long does the USVC part take?",
-        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state — confirm current times with the issuing agency.",
+        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state. Confirm current times with the issuing agency.",
       },
     ],
   },

@@ -120,6 +120,10 @@ export default function Certificates() {
                 </Link>
               </span>
             ))}
+            .{" "}
+            <Link className="howto-link" href="/guides">
+              Browse all guides
+            </Link>
             .
           </p>
         </div>

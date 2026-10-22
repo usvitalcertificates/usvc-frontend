@@ -88,6 +88,7 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
   if (!found) notFound();
   const name = found.name;
   const unavailable = isStateUnsupported(state);
+  const guide = BIRTH_GUIDE_SOURCES[state];
   const url = `${SITE_URL}/state/${state}`;
   const certUses = CERTIFICATES.map((cert) => CERTIFICATE_DETAILS[cert.slug].uses);
   const faqs = [
@@ -101,21 +102,12 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
     },
     {
       q: `Who can receive a certified ${name} record?`,
-      a: "The issuing agency decides eligibility — usually the person named on the record or specific qualifying relatives and representatives. Confirm your eligibility with the official agency resource before you apply.",
+      a: "The issuing agency decides eligibility, usually the person named on the record or specific qualifying relatives and representatives. Confirm your eligibility with the official agency resource before you apply.",
     },
     {
       q: "Do I need to visit an office in person?",
       a: "No. There is no walk-in service and no office visit needed. You order online with USVC and track the request.",
     },
-    ...(BIRTH_GUIDE_SOURCES[state]
-      ? [
-          {
-            q: `Where can I find a ${name} birth certificate guide?`,
-            a: `You can read our ${name} birth certificate guide.`,
-            href: `/guides/${state}/birth-certificate`,
-          },
-        ]
-      : []),
   ];
   const ld = {
     "@context": "https://schema.org",
@@ -171,12 +163,21 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
       <section className="page-section">
         <div className="container">
           <p className="state-intro">
-            {name} vital records — birth, death, marriage, and divorce certificates — are issued
-            under {name === "District of Columbia" ? "District" : "state"} rules, so the agency
-            holding your record depends on where the event happened, not where you live now. Below
-            you can start a guided {name} request for any of the four record types with USVC review
-            and online tracking.
+            {name} vital records, including birth, death, marriage, and divorce certificates, are
+            issued under {name === "District of Columbia" ? "District" : "state"} rules, so the
+            agency holding your record depends on where the event happened, not where you live now.
+            Below you can start a guided {name} request for any of the four record types with USVC
+            review and online tracking.
           </p>
+          {guide ? (
+            <p className="state-guide-callout">
+              Need the detailed process? Read the{" "}
+              <Link className="guide-link" href={`/guides/${state}/birth-certificate`}>
+                {name} birth certificate guide
+              </Link>
+              .
+            </p>
+          ) : null}
           {unavailable ? (
             <p className="notice" role="status">
               {STATE_UNAVAILABLE_MESSAGE} See{" "}
@@ -269,16 +270,7 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
               {faqs.map((faq) => (
                 <div key={faq.q}>
                   <h3>{faq.q}</h3>
-                  <p>
-                    {faq.href ? (
-                      <>
-                        You can read our <Link href={faq.href}>{name} birth certificate guide</Link>
-                        .
-                      </>
-                    ) : (
-                      faq.a
-                    )}
-                  </p>
+                  <p>{faq.a}</p>
                 </div>
               ))}
             </section>

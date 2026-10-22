@@ -2093,6 +2093,12 @@ small.application-error {
   font-size: 15px;
   line-height: 1.6;
 }
+.state-guide-callout {
+  margin: -8px 0 24px;
+  color: var(--muted-text);
+  font-size: 15px;
+  line-height: 1.6;
+}
 .legal-section {
   margin-top: 32px;
 }

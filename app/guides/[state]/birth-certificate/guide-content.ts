@@ -37,7 +37,7 @@ function genericGuide(stateName: string, officialUrl: string): BirthGuideContent
     metaDescription: `Official guidance plus USVC help for a ${stateName} birth certificate request. Eligibility, fees, steps.`,
     subtitle: `A starting point for understanding a ${stateName} birth-certificate request and the official agency resource.`,
     intro: [
-      `A ${stateName} birth certificate is issued under the rules of the ${stateName} issuing agency — so the record you need is held where the birth happened, not necessarily where you live now.`,
+      `A ${stateName} birth certificate is issued under the rules of the ${stateName} issuing agency, so the record you need is held where the birth happened, not necessarily where you live now.`,
       "This guide explains how to check the current official requirements and how USVC can help you submit a complete request.",
     ],
     quickFacts: [
@@ -51,7 +51,7 @@ function genericGuide(stateName: string, officialUrl: string): BirthGuideContent
         id: "official-resource",
         heading: `Start with the official ${stateName} resource`,
         paragraphs: [
-          "The official issuing-agency page explains its current request options, required documentation, eligibility, fees, and processing information. Those details can change without notice, so the agency page — not this guide — is the source of truth.",
+          "The official issuing-agency page explains its current request options, required documentation, eligibility, fees, and processing information. Those details can change without notice on the agency page, which this guide doesn't control.",
           "Open it first and confirm which request path fits your situation before you gather documents or pay anything.",
         ],
         links: [{ label: `Open the official ${stateName} birth-record page`, href: officialUrl }],
@@ -67,7 +67,7 @@ function genericGuide(stateName: string, officialUrl: string): BirthGuideContent
         id: "prepare",
         heading: "What to have ready before you start",
         paragraphs: [
-          "Having these details on hand makes the guided flow take most people about 10 minutes. If any detail is uncertain — a spelling, an exact date, a parent's name — check the agency's instructions for what it accepts before you submit, since corrections after filing can add delays.",
+          "Having these details on hand makes the guided flow take most people about 10 minutes. If any detail is uncertain, such as a spelling, an exact date, or a parent's name, check the agency's instructions for what it accepts before you submit, since corrections after filing can add delays.",
         ],
         bullets: [
           "The subject's full name at birth and date of birth.",
@@ -86,7 +86,7 @@ function genericGuide(stateName: string, officialUrl: string): BirthGuideContent
     faqs: [
       {
         question: `Where do I find the official ${stateName} birth-certificate requirements?`,
-        answer: `On the [official issuing-agency page](${officialUrl}) — it is the source of truth for current request options, required documentation, eligibility, fees, and processing information, all of which can change.`,
+        answer: `The [official issuing-agency page](${officialUrl}) is the source of truth for current request options, required documentation, eligibility, fees, and processing information, all of which can change.`,
       },
       {
         question: "What information should I have ready before I start?",
@@ -96,7 +96,7 @@ function genericGuide(stateName: string, officialUrl: string): BirthGuideContent
       {
         question: "How long does a request take?",
         answer:
-          "Our guided USVC form takes most people about 10 minutes. Agency processing and delivery times vary by state — confirm current times on the official agency page before you plan around a deadline.",
+          "Our guided USVC form takes most people about 10 minutes. Agency processing and delivery times vary by state. Confirm current times on the official agency page before you plan around a deadline.",
       },
       {
         question: "Can USVC file the request for me?",

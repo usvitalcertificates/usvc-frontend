@@ -56,7 +56,7 @@ export const CALIFORNIA_GUIDE: BirthGuideContent = {
       id: "official-resource",
       heading: "Start with the official California resource",
       paragraphs: [
-        "California's requirements are set by the issuing agency. The official CDPH page explains current request options, required documentation, eligibility, fees, processing, and delivery information. Those details can change without notice, so the agency page — not this guide — controls.",
+        "California's requirements are set by the issuing agency. The official CDPH page explains current request options, required documentation, eligibility, fees, processing, and delivery information. Those details can change without notice on the agency page, which this guide doesn't control.",
         "Open the official page first and confirm which request path fits your situation before you gather documents or pay anything.",
       ],
       links: [
@@ -68,7 +68,7 @@ export const CALIFORNIA_GUIDE: BirthGuideContent = {
       heading: "Understand the two certified copy types",
       paragraphs: [
         "California issues more than one type of certified birth record. An authorized copy can be used to establish the identity of the person named on the certificate. An informational copy is still a certified copy of the record, but it carries a notice that it is not valid for identity purposes.",
-        "The issuing agency controls who may receive each type. Before you order, confirm which copy the receiving organization will accept — a passport office, DMV, school, insurer, or foreign authority may have its own rules.",
+        "The issuing agency controls who may receive each type. Before you order, confirm which copy the receiving organization will accept. A passport office, DMV, school, insurer, or foreign authority may have its own rules.",
       ],
       links: [
         {
@@ -96,7 +96,7 @@ export const CALIFORNIA_GUIDE: BirthGuideContent = {
       heading: "State office or county office?",
       paragraphs: [
         "The state Vital Records office handles California birth records and supports mail and electronic request options. County offices handle records for births that happened in their county and may offer local or in-person service.",
-        "The county where the birth occurred is the key detail. If the birth happened outside California, request the record from that state or country instead — California cannot issue it.",
+        "The county where the birth occurred is the key detail. If the birth happened outside California, request the record from that state or country instead, because California cannot issue it.",
       ],
       links: [
         { label: "Find the county registrar or recorder", href: COUNTY_DIRECTORY_URL },
@@ -112,7 +112,7 @@ export const CALIFORNIA_GUIDE: BirthGuideContent = {
       bullets: [
         "The subject's full name at birth, including any suffix.",
         "Date of birth and the city and county of birth.",
-        "Parents' names as shown on the record, including the mother's name at birth.",
+        "Parents' names as shown on the record, including the mother's maiden name.",
         "Your relationship to the person named on the certificate.",
         "Your contact details and a deliverable shipping address.",
         "A government-issued photo ID and any court or legal documents that apply.",

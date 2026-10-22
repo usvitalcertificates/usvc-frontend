@@ -1000,7 +1000,7 @@ export function OrderForm({
     const get = (key: string) => String(formData.get(key) ?? "").trim();
     if (blockedCounty) {
       setError(
-        `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority. Please select a different ${noun}.`,
+        `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority.`,
       );
       document
         .getElementById("application-section-certificate")
@@ -1387,7 +1387,7 @@ export function OrderForm({
             {blockedCounty ? (
               <div className="county-blocked-alert" role="alert">
                 <strong>Certificate issuance is currently unavailable</strong> through{" "}
-                {blockedCounty} {noun} authority. Please select a different {noun}.
+                {blockedCounty} {noun} authority.
               </div>
             ) : null}
             {fieldErrors.county ? (

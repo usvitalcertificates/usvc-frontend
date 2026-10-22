@@ -10,13 +10,14 @@ import { PageHeader } from "@/app/usvc-ui";
 import {
   assertSeoLength,
   BIRTH_GUIDE_SOURCES,
+  ORGANIZATION_ID,
   SITEMAP_GUIDES_LAST_MODIFIED,
   SITE_URL,
   socialMetadata,
 } from "@/lib/seo";
 import { getBirthGuideContent } from "./guide-content";
 
-/** Prerender the 10 pilot guides (P0 SEO) so they are static HTML,
+/** Prerender all 13 pilot guides (P0 SEO) so they are static HTML,
  *  not dependent on sitemap-only discovery. */
 export async function generateStaticParams() {
   return Object.keys(BIRTH_GUIDE_SOURCES).map((state) => ({ state }));
@@ -104,13 +105,8 @@ export default async function BirthCertificateGuide({
         mainEntityOfPage: url,
         dateModified: SITEMAP_GUIDES_LAST_MODIFIED,
         inLanguage: "en-US",
-        author: { "@type": "Organization", name: "US Vital Certificates", url: SITE_URL },
-        publisher: {
-          "@type": "Organization",
-          name: "US Vital Certificates",
-          url: SITE_URL,
-          logo: { "@type": "ImageObject", url: `${SITE_URL}/assets/usvc-logo.webp` },
-        },
+        author: { "@id": ORGANIZATION_ID },
+        publisher: { "@id": ORGANIZATION_ID },
         about: { "@type": "Thing", name: `${content.stateName} birth certificates` },
         citation: content.sources.map((source) => source.href),
       },
@@ -255,6 +251,13 @@ export default async function BirthCertificateGuide({
               ))}
             </ul>
             <p className="legal-updated">Official sources checked: {content.sourceChecked}.</p>
+            <p className="guide-related">
+              Read our{" "}
+              <Link className="guide-link" href="/editorial">
+                editorial policy
+              </Link>{" "}
+              for sourcing, review, and corrections.
+            </p>
           </div>
 
           <p className="guide-related">

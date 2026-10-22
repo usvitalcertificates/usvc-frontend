@@ -57,6 +57,8 @@ const columns = [
     title: "Resources",
     links: [
       ["Find Your State", "/find-your-state"],
+      ["Birth Certificate Guides", "/guides"],
+      ["About USVC", "/about"],
       ["FAQ", "/faq"],
       ["Track Order", "/track-order"],
       ["Contact", "/contact"],
@@ -67,6 +69,7 @@ const columns = [
     links: [
       ["Privacy Policy", "/privacy-policy"],
       ["Terms of Service", "/terms-of-service"],
+      ["Editorial Policy", "/editorial"],
       ["Accessibility", "/accessibility"],
     ],
   },
