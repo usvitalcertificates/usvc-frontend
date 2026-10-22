@@ -13,6 +13,9 @@ const guides = {
   pennsylvania: "app/guides/[state]/birth-certificate/content/pennsylvania.ts",
   illinois: "app/guides/[state]/birth-certificate/content/illinois.ts",
   ohio: "app/guides/[state]/birth-certificate/content/ohio.ts",
+  georgia: "app/guides/[state]/birth-certificate/content/georgia.ts",
+  "north-carolina": "app/guides/[state]/birth-certificate/content/north-carolina.ts",
+  michigan: "app/guides/[state]/birth-certificate/content/michigan.ts",
 };
 
 const registeredGuides = read("app/guides/[state]/birth-certificate/guide-content.ts");
