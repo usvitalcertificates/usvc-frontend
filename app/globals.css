@@ -610,6 +610,23 @@ h3 {
   width: 70px;
   margin: 12px 0 0;
 }
+.certificate-support-intro {
+  margin: 16px 0 0;
+  color: var(--navy);
+  font-size: 17px;
+  line-height: 1.65;
+}
+.certificate-support-points {
+  margin: 12px 0 0;
+  padding-left: 24px;
+  list-style: disc;
+  color: var(--navy);
+  font-size: 17px;
+  line-height: 1.65;
+}
+.certificate-support-points li + li {
+  margin-top: 6px;
+}
 .type-description {
   margin: 14px 0 0;
   font-size: 16px;

@@ -2,6 +2,10 @@
 
 Updated: 2026-10-21. This is the implementation checklist for the October 21 audit and its Search Console follow-up. `Merged` describes Git status, not proof of production rollout. Only a live deployment check closes a live-site issue.
 
+## Card presentation follow-up — October 22
+
+Owner-requested change: replace fee paragraphs only inside the state certificate cards with guided-support copy and regular support/security/tracking bullets. Pricing FAQ and its structured data, application and checkout remain unchanged. This presentation change adds no URLs; sitemap target remains 268. Verified all 52 state hubs and VT/WY disabled buttons, desktop/mobile layout, formatting/lint/TypeScript, 14 unit tests, production build and all 268 sitemap URLs via HTTP SEO checks. Branch `feat/state-card-support`; no deployment.
+
 ## Completed or in progress
 
 | Item                                                   | Status                                                                                                                        | Evidence / next verification                                                                                                                                                                                                                                                                                    |
