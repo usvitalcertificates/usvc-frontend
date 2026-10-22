@@ -1,0 +1,93 @@
+.usvc-date {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+.usvc-date > input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 42px;
+}
+.usvc-date .usvc-date-toggle {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 32px;
+  min-width: 32px;
+  height: calc(100% - 8px);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.usvc-date .usvc-date-calendar {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  left: 0;
+  display: block;
+  width: 280px;
+  max-width: calc(100vw - 48px);
+  padding: 12px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: white;
+  color: inherit;
+  box-shadow: 0 6px 20px #0002;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.usvc-date .usvc-date-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.usvc-date .usvc-date-navigation input {
+  width: 75px;
+  min-height: 32px;
+  height: 32px;
+  padding: 2px;
+  font-size: 14px;
+}
+.usvc-date .usvc-date-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+.usvc-date .usvc-date-calendar button {
+  min-width: 0;
+  min-height: 32px;
+  height: 32px;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.usvc-date .usvc-date-calendar button:hover,
+.usvc-date .usvc-date-calendar button[aria-pressed="true"] {
+  background: color-mix(in srgb, currentColor 12%, white);
+}
+.usvc-date .usvc-date-calendar button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.usvc-date .usvc-date-calendar-format {
+  display: block;
+  font-size: 12px;
+  margin: 8px 0;
+}
+.usvc-date button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}

@@ -3,6 +3,8 @@
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, CheckCircle2, FileText, Flag, Play, Send, UploadCloud } from "lucide-react";
+import { ApplicationSections } from "@/components/staff/ApplicationSections";
+import { APPLICATION_LABELS } from "@/lib/form-config";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffData, staffFetch, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
@@ -103,54 +105,6 @@ interface AuditEntry {
 
 function auditLabel(entry: AuditEntry): string {
   return humanizeActivity(entry);
-}
-
-/** firstName → First name, dateOfBirth → Date of birth. */
-function prettyLabel(key: string): string {
-  const spaced = key
-    .replace(/([A-Z])/g, " $1")
-    .replace(/[_-]+/g, " ")
-    .trim();
-  return spaced.charAt(0).toUpperCase() + spaced.slice(1).toLowerCase();
-}
-
-function sectionText(entries: [string, unknown][]): string {
-  return entries
-    .filter(([, val]) => val !== "" && val !== undefined && val !== null)
-    .map(([key, val]) => `${prettyLabel(key)}: ${String(val)}`)
-    .join("\n");
-}
-
-/**
- * One striped-table section (Requestor, Subject, address…) with a header
- * Copy-all button for pasting the whole block onto government forms.
- */
-function FieldSection({ title, entries }: { title: string; entries: [string, unknown][] }) {
-  const visible = entries.filter(([, val]) => val !== "" && val !== undefined && val !== null);
-  if (visible.length === 0) return null;
-  return (
-    <section aria-label={title} className="staff-appsect">
-      <div className="staff-secthead">
-        <h3>{title}</h3>
-        <CopyButton value={sectionText(visible)} label={`${title} section`} />
-      </div>
-      <dl className="staff-deflist">
-        {visible.map(([key, val]) => {
-          const label = prettyLabel(key);
-          const text = String(val);
-          return (
-            <div key={key}>
-              <dt>{label}</dt>
-              <dd>
-                <CopyButton value={text} label={label} position="left" />
-                <span>{text}</span>
-              </dd>
-            </div>
-          );
-        })}
-      </dl>
-    </section>
-  );
 }
 
 const SENSITIVE_NOTICE: Record<"ssn" | "card", string> = {
@@ -278,22 +232,35 @@ function RevealCard({
                   </span>
                   <span className="staff-paycard-brand">{cardBrand(card.number)}</span>
                 </div>
+                <p className="staff-paycard-caption">{APPLICATION_LABELS.cardNumber}</p>
                 <p className="staff-paycard-number">
-                  <CopyButton value={card.number} label="Card number" position="left" />
+                  <CopyButton
+                    value={card.number}
+                    label={APPLICATION_LABELS.cardNumber}
+                    position="left"
+                  />
                   <span>{groupCardNumber(card.number)}</span>
                 </p>
                 <div className="staff-paycard-row">
                   <span>
-                    <span className="staff-paycard-caption">Expiry</span>
+                    <span className="staff-paycard-caption">{APPLICATION_LABELS.cardExpiry}</span>
                     <span className="staff-paycard-value">
-                      <CopyButton value={card.expiry} label="Card expiry" position="left" />
+                      <CopyButton
+                        value={card.expiry}
+                        label={APPLICATION_LABELS.cardExpiry}
+                        position="left"
+                      />
                       <span>{card.expiry}</span>
                     </span>
                   </span>
                   <span>
-                    <span className="staff-paycard-caption">CVC</span>
+                    <span className="staff-paycard-caption">{APPLICATION_LABELS.cardCvc}</span>
                     <span className="staff-paycard-value">
-                      <CopyButton value={card.securityCode} label="Card CVC" position="left" />
+                      <CopyButton
+                        value={card.securityCode}
+                        label={APPLICATION_LABELS.cardCvc}
+                        position="left"
+                      />
                       <span>{card.securityCode}</span>
                     </span>
                   </span>
@@ -327,9 +294,24 @@ function RevealCard({
           </>
         ) : (
           <div className="staff-reveal-form">
-            <p>
-              <code>*********</code>
-            </p>
+            {field === "card" ? (
+              <dl className="staff-deflist">
+                {[
+                  APPLICATION_LABELS.cardNumber,
+                  APPLICATION_LABELS.cardExpiry,
+                  APPLICATION_LABELS.cardCvc,
+                ].map((label) => (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>*********</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : (
+              <p>
+                <code>*********</code>
+              </p>
+            )}
             {reference ? (
               <p style={{ fontSize: "0.85rem", color: "var(--muted-text)" }}>{reference}</p>
             ) : null}
@@ -1022,43 +1004,25 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <div className="staff-panel">
             <h2>Application</h2>
             <div className="staff-panel-body">
-              <FieldSection
-                title="Requestor & contact"
-                entries={Object.entries(order.applicant ?? {})}
+              <ApplicationSections
+                data={order}
+                renderSensitive={(field) => (
+                  <RevealCard
+                    orderId={id}
+                    field={field}
+                    title={field === "ssn" ? APPLICATION_LABELS.ssn : "Credit Card Details"}
+                    shortTitle={field === "ssn" ? "SSN" : undefined}
+                    reference={
+                      field === "card" && order.cardLast4
+                        ? `Reference only — card ending ${order.cardLast4}. Full details are removed after submission.`
+                        : undefined
+                    }
+                    onReveal={() => void load()}
+                  />
+                )}
               />
-              {Object.keys(order.subject ?? {}).length > 0 ? (
-                <FieldSection title="Subject" entries={Object.entries(order.subject)} />
-              ) : null}
-              {Object.keys(order.family ?? {}).length > 0 ? (
-                <FieldSection title="Family" entries={Object.entries(order.family)} />
-              ) : null}
-              {Object.entries(order.addresses ?? {}).map(([kind, addr]) => (
-                <FieldSection
-                  key={kind}
-                  title={`${kind.charAt(0).toUpperCase() + kind.slice(1)} address`}
-                  entries={Object.entries(addr ?? {})}
-                />
-              ))}
             </div>
           </div>
-          <RevealCard
-            orderId={id}
-            field="ssn"
-            title="Social Security Number (SSN)"
-            shortTitle="SSN"
-            onReveal={() => void load()}
-          />
-          <RevealCard
-            orderId={id}
-            field="card"
-            title="Payment card"
-            reference={
-              order.cardLast4
-                ? `Reference only — card ending ${order.cardLast4}. Full details are removed after submission.`
-                : undefined
-            }
-            onReveal={() => void load()}
-          />
           {canCorrect && !closed && (order.status === "TO_CS" || order.status === "GTG") ? (
             <p style={{ fontSize: "0.9rem", color: "var(--muted-text)" }}>
               CS edits this order in the dedicated editor:{" "}

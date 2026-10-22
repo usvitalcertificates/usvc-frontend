@@ -1,5 +1,7 @@
 "use client";
 
+import { DateInput } from "@/components/DateInput";
+
 import Link from "next/link";
 import { use, useCallback, useEffect, useState } from "react";
 import { staffJson, staffRole } from "@/lib/staff-client";
@@ -191,24 +193,22 @@ export default function StaffAnalyticsPage({
           <div className="staff-analytics-dates">
             <label>
               From
-              <input
-                type="date"
+              <DateInput
                 value={from}
-                onChange={(event) => {
+                onValueChange={(date) => {
                   setPreset("custom");
-                  setFrom(event.target.value);
+                  setFrom(date);
                   setPage(1);
                 }}
               />
             </label>
             <label>
               To
-              <input
-                type="date"
+              <DateInput
                 value={to}
-                onChange={(event) => {
+                onValueChange={(date) => {
                   setPreset("custom");
-                  setTo(event.target.value);
+                  setTo(date);
                   setPage(1);
                 }}
               />
