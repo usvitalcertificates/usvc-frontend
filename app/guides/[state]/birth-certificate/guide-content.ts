@@ -4,12 +4,15 @@ import { FLORIDA_GUIDE } from "./content/florida";
 import { GEORGIA_GUIDE } from "./content/georgia";
 import { ILLINOIS_GUIDE } from "./content/illinois";
 import { MICHIGAN_GUIDE } from "./content/michigan";
+import { NEW_JERSEY_GUIDE } from "./content/new-jersey";
 import { NEW_YORK_GUIDE } from "./content/new-york";
 import { NORTH_CAROLINA_GUIDE } from "./content/north-carolina";
 import { OHIO_GUIDE } from "./content/ohio";
 import { PENNSYLVANIA_GUIDE } from "./content/pennsylvania";
 import { USVC_HELP_COPY } from "./content/shared";
 import { TEXAS_GUIDE } from "./content/texas";
+import { VIRGINIA_GUIDE } from "./content/virginia";
+import { WASHINGTON_GUIDE } from "./content/washington";
 
 const GUIDES: Record<string, BirthGuideContent> = {
   california: CALIFORNIA_GUIDE,
@@ -22,6 +25,9 @@ const GUIDES: Record<string, BirthGuideContent> = {
   georgia: GEORGIA_GUIDE,
   "north-carolina": NORTH_CAROLINA_GUIDE,
   michigan: MICHIGAN_GUIDE,
+  "new-jersey": NEW_JERSEY_GUIDE,
+  virginia: VIRGINIA_GUIDE,
+  washington: WASHINGTON_GUIDE,
 };
 
 function genericGuide(stateName: string, officialUrl: string): BirthGuideContent {
