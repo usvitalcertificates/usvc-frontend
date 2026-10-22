@@ -1,7 +1,10 @@
 import type { BirthGuideContent } from "./guide-types";
 import { CALIFORNIA_GUIDE } from "./content/california";
 import { FLORIDA_GUIDE } from "./content/florida";
+import { ILLINOIS_GUIDE } from "./content/illinois";
 import { NEW_YORK_GUIDE } from "./content/new-york";
+import { OHIO_GUIDE } from "./content/ohio";
+import { PENNSYLVANIA_GUIDE } from "./content/pennsylvania";
 import { USVC_HELP_COPY } from "./content/shared";
 import { TEXAS_GUIDE } from "./content/texas";
 
@@ -10,6 +13,9 @@ const GUIDES: Record<string, BirthGuideContent> = {
   texas: TEXAS_GUIDE,
   florida: FLORIDA_GUIDE,
   "new-york": NEW_YORK_GUIDE,
+  pennsylvania: PENNSYLVANIA_GUIDE,
+  illinois: ILLINOIS_GUIDE,
+  ohio: OHIO_GUIDE,
 };
 
 function genericGuide(stateName: string, officialUrl: string): BirthGuideContent {
