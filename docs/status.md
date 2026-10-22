@@ -1,5 +1,7 @@
 # Frontend status + remaining work
 
+- State guide FAQ follow-up (2026-10-22): existing guide links now appear as the answer to “Where can I find a [State] birth certificate guide?” with a quiet inline link. Only the ten states with existing guides receive this question. FAQ structured data includes the same answer text; no separate guide navigation block.
+
 - State guide placement (2026-10-22): moved each existing contextual birth-certificate guide link from below the certificate cards into its state FAQ section, after the questions. The same ten states retain their link text and destination; no new guides or FAQ/schema content changes. Production build, lint, formatting and HTTP SEO checks pass, including placement checks for all ten guide links and all 268 sitemap URLs.
 
 - State card follow-up (2026-10-22): removed only “Track Your Order Online” from the certificate-card bullet list after pulling latest develop. Cards retain the two approved support/security bullets; tracking elsewhere and all pricing/application behavior remain unchanged.
