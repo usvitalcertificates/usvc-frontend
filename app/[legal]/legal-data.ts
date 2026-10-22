@@ -19,7 +19,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
     title: "Privacy Policy",
     description:
       "How USVC collects, uses, discloses, retains, and protects the personal information you provide when requesting a vital certificate.",
-    lastUpdated: "October 3, 2026",
+    lastUpdated: "10/03/2026",
     sections: [
       {
         heading: "Introduction",
@@ -109,7 +109,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
     title: "Terms of Service",
     description:
       "The terms that apply when you use USVC to prepare, review, and submit a vital certificate request.",
-    lastUpdated: "October 1, 2026",
+    lastUpdated: "10/01/2026",
     sections: [
       {
         heading: "1. Introduction and agreement to terms",
@@ -263,7 +263,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
     title: "Accessibility Statement",
     description:
       "USVC is committed to making its website usable by as many people as possible, including people using assistive technology.",
-    lastUpdated: "October 1, 2026",
+    lastUpdated: "10/01/2026",
     sections: [
       {
         heading: "Our commitment",

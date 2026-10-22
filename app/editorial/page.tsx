@@ -50,7 +50,7 @@ export default function EditorialPage() {
       <section className="page-section">
         <div className="container">
           <div className="legal-body legal-soft">
-            <p className="legal-updated">Last reviewed: October 22, 2026</p>
+            <p className="legal-updated">Last reviewed: 10/22/2026</p>
 
             <div className="legal-section">
               <h2>Our purpose</h2>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { trackOrder } from "@/lib/api";
+import { formatDateUS } from "@/lib/date-format";
 import { PageHeader } from "../usvc-ui";
 import { trackAnalytics } from "../analytics";
 
@@ -21,12 +22,6 @@ const MILESTONES = [
   "Order Processing",
   "Order Processed - Submitted to the Govt Agency",
 ];
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-  }).format(new Date(value));
-}
 
 export default function TrackOrder() {
   const [result, setResult] = useState<TrackingResult | null>(null);
@@ -97,7 +92,7 @@ export default function TrackOrder() {
                 <p className="track-current-status">
                   <strong>Current Status: {result.currentStatus}</strong>
                 </p>
-                <p className="track-updated">Last updated: {formatDate(result.lastUpdatedAt)}</p>
+                <p className="track-updated">Last updated: {formatDateUS(result.lastUpdatedAt)}</p>
                 {result.timeline.length ? (
                   <ol className="tracking-timeline" aria-label="Order progress">
                     {MILESTONES.map((label) => {
@@ -111,7 +106,7 @@ export default function TrackOrder() {
                           aria-current={current ? "step" : undefined}
                         >
                           <strong>{label}</strong>
-                          {milestone ? <span>{formatDate(milestone.occurredAt)}</span> : null}
+                          {milestone ? <span>{formatDateUS(milestone.occurredAt)}</span> : null}
                         </li>
                       );
                     })}

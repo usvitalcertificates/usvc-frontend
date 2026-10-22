@@ -1,6 +1,7 @@
 "use client";
 import { FileText, CalendarDays, ShieldCheck, ArrowRight } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
+import { formatDateUS } from "@/lib/date-format";
 import { recoveryJson, recoveryDraft, type RecoveryApplication } from "@/lib/recovery-client";
 import { OrderForm } from "@/app/state/[state]/[certificate]/order-form";
 export default function ResumePage() {
@@ -244,12 +245,7 @@ export default function ResumePage() {
                         certificate
                       </p>
                       <span className="recovery-order-date">
-                        <CalendarDays aria-hidden /> Created{" "}
-                        {new Date(order.createdAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
+                        <CalendarDays aria-hidden /> Created {formatDateUS(order.createdAt)}
                       </span>
                     </div>
                     <div className="recovery-order-payment">
