@@ -4,7 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SeoJsonLd } from "@/app/seo-json-ld";
-import { assertSeoLength, CERTIFICATE_DETAILS, SITE_URL, socialMetadata } from "@/lib/seo";
+import {
+  assertSeoLength,
+  BIRTH_GUIDE_SOURCES,
+  CERTIFICATE_DETAILS,
+  SITE_URL,
+  socialMetadata,
+} from "@/lib/seo";
 import { isStateUnsupported, STATE_UNAVAILABLE_MESSAGE } from "@/lib/state-availability";
 import { STATES } from "@/lib/states";
 import { PageHeader } from "../../usvc-ui";
@@ -202,6 +208,14 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
               </article>
             ))}
           </div>
+
+          {BIRTH_GUIDE_SOURCES[state] ? (
+            <nav className="state-help" aria-label={`${name} certificate guides`}>
+              <Link className="howto-link" href={`/guides/${state}/birth-certificate`}>
+                {name} birth certificate guide
+              </Link>
+            </nav>
+          ) : null}
 
           <div className="state-benefits">
             <ul className="assurance-list">

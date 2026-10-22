@@ -132,6 +132,7 @@ export default function Home() {
           priority
           fetchPriority="high"
           sizes="100vw"
+          quality={60}
         />
         <div className="hero-overlay" aria-hidden="true" />
         <div className="container hero-stack">
