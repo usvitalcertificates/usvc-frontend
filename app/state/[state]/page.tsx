@@ -181,13 +181,14 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                   {name} {cert.name}
                 </h2>
                 <div className="patriotic-rule" aria-hidden="true" />
-                <p className="fee-line">
-                  Online Processing Fee $149.00 for the first certificate and $70.00 for each
-                  additional certificate
+                <p className="certificate-support-intro">
+                  Request your official {name} {cert.name} in less than 10 minutes.
                 </p>
-                <p className="fee-note">
-                  Agency fees are charged separately upon review and acceptance by the State Agency.
-                </p>
+                <ul className="certificate-support-points">
+                  <li>Full-Service Support from Start to Finish</li>
+                  <li>100% Protected and Secure</li>
+                  <li>Track Your Order Online</li>
+                </ul>
                 {unavailable ? (
                   <button
                     type="button"
