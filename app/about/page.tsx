@@ -162,7 +162,7 @@ export default function AboutPage() {
                 Email:{" "}
                 <a href="mailto:support@usvitalcertificates.org">support@usvitalcertificates.org</a>
                 <br />
-                Phone: <a href="tel:+12015349279">(201) 534-9279</a>
+                Phone: (201) 534-9279
               </p>
               <p>
                 For help with an existing order, use{" "}
