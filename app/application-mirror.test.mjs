@@ -184,3 +184,21 @@ test("US entry validates leap years and impossible dates without timezone shifts
   ])
     assert.equal(parseDateUS(invalid), null);
 });
+
+test("maiden-name labels and order match public configuration and Flow", () => {
+  for (const type of ["BIRTH", "MARRIAGE", "DIVORCE"]) {
+    const sections = applicationSections(order(type));
+    for (const group of sections.flatMap((s) => s.groups)) {
+      const fields = group.fields;
+      for (const [index, field] of fields.entries()) {
+        if (/subjectMaidenLastName|(?:^|\.)maidenLastName$|spouseMaidenLastName/.test(field.path)) {
+          assert.equal(field.label, "Maiden Name of Subject");
+          assert.equal(fields[index - 1].label, "Current Last Name of Subject");
+        }
+        if (field.path === "family.motherLastName") {
+          assert.equal(field.label, "Maiden Name of Mother");
+        }
+      }
+    }
+  }
+});

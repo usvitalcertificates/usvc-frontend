@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { staffJson, staffLogout } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
+import { useConfirmation } from "@/components/staff/useConfirmation";
 import { PageBand } from "@/components/staff/ui";
 
 export default function StaffSettings() {
@@ -18,6 +19,9 @@ export default function StaffSettings() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
+  const confirmation = useConfirmation(
+    JSON.stringify([role, email, currentPassword, newPassword, confirmPassword]),
+  );
   useEffect(() => {
     try {
       const token = sessionStorage.getItem("usvc-staff-access");
@@ -35,9 +39,9 @@ export default function StaffSettings() {
   const mismatch = newPassword !== "" && confirmPassword !== "" && newPassword !== confirmPassword;
   const tooShort = newPassword !== "" && newPassword.length < 8;
 
-  const changePassword = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (mismatch || tooShort) return;
+  const changePassword = async () => {
+    if (!isAdmin || mismatch || tooShort || !currentPassword || !newPassword || !confirmPassword)
+      return false;
     setSaving(true);
     setError("");
     try {
@@ -50,6 +54,7 @@ export default function StaffSettings() {
       window.setTimeout(() => router.replace("/auth"), 1200);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Password change failed");
+      throw e;
     } finally {
       setSaving(false);
     }
@@ -126,7 +131,19 @@ export default function StaffSettings() {
                 {error}
               </p>
             ) : null}
-            <form onSubmit={changePassword} style={{ marginTop: 0, maxWidth: "420px" }}>
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (mismatch || tooShort || !event.currentTarget.reportValidity()) return;
+                confirmation.request({
+                  title: "Change your password?",
+                  body: `Change the password for ${email}? All sessions, including this one, will be signed out.`,
+                  confirmLabel: "Change password",
+                  run: changePassword,
+                });
+              }}
+              style={{ marginTop: 0, maxWidth: "420px" }}
+            >
               <label>
                 Current password
                 <input
@@ -179,6 +196,7 @@ export default function StaffSettings() {
           </div>
         </div>
       ) : null}
+      {confirmation.dialog}
     </>
   );
 }

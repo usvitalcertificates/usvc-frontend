@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { KeyRound, LockKeyhole, LogOut, Plus, Power, RotateCcw } from "lucide-react";
 import { staffId, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
+import { useConfirmation } from "@/components/staff/useConfirmation";
 import { BackLink, ConfirmModal, PageBand, StatCard, Toast } from "@/components/staff/ui";
 
 interface StaffMember {
@@ -38,13 +39,9 @@ export default function StaffAdmin() {
   const [inviteRole, setInviteRole] = useState("FULFILLMENT");
   const [inviteLink, setInviteLink] = useState("");
   const [inviteEmailed, setInviteEmailed] = useState(false);
-  const [confirm, setConfirm] = useState<{
-    title: string;
-    body: string;
-    confirmLabel: string;
-    danger?: boolean;
-    run: () => Promise<void>;
-  } | null>(null);
+  const confirmation = useConfirmation(JSON.stringify([staff, isAdmin, currentStaffId]));
+  const inviteForm = useRef<HTMLFormElement>(null);
+  const [inviteBusy, setInviteBusy] = useState(false);
 
   const loadRoster = useCallback(async () => {
     setError("");
@@ -62,8 +59,9 @@ export default function StaffAdmin() {
     void loadRoster();
   }, [loadRoster]);
 
-  const invite = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const invite = async () => {
+    if (!isAdmin || !inviteForm.current?.reportValidity()) return false;
+    setInviteBusy(true);
     setError("");
     setInviteLink("");
     setInviteEmailed(false);
@@ -89,6 +87,9 @@ export default function StaffAdmin() {
       await loadRoster();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Invitation failed");
+      throw e;
+    } finally {
+      setInviteBusy(false);
     }
   };
 
@@ -110,6 +111,7 @@ export default function StaffAdmin() {
       await loadRoster();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Re-send failed");
+      throw e;
     }
   };
 
@@ -119,7 +121,6 @@ export default function StaffAdmin() {
     label: string,
   ) => {
     const run = async () => {
-      setConfirm(null);
       setError("");
       try {
         if (action === "disable" || action === "enable") {
@@ -134,6 +135,7 @@ export default function StaffAdmin() {
         await loadRoster();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Action failed");
+        throw e;
       }
     };
     const titles: Record<typeof action, string> = {
@@ -142,10 +144,15 @@ export default function StaffAdmin() {
       disable: "Deactivate account?",
       enable: "Reactivate account?",
     };
-    setConfirm({
+    confirmation.request({
       title: titles[action],
-      body: `${label}?`,
-      confirmLabel: action === "disable" ? "Deactivate" : "Confirm",
+      body: `${staff.find((member) => member.id === id)?.email ?? "Selected account"}: ${label}.`,
+      confirmLabel: {
+        revoke: "Revoke sessions",
+        "mfa-reset": "Reset 2-step",
+        disable: "Deactivate account",
+        enable: "Reactivate account",
+      }[action],
       danger: action === "disable",
       run,
     });
@@ -153,7 +160,6 @@ export default function StaffAdmin() {
 
   const resetPassword = async (id: string, email: string) => {
     const run = async () => {
-      setConfirm(null);
       setError("");
       setInviteLink("");
       setInviteEmailed(false);
@@ -172,9 +178,10 @@ export default function StaffAdmin() {
         await loadRoster();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Password reset failed");
+        throw e;
       }
     };
-    setConfirm({
+    confirmation.request({
       title: "Reset password?",
       body: `Issue ${email} a fresh 48-hour setup link? Their current password keeps working until they set a new one.`,
       confirmLabel: "Reset Password",
@@ -184,7 +191,6 @@ export default function StaffAdmin() {
 
   const changeRole = async (id: string, email: string, role: string) => {
     const run = async () => {
-      setConfirm(null);
       setError("");
       try {
         await staffJson(`/admin/staff/${id}`, {
@@ -195,9 +201,10 @@ export default function StaffAdmin() {
         await loadRoster();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Role change failed");
+        throw e;
       }
     };
-    setConfirm({
+    confirmation.request({
       title: "Change role?",
       body: `Change ${email} to role ${role}? They will be signed out.`,
       confirmLabel: "Change Role",
@@ -329,7 +336,14 @@ export default function StaffAdmin() {
                               className="staff-icon-btn"
                               aria-label={`Re-send invitation to ${member.email}`}
                               title="Re-send invitation"
-                              onClick={() => void resend(member.id, member.email)}
+                              onClick={() =>
+                                confirmation.request({
+                                  title: "Re-send staff invitation?",
+                                  body: `Send ${member.email} a new 48-hour setup link? Their previous invitation link will be replaced.`,
+                                  confirmLabel: "Re-send invitation",
+                                  run: () => resend(member.id, member.email),
+                                })
+                              }
                             >
                               <RotateCcw aria-hidden />
                             </button>
@@ -411,19 +425,21 @@ export default function StaffAdmin() {
       <p className="staff-results-count">Showing {staff.length} staff accounts.</p>
 
       {inviteOpen ? (
-        <div className="staff-modal-backdrop" onClick={() => setInviteOpen(false)}>
-          <div
-            className="staff-modal"
-            role="dialog"
-            aria-label="Invite staff member"
-            onClick={(e) => e.stopPropagation()}
+        <ConfirmModal
+          title="Invite staff member"
+          body="Review the name, work email and role before sending. They set their own password and pair their own authenticator."
+          confirmLabel="Send invitation"
+          busy={inviteBusy}
+          scope={JSON.stringify([isAdmin, currentStaffId])}
+          onCancel={() => setInviteOpen(false)}
+          onConfirm={invite}
+        >
+          <form
+            ref={inviteForm}
+            onSubmit={(event) => event.preventDefault()}
+            style={{ marginTop: 0, maxWidth: "none" }}
           >
-            <h2>Invite staff member</h2>
-            <p style={{ color: "var(--muted-text)" }}>
-              They set their own password and pair their own authenticator. Credentials are never
-              shared.
-            </p>
-            <form onSubmit={invite} style={{ marginTop: 0, maxWidth: "none" }}>
+            <fieldset disabled={inviteBusy} style={{ border: 0, padding: 0 }}>
               <label>
                 Full name
                 <input
@@ -451,45 +467,24 @@ export default function StaffAdmin() {
                   ))}
                 </select>
               </label>
-              <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
-                <button type="submit" className="staff-btn">
-                  Send invitation
-                </button>
-                <button
-                  type="button"
-                  className="staff-btn secondary"
-                  onClick={() => setInviteOpen(false)}
-                >
-                  Close
-                </button>
-              </div>
-            </form>
-            {inviteEmailed ? (
-              <p role="status" className="staff-alert success">
-                Invitation emailed — valid 48h.
-              </p>
-            ) : null}
-            {inviteLink ? (
-              <p>
-                Email is disabled in this environment. Share this setup link securely (valid 48h):
-                <br />
-                <code style={{ wordBreak: "break-all" }}>{inviteLink}</code>
-              </p>
-            ) : null}
-          </div>
-        </div>
+            </fieldset>
+          </form>
+        </ConfirmModal>
+      ) : null}
+      {inviteEmailed ? (
+        <p role="status" className="staff-alert success">
+          Invitation emailed — valid 48h.
+        </p>
+      ) : null}
+      {inviteLink ? (
+        <p>
+          Email is disabled in this environment. Share this setup link securely (valid 48h):
+          <br />
+          <code style={{ wordBreak: "break-all" }}>{inviteLink}</code>
+        </p>
       ) : null}
 
-      {confirm ? (
-        <ConfirmModal
-          title={confirm.title}
-          body={confirm.body}
-          confirmLabel={confirm.confirmLabel}
-          danger={confirm.danger}
-          onCancel={() => setConfirm(null)}
-          onConfirm={() => void confirm.run()}
-        />
-      ) : null}
+      {confirmation.dialog}
     </>
   );
 }

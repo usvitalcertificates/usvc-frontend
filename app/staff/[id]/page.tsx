@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, CheckCircle2, FileText, Flag, Play, Send, UploadCloud } from "lucide-react";
 import { ApplicationSections } from "@/components/staff/ApplicationSections";
 import { APPLICATION_LABELS } from "@/lib/form-config";
+import { useConfirmation } from "@/components/staff/useConfirmation";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffData, staffFetch, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
@@ -369,7 +370,6 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [substatus, setSubstatus] = useState("");
   const [moveTo, setMoveTo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [toCsOpen, setToCsOpen] = useState(false);
   const [docDeleteOpen, setDocDeleteOpen] = useState(false);
   const [docBusy, setDocBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -391,6 +391,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     setCanSeePricing(role === "ADMIN" || role === "CS");
     setCanCorrect(role === "ADMIN" || role === "CS");
   }, []);
+
+  const orderScope = JSON.stringify([id, order, isAdmin]);
+  const confirmation = useConfirmation(JSON.stringify([orderScope, moveTo, statusNote, substatus]));
 
   const load = useCallback(async () => {
     setError("");
@@ -434,7 +437,6 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   };
 
   const releaseOrder = async () => {
-    setReleaseOpen(false);
     setBusy(true);
     setError("");
     try {
@@ -442,36 +444,14 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       router.replace("/staff");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not release this order");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const confirmToCs = async () => {
-    setBusy(true);
-    setError("");
-    try {
-      await staffJson(`/orders/${id}/status`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          status: "TO_CS",
-          note: statusNote.trim(),
-          ...(substatus ? { substatus } : {}),
-        }),
-      });
-      setToCsOpen(false);
-      setSubstatus("");
-      router.replace("/staff");
-    } catch (e) {
-      setToCsOpen(false);
-      setError(e instanceof Error ? e.message : "Could not send to CS");
+      throw e;
     } finally {
       setBusy(false);
     }
   };
 
   const reopenOrder = async () => {
-    if (!reopenReason.trim()) return;
+    if (!reopenReason.trim()) return false;
     setReopenBusy(true);
     setError("");
     try {
@@ -485,6 +465,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not reopen this order");
+      throw e;
     } finally {
       setReopenBusy(false);
     }
@@ -508,6 +489,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
+      throw e;
     } finally {
       setDocBusy(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -543,7 +525,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   };
 
   const deleteDocument = async () => {
-    setDocDeleteOpen(false);
+    setDocBusy(true);
     setError("");
     try {
       await staffJson(`/orders/${id}/document`, { method: "DELETE", body: "{}" });
@@ -551,6 +533,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Delete failed");
+      throw e;
+    } finally {
+      setDocBusy(false);
     }
   };
 
@@ -809,19 +794,86 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                             ((order.notes ?? []).length === 0 || !order.document))
                         }
                         onClick={() => {
-                          if (exceptionMove) {
-                            setToCsOpen(true);
-                            return;
-                          }
-                          void postAction(
-                            `/orders/${id}/status`,
-                            {
-                              status: effectiveMoveTo,
-                              ...(gtgMove && statusNote.trim() ? { note: statusNote.trim() } : {}),
+                          const target = effectiveMoveTo;
+                          const payload = {
+                            status: target,
+                            ...(exceptionMove || (gtgMove && statusNote.trim())
+                              ? { note: statusNote.trim() }
+                              : {}),
+                            ...(exceptionMove && substatus ? { substatus } : {}),
+                          };
+                          confirmation.request({
+                            title:
+                              target === "SUBMITTED"
+                                ? "Confirm submission to Government Agency"
+                                : `Confirm: ${STATUS_LABELS[target] ?? target}`,
+                            body: (
+                              <>
+                                <p>
+                                  Order <strong>{order.publicNumber}</strong>:{" "}
+                                  {STATUS_LABELS[order.status] ?? order.status} →{" "}
+                                  {STATUS_LABELS[target] ?? target}.
+                                </p>
+                                {target === "SUBMITTED" ? (
+                                  <p>
+                                    Confirm that this order has been submitted to the government
+                                    agency. This records the submitted status, updates customer
+                                    tracking and may notify the customer. It does not file the
+                                    application with the agency.
+                                  </p>
+                                ) : exceptionMove ? (
+                                  <p>This sends the order to CS and drops your ownership.</p>
+                                ) : gtgMove ? (
+                                  <p>
+                                    This returns the order to fulfillment and drops your ownership.
+                                  </p>
+                                ) : (
+                                  <p>
+                                    This changes the order's workflow status and customer tracking.
+                                  </p>
+                                )}
+                                {payload.note ? (
+                                  <p style={{ whiteSpace: "pre-wrap" }}>Note: {payload.note}</p>
+                                ) : null}
+                                {exceptionMove && substatus ? <p>Substatus: {substatus}</p> : null}
+                              </>
+                            ),
+                            confirmLabel:
+                              target === "SUBMITTED"
+                                ? "Mark as submitted"
+                                : exceptionMove
+                                  ? "Send To CS"
+                                  : gtgMove
+                                    ? "Mark GTG"
+                                    : "Change status",
+                            danger: target === "SUBMITTED" || exceptionMove,
+                            run: async () => {
+                              if (
+                                !next.includes(target) ||
+                                (exceptionMove && !payload.note) ||
+                                (submitNeedsPackage &&
+                                  (!(order.notes ?? []).length || !order.document))
+                              )
+                                throw new Error(
+                                  "The requirements for this status change are no longer met. Cancel and review the order.",
+                                );
+                              setBusy(true);
+                              try {
+                                await staffJson(`/orders/${id}/status`, {
+                                  method: "PATCH",
+                                  body: JSON.stringify(payload),
+                                });
+                                setStatusNote("");
+                                setSubstatus("");
+                                setMoveTo(null);
+                                setToast("The order status has been changed for this order.");
+                                if (exceptionMove || gtgMove) router.replace("/staff");
+                                else await load();
+                              } finally {
+                                setBusy(false);
+                              }
                             },
-                            "PATCH",
-                            "The order status has been changed for this order.",
-                          );
+                          });
                         }}
                       >
                         {effectiveMoveTo === "SUBMITTED"
@@ -954,11 +1006,12 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   {!closed && isAdmin ? (
                     <ReassignControl
                       orderId={id}
+                      publicNumber={order.publicNumber}
+                      orderScope={orderScope}
                       onDone={(msg) => {
                         setToast(msg);
                         void load();
                       }}
-                      onError={setError}
                     />
                   ) : null}
                 </div>
@@ -1158,7 +1211,15 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     const file = e.target.files?.[0];
 
                     if (file) {
-                      void uploadDocument(file);
+                      confirmation.request({
+                        title: order.document
+                          ? "Replace completion PDF?"
+                          : "Upload completion PDF?",
+                        body: `Order ${order.publicNumber}: upload ${file.name} (${Math.ceil(file.size / 1024)} KB). ${order.document ? `This replaces ${order.document.name}.` : "This becomes the completion document for the order."}`,
+                        confirmLabel: order.document ? "Replace PDF" : "Upload PDF",
+                        danger: Boolean(order.document),
+                        run: () => uploadDocument(file),
+                      });
                     }
 
                     // Allow selecting the same file again
@@ -1288,197 +1349,131 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       ) : null}
 
       {reopenOpen && order ? (
-        <div
-          className="staff-modal-backdrop"
-          onClick={() => {
-            if (!reopenBusy) setReopenOpen(false);
-          }}
+        <ConfirmModal
+          title="Reopen order"
+          body={`Order ${order.publicNumber}: restore to ${STATUS_LABELS[reopenTo] ?? reopenTo}. This rolls back customer tracking and records the reason in the audit trail.`}
+          confirmLabel="Restore status"
+          scope={orderScope}
+          busy={reopenBusy}
+          confirmDisabled={!reopenReason.trim()}
+          onCancel={() => setReopenOpen(false)}
+          onConfirm={reopenOrder}
         >
-          <div
-            className="staff-modal"
-            role="dialog"
-            aria-label="Reopen order"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2>Reopen this order?</h2>
-            <p style={{ color: "var(--muted-text)" }}>
-              Restores the order to an earlier step and rolls back the customer-visible timeline.
-              This correction is recorded in the audit trail under your name.
-            </p>
-            <label>
-              Restore to
-              <select
-                value={reopenTo}
-                onChange={(e) => setReopenTo(e.target.value as "PAID" | "IN_REVIEW")}
-              >
-                {reopenTargets.map((s) => (
-                  <option key={s} value={s}>
-                    {STATUS_LABELS[s] ?? s}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Reason (required, recorded in the audit trail)
-              <textarea
-                value={reopenReason}
-                onChange={(e) => setReopenReason(e.target.value)}
-                rows={3}
-                maxLength={500}
-                placeholder="Accidentally clicked Submit to Govt Agency"
-                style={{ width: "100%", resize: "vertical" }}
-              />
-            </label>
-            <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
-              <button
-                type="button"
-                className="staff-btn"
-                disabled={reopenBusy || !reopenReason.trim()}
-                onClick={() => void reopenOrder()}
-              >
-                {reopenBusy ? "Restoring…" : "Restore status"}
-              </button>
-              <button
-                type="button"
-                className="staff-btn secondary"
-                disabled={reopenBusy}
-                onClick={() => setReopenOpen(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {toCsOpen && order ? (
-        <div className="staff-modal-backdrop" onClick={() => setToCsOpen(false)}>
-          <div
-            className="staff-modal"
-            role="dialog"
-            aria-label="Confirm send To CS"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2>Send To CS?</h2>
-            <p style={{ color: "var(--muted-text)" }}>
-              This will send order to CS for review and your ownership will drop automatically.
-            </p>
-            <p
-              role="note"
-              style={{
-                background: "#fef2f2",
-                border: "1px solid #fecaca",
-                borderRadius: "8px",
-                padding: "10px 12px",
-                fontSize: "0.9rem",
-                whiteSpace: "pre-wrap",
-                maxHeight: "180px",
-                overflowY: "auto",
-              }}
+          <label>
+            Restore to
+            <select
+              disabled={reopenBusy}
+              value={reopenTo}
+              onChange={(e) => setReopenTo(e.target.value as "PAID" | "IN_REVIEW")}
             >
-              <strong style={{ color: "#b91c1c" }}>Note to CS: </strong>
-              <span style={{ display: "block", marginTop: "4px" }}>{statusNote.trim()}</span>
-              {substatus ? (
-                <span style={{ display: "block", marginTop: "8px", color: "#7f1d1d" }}>
-                  Substatus: <strong>{substatus}</strong>
-                </span>
-              ) : null}
-            </p>
-            <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
-              <button
-                type="button"
-                className="staff-btn"
-                disabled={busy}
-                onClick={() => void confirmToCs()}
-              >
-                {busy ? "Sending…" : "Send To CS"}
-              </button>
-              <button
-                type="button"
-                className="staff-btn secondary"
-                onClick={() => setToCsOpen(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+              {reopenTargets.map((s) => (
+                <option key={s} value={s}>
+                  {STATUS_LABELS[s] ?? s}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Reason (required, recorded in the audit trail)
+            <textarea
+              value={reopenReason}
+              onChange={(e) => setReopenReason(e.target.value)}
+              disabled={reopenBusy}
+              rows={3}
+              maxLength={500}
+              placeholder="Accidentally clicked Submit to Govt Agency"
+              style={{ width: "100%", resize: "vertical" }}
+            />
+          </label>
+        </ConfirmModal>
       ) : null}
 
       {docDeleteOpen && order?.document ? (
         <ConfirmModal
           title="Delete completion PDF?"
-          body={`Delete ${order.document.name}? The order cannot be submitted until a new PDF is uploaded.`}
+          scope={orderScope}
+          busy={docBusy}
+          body={`Order ${order.publicNumber}: delete ${order.document.name}? The order cannot be submitted until a new PDF is uploaded.`}
           confirmLabel="Delete"
           danger
           onCancel={() => setDocDeleteOpen(false)}
-          onConfirm={() => void deleteDocument()}
+          onConfirm={deleteDocument}
         />
       ) : null}
 
       {releaseOpen && order ? (
         <ConfirmModal
           title="Drop Ownership?"
-          body="Release this order back to the queue? You will lose ownership."
+          scope={orderScope}
+          body={`Release order ${order.publicNumber} back to the queue? You will lose ownership.`}
           confirmLabel="Drop Ownership"
           danger
           busy={busy}
           onCancel={() => setReleaseOpen(false)}
-          onConfirm={() => void releaseOrder()}
+          onConfirm={releaseOrder}
         />
       ) : null}
+      {confirmation.dialog}
     </>
   );
 }
 
 function ReassignControl({
   orderId,
+  publicNumber,
+  orderScope,
   onDone,
-  onError,
 }: {
   orderId: string;
+  publicNumber: string;
+  orderScope: string;
   onDone: (msg: string) => void;
-  onError: (msg: string) => void;
 }) {
   const [staff, setStaff] = useState<{ id: string; fullName: string; email: string }[]>([]);
-  const [busy, setBusy] = useState(false);
+  const confirmation = useConfirmation(orderScope);
   useEffect(() => {
     staffData<{ staff?: { id: string; fullName: string; email: string }[] }>("/admin/staff")
       .then(({ data }) => setStaff(data.staff ?? []))
       .catch(() => setStaff([]));
   }, []);
   return (
-    <label>
-      Reassign to
-      <select
-        defaultValue=""
-        disabled={busy}
-        onChange={async (e) => {
-          const staffId = e.target.value;
-          if (!staffId) return;
-          setBusy(true);
-          try {
-            await staffJson(`/staff/orders/${orderId}/reassign`, {
-              method: "POST",
-              body: JSON.stringify({ staffId }),
+    <>
+      <label>
+        Reassign to
+        <select
+          defaultValue=""
+          disabled={confirmation.pending}
+          onChange={(e) => {
+            const staffId = e.target.value;
+            e.target.value = "";
+            const member = staff.find((person) => person.id === staffId);
+            if (!member) return;
+            confirmation.request({
+              title: "Reassign order?",
+              body: `Reassign order ${publicNumber} to ${member.fullName || member.email}? The current owner loses ownership.`,
+              confirmLabel: "Reassign order",
+              danger: true,
+              run: async () => {
+                await staffJson(`/staff/orders/${orderId}/reassign`, {
+                  method: "POST",
+                  body: JSON.stringify({ staffId }),
+                });
+                onDone("Order reassigned.");
+              },
             });
-            onDone("Order reassigned.");
-          } catch (err) {
-            onError(err instanceof Error ? err.message : "Reassign failed");
-          } finally {
-            setBusy(false);
-          }
-        }}
-      >
-        <option value="">Select agent…</option>
-        {staff
-          .filter((m) => m.email)
-          .map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.fullName || m.email}
-            </option>
-          ))}
-      </select>
-    </label>
+          }}
+        >
+          <option value="">Select agent…</option>
+          {staff
+            .filter((m) => m.email)
+            .map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.fullName || m.email}
+              </option>
+            ))}
+        </select>
+      </label>
+      {confirmation.dialog}
+    </>
   );
 }

@@ -776,8 +776,7 @@ export function OrderForm({
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const formRef = useRef<HTMLFormElement>(null);
-  /** Temporarily blocked county, derived from the live selection (selectable,
-   *  but blocks payment). Null when the selection is usable. */
+  /** Includes restored unavailable selections, which must remain blocked. */
   const blockedCounty = (() => {
     const county = values.county ?? draft.county ?? "";
     return county && isCountyTemporarilyUnavailable(abbr, county) ? county : null;
@@ -1009,9 +1008,9 @@ export function OrderForm({
     const formData = new FormData(form);
     const get = (key: string) => String(formData.get(key) ?? "").trim();
     if (blockedCounty) {
-      setError(
-        `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority.`,
-      );
+      const message = `Certificate issuance is currently unavailable through ${blockedCounty} ${noun} authority.`;
+      setError(message);
+      setFieldErrors((current) => ({ ...current, county: message }));
       document
         .getElementById("application-section-certificate")
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
