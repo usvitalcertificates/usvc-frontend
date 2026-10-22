@@ -2,6 +2,10 @@
 
 Updated: 2026-10-22. This is the implementation checklist for the October 21 audit and its Search Console follow-up. `Merged` describes Git status, not proof of production rollout. Only a live deployment check closes a live-site issue.
 
+## Price disclosure policy — October 22
+
+Exact USVC prices are now limited to the order form. The 52 state-hub cost FAQs and all 10 birth-certificate guides direct readers to the form for current pricing, while retaining the non-numeric explanation that agency and shipping fees are separate. No price amounts appear in public marketing copy, metadata, or FAQ structured data. A regression test verifies that $149/$70/$79 do not return to public copy and that the shared order form still displays the approved prices. No sitemap or URL changes.
+
 ## Guide redesign + California content — October 22
 
 All ten birth-certificate guides now share the FAQ/contact reading surface: Times typography, navy headings, muted body copy, light summary panel, bordered facts, and red inline text links. The former official-resource red button is now a text link; the only red buttons are the two “Start Your [State] Request” calls to action. California receives expanded generic content covering authorized vs. informational copies, eligibility, state vs. county filing, preparation, the request sequence, common situations, ten FAQs, and official-source citations. No state fees, processing times, or notarization requirements were published. The other nine guides keep their existing approved prose in the new layout. Article, BreadcrumbList and FAQPage schema were updated, the guide last-modified date is 2026-10-22, and the generated llms.txt description now reflects the practical guide format. No new URLs; sitemap target remains 268 pages and 10 guides. Formatting, lint, TypeScript, 14/14 unit tests, production build and `npm run test:seo` pass. Branch `feat/ca-birth-guide`; no PR, merge or deployment.

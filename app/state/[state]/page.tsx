@@ -97,7 +97,7 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
     },
     {
       q: `How much does a ${name} request cost through USVC?`,
-      a: "Our online processing fee is $149.00 for the first certificate and $70.00 for each additional certificate. Agency fees are charged separately upon review and acceptance by the state agency and will appear separately.",
+      a: "The order form shows the current USVC online processing fee before you pay. Agency fees are charged separately upon review and acceptance by the state agency and will appear separately.",
     },
     {
       q: `Who can receive a certified ${name} record?`,
