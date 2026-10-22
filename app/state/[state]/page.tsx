@@ -209,14 +209,6 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
             ))}
           </div>
 
-          {BIRTH_GUIDE_SOURCES[state] ? (
-            <nav className="state-help" aria-label={`${name} certificate guides`}>
-              <Link className="howto-link" href={`/guides/${state}/birth-certificate`}>
-                {name} birth certificate guide
-              </Link>
-            </nav>
-          ) : null}
-
           <div className="state-benefits">
             <ul className="assurance-list">
               <li>
@@ -271,6 +263,14 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                   <p>{faq.a}</p>
                 </div>
               ))}
+
+              {BIRTH_GUIDE_SOURCES[state] ? (
+                <nav className="state-help" aria-label={`${name} certificate guides`}>
+                  <Link className="howto-link" href={`/guides/${state}/birth-certificate`}>
+                    {name} birth certificate guide
+                  </Link>
+                </nav>
+              ) : null}
             </section>
           </div>
         </div>
