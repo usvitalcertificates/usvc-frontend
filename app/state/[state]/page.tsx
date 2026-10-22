@@ -4,7 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SeoJsonLd } from "@/app/seo-json-ld";
-import { assertSeoLength, CERTIFICATE_DETAILS, SITE_URL, socialMetadata } from "@/lib/seo";
+import {
+  assertSeoLength,
+  BIRTH_GUIDE_SOURCES,
+  CERTIFICATE_DETAILS,
+  SITE_URL,
+  socialMetadata,
+} from "@/lib/seo";
 import { isStateUnsupported, STATE_UNAVAILABLE_MESSAGE } from "@/lib/state-availability";
 import { STATES } from "@/lib/states";
 import { PageHeader } from "../../usvc-ui";
@@ -101,6 +107,15 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
       q: "Do I need to visit an office in person?",
       a: "No. There is no walk-in service and no office visit needed. You order online with USVC and track the request.",
     },
+    ...(BIRTH_GUIDE_SOURCES[state]
+      ? [
+          {
+            q: `Where can I find a ${name} birth certificate guide?`,
+            a: `You can read our ${name} birth certificate guide.`,
+            href: `/guides/${state}/birth-certificate`,
+          },
+        ]
+      : []),
   ];
   const ld = {
     "@context": "https://schema.org",
@@ -175,13 +190,13 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                   {name} {cert.name}
                 </h2>
                 <div className="patriotic-rule" aria-hidden="true" />
-                <p className="fee-line">
-                  Online Processing Fee $149.00 for the first certificate and $70.00 for each
-                  additional certificate
+                <p className="certificate-support-intro">
+                  Request your official {name} {cert.name} in less than 10 minutes.
                 </p>
-                <p className="fee-note">
-                  Agency fees are charged separately upon review and acceptance by the State Agency.
-                </p>
+                <ul className="certificate-support-points">
+                  <li>Full-Service Support from Start to Finish</li>
+                  <li>100% Protected and Secure</li>
+                </ul>
                 {unavailable ? (
                   <button
                     type="button"
@@ -254,7 +269,16 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
               {faqs.map((faq) => (
                 <div key={faq.q}>
                   <h3>{faq.q}</h3>
-                  <p>{faq.a}</p>
+                  <p>
+                    {faq.href ? (
+                      <>
+                        You can read our <Link href={faq.href}>{name} birth certificate guide</Link>
+                        .
+                      </>
+                    ) : (
+                      faq.a
+                    )}
+                  </p>
                 </div>
               ))}
             </section>

@@ -7,7 +7,7 @@ export function GET() {
   const guides = Object.entries(BIRTH_GUIDE_SOURCES)
     .map(
       ([slug, guide]) =>
-        `- [${guide.state} birth-certificate guide](${SITE_URL}/guides/${slug}/birth-certificate): An introductory guide with a link to the official issuing agency.`,
+        `- [${guide.state} birth-certificate guide](${SITE_URL}/guides/${slug}/birth-certificate): A practical guide to requesting a state birth certificate, with a link to the official issuing agency.`,
     )
     .join("\n");
   const text = `# US Vital Certificates (USVC)

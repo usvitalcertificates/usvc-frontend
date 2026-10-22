@@ -126,6 +126,7 @@ try {
     !urls.some((url) => /\/state\/[^/]+\/(?:birth|death|marriage|divorce)-certificate$/.test(url)),
   );
   const imagePaths = new Set();
+  const renderedPages = new Map();
   let cursor = 0;
   await Promise.all(
     Array.from({ length: 6 }, async () => {
@@ -134,6 +135,8 @@ try {
         const response = await request(new URL(url).pathname);
         assert.equal(response.status, 200, url);
         const html = await response.text();
+        renderedPages.set(url, html);
+        assert(!/<link\b[^>]*as="font"/.test(html), `${url}: public font preload`);
         const canonical = [...html.matchAll(/<link\b[^>]*rel="canonical"[^>]*href="([^"]+)"/g)];
         assert.deepEqual(
           canonical.map((m) => decode(m[1])),
@@ -169,6 +172,73 @@ try {
         assert(!response.headers.get("x-robots-tag")?.includes("noindex"), url);
       }
     }),
+  );
+  const guideStates = urls.flatMap((url) => {
+    const match = new URL(url).pathname.match(/^\/guides\/([^/]+)\/birth-certificate$/);
+    return match ? [match[1]] : [];
+  });
+  assert.equal(guideStates.length, 10);
+  for (const url of urls.filter((url) => /^\/state\/[^/]+$/.test(new URL(url).pathname))) {
+    const state = new URL(url).pathname.split("/").at(-1);
+    const html = renderedPages.get(url);
+    const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1] || "";
+    const guideLinks = [
+      ...main.matchAll(/<a\b[^>]*href="\/guides\/[^"/]+\/birth-certificate"[^>]*>[\s\S]*?<\/a>/g),
+    ];
+    assert.equal(guideLinks.length, guideStates.includes(state) ? 1 : 0, url);
+    if (guideLinks.length) {
+      assert(guideLinks[0][0].includes(`href="/guides/${state}/birth-certificate"`), url);
+      const faqSection = [...main.matchAll(/<section\b[^>]*>([\s\S]*?)<\/section>/g)].find(
+        (match) => /<h2>[^<]* questions, answered<\/h2>/.test(match[1].replace(/<!--.*?-->/g, "")),
+      );
+      assert(faqSection?.[1].includes(guideLinks[0][0]), `Guide belongs in state FAQ: ${url}`);
+      assert(faqSection[1].includes("birth certificate guide?</h3>"), url);
+      assert(faqSection[1].includes("You can read our"), url);
+    }
+  }
+
+  const graph = new Map(
+    [...renderedPages].map(([url, html]) => [
+      url,
+      [...html.matchAll(/<a\b[^>]*href="([^"]+)"/g)].map((m) => {
+        const target = new URL(decode(m[1]), url);
+        target.hash = "";
+        return target.href.replace(/\/$/, "");
+      }),
+    ]),
+  );
+  const distance = new Map([[site, 0]]);
+  const queue = [site];
+  for (let i = 0; i < queue.length; i++) {
+    const from = queue[i];
+    for (const target of graph.get(from) || []) {
+      if (graph.has(target) && !distance.has(target)) {
+        distance.set(target, distance.get(from) + 1);
+        queue.push(target);
+      }
+    }
+  }
+  assert.equal(
+    distance.size,
+    urls.length,
+    "All sitemap pages must be linked from the homepage graph",
+  );
+  assert(Math.max(...distance.values()) <= 2, "Sitemap pages must remain within two link hops");
+  const homeHtml = renderedPages.get(site);
+  assert(homeHtml.includes("q=60"), "Homepage hero must use the approved lighter quality");
+  const optimizedImages = [];
+  for (const quality of [60, 75]) {
+    const response = await request(
+      `/_next/image?url=%2Fassets%2Fwhite-house-hero.webp&w=750&q=${quality}`,
+      { headers: { Accept: "image/webp" } },
+    );
+    assert.equal(response.status, 200, `Hero quality ${quality}`);
+    assert.match(response.headers.get("content-type"), /image\/webp/);
+    optimizedImages.push(Buffer.from(await response.arrayBuffer()).length);
+  }
+  assert(optimizedImages[0] < optimizedImages[1], "Hero quality 60 must reduce transfer bytes");
+  console.log(
+    `Guide links/reachability verified; hero WebP bytes: quality 75 ${optimizedImages[1]}, quality 60 ${optimizedImages[0]}.`,
   );
   for (const image of imagePaths) {
     const response = await request(image);

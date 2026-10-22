@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
+import { FaqAccordion } from "@/app/faq/faq-accordion";
+import { faqAnswerToPlainText } from "@/app/faq/faq-data";
 import { SeoJsonLd } from "@/app/seo-json-ld";
 import { PageHeader } from "@/app/usvc-ui";
 import {
@@ -10,8 +14,7 @@ import {
   SITE_URL,
   socialMetadata,
 } from "@/lib/seo";
-
-const CHECKED = "September 30, 2026";
+import { getBirthGuideContent } from "./guide-content";
 
 /** Prerender the 10 pilot guides (P0 SEO) so they are static HTML,
  *  not dependent on sitemap-only discovery. */
@@ -27,11 +30,9 @@ export async function generateMetadata({
   const { state } = await params;
   const guide = BIRTH_GUIDE_SOURCES[state];
   if (!guide) return {};
-  const title = assertSeoLength("title", `How to Get a ${guide.state} Birth Certificate`);
-  const description = assertSeoLength(
-    "description",
-    `Official guidance plus USVC help for a ${guide.state} birth certificate request. Eligibility, fees, steps.`,
-  );
+  const content = getBirthGuideContent(state, guide.state, guide.url);
+  const title = assertSeoLength("title", content.metaTitle);
+  const description = assertSeoLength("description", content.metaDescription);
   return {
     title,
     description,
@@ -45,6 +46,43 @@ export async function generateMetadata({
   };
 }
 
+const LINK_RE = /\[([^\]]+)\]\(([^)]+)\)/g;
+
+function GuideLink({ href, children }: { href: string; children: ReactNode }) {
+  if (href.startsWith("/")) {
+    return (
+      <Link className="guide-link" href={href}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <a className="guide-link" href={href} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
+  );
+}
+
+function renderInline(text: string, keyPrefix: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  const re = new RegExp(LINK_RE);
+  while ((match = re.exec(text)) !== null) {
+    if (match.index > lastIndex) nodes.push(text.slice(lastIndex, match.index));
+    const label = match[1] ?? "";
+    const href = match[2] ?? "#";
+    nodes.push(
+      <GuideLink key={`${keyPrefix}-l${match.index}`} href={href}>
+        {label}
+      </GuideLink>,
+    );
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) nodes.push(text.slice(lastIndex));
+  return nodes;
+}
+
 export default async function BirthCertificateGuide({
   params,
 }: {
@@ -53,36 +91,28 @@ export default async function BirthCertificateGuide({
   const { state } = await params;
   const guide = BIRTH_GUIDE_SOURCES[state];
   if (!guide) notFound();
+  const content = getBirthGuideContent(state, guide.state, guide.url);
   const url = `${SITE_URL}/guides/${state}/birth-certificate`;
   const orderUrl = `/state/${state}/order/birth-certificate`;
-  const faqs = [
-    {
-      q: `Where do I find the official ${guide.state} birth-certificate requirements?`,
-      a: `On the issuing agency page linked above — it is the source of truth for current request options, required documentation, eligibility, fees, and processing information, all of which can change.`,
-    },
-    {
-      q: "What information should I have ready before I start?",
-      a: "Typically the subject's full name at birth, date and place of birth, and parents' names, plus your contact details and a deliverable shipping address. The agency page lists the exact documents it requires.",
-    },
-    {
-      q: "How long does a request take?",
-      a: "Our guided USVC form takes most people about 10 minutes. Agency processing and delivery times vary by state — confirm current times on the official agency page before you plan around a deadline.",
-    },
-    {
-      q: "Can USVC file the request for me?",
-      a: "Yes. USVC provides a guided online request flow, reviews your submitted information for completeness, files it with the agency, and helps you track the request process. We are an independent assistance service, not a government agency.",
-    },
-  ];
   const ld = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "Article",
-        headline: `How to Get a ${guide.state} Birth Certificate`,
+        headline: content.metaTitle,
+        description: content.metaDescription,
         mainEntityOfPage: url,
         dateModified: SITEMAP_GUIDES_LAST_MODIFIED,
-        author: { "@type": "Organization", name: "US Vital Certificates" },
-        about: { "@type": "Thing", name: `${guide.state} birth certificates` },
+        inLanguage: "en-US",
+        author: { "@type": "Organization", name: "US Vital Certificates", url: SITE_URL },
+        publisher: {
+          "@type": "Organization",
+          name: "US Vital Certificates",
+          url: SITE_URL,
+          logo: { "@type": "ImageObject", url: `${SITE_URL}/assets/usvc-logo.webp` },
+        },
+        about: { "@type": "Thing", name: `${content.stateName} birth certificates` },
+        citation: content.sources.map((source) => source.href),
       },
       {
         "@type": "BreadcrumbList",
@@ -91,17 +121,23 @@ export default async function BirthCertificateGuide({
           {
             "@type": "ListItem",
             position: 2,
-            name: `${guide.state} birth certificate guide`,
+            name: `${content.stateName} vital records`,
+            item: `${SITE_URL}/state/${state}`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: `${content.stateName} birth certificate guide`,
             item: url,
           },
         ],
       },
       {
         "@type": "FAQPage",
-        mainEntity: faqs.map((faq) => ({
+        mainEntity: content.faqs.map((faq) => ({
           "@type": "Question",
-          name: faq.q,
-          acceptedAnswer: { "@type": "Answer", text: faq.a },
+          name: faq.question,
+          acceptedAnswer: { "@type": "Answer", text: faqAnswerToPlainText(faq.answer) },
         })),
       },
     ],
@@ -113,105 +149,132 @@ export default async function BirthCertificateGuide({
         <ol>
           <li>
             <Link href="/">Home</Link>
+            <ChevronRight aria-hidden="true" />
           </li>
           <li>
-            <span aria-current="page">{guide.state} birth certificate guide</span>
+            <Link href={`/state/${state}`}>{content.stateName} vital records</Link>
+            <ChevronRight aria-hidden="true" />
+          </li>
+          <li>
+            <span aria-current="page">{content.stateName} birth certificate guide</span>
           </li>
         </ol>
       </nav>
       <PageHeader
         eyebrow="Official-resource guide"
-        title={`How to Get a ${guide.state} Birth Certificate`}
-        subtitle={`A starting point for understanding a ${guide.state} birth-certificate request and the official agency resource.`}
+        title={`How to Get a ${content.stateName} Birth Certificate`}
+        subtitle={content.subtitle}
       />
       <section className="page-section">
-        <div className="container legal-body">
-          <p>
-            A {guide.state} birth certificate is issued under the rules of the {guide.state} issuing
-            agency — so the record you need is held where the birth happened, not necessarily where
-            you live now. This guide explains how to check the current official requirements and how
-            USVC can help you submit a complete request.
-          </p>
-          <h2>Start with the official {guide.state} resource</h2>
-          <p>
-            The official issuing-agency page explains its current request options, required
-            documentation, eligibility, fees, and processing information. Those details can change
-            without notice, so the agency page — not this guide — is the source of truth. Open it
-            first and confirm which request path fits your situation before you gather documents or
-            pay anything.
-          </p>
-          <p>
-            <a
-              className="button button-secondary"
-              href={guide.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Visit the official {guide.state} birth-records resource
-            </a>
-          </p>
-          <h2>How a {guide.state} request usually works</h2>
-          <p>
-            Most states follow the same broad pattern. First, confirm on the agency page whether you
-            are eligible to receive the record — eligibility is set by the issuing agency and is
-            often limited to the person named on the record or specific qualifying relatives and
-            representatives. Second, gather the information the agency asks for: the subject&apos;s
-            full name at birth, date and place of birth, and parents&apos; names, plus your own
-            contact details and a deliverable shipping address. Third, submit the request through
-            the channel the agency currently supports and keep your confirmation so you can track
-            it.
-          </p>
-          <h2>What to have ready before you start</h2>
-          <p>
-            Having these details on hand makes the guided flow take most people about 10 minutes:
-            the subject&apos;s full name at birth, date of birth, city or county of birth, and
-            parents&apos; names; your relationship to the subject; and a shipping address where a
-            certificate can be signed for if it ships by courier. If any detail is uncertain — a
-            spelling, an exact date, a parent&apos;s name — check the agency&apos;s instructions for
-            what it accepts before you submit, since corrections after filing can add delays.
-          </p>
-          <h2>How USVC can help</h2>
-          <p>
-            USVC is an independent document assistance service, not a government agency. We provide
-            a guided online request flow in plain language, review submitted information for
-            completeness and inconsistencies, file the request with the agency, and help you track
-            the request process. Our online processing fee is $149.00 for the first certificate and
-            $70.00 for each additional certificate; agency fees are charged separately upon review
-            and acceptance by the state agency.
-          </p>
-          <p>
+        <div className="container guide-layout">
+          <div className="guide-summary">
+            <p className="eyebrow">The short answer</p>
+            <h2>{content.stateName} birth certificate requests, simplified</h2>
+            {content.intro.map((paragraph, index) => (
+              <p key={`intro-${index}`}>{paragraph}</p>
+            ))}
+            <dl className="guide-facts">
+              {content.quickFacts.map((fact) => (
+                <div key={fact.label}>
+                  <dt>{fact.label}</dt>
+                  <dd>{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="guide-cta">
+              <div>
+                <h3>Ready to start your {content.stateName} request?</h3>
+                <p>Use the guided form and let USVC review your details before filing.</p>
+              </div>
+              <Link className="button button-primary" href={orderUrl}>
+                {content.ctaLabel}
+              </Link>
+            </div>
+            <p className="guide-cta-note">{content.ctaNote}</p>
+          </div>
+
+          {content.sections.map((section) => (
+            <section key={section.id} className="guide-section" id={section.id}>
+              <h2>{section.heading}</h2>
+              {section.paragraphs?.map((paragraph, index) => (
+                <p key={`${section.id}-p${index}`}>
+                  {renderInline(paragraph, `${section.id}-p${index}`)}
+                </p>
+              ))}
+              {section.bullets ? (
+                <ul>
+                  {section.bullets.map((bullet, index) => (
+                    <li key={`${section.id}-b${index}`}>
+                      {renderInline(bullet, `${section.id}-b${index}`)}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              {section.note ? <p className="guide-note">{section.note}</p> : null}
+              {section.links ? (
+                <ul className="guide-link-list">
+                  {section.links.map((link) => (
+                    <li key={link.href}>
+                      <GuideLink href={link.href}>{link.label}</GuideLink>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </section>
+          ))}
+
+          <section className="guide-section guide-faq-section">
+            <h2>{content.stateName} birth-certificate questions, answered</h2>
+            <FaqAccordion items={content.faqs} />
+          </section>
+
+          <div className="guide-cta guide-cta-final">
+            <div>
+              <h2>Start Your {content.stateName} Request</h2>
+              <p>
+                Finish the guided request in about 10 minutes. Agency fees and shipping are
+                separate.
+              </p>
+            </div>
             <Link className="button button-primary" href={orderUrl}>
-              Start your {guide.state} request
+              {content.ctaLabel}
             </Link>
-          </p>
-          <p>
+          </div>
+
+          <div className="guide-sources">
+            <h2>Official sources</h2>
+            <p>
+              This guide summarizes official published information. Requirements are controlled by
+              the issuing agency and may change.
+            </p>
+            <ul className="guide-link-list">
+              {content.sources.map((source) => (
+                <li key={source.href}>
+                  <GuideLink href={source.href}>{source.label}</GuideLink>
+                </li>
+              ))}
+            </ul>
+            <p className="legal-updated">Official sources checked: {content.sourceChecked}.</p>
+          </div>
+
+          <p className="guide-related">
             Prefer to compare record types first? See{" "}
-            <Link className="howto-link" href={`/state/${state}`}>
-              all {guide.state} vital-record options
+            <Link className="guide-link" href={`/state/${state}`}>
+              all {content.stateName} vital-record options
             </Link>{" "}
             or browse{" "}
-            <Link className="howto-link" href="/certificates">
+            <Link className="guide-link" href="/certificates">
               certificate types
             </Link>
+            . Questions about our service?{" "}
+            <Link className="guide-link" href="/faq">
+              Read the FAQ
+            </Link>{" "}
+            or{" "}
+            <Link className="guide-link" href="/contact">
+              contact support
+            </Link>
             .
-          </p>
-          <h2>Before you begin</h2>
-          <p>
-            Review the official agency instructions, gather the information requested by the agency,
-            and use the agency resource for current requirements or questions about your
-            eligibility. If you are ordering for someone else, confirm you qualify to receive their
-            record — agencies enforce this strictly.
-          </p>
-          <h2>{guide.state} birth-certificate questions, answered</h2>
-          {faqs.map((faq) => (
-            <div key={faq.q}>
-              <h3>{faq.q}</h3>
-              <p>{faq.a}</p>
-            </div>
-          ))}
-          <p className="legal-updated">
-            Official source checked: {CHECKED}. Requirements are controlled by the issuing agency
-            and may change.
           </p>
         </div>
       </section>
