@@ -113,8 +113,8 @@ try {
   assert.match(sitemapResponse.headers.get("content-type"), /xml/);
   const xml = await sitemapResponse.text();
   const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(([, url]) => decode(url));
-  assert.equal(urls.length, 268);
-  assert.equal(new Set(urls).size, 268);
+  assert.equal(urls.length, 271);
+  assert.equal(new Set(urls).size, 271);
   assert(urls.every((url) => new URL(url).origin === site));
   assert(
     !urls.some((url) =>
@@ -177,7 +177,7 @@ try {
     const match = new URL(url).pathname.match(/^\/guides\/([^/]+)\/birth-certificate$/);
     return match ? [match[1]] : [];
   });
-  assert.equal(guideStates.length, 10);
+  assert.equal(guideStates.length, 13);
   for (const url of urls.filter((url) => /^\/state\/[^/]+$/.test(new URL(url).pathname))) {
     const state = new URL(url).pathname.split("/").at(-1);
     const html = renderedPages.get(url);
@@ -267,9 +267,9 @@ try {
   const llms = await llmsResponse.text();
   assert(llms.startsWith("# US Vital Certificates (USVC)\n"));
   assert(llms.includes("not a government agency"));
-  assert.equal((llms.match(/\/guides\//g) || []).length, 10);
+  assert.equal((llms.match(/\/guides\//g) || []).length, 13);
   const links = [...llms.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((m) => m[1]);
-  assert(links.length > 10);
+  assert(links.length > 13);
   for (const link of links) {
     assert(
       urls.includes(link) || [site + "/sitemap.xml", site + "/robots.txt"].includes(link),

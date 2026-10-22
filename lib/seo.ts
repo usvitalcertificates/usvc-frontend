@@ -94,6 +94,18 @@ export const BIRTH_GUIDE_SOURCES: Record<string, { state: string; url: string }>
     state: "Michigan",
     url: "https://www.michigan.gov/mdhhs/doing-business/vitalrecords",
   },
+  "new-jersey": {
+    state: "New Jersey",
+    url: "https://www.nj.gov/health/vital/order-vital/non-genealogical-records",
+  },
+  virginia: {
+    state: "Virginia",
+    url: "https://www.vdh.virginia.gov/vital-records/applications-for-a-vital-record/",
+  },
+  washington: {
+    state: "Washington",
+    url: "https://doh.wa.gov/licenses-permits-and-certificates/vital-records/ordering-vital-record/birth-record",
+  },
 };
 
 export const INDEXABLE_STATES = [
