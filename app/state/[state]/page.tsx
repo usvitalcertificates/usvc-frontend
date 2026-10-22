@@ -107,6 +107,15 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
       q: "Do I need to visit an office in person?",
       a: "No. There is no walk-in service and no office visit needed. You order online with USVC and track the request.",
     },
+    ...(BIRTH_GUIDE_SOURCES[state]
+      ? [
+          {
+            q: `Where can I find a ${name} birth certificate guide?`,
+            a: `You can read our ${name} birth certificate guide.`,
+            href: `/guides/${state}/birth-certificate`,
+          },
+        ]
+      : []),
   ];
   const ld = {
     "@context": "https://schema.org",
@@ -260,17 +269,18 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
               {faqs.map((faq) => (
                 <div key={faq.q}>
                   <h3>{faq.q}</h3>
-                  <p>{faq.a}</p>
+                  <p>
+                    {faq.href ? (
+                      <>
+                        You can read our <Link href={faq.href}>{name} birth certificate guide</Link>
+                        .
+                      </>
+                    ) : (
+                      faq.a
+                    )}
+                  </p>
                 </div>
               ))}
-
-              {BIRTH_GUIDE_SOURCES[state] ? (
-                <nav className="state-help" aria-label={`${name} certificate guides`}>
-                  <Link className="howto-link" href={`/guides/${state}/birth-certificate`}>
-                    {name} birth certificate guide
-                  </Link>
-                </nav>
-              ) : null}
             </section>
           </div>
         </div>

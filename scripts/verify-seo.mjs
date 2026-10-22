@@ -182,19 +182,21 @@ try {
     const state = new URL(url).pathname.split("/").at(-1);
     const html = renderedPages.get(url);
     const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1] || "";
-    const navigation = [
-      ...main.matchAll(/<nav\b[^>]*aria-label="[^"]* certificate guides"[^>]*>([\s\S]*?)<\/nav>/g),
+    const guideLinks = [
+      ...main.matchAll(/<a\b[^>]*href="\/guides\/[^"/]+\/birth-certificate"[^>]*>[\s\S]*?<\/a>/g),
     ];
-    assert.equal(navigation.length, guideStates.includes(state) ? 1 : 0, url);
-    if (navigation.length) {
-      assert(navigation[0][1].includes(`href="/guides/${state}/birth-certificate"`), url);
-      assert(navigation[0][1].includes("birth certificate guide"), url);
+    assert.equal(guideLinks.length, guideStates.includes(state) ? 1 : 0, url);
+    if (guideLinks.length) {
+      assert(guideLinks[0][0].includes(`href="/guides/${state}/birth-certificate"`), url);
       const faqSection = [...main.matchAll(/<section\b[^>]*>([\s\S]*?)<\/section>/g)].find(
         (match) => /<h2>[^<]* questions, answered<\/h2>/.test(match[1].replace(/<!--.*?-->/g, "")),
       );
-      assert(faqSection?.[1].includes(navigation[0][0]), `Guide belongs in state FAQ: ${url}`);
+      assert(faqSection?.[1].includes(guideLinks[0][0]), `Guide belongs in state FAQ: ${url}`);
+      assert(faqSection[1].includes("birth certificate guide?</h3>"), url);
+      assert(faqSection[1].includes("You can read our"), url);
     }
   }
+
   const graph = new Map(
     [...renderedPages].map(([url, html]) => [
       url,
