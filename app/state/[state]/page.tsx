@@ -187,7 +187,6 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                 <ul className="certificate-support-points">
                   <li>Full-Service Support from Start to Finish</li>
                   <li>100% Protected and Secure</li>
-                  <li>Track Your Order Online</li>
                 </ul>
                 {unavailable ? (
                   <button
