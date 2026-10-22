@@ -2,8 +2,10 @@
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, CheckCircle2, FileText, Flag, Play, Send, UploadCloud } from "lucide-react";
+import { ArrowRight, FileText, Play, UploadCloud } from "lucide-react";
 import { ApplicationSections } from "@/components/staff/ApplicationSections";
+import { CsReviewSection } from "@/components/staff/CsReviewSection";
+import { FinishOrderPanel } from "@/components/staff/FinishOrderPanel";
 import { APPLICATION_LABELS } from "@/lib/form-config";
 import { useConfirmation } from "@/components/staff/useConfirmation";
 import { CopyButton } from "@/components/staff/CopyButton";
@@ -16,7 +18,6 @@ import {
   StatusPill,
   Stepper,
   Toast,
-  TO_CS_SUBSTATUSES,
 } from "@/components/staff/ui";
 import {
   activityCategory,
@@ -27,41 +28,12 @@ import {
 } from "@/components/staff/activity";
 import { formatDateTimeUS } from "@/lib/date-format";
 
-const NEXT_STATUS: Record<string, string[]> = {
-  PAID: ["IN_REVIEW"],
-  IN_REVIEW: ["SUBMITTED", "TO_CS"],
-  TO_CS: ["GTG"],
-  GTG: ["IN_REVIEW"],
-  SUBMITTED: [],
-};
-
 /** ADMIN-only rewinds. Mirrors the backend order-reopen transitions. */
 const REOPEN_TARGETS: Record<string, ("PAID" | "IN_REVIEW")[]> = {
   SUBMITTED: ["IN_REVIEW", "PAID"],
   IN_REVIEW: ["PAID"],
   TO_CS: ["IN_REVIEW", "PAID"],
   GTG: ["IN_REVIEW", "PAID"],
-};
-
-const MOVE_TONE: Record<string, "primary" | "green" | "red"> = {
-  IN_REVIEW: "primary",
-  SUBMITTED: "green",
-  GTG: "green",
-  TO_CS: "red",
-};
-
-const MOVE_ICON: Record<string, typeof Send> = {
-  IN_REVIEW: Play,
-  SUBMITTED: Send,
-  GTG: CheckCircle2,
-  TO_CS: Flag,
-};
-
-const MOVE_HINT: Record<string, string> = {
-  IN_REVIEW: "Resume processing",
-  SUBMITTED: "Complete work and send to the agency",
-  GTG: "Approve — return to the queue",
-  TO_CS: "Park with a required note for CS",
 };
 
 interface OrderDetail {
@@ -366,9 +338,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
   const [note, setNote] = useState("");
-  const [statusNote, setStatusNote] = useState("");
+  const [csNote, setCsNote] = useState("");
   const [substatus, setSubstatus] = useState("");
-  const [moveTo, setMoveTo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [docDeleteOpen, setDocDeleteOpen] = useState(false);
   const [docBusy, setDocBusy] = useState(false);
@@ -376,6 +347,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [releaseOpen, setReleaseOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("summary");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isCs, setIsCs] = useState(false);
   const [canSeePricing, setCanSeePricing] = useState(false);
   const [canCorrect, setCanCorrect] = useState(false);
   const [histLimit, setHistLimit] = useState(10);
@@ -388,12 +360,13 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   useEffect(() => {
     const role = staffRole();
     setIsAdmin(role === "ADMIN");
+    setIsCs(role === "CS");
     setCanSeePricing(role === "ADMIN" || role === "CS");
     setCanCorrect(role === "ADMIN" || role === "CS");
   }, []);
 
   const orderScope = JSON.stringify([id, order, isAdmin]);
-  const confirmation = useConfirmation(JSON.stringify([orderScope, moveTo, statusNote, substatus]));
+  const confirmation = useConfirmation(JSON.stringify([orderScope, csNote, substatus]));
 
   const load = useCallback(async () => {
     setError("");
@@ -424,9 +397,6 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     try {
       await staffJson(path, { method, body: JSON.stringify(body ?? {}) });
       setNote("");
-      setStatusNote("");
-      setSubstatus("");
-      setMoveTo(null);
       setToast(success);
       await load();
     } catch (e) {
@@ -469,13 +439,6 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     } finally {
       setReopenBusy(false);
     }
-  };
-
-  const goWorkflow = () => {
-    setTab("summary");
-    window.setTimeout(() => {
-      document.getElementById("workflow")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 60);
   };
 
   const uploadDocument = async (file: File) => {
@@ -557,21 +520,29 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     );
   }
 
-  const next = NEXT_STATUS[order.status] ?? [];
   const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
   const closed = order.status === "SUBMITTED";
   const reopenTargets = REOPEN_TARGETS[order.status] ?? [];
-  const effectiveMoveTo = moveTo ?? next[0] ?? "";
-  const exceptionMove = effectiveMoveTo === "TO_CS";
-  const gtgMove = effectiveMoveTo === "GTG";
-  const submitMove = effectiveMoveTo === "SUBMITTED";
-  // Fulfillment must attach the completion PDF + note before SUBMITTED.
-  const submitNeedsPackage = submitMove && !isAdmin;
-  // TO_CS is locked: only CS/ADMIN (canCorrect) may move it — and only to GTG.
-  const toCsLocked = order.status === "TO_CS" && !canCorrect;
   const requestorName =
     `${order.applicant.firstName ?? ""} ${order.applicant.lastName ?? ""}`.trim() || "—";
   const certName = `${order.stateCode} ${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} Certificate`;
+  const submittedAt =
+    [...audit]
+      .reverse()
+      .find(
+        (e) =>
+          e.action === "fulfillment_status_updated" &&
+          (e.metadata as { status?: string } | undefined)?.status === "SUBMITTED",
+      )?.createdAt ?? null;
+  const csSentAt =
+    [...audit]
+      .reverse()
+      .find(
+        (e) =>
+          e.action === "fulfillment_status_updated" &&
+          (e.metadata as { status?: string } | undefined)?.status === "TO_CS",
+      )?.createdAt ?? null;
+  const latestNote = (order.notes ?? []).at(-1)?.body ?? null;
 
   const days: { day: string; entries: AuditEntry[] }[] = [];
   for (const entry of [...audit].reverse()) {
@@ -598,6 +569,184 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     /(\b\d{3}[- ]?\d{2}[- ]?\d{4}\b|\b\d{13,19}\b)/.test(note) &&
     "This looks like an SSN or card number — notes are internal but never store sensitive values here.";
 
+  const goToTab = (value: Tab) => {
+    setTab(value);
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 60);
+  };
+
+  const startProcessing = () => {
+    confirmation.request({
+      title: "Start order processing?",
+      body: (
+        <>
+          <p>
+            Order <strong>{order.publicNumber}</strong>: Took Ownership → Order Processing.
+          </p>
+          <p>This opens the Application tab so you can review the form.</p>
+        </>
+      ),
+      confirmLabel: "Start Order Processing",
+      run: async () => {
+        if (order.status !== "PAID") throw new Error("This order can no longer be started.");
+        setBusy(true);
+        try {
+          await staffJson(`/orders/${id}/status`, {
+            method: "PATCH",
+            body: JSON.stringify({ status: "IN_REVIEW" }),
+          });
+          setToast("Order processing started. Continue in the Application tab.");
+          await load();
+          goToTab("application");
+        } finally {
+          setBusy(false);
+        }
+      },
+    });
+  };
+
+  const sendToCs = () => {
+    const noteBody = csNote.trim();
+    if (!noteBody) return;
+    confirmation.request({
+      title: "Send this order to CS?",
+      body: (
+        <>
+          <p>
+            Order <strong>{order.publicNumber}</strong>: Order Processing → To CS.
+          </p>
+          <p>This releases your ownership and returns you to the queue for CS to review.</p>
+          {substatus ? (
+            <p>
+              Substatus: <strong>{substatus}</strong>
+            </p>
+          ) : null}
+          <p style={{ whiteSpace: "pre-wrap" }}>Note: {noteBody}</p>
+        </>
+      ),
+      confirmLabel: "Send To CS",
+      danger: true,
+      run: async () => {
+        if (order.status !== "IN_REVIEW")
+          throw new Error("This order can no longer be sent to CS.");
+        setBusy(true);
+        try {
+          await staffJson(`/orders/${id}/status`, {
+            method: "PATCH",
+            body: JSON.stringify({
+              status: "TO_CS",
+              note: noteBody,
+              ...(substatus ? { substatus } : {}),
+            }),
+          });
+          setCsNote("");
+          setSubstatus("");
+          router.replace("/staff");
+        } finally {
+          setBusy(false);
+        }
+      },
+    });
+  };
+
+  const markGtg = () => {
+    const noteBody = csNote.trim();
+    confirmation.request({
+      title: "Mark this order GTG?",
+      body: (
+        <>
+          <p>
+            Order <strong>{order.publicNumber}</strong>: To CS → GTG.
+          </p>
+          <p>This returns the order to fulfillment and releases your ownership.</p>
+          {noteBody ? <p style={{ whiteSpace: "pre-wrap" }}>Completion note: {noteBody}</p> : null}
+        </>
+      ),
+      confirmLabel: "Mark GTG",
+      run: async () => {
+        if (order.status !== "TO_CS") throw new Error("This order is no longer waiting on CS.");
+        setBusy(true);
+        try {
+          await staffJson(`/orders/${id}/status`, {
+            method: "PATCH",
+            body: JSON.stringify({ status: "GTG", ...(noteBody ? { note: noteBody } : {}) }),
+          });
+          setCsNote("");
+          router.replace("/staff");
+        } finally {
+          setBusy(false);
+        }
+      },
+    });
+  };
+
+  const resumeProcessing = () => {
+    confirmation.request({
+      title: "Resume order processing?",
+      body: (
+        <>
+          <p>
+            Order <strong>{order.publicNumber}</strong>: GTG → Order Processing.
+          </p>
+          <p>
+            CS marked the application correct. Continue reviewing it, then proceed to the completion
+            documents.
+          </p>
+        </>
+      ),
+      confirmLabel: "Resume Order Processing",
+      run: async () => {
+        if (order.status !== "GTG") throw new Error("This order is not ready to resume.");
+        setBusy(true);
+        try {
+          await staffJson(`/orders/${id}/status`, {
+            method: "PATCH",
+            body: JSON.stringify({ status: "IN_REVIEW" }),
+          });
+          setToast("Order processing resumed.");
+          await load();
+        } finally {
+          setBusy(false);
+        }
+      },
+    });
+  };
+
+  const submitToAgency = () => {
+    confirmation.request({
+      title: "Submit to Government Agency?",
+      body: (
+        <>
+          <p>
+            Order <strong>{order.publicNumber}</strong>: Order Processing → Sent to Government
+            Agency.
+          </p>
+          <p>
+            This records the submitted status, updates customer tracking, may notify the customer,
+            and closes the order. It does not file the application with the agency.
+          </p>
+        </>
+      ),
+      confirmLabel: "Mark as submitted",
+      danger: true,
+      run: async () => {
+        if (order.status !== "IN_REVIEW") throw new Error("The order is not in processing.");
+        if (!isAdmin && (!order.document || (order.notes ?? []).length === 0))
+          throw new Error("Upload the completion PDF and add at least one note before submitting.");
+        setBusy(true);
+        try {
+          await staffJson(`/orders/${id}/status`, {
+            method: "PATCH",
+            body: JSON.stringify({ status: "SUBMITTED" }),
+          });
+          setToast("The order was submitted and is now closed.");
+          await load();
+        } finally {
+          setBusy(false);
+        }
+      },
+    });
+  };
+
   return (
     <>
       <BackLink href="/staff">← Back to Open Orders</BackLink>
@@ -618,9 +767,6 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         {!closed ? (
           <div className="staff-orderbar-side">
             <div className="staff-orderbar-actions">
-              <button type="button" className="staff-btn light" onClick={goWorkflow}>
-                Update status
-              </button>
               <button
                 type="button"
                 className="staff-btn danger"
@@ -670,238 +816,45 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <div className="staff-panel-body">
               <Stepper
                 status={order.status}
-                submittedAt={
-                  [...audit]
-                    .reverse()
-                    .find(
-                      (e) =>
-                        e.action === "fulfillment_status_updated" &&
-                        (e.metadata as { status?: string } | undefined)?.status === "SUBMITTED",
-                    )?.createdAt ?? null
-                }
-                parkedNote={
-                  order.status === "TO_CS"
-                    ? ((order.notes ?? []).at(-1)?.body.slice(0, 140) ?? null)
-                    : null
-                }
+                submittedAt={submittedAt}
+                parkedNote={order.status === "TO_CS" ? (latestNote?.slice(0, 140) ?? null) : null}
               />
-              {!closed ? (
-                toCsLocked ? (
-                  <div
-                    role="status"
-                    style={{
-                      background: "#fef2f2",
-                      border: "1px solid #fecaca",
-                      borderRadius: "8px",
-                      padding: "12px 14px",
-                      marginTop: "16px",
-                    }}
+              {order.status === "PAID" ? (
+                <div className="staff-next-step">
+                  <span className="staff-next-step-icon" aria-hidden>
+                    <Play />
+                  </span>
+                  <div className="staff-next-step-copy">
+                    <strong>Next step</strong>
+                    <span>
+                      Start processing this order. The Application tab opens automatically so you
+                      can review the form.
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    className="staff-btn"
+                    disabled={busy}
+                    onClick={startProcessing}
                   >
-                    <p style={{ color: "#b91c1c", fontWeight: 700, margin: "0 0 4px" }}>
-                      CS is looking into it.
-                    </p>
-                    {order.substatus ? (
-                      <p style={{ margin: "0 0 4px", fontSize: "0.9rem", color: "#7f1d1d" }}>
-                        Substatus: <strong>{order.substatus}</strong>
-                      </p>
-                    ) : null}
-                    <p style={{ margin: 0, fontSize: "0.9rem", color: "#7f1d1d" }}>
-                      Submit is blocked until CS or ADMIN marks this order GTG. It will then return
-                      to the queue so you can continue.
-                    </p>
-                  </div>
-                ) : (
-                  <div style={{ marginTop: "16px" }}>
-                    <p className="staff-move-label">Choose the next workflow step</p>
-                    <div className="staff-move-group" role="group" aria-label="Move to">
-                      {next.map((s) => {
-                        const Icon = MOVE_ICON[s] ?? Play;
-                        return (
-                          <button
-                            key={s}
-                            type="button"
-                            aria-pressed={effectiveMoveTo === s}
-                            onClick={() => {
-                              setMoveTo(s);
-                              if (s !== "TO_CS") setSubstatus("");
-                              setStatusNote("");
-                            }}
-                            className={`staff-move-btn tone-${MOVE_TONE[s] ?? "primary"}`}
-                          >
-                            <Icon aria-hidden />
-                            <span>
-                              <strong>{STATUS_LABELS[s] ?? s}</strong>
-                              <small>{MOVE_HINT[s] ?? ""}</small>
-                            </span>
-                            {effectiveMoveTo === s ? (
-                              <span className="staff-move-check" aria-hidden>
-                                <Check />
-                              </span>
-                            ) : null}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {exceptionMove ? (
-                      <>
-                        <label>
-                          Internal note (required for To CS)
-                          <textarea
-                            value={statusNote}
-                            onChange={(e) => setStatusNote(e.target.value)}
-                            rows={4}
-                            maxLength={2000}
-                            placeholder="What does this order need before it can continue?…"
-                            autoComplete="off"
-                            style={{ width: "100%", minHeight: "88px", resize: "vertical" }}
-                          />
-                        </label>
-                        <label>
-                          Substatus (optional)
-                          <select value={substatus} onChange={(e) => setSubstatus(e.target.value)}>
-                            <option value="">No substatus</option>
-                            {TO_CS_SUBSTATUSES.map((s) => (
-                              <option key={s} value={s}>
-                                {s}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                      </>
-                    ) : null}
-                    {gtgMove ? (
-                      <label>
-                        Completion note (optional)
-                        <input
-                          value={statusNote}
-                          onChange={(e) => setStatusNote(e.target.value)}
-                          maxLength={2000}
-                          placeholder="What was fixed?…"
-                          autoComplete="off"
-                        />
-                      </label>
-                    ) : null}
-                    <div
-                      style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}
-                    >
-                      <button
-                        type="button"
-                        className="staff-btn"
-                        disabled={
-                          busy ||
-                          (exceptionMove && !statusNote.trim()) ||
-                          (submitNeedsPackage &&
-                            ((order.notes ?? []).length === 0 || !order.document))
-                        }
-                        onClick={() => {
-                          const target = effectiveMoveTo;
-                          const payload = {
-                            status: target,
-                            ...(exceptionMove || (gtgMove && statusNote.trim())
-                              ? { note: statusNote.trim() }
-                              : {}),
-                            ...(exceptionMove && substatus ? { substatus } : {}),
-                          };
-                          confirmation.request({
-                            title:
-                              target === "SUBMITTED"
-                                ? "Confirm submission to Government Agency"
-                                : `Confirm: ${STATUS_LABELS[target] ?? target}`,
-                            body: (
-                              <>
-                                <p>
-                                  Order <strong>{order.publicNumber}</strong>:{" "}
-                                  {STATUS_LABELS[order.status] ?? order.status} →{" "}
-                                  {STATUS_LABELS[target] ?? target}.
-                                </p>
-                                {target === "SUBMITTED" ? (
-                                  <p>
-                                    Confirm that this order has been submitted to the government
-                                    agency. This records the submitted status, updates customer
-                                    tracking and may notify the customer. It does not file the
-                                    application with the agency.
-                                  </p>
-                                ) : exceptionMove ? (
-                                  <p>This sends the order to CS and drops your ownership.</p>
-                                ) : gtgMove ? (
-                                  <p>
-                                    This returns the order to fulfillment and drops your ownership.
-                                  </p>
-                                ) : (
-                                  <p>
-                                    This changes the order's workflow status and customer tracking.
-                                  </p>
-                                )}
-                                {payload.note ? (
-                                  <p style={{ whiteSpace: "pre-wrap" }}>Note: {payload.note}</p>
-                                ) : null}
-                                {exceptionMove && substatus ? <p>Substatus: {substatus}</p> : null}
-                              </>
-                            ),
-                            confirmLabel:
-                              target === "SUBMITTED"
-                                ? "Mark as submitted"
-                                : exceptionMove
-                                  ? "Send To CS"
-                                  : gtgMove
-                                    ? "Mark GTG"
-                                    : "Change status",
-                            danger: target === "SUBMITTED" || exceptionMove,
-                            run: async () => {
-                              if (
-                                !next.includes(target) ||
-                                (exceptionMove && !payload.note) ||
-                                (submitNeedsPackage &&
-                                  (!(order.notes ?? []).length || !order.document))
-                              )
-                                throw new Error(
-                                  "The requirements for this status change are no longer met. Cancel and review the order.",
-                                );
-                              setBusy(true);
-                              try {
-                                await staffJson(`/orders/${id}/status`, {
-                                  method: "PATCH",
-                                  body: JSON.stringify(payload),
-                                });
-                                setStatusNote("");
-                                setSubstatus("");
-                                setMoveTo(null);
-                                setToast("The order status has been changed for this order.");
-                                if (exceptionMove || gtgMove) router.replace("/staff");
-                                else await load();
-                              } finally {
-                                setBusy(false);
-                              }
-                            },
-                          });
-                        }}
-                      >
-                        {effectiveMoveTo === "SUBMITTED"
-                          ? "Confirm: Send to Government Agency"
-                          : `Confirm: ${STATUS_LABELS[effectiveMoveTo] ?? effectiveMoveTo}`}
-                      </button>
-                    </div>
-                    {submitNeedsPackage && ((order.notes ?? []).length === 0 || !order.document) ? (
-                      <p
-                        style={{
-                          fontSize: "0.85rem",
-                          color: "var(--flow-secondary)",
-                          margin: "8px 0 0",
-                        }}
-                      >
-                        Add at least one order note and upload the PDF in Notes &amp; Document
-                        Upload before sending this order to the agency.
-                      </p>
-                    ) : null}
-                  </div>
-                )
-              ) : (
+                    <Play aria-hidden />
+                    Start Order Processing
+                  </button>
+                </div>
+              ) : null}
+              {order.status === "IN_REVIEW" ? (
+                <p className="staff-workflow-hint">
+                  Continue in the <strong>Application</strong> tab. Use Proceed there when you are
+                  ready for the completion documents.
+                </p>
+              ) : null}
+              {closed ? (
                 <p style={{ color: "var(--flow-secondary)", marginBottom: 0 }}>
                   {isAdmin
                     ? "Submitted by mistake? Use the super-admin correction below to reopen it."
                     : "No further actions — the submission record above is final."}
                 </p>
-              )}
+              ) : null}
             </div>
           </div>
 
@@ -1076,11 +1029,55 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               />
             </div>
           </div>
-          {canCorrect && !closed && (order.status === "TO_CS" || order.status === "GTG") ? (
-            <p style={{ fontSize: "0.9rem", color: "var(--muted-text)" }}>
-              CS edits this order in the dedicated editor:{" "}
-              <a href={`/staff/cs/edit/${id}`}>Open in CS editor →</a>
-            </p>
+          <CsReviewSection
+            status={order.status}
+            isCs={isCs}
+            canCorrect={canCorrect}
+            busy={busy}
+            note={csNote}
+            substatus={substatus}
+            savedSubstatus={order.substatus ?? ""}
+            latestNote={latestNote}
+            sentAt={csSentAt}
+            csEditorHref={`/staff/cs/edit/${id}`}
+            onNoteChange={setCsNote}
+            onSubstatusChange={setSubstatus}
+            onSendToCs={sendToCs}
+            onMarkGtg={markGtg}
+            onResume={resumeProcessing}
+          />
+          {!closed ? (
+            <div className="staff-step-footer">
+              <div>
+                <strong>
+                  {order.status === "IN_REVIEW"
+                    ? "Application reviewed?"
+                    : order.status === "TO_CS"
+                      ? "CS review in progress"
+                      : order.status === "GTG"
+                        ? "CS marked this form ready"
+                        : "Start processing first"}
+                </strong>
+                <p>
+                  {order.status === "IN_REVIEW"
+                    ? "No CS review needed? Continue to attach the completion PDF and add an internal note."
+                    : order.status === "TO_CS"
+                      ? "Continue once the order is marked GTG and processing resumes."
+                      : order.status === "GTG"
+                        ? "Resume Order Processing above before continuing."
+                        : "Use the Summary tab to start Order Processing."}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="staff-btn"
+                disabled={busy || order.status !== "IN_REVIEW"}
+                onClick={() => goToTab("notes")}
+              >
+                Proceed to Notes &amp; Document Upload
+                <ArrowRight aria-hidden />
+              </button>
+            </div>
           ) : null}
         </>
       ) : null}
@@ -1300,6 +1297,15 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
           </div>
+          <FinishOrderPanel
+            status={order.status}
+            isAdmin={isAdmin}
+            hasDocument={Boolean(order.document)}
+            noteCount={(order.notes ?? []).length}
+            submittedAt={submittedAt}
+            busy={busy}
+            onSubmit={submitToAgency}
+          />
           <div className="staff-panel">
             <h2>Order History</h2>
             <div className="staff-panel-body">

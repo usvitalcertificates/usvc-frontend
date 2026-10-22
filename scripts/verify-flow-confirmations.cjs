@@ -322,11 +322,21 @@ async function until(predicate) {
   }
   try {
     await detail();
+    await page.getByRole("tab", { name: "Application (Owners only)", exact: true }).click();
+    await page
+      .getByRole("button", { name: "Proceed to Notes & Document Upload", exact: true })
+      .click();
+    await page.waitForFunction(() =>
+      Array.from(document.querySelectorAll('[role="tab"]')).some(
+        (tab) =>
+          tab.getAttribute("aria-selected") === "true" &&
+          tab.textContent?.includes("Notes & Document Upload"),
+      ),
+    );
+    passed.push("Application hand-off to Notes tab");
     const chooseSubmission = async () => {
-      await page.getByRole("button", { name: /^Sent to Government Agency/ }).click();
-      await page
-        .getByRole("button", { name: "Confirm: Send to Government Agency", exact: true })
-        .click();
+      await page.getByRole("tab", { name: "Notes & Document Upload", exact: true }).click();
+      await page.getByRole("button", { name: "Submit to Government Agency", exact: true }).click();
     };
     await exercise(
       "Agency submission: cancel, keyboard trap, duplicate guard, pending dismissal, failure/retry",
@@ -341,26 +351,48 @@ async function until(predicate) {
     );
     await detail("PAID");
     await exercise(
-      "Processing status",
-      () => page.getByRole("button", { name: "Confirm: Order Processing", exact: true }).click(),
-      "Change status",
+      "Start order processing",
+      () =>
+        page.getByRole("button", { name: "Start Order Processing", exact: true }).first().click(),
+      "Start Order Processing",
       "/orders/flow-test/status",
+    );
+    assert.equal(writes.at(-1).payload.status, "IN_REVIEW");
+    await page.waitForFunction(() =>
+      Array.from(document.querySelectorAll('[role="tab"]')).some(
+        (tab) =>
+          tab.getAttribute("aria-selected") === "true" &&
+          tab.textContent?.includes("Application (Owners only)"),
+      ),
     );
     await detail();
     const toCs = async () => {
-      await page.getByRole("button", { name: /^To CS/ }).click();
-      await page
-        .getByLabel("Internal note (required for To CS)")
-        .fill("Synthetic CS review required");
-      await page.getByRole("button", { name: "Confirm: To CS", exact: true }).click();
+      await page.getByRole("tab", { name: "Application (Owners only)", exact: true }).click();
+      await page.getByLabel("Note for CS (required)").fill("Synthetic CS review required");
+      await page.getByLabel("Substatus (optional)").selectOption("1st Contact");
+      await page.getByRole("button", { name: "Send to CS", exact: true }).click();
     };
     await exercise("To CS with required note", toCs, "Send To CS", "/orders/flow-test/status");
     assert.equal(writes.at(-1).payload.note, "Synthetic CS review required");
+    assert.equal(writes.at(-1).payload.substatus, "1st Contact");
     await detail("TO_CS");
     await exercise(
       "GTG from order detail",
-      () => page.getByRole("button", { name: "Confirm: GTG", exact: true }).click(),
+      async () => {
+        await page.getByRole("tab", { name: "Application (Owners only)", exact: true }).click();
+        await page.getByRole("button", { name: "Mark GTG", exact: true }).click();
+      },
       "Mark GTG",
+      "/orders/flow-test/status",
+    );
+    await detail("GTG");
+    await exercise(
+      "Resume after GTG",
+      async () => {
+        await page.getByRole("tab", { name: "Application (Owners only)", exact: true }).click();
+        await page.getByRole("button", { name: "Resume Order Processing", exact: true }).click();
+      },
+      "Resume Order Processing",
       "/orders/flow-test/status",
     );
     await detail();
@@ -625,13 +657,18 @@ async function until(predicate) {
     });
     const limitedPage = await limited.newPage();
     await limitedPage.goto(base + "/staff/flow-test");
-    await limitedPage.getByRole("button", { name: /^Sent to Government Agency/ }).click();
+    await limitedPage.getByRole("tab", { name: "Notes & Document Upload", exact: true }).click();
     assert.equal(
       await limitedPage
-        .getByRole("button", { name: "Confirm: Send to Government Agency", exact: true })
+        .getByRole("button", { name: "Submit to Government Agency", exact: true })
         .isDisabled(),
       true,
     );
+    await limitedPage
+      .getByText("Upload the completion PDF and add at least one internal note above.", {
+        exact: true,
+      })
+      .waitFor();
     await limitedPage.goto(base + "/staff/cs/edit/flow-test");
     await limitedPage
       .getByText("Order editing is restricted to CS and ADMIN roles.", { exact: true })
