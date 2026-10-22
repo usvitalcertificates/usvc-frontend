@@ -1,4 +1,4 @@
-import { SITE_URL } from "@/lib/seo";
+import { ORGANIZATION_ID, SITE_URL } from "@/lib/seo";
 
 export function SeoJsonLd({ value }: { value: Record<string, unknown> }) {
   return (
@@ -12,9 +12,15 @@ export function SeoJsonLd({ value }: { value: Record<string, unknown> }) {
 export const organizationLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": ORGANIZATION_ID,
   name: "US Vital Certificates",
+  legalName: "US VITAL CERTIFICATES, LLC",
   url: SITE_URL,
   logo: `${SITE_URL}/assets/usvc-logo.webp`,
+  sameAs: [
+    "https://www.linkedin.com/company/usvitalcertificates/",
+    "https://www.facebook.com/share/1CGSWWbYVh/",
+  ],
   contactPoint: {
     "@type": "ContactPoint",
     email: "support@usvitalcertificates.org",

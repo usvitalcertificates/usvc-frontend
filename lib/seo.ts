@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 export const SITE_URL = "https://usvitalcertificates.org";
+export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 
 export const SOCIAL_IMAGE = {
   url: `${SITE_URL}/opengraph-image`,
@@ -198,7 +199,7 @@ export function titleCase(value: string) {
  */
 // All four public page groups received the social metadata update on this date.
 // These describe page modifications, not the date official sources were checked.
-export const SITEMAP_STATIC_LAST_MODIFIED = "2026-10-21";
+export const SITEMAP_STATIC_LAST_MODIFIED = "2026-10-22";
 export const SITEMAP_STATES_LAST_MODIFIED = "2026-10-21";
 export const SITEMAP_ORDERS_LAST_MODIFIED = "2026-10-21";
 export const SITEMAP_GUIDES_LAST_MODIFIED = "2026-10-22";
