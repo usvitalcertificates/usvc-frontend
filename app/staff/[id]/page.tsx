@@ -31,6 +31,14 @@ const NEXT_STATUS: Record<string, string[]> = {
   SUBMITTED: [],
 };
 
+/** ADMIN-only rewinds. Mirrors the backend order-reopen transitions. */
+const REOPEN_TARGETS: Record<string, ("PAID" | "IN_REVIEW")[]> = {
+  SUBMITTED: ["IN_REVIEW", "PAID"],
+  IN_REVIEW: ["PAID"],
+  TO_CS: ["IN_REVIEW", "PAID"],
+  GTG: ["IN_REVIEW", "PAID"],
+};
+
 const MOVE_TONE: Record<string, "primary" | "green" | "red"> = {
   IN_REVIEW: "primary",
   SUBMITTED: "green",
@@ -389,6 +397,10 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [canCorrect, setCanCorrect] = useState(false);
   const [histLimit, setHistLimit] = useState(10);
   const [noteLimit, setNoteLimit] = useState(10);
+  const [reopenOpen, setReopenOpen] = useState(false);
+  const [reopenTo, setReopenTo] = useState<"PAID" | "IN_REVIEW">("IN_REVIEW");
+  const [reopenReason, setReopenReason] = useState("");
+  const [reopenBusy, setReopenBusy] = useState(false);
 
   useEffect(() => {
     const role = staffRole();
@@ -472,6 +484,26 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       setError(e instanceof Error ? e.message : "Could not send to CS");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const reopenOrder = async () => {
+    if (!reopenReason.trim()) return;
+    setReopenBusy(true);
+    setError("");
+    try {
+      await staffJson(`/orders/${id}/reopen`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: reopenTo, reason: reopenReason.trim() }),
+      });
+      setReopenOpen(false);
+      setReopenReason("");
+      setToast("Order status restored.");
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not reopen this order");
+    } finally {
+      setReopenBusy(false);
     }
   };
 
@@ -560,6 +592,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const next = NEXT_STATUS[order.status] ?? [];
   const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
   const closed = order.status === "SUBMITTED";
+  const reopenTargets = REOPEN_TARGETS[order.status] ?? [];
   const effectiveMoveTo = moveTo ?? next[0] ?? "";
   const exceptionMove = effectiveMoveTo === "TO_CS";
   const gtgMove = effectiveMoveTo === "GTG";
@@ -829,11 +862,37 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 )
               ) : (
                 <p style={{ color: "var(--flow-secondary)", marginBottom: 0 }}>
-                  No further actions — the submission record above is final.
+                  {isAdmin
+                    ? "Submitted by mistake? Use the super-admin correction below to reopen it."
+                    : "No further actions — the submission record above is final."}
                 </p>
               )}
             </div>
           </div>
+
+          {isAdmin && reopenTargets.length > 0 ? (
+            <div className="staff-panel" id="admin-reopen">
+              <h2>Super-admin correction</h2>
+              <div className="staff-panel-body">
+                <p style={{ marginTop: 0, color: "var(--flow-secondary)" }}>
+                  Accidentally moved this order forward? Restoring it rolls back the
+                  customer-visible timeline and is recorded in the audit trail under your name.
+                </p>
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  disabled={busy}
+                  onClick={() => {
+                    setReopenTo(reopenTargets[0]);
+                    setReopenReason("");
+                    setReopenOpen(true);
+                  }}
+                >
+                  Reopen order…
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           <div className="staff-grid-2">
             <div className="staff-panel">
@@ -1261,6 +1320,70 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
         </>
+      ) : null}
+
+      {reopenOpen && order ? (
+        <div
+          className="staff-modal-backdrop"
+          onClick={() => {
+            if (!reopenBusy) setReopenOpen(false);
+          }}
+        >
+          <div
+            className="staff-modal"
+            role="dialog"
+            aria-label="Reopen order"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2>Reopen this order?</h2>
+            <p style={{ color: "var(--muted-text)" }}>
+              Restores the order to an earlier step and rolls back the customer-visible timeline.
+              This correction is recorded in the audit trail under your name.
+            </p>
+            <label>
+              Restore to
+              <select
+                value={reopenTo}
+                onChange={(e) => setReopenTo(e.target.value as "PAID" | "IN_REVIEW")}
+              >
+                {reopenTargets.map((s) => (
+                  <option key={s} value={s}>
+                    {STATUS_LABELS[s] ?? s}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Reason (required, recorded in the audit trail)
+              <textarea
+                value={reopenReason}
+                onChange={(e) => setReopenReason(e.target.value)}
+                rows={3}
+                maxLength={500}
+                placeholder="Accidentally clicked Submit to Govt Agency"
+                style={{ width: "100%", resize: "vertical" }}
+              />
+            </label>
+            <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
+              <button
+                type="button"
+                className="staff-btn"
+                disabled={reopenBusy || !reopenReason.trim()}
+                onClick={() => void reopenOrder()}
+              >
+                {reopenBusy ? "Restoring…" : "Restore status"}
+              </button>
+              <button
+                type="button"
+                className="staff-btn secondary"
+                disabled={reopenBusy}
+                onClick={() => setReopenOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
 
       {toCsOpen && order ? (
