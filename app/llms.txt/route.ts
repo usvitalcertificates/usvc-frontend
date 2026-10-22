@@ -22,9 +22,13 @@ USVC provides guided online requests, application review and processing support.
 - [Certificate types](${SITE_URL}/certificates): Birth, death, marriage and divorce certificate assistance.
 - [State directory](${SITE_URL}/find-your-state): Available jurisdictions and links to public state pages.
 - [Frequently asked questions](${SITE_URL}/faq): Service fees, eligibility, processing, shipping and refunds.
+- [About USVC](${SITE_URL}/about): Who operates the service, what it does and does not do, and company contact details.
+- [Editorial policy](${SITE_URL}/editorial): Source standards, review process, corrections and AI disclosure.
 - [Contact support](${SITE_URL}/contact): Public support contact page.
 
 ## Official-resource birth guides
+
+- [All birth-certificate guides](${SITE_URL}/guides): Directory of state guides with links to official issuing agencies.
 
 ${guides}
 

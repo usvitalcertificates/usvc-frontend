@@ -23,8 +23,8 @@ const labels: Record<string, string> = {
   "divorce-certificate": "Divorce",
 };
 
-/** Prerender all indexable order pages + VT/WY notice variants (P0 SEO)
- *  so Google gets static HTML for the 200-URL cluster. */
+/** Prerender every order page, including VT/WY notice variants, so
+ *  customers get static HTML without waiting on a dynamic render. */
 export async function generateStaticParams() {
   return ALL_STATE_SLUGS.flatMap((state) =>
     CERTIFICATE_SLUGS.map((certificate) => ({ state, certificate })),
@@ -48,13 +48,14 @@ export async function generateMetadata({
     `Start a guided ${name} ${type.toLowerCase()} certificate request with USVC review and tracking.`,
   );
   const url = `https://usvitalcertificates.org/state/${state}/order/${certificate}`;
-  // VT/WY render an unavailable notice, never a form: keep crawlable
-  // for users but out of the index (matches state-hub behavior).
+  // Order pages are transactional templates. Keep them crawlable for
+  // customers and link equity, but out of the search index.
+  const robots = { index: false, follow: true } as const;
   if (isStateUnsupported(state)) {
     return {
       title,
       description,
-      robots: { index: false, follow: true },
+      robots,
       alternates: { canonical: url },
       ...socialMetadata({ title, description, url }),
     };
@@ -62,6 +63,7 @@ export async function generateMetadata({
   return {
     title,
     description,
+    robots,
     alternates: {
       canonical: url,
     },
