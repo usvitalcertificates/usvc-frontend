@@ -2,6 +2,10 @@
 
 Updated: 2026-10-22. This is the implementation checklist for the October 21 audit and its Search Console follow-up. `Merged` describes Git status, not proof of production rollout. Only a live deployment check closes a live-site issue.
 
+## Texas, Florida and New York guide depth — October 22
+
+The first three states in the remaining nine-state rollout now use the California-depth guide model: state-specific record types, eligibility, identification, state-versus-local filing, preparation, request sequence, special situations, ten FAQs and official-source citations. Guide content is split into per-state files with shared types and USVC help copy so the next six states can follow the same review pattern. Florida’s source URL was updated to the current Department of Health birth-certificate page. No state fees, processing times, or notarization requirements were published; exact USVC prices remain limited to the order form. No new URLs; sitemap target stays 268 pages and 10 guides. Formatting, lint, TypeScript, 20/20 unit tests, production build and `npm run test:seo` pass. Branch `feat/tx-fl-ny-birth-guides`; no PR, merge or deployment yet.
+
 ## Price disclosure policy — October 22
 
 Exact USVC prices are now limited to the order form. The 52 state-hub cost FAQs and all 10 birth-certificate guides direct readers to the form for current pricing, while retaining the non-numeric explanation that agency and shipping fees are separate. No price amounts appear in public marketing copy, metadata, or FAQ structured data. A regression test verifies that $149/$70/$79 do not return to public copy and that the shared order form still displays the approved prices. No sitemap or URL changes.

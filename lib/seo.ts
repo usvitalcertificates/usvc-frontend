@@ -73,7 +73,7 @@ export const BIRTH_GUIDE_SOURCES: Record<string, { state: string; url: string }>
   texas: { state: "Texas", url: "https://www.dshs.texas.gov/vital-statistics/birth-records" },
   florida: {
     state: "Florida",
-    url: "https://www.floridahealth.gov/certificates/certificates/birth/index.html",
+    url: "https://www.floridahealth.gov/certificates-records/birth-certificates/",
   },
   "new-york": { state: "New York", url: "https://www.health.ny.gov/vital_records/birth.htm" },
   pennsylvania: {
