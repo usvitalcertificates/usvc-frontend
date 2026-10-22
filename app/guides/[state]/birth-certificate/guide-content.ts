@@ -45,9 +45,9 @@ const PROCESSING_URL =
   "https://www.cdph.ca.gov/Programs/CHSI/Pages/Vital-Records-Processing-Times.aspx";
 const APOSTILLE_URL = "https://www.sos.ca.gov/notary/request-apostille";
 
-const USVC_PRICING = [
+const USVC_HELP_COPY = [
   "USVC is an independent document assistance service, not a government agency. We provide a guided online request flow in plain language, review submitted information for completeness and inconsistencies, file the request with the agency, and help you track the request process.",
-  "Our online processing fee is $149.00 for the first certificate and $70.00 for each additional certificate. Agency fees and any shipping charges are separate and are charged upon review and acceptance by the issuing agency.",
+  "The order form shows the current USVC processing fee before you pay. Agency fees and any shipping charges are separate and are charged upon review and acceptance by the issuing agency.",
 ];
 
 const CALIFORNIA_GUIDE: BirthGuideContent = {
@@ -189,7 +189,7 @@ const CALIFORNIA_GUIDE: BirthGuideContent = {
     {
       id: "usvc-help",
       heading: "How USVC can help",
-      paragraphs: USVC_PRICING,
+      paragraphs: USVC_HELP_COPY,
       bullets: [
         "We check your submitted information for missing details and inconsistencies before filing.",
         "We file the request with the issuing agency and give you an online way to track it.",
@@ -313,7 +313,7 @@ function genericGuide(stateName: string, officialUrl: string): BirthGuideContent
       {
         id: "usvc-help",
         heading: "How USVC can help",
-        paragraphs: USVC_PRICING,
+        paragraphs: USVC_HELP_COPY,
       },
     ],
     faqs: [
