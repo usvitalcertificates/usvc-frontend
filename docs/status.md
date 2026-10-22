@@ -1,5 +1,7 @@
 # Frontend status + remaining work
 
+- Guide redesign + California depth (2026-10-22): all ten birth-certificate guides now use the FAQ/contact reading surface (Times, navy headings, muted body, light panels, red inline links). The official-resource red button is replaced by a text link; the only red buttons are the two “Start Your [State] Request” CTAs. California gains a deeper generic guide (authorized vs. informational copies, eligibility, state vs. county path, preparation, step-by-step, common situations, ten FAQs, official-source citations) without publishing state fees, processing times, or notarization requirements. Other nine guides keep their existing approved prose in the new layout. Article/Breadcrumb/FAQ schema, a state-hub breadcrumb, guide last-modified date, and llms.txt description updated. Formatting, lint, TypeScript, 14/14 unit tests, production build and SEO HTTP checks pass; all 268 sitemap URLs and 10 guides verified. Feature branch `feat/ca-birth-guide`; not deployed.
+
 - State guide FAQ follow-up (2026-10-22): existing guide links now appear as the answer to “Where can I find a [State] birth certificate guide?” with a quiet inline link. Only the ten states with existing guides receive this question. FAQ structured data includes the same answer text; no separate guide navigation block.
 
 - State guide placement (2026-10-22): moved each existing contextual birth-certificate guide link from below the certificate cards into its state FAQ section, after the questions. The same ten states retain their link text and destination; no new guides or FAQ/schema content changes. Production build, lint, formatting and HTTP SEO checks pass, including placement checks for all ten guide links and all 268 sitemap URLs.
@@ -12,7 +14,7 @@
 
 - Technical SEO cleanup (2026-10-21): homepage canonical moved out of the root layout; invalid legal/state metadata stops before emitting a canonical. State hubs consume the shared 52-jurisdiction inventory, with parity/uniqueness/availability tests against the order and sitemap lists. Production HTTP regressions require real 404 + noindex + no canonical for invalid legal, state, guide and certificate URLs, testing crawler and browser user agents. All 268 sitemap pages retain 200/self-canonical/indexable output; VT/WY remain 200 unavailable/noindex notices. Node 24: 14/14 unit tests, production build, lint, TypeScript, formatting and SEO HTTP checks pass. Mobile measurement results and remaining performance recommendations are in `docs/mobile-performance-2026-10-21.md`. No public copy, service claims, Nebraska facts, guide content or profile information changed; no production deployment.
 
-Last updated: 2026-10-21. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
+Last updated: 2026-10-22. Phase 1 (public funnel) and Phase 2 (staff MVP) built.
 
 ## Implemented
 

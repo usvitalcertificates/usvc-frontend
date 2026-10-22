@@ -2124,6 +2124,181 @@ small.application-error {
   font-weight: 400;
 }
 
+/* Birth-certificate guides: FAQ/contact reading surface, one red CTA. */
+.guide-layout {
+  display: grid;
+  gap: 32px;
+  max-width: 920px;
+  margin-inline: auto;
+}
+.guide-summary {
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #f4f6f9;
+  color: #767676;
+  font-size: 17px;
+  line-height: 1.65;
+}
+.guide-summary .eyebrow {
+  margin: 0;
+}
+.guide-summary h2 {
+  margin: 8px 0 0;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+}
+.guide-summary > p {
+  margin: 16px 0 0;
+}
+.guide-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 24px 0 0;
+}
+.guide-facts > div {
+  padding: 16px;
+  border: 1px solid #e0e3ea;
+  border-radius: 6px;
+  background: #fff;
+}
+.guide-facts dt {
+  color: var(--navy);
+  font-size: 12.8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.guide-facts dd {
+  margin: 6px 0 0;
+  color: #5f5e65;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.guide-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+}
+.guide-cta h2,
+.guide-cta h3 {
+  font-size: 22px;
+}
+.guide-cta p {
+  margin: 8px 0 0;
+  color: #5f5e65;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.guide-cta .button {
+  flex: 0 0 auto;
+}
+.guide-cta-note {
+  margin: 12px 0 0;
+  color: var(--muted-text);
+  font-size: 14.4px;
+  line-height: 1.6;
+}
+.guide-section {
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+.guide-section h2 {
+  font-size: 22px;
+}
+.guide-section p {
+  margin: 16px 0 0;
+  color: #767676;
+  font-size: 17px;
+  line-height: 1.65;
+}
+.guide-section ul {
+  margin: 16px 0 0;
+  padding-left: 24px;
+  color: #767676;
+  font-size: 17px;
+  line-height: 1.65;
+}
+.guide-section li + li {
+  margin-top: 8px;
+}
+.guide-link {
+  color: var(--red);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.guide-link:hover {
+  color: var(--red);
+  opacity: 0.8;
+}
+.guide-section p.guide-note {
+  margin-top: 16px;
+  padding: 16px 20px;
+  border-left: 4px solid var(--navy);
+  background: var(--muted);
+  color: #5f5e65;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.guide-link-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.guide-section ul.guide-link-list {
+  padding: 0;
+}
+.guide-link-list li {
+  margin: 0;
+}
+.guide-section .guide-link-list li {
+  margin: 0;
+}
+.guide-faq-section {
+  padding-top: 32px;
+}
+.guide-faq-section .faq-accordion {
+  margin-top: 20px;
+}
+.guide-cta-final {
+  margin-top: 0;
+  background: #f4f6f9;
+}
+.guide-sources {
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+.guide-sources h2 {
+  font-size: 22px;
+}
+.guide-sources > p {
+  margin: 12px 0 0;
+  color: #767676;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.guide-sources .legal-updated {
+  margin-top: 16px;
+}
+.guide-related {
+  margin: 0;
+  color: #767676;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
 /* How-it-works timeline: ghost numerals, navy icon chips, dashed connector. */
 .steps-timeline {
   position: relative;
@@ -2850,6 +3025,27 @@ textarea {
   }
   .faq-support {
     padding: 20px;
+  }
+  .guide-layout {
+    gap: 28px;
+  }
+  .guide-summary {
+    padding: 24px 20px;
+  }
+  .guide-facts {
+    grid-template-columns: 1fr;
+  }
+  .guide-cta {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 20px;
+  }
+  .guide-cta .button {
+    width: 100%;
+  }
+  .guide-link-list {
+    flex-direction: column;
+    gap: 10px;
   }
   .footer-columns {
     gap: 32px;

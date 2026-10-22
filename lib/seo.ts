@@ -189,7 +189,7 @@ export function titleCase(value: string) {
 export const SITEMAP_STATIC_LAST_MODIFIED = "2026-10-21";
 export const SITEMAP_STATES_LAST_MODIFIED = "2026-10-21";
 export const SITEMAP_ORDERS_LAST_MODIFIED = "2026-10-21";
-export const SITEMAP_GUIDES_LAST_MODIFIED = "2026-10-21";
+export const SITEMAP_GUIDES_LAST_MODIFIED = "2026-10-22";
 
 /**
  * P1 SEO: cert-type content slots so the 200 order pages and 50 state
