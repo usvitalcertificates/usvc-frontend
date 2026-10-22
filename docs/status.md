@@ -1,5 +1,7 @@
 # Frontend status + remaining work
 
+- State guide placement (2026-10-22): moved each existing contextual birth-certificate guide link from below the certificate cards into its state FAQ section, after the questions. The same ten states retain their link text and destination; no new guides or FAQ/schema content changes. Production build, lint, formatting and HTTP SEO checks pass, including placement checks for all ten guide links and all 268 sitemap URLs.
+
 - State card follow-up (2026-10-22): removed only “Track Your Order Online” from the certificate-card bullet list after pulling latest develop. Cards retain the two approved support/security bullets; tracking elsewhere and all pricing/application behavior remain unchanged.
 
 - State certificate cards (2026-10-22): replace only the two card fee paragraphs with the owner-approved “Request your official [State] [Certificate] in less than 10 minutes.” introduction and three owner-approved support/security/tracking bullets. Retain regular bullets, navy Times text, white cards, existing CTAs and VT/WY disabled behavior. Pricing FAQ/schema, order form, checkout and pricing logic remain unchanged. Verification: all 52 hubs have four updated cards with no card pricing and retained pricing FAQ; VT/WY buttons remain disabled. Desktop 1440px and mobile 390px browser checks show no overflow. Formatting, lint, 14 unit tests, TypeScript, production build and HTTP SEO checks pass; sitemap remains 268 URLs. Feature branch `feat/state-card-support`, no deployment.

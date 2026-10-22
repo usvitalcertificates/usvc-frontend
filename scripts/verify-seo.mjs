@@ -189,6 +189,10 @@ try {
     if (navigation.length) {
       assert(navigation[0][1].includes(`href="/guides/${state}/birth-certificate"`), url);
       assert(navigation[0][1].includes("birth certificate guide"), url);
+      const faqSection = [...main.matchAll(/<section\b[^>]*>([\s\S]*?)<\/section>/g)].find(
+        (match) => /<h2>[^<]* questions, answered<\/h2>/.test(match[1].replace(/<!--.*?-->/g, "")),
+      );
+      assert(faqSection?.[1].includes(navigation[0][0]), `Guide belongs in state FAQ: ${url}`);
     }
   }
   const graph = new Map(
