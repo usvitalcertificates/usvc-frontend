@@ -1,5 +1,7 @@
 "use client";
 
+import { DateInput } from "@/components/DateInput";
+
 import Link from "next/link";
 import { use, useCallback, useEffect, useState } from "react";
 import { staffJson, staffRole } from "@/lib/staff-client";
@@ -14,6 +16,7 @@ import {
   StatusPill,
 } from "@/components/staff/ui";
 import { CopyIconButton } from "@/components/staff/CopyButton";
+import { formatDateUS, formatTimeUS } from "@/lib/date-format";
 
 type Workflow = "all" | "processing" | "to_cs" | "gtg" | "submitted";
 type Preset = "today" | "7d" | "30d" | "month" | "all" | "custom";
@@ -190,24 +193,22 @@ export default function StaffAnalyticsPage({
           <div className="staff-analytics-dates">
             <label>
               From
-              <input
-                type="date"
+              <DateInput
                 value={from}
-                onChange={(event) => {
+                onValueChange={(date) => {
                   setPreset("custom");
-                  setFrom(event.target.value);
+                  setFrom(date);
                   setPage(1);
                 }}
               />
             </label>
             <label>
               To
-              <input
-                type="date"
+              <DateInput
                 value={to}
-                onChange={(event) => {
+                onValueChange={(date) => {
                   setPreset("custom");
-                  setTo(event.target.value);
+                  setTo(date);
                   setPage(1);
                 }}
               />
@@ -279,17 +280,8 @@ export default function StaffAnalyticsPage({
                       <StatusPill status={order.status} />
                     </td>
                     <td className="staff-analytics-date">
-                      {new Date(order.latestActivityAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                      <span>
-                        {new Date(order.latestActivityAt).toLocaleTimeString("en-US", {
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
-                      </span>
+                      {formatDateUS(order.latestActivityAt)}
+                      <span>{formatTimeUS(order.latestActivityAt)}</span>
                     </td>
                     <td>
                       {!selfMode || order.canOpen ? (

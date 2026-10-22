@@ -3,7 +3,7 @@
 import { useLayoutEffect, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Check, ChevronDown, Tag } from "lucide-react";
 import { copyMoney, copyPricing, MAX_COPIES } from "@/lib/copy-pricing";
-import type { CertificateSlug } from "@/lib/form-config";
+import { APPLICATION_LABELS, type CertificateSlug } from "@/lib/form-config";
 
 const examples: Record<CertificateSlug, readonly string[]> = {
   "birth-certificate": [
@@ -179,7 +179,7 @@ export function CopyQuantity({
         htmlFor="copy-quantity-select"
         className="copy-quantity-heading"
       >
-        Number of Certified Copies <span className="required-mark">*</span>
+        {APPLICATION_LABELS.copies} <span className="required-mark">*</span>
       </label>
       <div
         className="copy-picker"

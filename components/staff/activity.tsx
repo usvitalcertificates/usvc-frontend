@@ -1,6 +1,7 @@
 "use client";
 
 import { STATUS_LABELS } from "@/components/staff/ui";
+import { formatDateUS, formatDateTimeUS } from "@/lib/date-format";
 
 export interface ActivityEntryLike {
   action?: string;
@@ -20,6 +21,7 @@ const ORDER_LABELS: Record<string, string> = {
   order_reassigned: "Order reassigned",
   form_corrected: "Application form corrected",
   fulfillment_status_updated: "Status updated",
+  status_reopened: "Status reopened",
   internal_note_added: "Internal note added",
   sensitive_reveal: "Sensitive data revealed",
   confirmation_email_sent: "Confirmation email sent",
@@ -76,7 +78,7 @@ export function activityCategory(action?: string): string {
     action === "mfa_failure"
   )
     return "security";
-  if (action === "fulfillment_status_updated") return "status";
+  if (action === "fulfillment_status_updated" || action === "status_reopened") return "status";
   if (action === "internal_note_added") return "note";
   if (action === "order_claimed" || action === "order_reassigned" || action === "order_released")
     return "claim";
@@ -96,14 +98,13 @@ export function relTime(value?: string): string {
   if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
   if (days < 30) return `${days}d ago`;
-  return new Date(value).toLocaleDateString("en-US");
+  return formatDateUS(value);
 }
 
 export function fullTime(value?: string): string {
-  return value ? new Date(value).toLocaleString("en-US") : "";
+  return value ? formatDateTimeUS(value) : "";
 }
 
 export function dayKey(value: string | Date): string {
-  const date = value instanceof Date ? value : new Date(value);
-  return date.toLocaleDateString("en-US", { year: "numeric", month: "2-digit", day: "2-digit" });
+  return formatDateUS(value);
 }

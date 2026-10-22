@@ -218,7 +218,7 @@ export const NEW_YORK_GUIDE: BirthGuideContent = {
     { label: "NYC Health – Birth certificates", href: NYC_BIRTH_URL },
     { label: "New York State – Vital records", href: NEW_YORK_VITAL_RECORDS_URL },
   ],
-  sourceChecked: "October 22, 2026",
+  sourceChecked: "10/22/2026",
   ctaLabel: "Start Your New York Request",
   ctaNote:
     "Most people finish the guided form in about 10 minutes. Agency fees and shipping are separate from the USVC service fee.",

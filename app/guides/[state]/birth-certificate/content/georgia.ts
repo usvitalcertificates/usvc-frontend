@@ -290,7 +290,7 @@ export const GEORGIA_GUIDE: BirthGuideContent = {
     { label: "Georgia Department of Public Health – About Vital Records", href: GA_ABOUT_URL },
     { label: "Georgia.gov – FAQs about certificates", href: GA_FAQ_URL },
   ],
-  sourceChecked: "October 22, 2026",
+  sourceChecked: "10/22/2026",
   ctaLabel: "Start Your Georgia Request",
   ctaNote:
     "Most people finish the guided form in about 10 minutes. Agency fees and shipping are separate from the USVC service fee.",

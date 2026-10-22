@@ -35,7 +35,7 @@ for (const [slug, file] of Object.entries(guides)) {
     assert.ok((source.match(/\n\s+id: "/g) ?? []).length >= 6, `${slug} sections`);
     assert.ok((source.match(/\n\s+question: /g) ?? []).length >= 9, `${slug} FAQs`);
     assert.ok((source.match(/\n\s+\{ label: /g) ?? []).length >= 7, `${slug} sources`);
-    assert.match(source, /sourceChecked: "October 22, 2026"/);
+    assert.match(source, /sourceChecked: "10\/22\/2026"/);
     assert.match(source, /ctaLabel: "Start Your /);
   });
 }

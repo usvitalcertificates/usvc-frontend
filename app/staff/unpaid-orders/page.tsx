@@ -1,5 +1,7 @@
 "use client";
 
+import { DateInput } from "@/components/DateInput";
+
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { staffJson } from "@/lib/staff-client";
@@ -161,19 +163,14 @@ function UnpaidOrders() {
           </label>
           <label>
             From
-            <input
-              type="date"
-              value={draft.from}
-              onChange={(e) => update("from", e.target.value)}
-            />
+            <DateInput value={draft.from} onValueChange={(date) => update("from", date)} />
           </label>
           <label>
             Through
-            <input
-              type="date"
+            <DateInput
               min={draft.from || undefined}
               value={draft.to}
-              onChange={(e) => update("to", e.target.value)}
+              onValueChange={(date) => update("to", date)}
             />
           </label>
           <button className="staff-btn" type="submit">

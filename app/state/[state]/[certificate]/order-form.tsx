@@ -1,5 +1,6 @@
 "use client";
 
+import { DateInput } from "@/components/DateInput";
 import { CopyQuantity } from "./copy-quantity";
 import { copyPricing, copyMoney } from "@/lib/copy-pricing";
 import Link from "next/link";
@@ -15,6 +16,14 @@ import { getAnalyticsAttribution, getOpenAIAttribution, trackAnalytics } from "@
 import { trackOpenAICheckoutStarted } from "@/app/openai-analytics";
 import { isCountyTemporarilyUnavailable } from "@/lib/county-availability";
 import {
+  APPLICATION_TITLES,
+  APPLICATION_ADDRESS_TYPES as ADDRESS_TYPE_OPTIONS,
+  APPLICATION_LABELS,
+  ADDRESS_LABELS,
+  applicationSectionKeys,
+  eventLocationLabels,
+  applicationReasonLabel,
+  visiblePersonFields,
   BIRTH_MIN_YEAR,
   DEATH_MIN_YEAR,
   DIVORCE_MIN_YEAR,
@@ -33,7 +42,6 @@ import {
 } from "@/lib/geo";
 import {
   ADDRESS_SECTION_NOTES,
-  ADDRESS_TYPE_OPTIONS,
   APO_FPO_OPTIONS,
   INTERNATIONAL_COUNTRIES,
   PROCESSING_PAYMENT_AUTHORIZATION_TEXT,
@@ -439,11 +447,19 @@ function Field({
           required={def.required}
           placeholder="Please select…"
         />
+      ) : def.type === "date" ? (
+        <DateInput
+          id={id}
+          name={def.key}
+          required={def.required}
+          defaultValue={defaultValue ?? ""}
+          aria-label={def.label}
+        />
       ) : (
         <input
           id={id}
           name={def.key}
-          type={def.type === "date" ? "date" : "text"}
+          type="text"
           required={def.required}
           defaultValue={defaultValue ?? ""}
         />
@@ -528,15 +544,15 @@ function AddressFields({
           />
         </label>
         <div className="application-field">
-          <span>First Name</span>
+          <span>{ADDRESS_LABELS.firstName}</span>
           <p className="readonly-name">{requestorFirst.trim() || "Not provided"}</p>
         </div>
         <div className="application-field">
-          <span>Last Name</span>
+          <span>{ADDRESS_LABELS.lastName}</span>
           <p className="readonly-name">{requestorLast.trim() || "Not provided"}</p>
         </div>
         <label className="application-field wide">
-          Address Line 1 <span>*</span>
+          {ADDRESS_LABELS.line1} <span>*</span>
           <input name={`${prefix}Line1`} required defaultValue={get("Line1")} />
           {errors[`addresses.${prefix}.line1`] ? (
             <small className="application-error" role="alert">
@@ -545,11 +561,11 @@ function AddressFields({
           ) : null}
         </label>
         <label className="application-field wide">
-          Address Line 2 (optional)
+          {ADDRESS_LABELS.line2}
           <input name={`${prefix}Line2`} defaultValue={get("Line2")} />
         </label>
         <label className="application-field">
-          City <span>*</span>
+          {ADDRESS_LABELS.city} <span>*</span>
           <input name={`${prefix}City`} required defaultValue={get("City")} />
           {errors[`addresses.${prefix}.city`] ? (
             <small className="application-error" role="alert">
@@ -559,7 +575,7 @@ function AddressFields({
         </label>
         {type === "domestic" ? (
           <label className="application-field">
-            State <span>*</span>
+            {ADDRESS_LABELS.state} <span>*</span>
             <SearchableSelect
               name={`${prefix}State`}
               required
@@ -588,7 +604,7 @@ function AddressFields({
           </label>
         )}
         <label className="application-field">
-          Zip/Postal Code <span>*</span>
+          {ADDRESS_LABELS.postalCode} <span>*</span>
           <input name={`${prefix}Zip`} required defaultValue={get("Zip")} />
           {errors[`addresses.${prefix}.postalCode`] ? (
             <small className="application-error" role="alert">
@@ -598,7 +614,7 @@ function AddressFields({
         </label>
         {type === "international" ? (
           <label className="application-field">
-            Country <span>*</span>
+            {ADDRESS_LABELS.country} <span>*</span>
             <SearchableSelect
               name={`${prefix}Country`}
               required
@@ -774,7 +790,7 @@ export function OrderForm({
     const form = formRef.current;
     for (const name of inputNamesForError(key)) {
       const searchBox = form?.querySelector(
-        `[data-combobox-search="${CSS.escape(name)}"]`,
+        `[data-combobox-search="${CSS.escape(name)}"], [data-date-for="${CSS.escape(name)}"]`,
       ) as HTMLElement | null;
       if (searchBox) {
         searchBox.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -819,9 +835,9 @@ export function OrderForm({
     // Mirror invalid styling onto searchable-dropdown search boxes: the
     // hidden value inputs match [name] above (invisible), so copy their flags
     // to the paired visible box.
-    form.querySelectorAll("input[data-combobox]").forEach((hidden) => {
+    form.querySelectorAll("input[data-combobox], input[data-date-value]").forEach((hidden) => {
       const pair = form.querySelector(
-        `[data-combobox-search="${CSS.escape(hidden.getAttribute("data-combobox") ?? "")}"]`,
+        `[data-combobox-search="${CSS.escape(hidden.getAttribute("data-combobox") ?? "")}"], [data-date-for="${CSS.escape(hidden.getAttribute("data-date-value") ?? "")}"]`,
       );
       if (!pair) return;
       if (hidden.getAttribute("data-invalid") === "true") {
@@ -902,18 +918,7 @@ export function OrderForm({
    *  section never leaves a numbering gap (death flows 1,2,3,4… instead of
    *  1,2,3,5…). Certificates with a family section keep 1–10 as before. */
   const sectionNumber = (key: SectionKey): number => {
-    const order: SectionKey[] = [
-      "certificate",
-      "requestor",
-      "subject",
-      ...(hasFamilySection ? (["family"] as SectionKey[]) : []),
-      "shipping",
-      "copies",
-      "billing",
-      "card",
-      "summary",
-      "submit",
-    ];
+    const order = applicationSectionKeys(config);
     return order.indexOf(key) + 1;
   };
   const sexValue = values.sex ?? draft.sex ?? "";
@@ -947,7 +952,12 @@ export function OrderForm({
     setValues((prev) => {
       const merged = { ...data };
       for (const [k, v] of Object.entries(prev)) {
-        if ((merged[k] === undefined || merged[k] === "") && v !== "") merged[k] = v;
+        if (
+          (merged[k] === undefined || merged[k] === "") &&
+          v !== "" &&
+          !(k === changed && (event?.target as HTMLElement | null)?.hasAttribute("data-date-value"))
+        )
+          merged[k] = v;
       }
       return merged;
     });
@@ -1352,11 +1362,11 @@ export function OrderForm({
       <FormSection
         sectionKey="certificate"
         number={sectionNumber("certificate")}
-        title="Information About the Certificate"
+        title={APPLICATION_TITLES.certificate}
       >
         <div className="application-grid">
           <label className="application-field">
-            Certificate Type <span>*</span>
+            {APPLICATION_LABELS.certificate} <span>*</span>
             <input
               name="certificate"
               defaultValue={certificateName.replace(`${stateName} `, "")}
@@ -1364,12 +1374,11 @@ export function OrderForm({
             />
           </label>
           <label className="application-field">
-            State / Territory <span>*</span>
+            {APPLICATION_LABELS.state} <span>*</span>
             <input name="state" defaultValue={stateName} disabled />
           </label>
           <label className="application-field">
-            {`${noun.charAt(0).toUpperCase()}${noun.slice(1)} where the ${config.eventLocationLabel} occurred`}{" "}
-            <span>*</span>
+            {eventLocationLabels(config, noun).county} <span>*</span>
             <SearchableSelect
               name="county"
               required
@@ -1397,7 +1406,7 @@ export function OrderForm({
             ) : null}
           </label>
           <label className="application-field">
-            {`City / town where the ${config.eventLocationLabel} occurred`} <span>*</span>
+            {eventLocationLabels(config, noun).city} <span>*</span>
             <SearchableSelect
               name="city"
               required
@@ -1447,8 +1456,7 @@ export function OrderForm({
             </p>
           ) : null}
           <label className="application-field wide">
-            {isBirth || isDeath ? "Reason for Request" : "Reason for requesting this certificate"}{" "}
-            <span>*</span>
+            {applicationReasonLabel(certSlug)} <span>*</span>
             <SearchableSelect
               name="reason"
               required
@@ -1462,7 +1470,7 @@ export function OrderForm({
           </label>
           {reason === "Other" ? (
             <label className="application-field wide">
-              Please describe your reason <span>*</span>
+              {APPLICATION_LABELS.reasonOther} <span>*</span>
               <input name="reasonOther" required defaultValue={draft.reasonOther ?? ""} />
               {fieldErrors.reasonOther ? (
                 <small className="application-error" role="alert">
@@ -1514,7 +1522,7 @@ export function OrderForm({
         <FormSection
           sectionKey="requestor"
           number={sectionNumber("requestor")}
-          title="Information About the Requestor"
+          title={APPLICATION_TITLES.requestor}
         >
           {isBirth || isMarriage || isDivorce ? (
             <p className="hint">
@@ -1538,7 +1546,7 @@ export function OrderForm({
           ) : null}
           <div className="application-grid">
             <label className="application-field wide">
-              Your relationship to the person named on the certificate <span>*</span>
+              {APPLICATION_LABELS.relationship} <span>*</span>
               <SearchableSelect
                 name="relationship"
                 required
@@ -1566,7 +1574,7 @@ export function OrderForm({
             </p>
             {relationship === "Other" ? (
               <label className="application-field wide">
-                Please describe your relationship <span>*</span>
+                {APPLICATION_LABELS.relationshipOther} <span>*</span>
                 <input
                   name="relationshipOther"
                   required
@@ -1580,7 +1588,7 @@ export function OrderForm({
               </label>
             ) : null}
             <label className="application-field">
-              First Name of Requestor <span>*</span>
+              {APPLICATION_LABELS.firstName} <span>*</span>
               <input
                 name="applicantFirstName"
                 required
@@ -1588,11 +1596,11 @@ export function OrderForm({
               />
             </label>
             <label className="application-field">
-              Middle Name of Requestor
+              {APPLICATION_LABELS.middleName}
               <input name="applicantMiddleName" defaultValue={draft.applicantMiddleName ?? ""} />
             </label>
             <label className="application-field">
-              Current Last Name of Requestor <span>*</span>
+              {APPLICATION_LABELS.lastName} <span>*</span>
               <input
                 name="applicantLastName"
                 required
@@ -1600,7 +1608,7 @@ export function OrderForm({
               />
             </label>
             <label className="application-field">
-              Suffix
+              {APPLICATION_LABELS.suffix}
               <SearchableSelect
                 name="applicantSuffix"
                 defaultValue={draft.applicantSuffix ?? ""}
@@ -1618,10 +1626,11 @@ export function OrderForm({
           <div className="application-grid">
             {config.requestor.showDateOfBirth ? (
               <label className="application-field">
-                Your date of birth {config.requestor.dateOfBirthRequired ? <span>*</span> : null}
-                <input
+                {APPLICATION_LABELS.dateOfBirth}{" "}
+                {config.requestor.dateOfBirthRequired ? <span>*</span> : null}
+                <DateInput
                   name="applicantDob"
-                  type="date"
+                  aria-label={APPLICATION_LABELS.dateOfBirth}
                   required={config.requestor.dateOfBirthRequired}
                   defaultValue={draft.applicantDob ?? ""}
                 />
@@ -1634,7 +1643,7 @@ export function OrderForm({
             ) : null}
             {config.requestor.showSsn ? (
               <label className="application-field">
-                Your Social Security Number {config.requestor.ssnRequired ? <span>*</span> : null}
+                {APPLICATION_LABELS.ssn} {config.requestor.ssnRequired ? <span>*</span> : null}
                 <input
                   name="requestorSsn"
                   type="text"
@@ -1669,7 +1678,7 @@ export function OrderForm({
         <FormSection
           sectionKey="subject"
           number={sectionNumber("subject")}
-          title="Information About the Subject"
+          title={config.subjectSectionTitle}
         >
           {certSlug === "birth-certificate" ? (
             <p className="adoption-note">
@@ -1693,17 +1702,11 @@ export function OrderForm({
           )}
           {spousesTogether ? <h3 className="spouse-heading">Spouse 1</h3> : null}
           <div className="application-grid">
-            {config.person.map((field) => {
-              // Birth: maiden name only applies to a Female subject — hidden
-              // for Male, compulsory for Female.
-              if (isBirth && field.key === "subjectMaidenLastName" && sexValue === "Male")
-                return null;
-              const requiredWhenFemale =
-                isBirth && field.key === "subjectMaidenLastName" && sexValue === "Female";
+            {visiblePersonFields(config, isBirth, sexValue).map((field) => {
               return (
                 <Field
                   key={field.key}
-                  def={requiredWhenFemale ? { ...field, required: true } : field}
+                  def={field}
                   defaultValue={draft[field.key]}
                   error={fieldErrors[`subject.${field.key}`]}
                 />
@@ -1732,7 +1735,7 @@ export function OrderForm({
           <FormSection
             sectionKey="family"
             number={sectionNumber("family")}
-            title="Parent / Family Information"
+            title={APPLICATION_TITLES.family}
           >
             {config.family.length > 0 ? (
               <fieldset>
@@ -1806,7 +1809,7 @@ export function OrderForm({
         <FormSection
           sectionKey="shipping"
           number={sectionNumber("shipping")}
-          title="Shipping & Contact Information"
+          title={APPLICATION_TITLES.shipping}
         >
           <p className="hint">
             <strong className="important-note">Requirements:</strong>{" "}
@@ -1859,7 +1862,7 @@ export function OrderForm({
             <p className="contact-heading">Contact Information</p>
             <div className="application-grid">
               <label className="application-field wide">
-                Phone Number <span>*</span>
+                {APPLICATION_LABELS.phone} <span>*</span>
                 <PhoneInput
                   defaultCountry="us"
                   preferredCountries={["us"]}
@@ -1882,7 +1885,7 @@ export function OrderForm({
                 ) : null}
               </label>
               <label className="application-field">
-                Email address <span>*</span>
+                {APPLICATION_LABELS.email} <span>*</span>
                 <input
                   name="email"
                   type="email"
@@ -1924,7 +1927,7 @@ export function OrderForm({
         <FormSection
           sectionKey="copies"
           number={sectionNumber("copies")}
-          title="Copies & Processing"
+          title={APPLICATION_TITLES.copies}
         >
           <CopyQuantity
             copies={copies}
@@ -1933,7 +1936,7 @@ export function OrderForm({
             onSelect={(value) => setValues((v) => ({ ...v, copies: value }))}
           />
           <label className="application-field wide">
-            Delivery Method <span>*</span>
+            {APPLICATION_LABELS.delivery} <span>*</span>
             <SearchableSelect
               name="delivery"
               required
@@ -1956,7 +1959,7 @@ export function OrderForm({
             </em>
           </p>
           <fieldset className="processing-options">
-            <legend>Processing speed</legend>
+            <legend>{APPLICATION_LABELS.processing}</legend>
             <label className={rush ? "" : "selected"}>
               <input
                 type="radio"
@@ -1995,7 +1998,11 @@ export function OrderForm({
           <p className="hint">{PROCESSING_CLARIFICATION_NOTE}</p>
         </FormSection>
 
-        <FormSection sectionKey="billing" number={sectionNumber("billing")} title="Billing Details">
+        <FormSection
+          sectionKey="billing"
+          number={sectionNumber("billing")}
+          title={APPLICATION_TITLES.billing}
+        >
           <p className="hint">
             <strong className="important-note">Requirements:</strong>{" "}
             <em>The Billing Address Name must match the Requestor Name.</em>
@@ -2055,7 +2062,11 @@ export function OrderForm({
           />
         </FormSection>
 
-        <FormSection sectionKey="card" number={sectionNumber("card")} title="Credit Card Details">
+        <FormSection
+          sectionKey="card"
+          number={sectionNumber("card")}
+          title={APPLICATION_TITLES.card}
+        >
           {paymentFailure || paymentProcessing ? (
             <div
               className={`payment-recovery-panel ${paymentProcessing ? "is-processing" : "is-declined"}`}
@@ -2130,7 +2141,7 @@ export function OrderForm({
           </p>
           <div className="application-grid payment-card-grid">
             <label className="application-field wide">
-              Credit Card Number <span>*</span>
+              {APPLICATION_LABELS.cardNumber} <span>*</span>
               <div className="card-number-field">
                 <input
                   name="cardNumber"
@@ -2163,7 +2174,7 @@ export function OrderForm({
               ) : null}
             </label>
             <label className="application-field">
-              Credit Card Expiry Date (MM/YY) <span>*</span>
+              {APPLICATION_LABELS.cardExpiry} <span>*</span>
               <input
                 name="cardExpiry"
                 required
@@ -2186,7 +2197,7 @@ export function OrderForm({
               ) : null}
             </label>
             <label className="application-field">
-              CVV <span>*</span>
+              {APPLICATION_LABELS.cardCvc} <span>*</span>
               <input
                 name="cardSecurityCode"
                 required
@@ -2230,7 +2241,11 @@ export function OrderForm({
           ) : null}
         </FormSection>
 
-        <FormSection sectionKey="summary" number={sectionNumber("summary")} title="Order Summary">
+        <FormSection
+          sectionKey="summary"
+          number={sectionNumber("summary")}
+          title={APPLICATION_TITLES.summary}
+        >
           <div className="order-summary">
             <h3>{certificateName}</h3>
             <p>
@@ -2290,7 +2305,11 @@ export function OrderForm({
           </div>
         </FormSection>
 
-        <FormSection sectionKey="submit" number={sectionNumber("submit")} title="Submit Your Order">
+        <FormSection
+          sectionKey="submit"
+          number={sectionNumber("submit")}
+          title={APPLICATION_TITLES.submit}
+        >
           <div className="verify-panel">
             <h3>Verify Order</h3>
             <ol className="verify-list">

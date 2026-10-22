@@ -3,6 +3,8 @@
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, CheckCircle2, FileText, Flag, Play, Send, UploadCloud } from "lucide-react";
+import { ApplicationSections } from "@/components/staff/ApplicationSections";
+import { APPLICATION_LABELS } from "@/lib/form-config";
 import { CopyButton } from "@/components/staff/CopyButton";
 import { staffData, staffFetch, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
@@ -22,6 +24,7 @@ import {
   humanizeActivity,
   relTime,
 } from "@/components/staff/activity";
+import { formatDateTimeUS } from "@/lib/date-format";
 
 const NEXT_STATUS: Record<string, string[]> = {
   PAID: ["IN_REVIEW"],
@@ -29,6 +32,14 @@ const NEXT_STATUS: Record<string, string[]> = {
   TO_CS: ["GTG"],
   GTG: ["IN_REVIEW"],
   SUBMITTED: [],
+};
+
+/** ADMIN-only rewinds. Mirrors the backend order-reopen transitions. */
+const REOPEN_TARGETS: Record<string, ("PAID" | "IN_REVIEW")[]> = {
+  SUBMITTED: ["IN_REVIEW", "PAID"],
+  IN_REVIEW: ["PAID"],
+  TO_CS: ["IN_REVIEW", "PAID"],
+  GTG: ["IN_REVIEW", "PAID"],
 };
 
 const MOVE_TONE: Record<string, "primary" | "green" | "red"> = {
@@ -94,54 +105,6 @@ interface AuditEntry {
 
 function auditLabel(entry: AuditEntry): string {
   return humanizeActivity(entry);
-}
-
-/** firstName → First name, dateOfBirth → Date of birth. */
-function prettyLabel(key: string): string {
-  const spaced = key
-    .replace(/([A-Z])/g, " $1")
-    .replace(/[_-]+/g, " ")
-    .trim();
-  return spaced.charAt(0).toUpperCase() + spaced.slice(1).toLowerCase();
-}
-
-function sectionText(entries: [string, unknown][]): string {
-  return entries
-    .filter(([, val]) => val !== "" && val !== undefined && val !== null)
-    .map(([key, val]) => `${prettyLabel(key)}: ${String(val)}`)
-    .join("\n");
-}
-
-/**
- * One striped-table section (Requestor, Subject, address…) with a header
- * Copy-all button for pasting the whole block onto government forms.
- */
-function FieldSection({ title, entries }: { title: string; entries: [string, unknown][] }) {
-  const visible = entries.filter(([, val]) => val !== "" && val !== undefined && val !== null);
-  if (visible.length === 0) return null;
-  return (
-    <section aria-label={title} className="staff-appsect">
-      <div className="staff-secthead">
-        <h3>{title}</h3>
-        <CopyButton value={sectionText(visible)} label={`${title} section`} />
-      </div>
-      <dl className="staff-deflist">
-        {visible.map(([key, val]) => {
-          const label = prettyLabel(key);
-          const text = String(val);
-          return (
-            <div key={key}>
-              <dt>{label}</dt>
-              <dd>
-                <CopyButton value={text} label={label} position="left" />
-                <span>{text}</span>
-              </dd>
-            </div>
-          );
-        })}
-      </dl>
-    </section>
-  );
 }
 
 const SENSITIVE_NOTICE: Record<"ssn" | "card", string> = {
@@ -269,22 +232,35 @@ function RevealCard({
                   </span>
                   <span className="staff-paycard-brand">{cardBrand(card.number)}</span>
                 </div>
+                <p className="staff-paycard-caption">{APPLICATION_LABELS.cardNumber}</p>
                 <p className="staff-paycard-number">
-                  <CopyButton value={card.number} label="Card number" position="left" />
+                  <CopyButton
+                    value={card.number}
+                    label={APPLICATION_LABELS.cardNumber}
+                    position="left"
+                  />
                   <span>{groupCardNumber(card.number)}</span>
                 </p>
                 <div className="staff-paycard-row">
                   <span>
-                    <span className="staff-paycard-caption">Expiry</span>
+                    <span className="staff-paycard-caption">{APPLICATION_LABELS.cardExpiry}</span>
                     <span className="staff-paycard-value">
-                      <CopyButton value={card.expiry} label="Card expiry" position="left" />
+                      <CopyButton
+                        value={card.expiry}
+                        label={APPLICATION_LABELS.cardExpiry}
+                        position="left"
+                      />
                       <span>{card.expiry}</span>
                     </span>
                   </span>
                   <span>
-                    <span className="staff-paycard-caption">CVC</span>
+                    <span className="staff-paycard-caption">{APPLICATION_LABELS.cardCvc}</span>
                     <span className="staff-paycard-value">
-                      <CopyButton value={card.securityCode} label="Card CVC" position="left" />
+                      <CopyButton
+                        value={card.securityCode}
+                        label={APPLICATION_LABELS.cardCvc}
+                        position="left"
+                      />
                       <span>{card.securityCode}</span>
                     </span>
                   </span>
@@ -318,9 +294,24 @@ function RevealCard({
           </>
         ) : (
           <div className="staff-reveal-form">
-            <p>
-              <code>*********</code>
-            </p>
+            {field === "card" ? (
+              <dl className="staff-deflist">
+                {[
+                  APPLICATION_LABELS.cardNumber,
+                  APPLICATION_LABELS.cardExpiry,
+                  APPLICATION_LABELS.cardCvc,
+                ].map((label) => (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>*********</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : (
+              <p>
+                <code>*********</code>
+              </p>
+            )}
             {reference ? (
               <p style={{ fontSize: "0.85rem", color: "var(--muted-text)" }}>{reference}</p>
             ) : null}
@@ -389,6 +380,10 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const [canCorrect, setCanCorrect] = useState(false);
   const [histLimit, setHistLimit] = useState(10);
   const [noteLimit, setNoteLimit] = useState(10);
+  const [reopenOpen, setReopenOpen] = useState(false);
+  const [reopenTo, setReopenTo] = useState<"PAID" | "IN_REVIEW">("IN_REVIEW");
+  const [reopenReason, setReopenReason] = useState("");
+  const [reopenBusy, setReopenBusy] = useState(false);
 
   useEffect(() => {
     const role = staffRole();
@@ -472,6 +467,26 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       setError(e instanceof Error ? e.message : "Could not send to CS");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const reopenOrder = async () => {
+    if (!reopenReason.trim()) return;
+    setReopenBusy(true);
+    setError("");
+    try {
+      await staffJson(`/orders/${id}/reopen`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: reopenTo, reason: reopenReason.trim() }),
+      });
+      setReopenOpen(false);
+      setReopenReason("");
+      setToast("Order status restored.");
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not reopen this order");
+    } finally {
+      setReopenBusy(false);
     }
   };
 
@@ -560,6 +575,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const next = NEXT_STATUS[order.status] ?? [];
   const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
   const closed = order.status === "SUBMITTED";
+  const reopenTargets = REOPEN_TARGETS[order.status] ?? [];
   const effectiveMoveTo = moveTo ?? next[0] ?? "";
   const exceptionMove = effectiveMoveTo === "TO_CS";
   const gtgMove = effectiveMoveTo === "GTG";
@@ -607,7 +623,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <CopyButton value={order.publicNumber} label="Order number" />
           </h1>
           <p className="staff-orderbar-sub">
-            {`${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} · ${order.stateName} (${order.geo.county}, ${order.geo.city}) · Created ${new Date(order.createdAt).toLocaleString("en-US")}`}
+            {`${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} · ${order.stateName} (${order.geo.county}, ${order.geo.city}) · Created ${formatDateTimeUS(order.createdAt)}`}
           </p>
           <div className="staff-orderbar-statuses">
             <StatusPill status={order.status} />
@@ -829,11 +845,37 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 )
               ) : (
                 <p style={{ color: "var(--flow-secondary)", marginBottom: 0 }}>
-                  No further actions — the submission record above is final.
+                  {isAdmin
+                    ? "Submitted by mistake? Use the super-admin correction below to reopen it."
+                    : "No further actions — the submission record above is final."}
                 </p>
               )}
             </div>
           </div>
+
+          {isAdmin && reopenTargets.length > 0 ? (
+            <div className="staff-panel" id="admin-reopen">
+              <h2>Super-admin correction</h2>
+              <div className="staff-panel-body">
+                <p style={{ marginTop: 0, color: "var(--flow-secondary)" }}>
+                  Accidentally moved this order forward? Restoring it rolls back the
+                  customer-visible timeline and is recorded in the audit trail under your name.
+                </p>
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  disabled={busy}
+                  onClick={() => {
+                    setReopenTo(reopenTargets[0]);
+                    setReopenReason("");
+                    setReopenOpen(true);
+                  }}
+                >
+                  Reopen order…
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           <div className="staff-grid-2">
             <div className="staff-panel">
@@ -853,7 +895,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   </div>
                   <div>
                     <dt>Sent to agency</dt>
-                    <dd>{new Date(order.createdAt).toLocaleString("en-US")}</dd>
+                    <dd>{formatDateTimeUS(order.createdAt)}</dd>
                   </div>
                 </dl>
                 <h3>Requestor</h3>
@@ -962,43 +1004,25 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           <div className="staff-panel">
             <h2>Application</h2>
             <div className="staff-panel-body">
-              <FieldSection
-                title="Requestor & contact"
-                entries={Object.entries(order.applicant ?? {})}
+              <ApplicationSections
+                data={order}
+                renderSensitive={(field) => (
+                  <RevealCard
+                    orderId={id}
+                    field={field}
+                    title={field === "ssn" ? APPLICATION_LABELS.ssn : "Credit Card Details"}
+                    shortTitle={field === "ssn" ? "SSN" : undefined}
+                    reference={
+                      field === "card" && order.cardLast4
+                        ? `Reference only — card ending ${order.cardLast4}. Full details are removed after submission.`
+                        : undefined
+                    }
+                    onReveal={() => void load()}
+                  />
+                )}
               />
-              {Object.keys(order.subject ?? {}).length > 0 ? (
-                <FieldSection title="Subject" entries={Object.entries(order.subject)} />
-              ) : null}
-              {Object.keys(order.family ?? {}).length > 0 ? (
-                <FieldSection title="Family" entries={Object.entries(order.family)} />
-              ) : null}
-              {Object.entries(order.addresses ?? {}).map(([kind, addr]) => (
-                <FieldSection
-                  key={kind}
-                  title={`${kind.charAt(0).toUpperCase() + kind.slice(1)} address`}
-                  entries={Object.entries(addr ?? {})}
-                />
-              ))}
             </div>
           </div>
-          <RevealCard
-            orderId={id}
-            field="ssn"
-            title="Social Security Number (SSN)"
-            shortTitle="SSN"
-            onReveal={() => void load()}
-          />
-          <RevealCard
-            orderId={id}
-            field="card"
-            title="Payment card"
-            reference={
-              order.cardLast4
-                ? `Reference only — card ending ${order.cardLast4}. Full details are removed after submission.`
-                : undefined
-            }
-            onReveal={() => void load()}
-          />
           {canCorrect && !closed && (order.status === "TO_CS" || order.status === "GTG") ? (
             <p style={{ fontSize: "0.9rem", color: "var(--muted-text)" }}>
               CS edits this order in the dedicated editor:{" "}
@@ -1154,7 +1178,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
                         <span>
                           {(order.document.size / 1024).toFixed(0)} KB · uploaded{" "}
-                          {new Date(order.document.uploadedAt).toLocaleString("en-US")}
+                          {formatDateTimeUS(order.document.uploadedAt)}
                         </span>
                       </span>
                     </div>
@@ -1261,6 +1285,70 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
         </>
+      ) : null}
+
+      {reopenOpen && order ? (
+        <div
+          className="staff-modal-backdrop"
+          onClick={() => {
+            if (!reopenBusy) setReopenOpen(false);
+          }}
+        >
+          <div
+            className="staff-modal"
+            role="dialog"
+            aria-label="Reopen order"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2>Reopen this order?</h2>
+            <p style={{ color: "var(--muted-text)" }}>
+              Restores the order to an earlier step and rolls back the customer-visible timeline.
+              This correction is recorded in the audit trail under your name.
+            </p>
+            <label>
+              Restore to
+              <select
+                value={reopenTo}
+                onChange={(e) => setReopenTo(e.target.value as "PAID" | "IN_REVIEW")}
+              >
+                {reopenTargets.map((s) => (
+                  <option key={s} value={s}>
+                    {STATUS_LABELS[s] ?? s}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Reason (required, recorded in the audit trail)
+              <textarea
+                value={reopenReason}
+                onChange={(e) => setReopenReason(e.target.value)}
+                rows={3}
+                maxLength={500}
+                placeholder="Accidentally clicked Submit to Govt Agency"
+                style={{ width: "100%", resize: "vertical" }}
+              />
+            </label>
+            <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
+              <button
+                type="button"
+                className="staff-btn"
+                disabled={reopenBusy || !reopenReason.trim()}
+                onClick={() => void reopenOrder()}
+              >
+                {reopenBusy ? "Restoring…" : "Restore status"}
+              </button>
+              <button
+                type="button"
+                className="staff-btn secondary"
+                disabled={reopenBusy}
+                onClick={() => setReopenOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       ) : null}
 
       {toCsOpen && order ? (

@@ -2424,7 +2424,7 @@ dl.staff-lines {
   align-items: end;
   flex-wrap: wrap;
 }
-.staff-dashboard-filters input[type="date"] {
+.staff-dashboard-filters .usvc-date {
   min-width: 150px;
 }
 .staff-dashboard-table {
@@ -3209,4 +3209,64 @@ dl.staff-lines {
   .staff-resume-footer .staff-btn {
     align-self: flex-start;
   }
+}
+
+.staff-application-sections {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.staff-application-sections .staff-secthead h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.staff-application-group {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.staff-application-group + .staff-application-group {
+  margin-top: 16px;
+}
+.staff-application-group h3 {
+  margin: 8px 0;
+  font-size: 1rem;
+}
+.staff-application-sections .staff-deflist {
+  margin: 0;
+}
+.staff-application-sections input,
+.staff-application-sections select {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.staff-application-sections .staff-appsect {
+  margin-bottom: 0;
+}
+.staff-application-sections .staff-deflist > div {
+  grid-template-columns: minmax(150px, 32%) minmax(0, 1fr);
+}
+.staff-sensitive-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+@media (max-width: 600px) {
+  .staff-application-sections .staff-deflist > div {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .staff-application-sections .staff-secthead {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+.staff-application-sections .staff-secthead h2,
+.staff-application-sections .staff-application-group h3,
+.staff-application-sections .staff-deflist dt,
+.staff-application-sections label > span:first-child {
+  text-transform: capitalize;
 }

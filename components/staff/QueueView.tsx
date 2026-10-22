@@ -15,6 +15,7 @@ import {
   TimedActionModal,
 } from "@/components/staff/ui";
 import { CopyIconButton } from "@/components/staff/CopyButton";
+import { formatDateUS, formatTimeUS } from "@/lib/date-format";
 
 interface QueueOrder {
   id: string;
@@ -364,19 +365,10 @@ export function QueueView({
                 {orders.map((order) => (
                   <tr key={order.id}>
                     <td style={{ whiteSpace: "nowrap" }}>
-                      <span className="staff-date">
-                        {new Date(order.createdAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </span>
+                      <span className="staff-date">{formatDateUS(order.createdAt)}</span>
                       <br />
                       <span className="staff-pill gray staff-time-badge">
-                        {new Date(order.createdAt).toLocaleTimeString("en-US", {
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
+                        {formatTimeUS(order.createdAt)}
                       </span>
                     </td>
                     <td>

@@ -218,7 +218,7 @@ export const FLORIDA_GUIDE: BirthGuideContent = {
     },
     { label: "CDC – Where to write for vital records", href: CDC_OUTSIDE_URL },
   ],
-  sourceChecked: "October 22, 2026",
+  sourceChecked: "10/22/2026",
   ctaLabel: "Start Your Florida Request",
   ctaNote:
     "Most people finish the guided form in about 10 minutes. Agency fees and shipping are separate from the USVC service fee.",

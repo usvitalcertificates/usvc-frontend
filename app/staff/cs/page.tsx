@@ -13,6 +13,7 @@ import {
   TimedActionModal,
 } from "@/components/staff/ui";
 import { CopyIconButton } from "@/components/staff/CopyButton";
+import { formatDateUS, formatTimeUS } from "@/lib/date-format";
 
 interface CsOrder {
   id: string;
@@ -275,19 +276,10 @@ export default function CsCorrections() {
                     <td className="staff-correction-handoff">
                       {o.sentToCsAt ? (
                         <>
-                          <span className="staff-date">
-                            {new Date(o.sentToCsAt).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
-                          </span>
+                          <span className="staff-date">{formatDateUS(o.sentToCsAt)}</span>
                           <br />
                           <span className="staff-pill gray staff-time-badge">
-                            {new Date(o.sentToCsAt).toLocaleTimeString("en-US", {
-                              hour: "numeric",
-                              minute: "2-digit",
-                            })}
+                            {formatTimeUS(o.sentToCsAt)}
                           </span>
                         </>
                       ) : (
