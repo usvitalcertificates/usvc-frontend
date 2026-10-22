@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
+import { formatDateTimeUS } from "@/lib/date-format";
 
 export const OUTCOME_LABELS: Record<string, string> = {
   NOT_CONTACTED: "Not contacted",
@@ -35,7 +36,7 @@ export function money(cents: number, currency = "usd") {
   }).format(cents / 100);
 }
 export function dateTime(value: string) {
-  return new Date(value).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+  return formatDateTimeUS(value);
 }
 const PAYMENT_LABELS: Record<string, string> = {
   PENDING: "Pending",

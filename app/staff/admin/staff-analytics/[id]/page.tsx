@@ -14,6 +14,7 @@ import {
   StatusPill,
 } from "@/components/staff/ui";
 import { CopyIconButton } from "@/components/staff/CopyButton";
+import { formatDateUS, formatTimeUS } from "@/lib/date-format";
 
 type Workflow = "all" | "processing" | "to_cs" | "gtg" | "submitted";
 type Preset = "today" | "7d" | "30d" | "month" | "all" | "custom";
@@ -279,17 +280,8 @@ export default function StaffAnalyticsPage({
                       <StatusPill status={order.status} />
                     </td>
                     <td className="staff-analytics-date">
-                      {new Date(order.latestActivityAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                      <span>
-                        {new Date(order.latestActivityAt).toLocaleTimeString("en-US", {
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
-                      </span>
+                      {formatDateUS(order.latestActivityAt)}
+                      <span>{formatTimeUS(order.latestActivityAt)}</span>
                     </td>
                     <td>
                       {!selfMode || order.canOpen ? (

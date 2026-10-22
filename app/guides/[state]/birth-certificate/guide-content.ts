@@ -105,7 +105,7 @@ function genericGuide(stateName: string, officialUrl: string): BirthGuideContent
       },
     ],
     sources: [{ label: `${stateName} official birth-record resource`, href: officialUrl }],
-    sourceChecked: "September 30, 2026",
+    sourceChecked: "09/30/2026",
     ctaLabel: `Start Your ${stateName} Request`,
     ctaNote:
       "Most people finish the guided form in about 10 minutes. Agency fees and shipping are separate from the USVC service fee.",

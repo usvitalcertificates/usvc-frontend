@@ -1,5 +1,7 @@
 # Frontend status + remaining work
 
+- US date format (2026-10-23): added `lib/date-format.ts` (`formatDateUS` → MM/DD/YYYY, plus `formatTimeUS`/`formatDateTimeUS`) and routed every displayed timestamp through it: public order tracking, resume, staff queue/CS/payment/unpaid/admin analytics, order detail, activity/history, legal "Last updated", about/editorial review dates and guide "sources checked" metadata. Relative labels (`2h ago`) and ISO API/sitemap values are unchanged. Formatting, lint, TypeScript, 33/33 tests and production build (305 pages) pass. Not deployed.
+
 - ADMIN status reopen (2026-10-23): the staff order detail page gains a super-admin-only "Super-admin correction" panel and a reason-required modal that restores an accidentally advanced order (`SUBMITTED`/`GTG`/`TO_CS`/`IN_REVIEW` → `IN_REVIEW`/`PAID`) via `PATCH /orders/:id/reopen`. The modal states that the customer timeline is rolled back and the action is audited; the activity timeline labels the new `status_reopened` event. Formatting, lint, TypeScript, 33/33 tests and production build (305 pages) pass. Not deployed.
 
 - Release safety CI (2026-10-22): added GitHub Actions checks for pull requests and pushes to `develop` and `main`. On Node 24, CI installs with `npm ci` and runs formatting, lint, TypeScript, tests, production build, SEO HTTP checks and the production dependency audit. Branch `chore/release-safety`; pending PR. Branch protection remains a manual GitHub setting.

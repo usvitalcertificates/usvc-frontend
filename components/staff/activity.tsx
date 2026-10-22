@@ -1,6 +1,7 @@
 "use client";
 
 import { STATUS_LABELS } from "@/components/staff/ui";
+import { formatDateUS, formatDateTimeUS } from "@/lib/date-format";
 
 export interface ActivityEntryLike {
   action?: string;
@@ -97,14 +98,13 @@ export function relTime(value?: string): string {
   if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
   if (days < 30) return `${days}d ago`;
-  return new Date(value).toLocaleDateString("en-US");
+  return formatDateUS(value);
 }
 
 export function fullTime(value?: string): string {
-  return value ? new Date(value).toLocaleString("en-US") : "";
+  return value ? formatDateTimeUS(value) : "";
 }
 
 export function dayKey(value: string | Date): string {
-  const date = value instanceof Date ? value : new Date(value);
-  return date.toLocaleDateString("en-US", { year: "numeric", month: "2-digit", day: "2-digit" });
+  return formatDateUS(value);
 }

@@ -22,6 +22,7 @@ import {
   humanizeActivity,
   relTime,
 } from "@/components/staff/activity";
+import { formatDateTimeUS } from "@/lib/date-format";
 
 const NEXT_STATUS: Record<string, string[]> = {
   PAID: ["IN_REVIEW"],
@@ -640,7 +641,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <CopyButton value={order.publicNumber} label="Order number" />
           </h1>
           <p className="staff-orderbar-sub">
-            {`${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} · ${order.stateName} (${order.geo.county}, ${order.geo.city}) · Created ${new Date(order.createdAt).toLocaleString("en-US")}`}
+            {`${order.certificate.charAt(0) + order.certificate.slice(1).toLowerCase()} · ${order.stateName} (${order.geo.county}, ${order.geo.city}) · Created ${formatDateTimeUS(order.createdAt)}`}
           </p>
           <div className="staff-orderbar-statuses">
             <StatusPill status={order.status} />
@@ -912,7 +913,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   </div>
                   <div>
                     <dt>Sent to agency</dt>
-                    <dd>{new Date(order.createdAt).toLocaleString("en-US")}</dd>
+                    <dd>{formatDateTimeUS(order.createdAt)}</dd>
                   </div>
                 </dl>
                 <h3>Requestor</h3>
@@ -1213,7 +1214,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
                         <span>
                           {(order.document.size / 1024).toFixed(0)} KB · uploaded{" "}
-                          {new Date(order.document.uploadedAt).toLocaleString("en-US")}
+                          {formatDateTimeUS(order.document.uploadedAt)}
                         </span>
                       </span>
                     </div>

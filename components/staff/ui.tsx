@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
+import { formatDateUS, formatDateTimeUS } from "@/lib/date-format";
 
 export const STATUS_LABELS: Record<string, string> = {
   DRAFT: "Draft",
@@ -458,9 +459,7 @@ export function Stepper({
             <span aria-hidden>✓ </span>This order is closed — sent to the government agency.
           </p>
           {submittedAt ? (
-            <p className="staff-closed-sub">
-              Sent {new Date(submittedAt).toLocaleString("en-US")}.
-            </p>
+            <p className="staff-closed-sub">Sent {formatDateTimeUS(submittedAt)}.</p>
           ) : null}
         </div>
       ) : null}
@@ -470,8 +469,7 @@ export function Stepper({
 
 /** Groups timestamped entries under day headers (MILES-style order history). */
 export function dayKey(value: string | Date): string {
-  const date = value instanceof Date ? value : new Date(value);
-  return date.toLocaleDateString("en-US", { year: "numeric", month: "2-digit", day: "2-digit" });
+  return formatDateUS(value);
 }
 
 export function BackLink({ href, children }: { href: string; children: ReactNode }) {

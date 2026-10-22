@@ -245,7 +245,7 @@ export const PENNSYLVANIA_GUIDE: BirthGuideContent = {
     { label: "Pennsylvania Department of Health – Vital Records", href: PA_VITAL_RECORDS_URL },
     { label: "Pennsylvania authorized online ordering", href: PA_ONLINE_URL },
   ],
-  sourceChecked: "October 22, 2026",
+  sourceChecked: "10/22/2026",
   ctaLabel: "Start Your Pennsylvania Request",
   ctaNote:
     "Most people finish the guided form in about 10 minutes. Agency fees and shipping are separate from the USVC service fee.",
