@@ -139,10 +139,10 @@ export default function StaffAdmin() {
       }
     };
     const titles: Record<typeof action, string> = {
-      revoke: "Revoke sessions?",
-      "mfa-reset": "Reset 2-step?",
-      disable: "Deactivate account?",
-      enable: "Reactivate account?",
+      revoke: "Revoke Sessions?",
+      "mfa-reset": "Reset 2-Step?",
+      disable: "Deactivate Account?",
+      enable: "Reactivate Account?",
     };
     confirmation.request({
       title: titles[action],
@@ -182,7 +182,7 @@ export default function StaffAdmin() {
       }
     };
     confirmation.request({
-      title: "Reset password?",
+      title: "Reset Password?",
       body: `Issue ${email} a fresh 48-hour setup link? Their current password keeps working until they set a new one.`,
       confirmLabel: "Reset Password",
       run,
@@ -205,7 +205,7 @@ export default function StaffAdmin() {
       }
     };
     confirmation.request({
-      title: "Change role?",
+      title: "Change Role?",
       body: `Change ${email} to role ${role}? They will be signed out.`,
       confirmLabel: "Change Role",
       run,
@@ -338,7 +338,7 @@ export default function StaffAdmin() {
                               title="Re-send invitation"
                               onClick={() =>
                                 confirmation.request({
-                                  title: "Re-send staff invitation?",
+                                  title: "Re-send Staff Invitation?",
                                   body: `Send ${member.email} a new 48-hour setup link? Their previous invitation link will be replaced.`,
                                   confirmLabel: "Re-send invitation",
                                   run: () => resend(member.id, member.email),
@@ -426,7 +426,7 @@ export default function StaffAdmin() {
 
       {inviteOpen ? (
         <ConfirmModal
-          title="Invite staff member"
+          title="Invite Staff Member"
           body="Review the name, work email and role before sending. They set their own password and pair their own authenticator."
           confirmLabel="Send invitation"
           busy={inviteBusy}

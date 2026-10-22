@@ -143,7 +143,7 @@ export default function CsCorrections() {
       {claimed ? (
         <TimedActionModal
           key={claimed.id}
-          title="Ownership taken"
+          title="Ownership Taken"
           orderNumber={claimed.number}
           primaryLabel="Open Order"
           primaryHref={`/staff/cs/edit/${claimed.id}`}

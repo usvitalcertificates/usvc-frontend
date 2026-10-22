@@ -136,7 +136,7 @@ export default function StaffSettings() {
                 event.preventDefault();
                 if (mismatch || tooShort || !event.currentTarget.reportValidity()) return;
                 confirmation.request({
-                  title: "Change your password?",
+                  title: "Change Your Password?",
                   body: `Change the password for ${email}? All sessions, including this one, will be signed out.`,
                   confirmLabel: "Change password",
                   run: changePassword,

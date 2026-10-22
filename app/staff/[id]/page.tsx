@@ -576,7 +576,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
   const startProcessing = () => {
     confirmation.request({
-      title: "Start order processing?",
+      title: "Start Order Processing?",
       body: (
         <>
           <p>
@@ -608,7 +608,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     const noteBody = csNote.trim();
     if (!noteBody) return;
     confirmation.request({
-      title: "Send this order to CS?",
+      title: "Send This Order to CS?",
       body: (
         <>
           <p>
@@ -651,7 +651,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
   const markGtg = () => {
     const noteBody = csNote.trim();
     confirmation.request({
-      title: "Mark this order GTG?",
+      title: "Mark This Order GTG?",
       body: (
         <>
           <p>
@@ -681,7 +681,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
   const resumeProcessing = () => {
     confirmation.request({
-      title: "Resume order processing?",
+      title: "Resume Order Processing?",
       body: (
         <>
           <p>
@@ -726,7 +726,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
           </p>
         </>
       ),
-      confirmLabel: "Mark as submitted",
+      confirmLabel: "Close This Order",
       danger: true,
       run: async () => {
         if (order.status !== "IN_REVIEW") throw new Error("The order is not in processing.");
@@ -1184,7 +1184,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               <div className="staff-package-heading">
                 <div>
                   <h2>
-                    Completion document
+                    Completion Document
                     <span className="staff-sr-only"> (required)</span>
                   </h2>
 
@@ -1210,8 +1210,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     if (file) {
                       confirmation.request({
                         title: order.document
-                          ? "Replace completion PDF?"
-                          : "Upload completion PDF?",
+                          ? "Replace Completion PDF?"
+                          : "Upload Completion PDF?",
                         body: `Order ${order.publicNumber}: upload ${file.name} (${Math.ceil(file.size / 1024)} KB). ${order.document ? `This replaces ${order.document.name}.` : "This becomes the completion document for the order."}`,
                         confirmLabel: order.document ? "Replace PDF" : "Upload PDF",
                         danger: Boolean(order.document),
@@ -1356,7 +1356,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
       {reopenOpen && order ? (
         <ConfirmModal
-          title="Reopen order"
+          title="Reopen Order"
           body={`Order ${order.publicNumber}: restore to ${STATUS_LABELS[reopenTo] ?? reopenTo}. This rolls back customer tracking and records the reason in the audit trail.`}
           confirmLabel="Restore status"
           scope={orderScope}
@@ -1396,7 +1396,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 
       {docDeleteOpen && order?.document ? (
         <ConfirmModal
-          title="Delete completion PDF?"
+          title="Delete Completion PDF?"
           scope={orderScope}
           busy={docBusy}
           body={`Order ${order.publicNumber}: delete ${order.document.name}? The order cannot be submitted until a new PDF is uploaded.`}
@@ -1455,7 +1455,7 @@ function ReassignControl({
             const member = staff.find((person) => person.id === staffId);
             if (!member) return;
             confirmation.request({
-              title: "Reassign order?",
+              title: "Reassign Order?",
               body: `Reassign order ${publicNumber} to ${member.fullName || member.email}? The current owner loses ownership.`,
               confirmLabel: "Reassign order",
               danger: true,

@@ -383,7 +383,7 @@ function DetailBody({ id }: { id: string }) {
                     disabled={linkBusy || detail.order.paymentStatus === "PAID"}
                     onClick={() =>
                       confirmation.request({
-                        title: "Create or replace recovery link?",
+                        title: "Create or Replace Recovery Link?",
                         body: `Order ${detail.order.publicNumber}: create a secure 48-hour resume link. Previously issued links for this order may stop working. The customer must still verify their email.`,
                         confirmLabel: "Create recovery link",
                         run: generateResumeLink,
@@ -406,7 +406,7 @@ function DetailBody({ id }: { id: string }) {
                   disabled={linkBusy || detail.order.paymentStatus === "PAID"}
                   onClick={() =>
                     confirmation.request({
-                      title: "Create or replace recovery link?",
+                      title: "Create or Replace Recovery Link?",
                       body: `Order ${detail.order.publicNumber}: create a secure 48-hour resume link. Previously issued links and their sessions for this order will stop working. The customer must still verify their email.`,
                       confirmLabel: "Create recovery link",
                       run: generateResumeLink,

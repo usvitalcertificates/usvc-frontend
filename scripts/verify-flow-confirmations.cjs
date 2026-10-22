@@ -72,6 +72,20 @@ const original = {
   amountCents: 14900,
   pricing: { serviceCents: 14900, rushCents: 0, totalCents: 14900 },
 };
+const queueOrder = {
+  id: "flow-test",
+  publicNumber: original.publicNumber,
+  certificate: "BIRTH",
+  stateCode: "NY",
+  county: "Albany",
+  requestor: "Sample Applicant",
+  copies: 1,
+  rush: false,
+  status: "GTG",
+  assignedToMe: false,
+  assignedName: null,
+  createdAt: original.createdAt,
+};
 const roster = [
   {
     id: "actor",
@@ -149,7 +163,7 @@ async function until(predicate) {
       if (path === "/staff/orders/flow-test") body = order;
       else if (path === "/admin/staff") body = { staff };
       else if (path.endsWith("/audit")) body = { auditEvents: [] };
-      else if (path === "/staff/orders") body = { orders: [], total: 0, pages: 1 };
+      else if (path === "/staff/orders") body = { orders: [queueOrder], total: 1, pages: 1 };
       else if (path === "/staff/unpaid-orders/flow-test")
         body = {
           order: {
@@ -194,6 +208,11 @@ async function until(predicate) {
       if (path === "/orders/flow-test/status") {
         order.status = payload.status;
         if (payload.status === "GTG" || payload.status === "TO_CS") order.assignedTo = null;
+      }
+      if (path === "/staff/orders/flow-test/claim") {
+        order.assignedTo = "actor";
+        order.assignedName = "Test Actor";
+        body = { ok: true, publicNumber: order.publicNumber, status: "GTG" };
       }
       if (path === "/orders/flow-test/reopen") order.status = payload.status;
       if (path === "/staff/orders/flow-test/correction")
@@ -341,7 +360,7 @@ async function until(predicate) {
     await exercise(
       "Agency submission: cancel, keyboard trap, duplicate guard, pending dismissal, failure/retry",
       chooseSubmission,
-      "Mark as submitted",
+      "Close This Order",
       "/orders/flow-test/status",
       { failure: true, pending: true },
     );
@@ -395,6 +414,38 @@ async function until(predicate) {
       "Resume Order Processing",
       "/orders/flow-test/status",
     );
+    order = copy(original);
+    order.status = "GTG";
+    order.assignedTo = null;
+    order.assignedName = null;
+    const claimWritesBefore = count("/staff/orders/flow-test/claim");
+    const statusWritesBefore = count("/orders/flow-test/status");
+    await navigate("/staff");
+    await page
+      .getByRole("button", { name: /Take Ownership/ })
+      .first()
+      .click();
+    await until(
+      () =>
+        count("/staff/orders/flow-test/claim") === claimWritesBefore + 1 &&
+        count("/orders/flow-test/status") === statusWritesBefore + 1,
+    );
+    await page.getByRole("heading", { name: "Ownership Taken", exact: true }).waitFor();
+    assert.equal(order.status, "IN_REVIEW");
+    assert.equal(
+      writes.filter((write) => write.path === "/orders/flow-test/status").at(-1).payload.status,
+      "IN_REVIEW",
+    );
+    await page.getByRole("link", { name: "Open Order", exact: true }).click();
+    await page.getByRole("tab", { name: "Summary", exact: true }).waitFor();
+    await page.getByRole("tab", { name: "Application (Owners only)", exact: true }).click();
+    assert.equal(
+      await page
+        .getByRole("button", { name: "Proceed to Notes & Document Upload", exact: true })
+        .isEnabled(),
+      true,
+    );
+    passed.push("GTG claim auto-resumes and enables Proceed");
     await detail();
     await exercise(
       "Drop ownership",

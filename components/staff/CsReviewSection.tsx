@@ -174,19 +174,17 @@ export function CsReviewSection({
         </div>
         <div className="staff-cs-body">
           {latestNote ? <blockquote className="staff-cs-note">{latestNote}</blockquote> : null}
-          {!isCs ? (
-            <div className="staff-cs-actions">
-              {canCorrect ? (
-                <a className="staff-cs-editor" href={csEditorHref}>
-                  Open in CS editor →
-                </a>
-              ) : null}
-              <button type="button" className="staff-btn" disabled={busy} onClick={onResume}>
-                <Play aria-hidden />
-                Resume Order Processing
-              </button>
-            </div>
-          ) : null}
+          <div className="staff-cs-actions">
+            {canCorrect ? (
+              <a className="staff-cs-editor" href={csEditorHref}>
+                Open in CS editor →
+              </a>
+            ) : null}
+            <button type="button" className="staff-btn" disabled={busy} onClick={onResume}>
+              <Play aria-hidden />
+              Resume Order Processing
+            </button>
+          </div>
         </div>
       </section>
     );
