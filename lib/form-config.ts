@@ -196,6 +196,11 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       { key: "firstName", label: "First Name of Subject", required: true },
       { key: "middleName", label: "Middle Name of Subject" },
       { key: "lastName", label: "Current Last Name of Subject", required: true },
+      {
+        key: "subjectMaidenLastName",
+        label: "Maiden Name of Subject",
+        help: "Required when the recorded gender is Female. Hidden when Male.",
+      },
       { key: "suffix", label: "Suffix", type: "select", options: SUFFIX_OPTIONS },
       {
         key: "eventDate",
@@ -205,11 +210,6 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
         help: "The exact date of birth of the person listed on the certificate.",
       },
       { key: "sex", label: "Gender", type: "select", required: true, options: BIRTH_SEX_OPTIONS },
-      {
-        key: "subjectMaidenLastName",
-        label: "Maiden Last Name of Subject",
-        help: "Required when the recorded gender is Female. Hidden when Male.",
-      },
       {
         key: "stillLiving",
         label: "Is subject still living?",
@@ -224,7 +224,7 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       { key: "motherFirstName", label: "First Name of Mother", required: true },
       { key: "motherMiddleName", label: "Middle Name of Mother" },
       { key: "motherCurrentLastName", label: "Current Last Name of Mother", required: true },
-      { key: "motherLastName", label: "Maiden Last Name of Mother", required: true },
+      { key: "motherLastName", label: "Maiden Name of Mother", required: true },
     ],
     familySecondLegend: "Father / second parent",
     familySecondNote: FATHER_NOTE,
@@ -314,7 +314,7 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       { key: "firstName", label: "First Name of Subject", required: true },
       { key: "middleName", label: "Middle Name of Subject" },
       { key: "lastName", label: "Current Last Name of Subject", required: true },
-      { key: "maidenLastName", label: "Maiden Last Name of Subject", required: true },
+      { key: "maidenLastName", label: "Maiden Name of Subject", required: true },
       {
         key: "eventDate",
         label: "Date of Marriage",
@@ -336,7 +336,7 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       { key: "spouseFirstName", label: "First Name of Subject", required: true },
       { key: "spouseMiddleName", label: "Middle Name of Subject" },
       { key: "spouseLastName", label: "Current Last Name of Subject", required: true },
-      { key: "spouseMaidenLastName", label: "Maiden Last Name of Subject", required: true },
+      { key: "spouseMaidenLastName", label: "Maiden Name of Subject", required: true },
       { key: "spouseCurrentLastName", label: "Current last name, if different" },
     ],
     relationships: [
@@ -379,7 +379,7 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       { key: "firstName", label: "First Name of Subject", required: true },
       { key: "middleName", label: "Middle Name of Subject" },
       { key: "lastName", label: "Current Last Name of Subject", required: true },
-      { key: "maidenLastName", label: "Maiden Last Name of Subject", required: true },
+      { key: "maidenLastName", label: "Maiden Name of Subject", required: true },
       {
         key: "eventDate",
         label: "Date of Divorce",
@@ -401,7 +401,7 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       { key: "spouseFirstName", label: "First Name of Subject", required: true },
       { key: "spouseMiddleName", label: "Middle Name of Subject" },
       { key: "spouseLastName", label: "Current Last Name of Subject", required: true },
-      { key: "spouseMaidenLastName", label: "Maiden Last Name of Subject", required: true },
+      { key: "spouseMaidenLastName", label: "Maiden Name of Subject", required: true },
       {
         key: "court",
         label: "Court or jurisdiction, if known",
