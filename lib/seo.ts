@@ -216,7 +216,7 @@ export const CERTIFICATE_DETAILS: Record<
 > = {
   "birth-certificate": {
     label: "Birth",
-    uses: "A certified birth certificate is most often requested as proof of identity, age, citizenship, and parentage — for passports, REAL ID, school enrollment, and benefits claims.",
+    uses: "A certified birth certificate is most often requested as proof of identity, age, citizenship, and parentage, including for passports, REAL ID, school enrollment, and benefits claims.",
     checklist: [
       "Subject's full name at birth, date of birth, and place of birth",
       "Parents' names as shown on the record",
@@ -233,7 +233,7 @@ export const CERTIFICATE_DETAILS: Record<
       },
       {
         q: "How long does the USVC part take?",
-        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state — confirm current times with the issuing agency.",
+        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state. Confirm current times with the issuing agency.",
       },
     ],
   },
@@ -256,7 +256,7 @@ export const CERTIFICATE_DETAILS: Record<
       },
       {
         q: "How long does the USVC part take?",
-        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state — confirm current times with the issuing agency.",
+        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state. Confirm current times with the issuing agency.",
       },
     ],
   },
@@ -279,7 +279,7 @@ export const CERTIFICATE_DETAILS: Record<
       },
       {
         q: "How long does the USVC part take?",
-        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state — confirm current times with the issuing agency.",
+        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state. Confirm current times with the issuing agency.",
       },
     ],
   },
@@ -302,7 +302,7 @@ export const CERTIFICATE_DETAILS: Record<
       },
       {
         q: "How long does the USVC part take?",
-        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state — confirm current times with the issuing agency.",
+        a: "Most people finish our guided form in about 10 minutes. Agency processing and delivery times vary by state. Confirm current times with the issuing agency.",
       },
     ],
   },

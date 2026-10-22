@@ -55,7 +55,7 @@ export const TEXAS_GUIDE: BirthGuideContent = {
       id: "official-resource",
       heading: "Start with the official Texas resource",
       paragraphs: [
-        "Texas DSHS controls the application, identification, and record-type rules. Its official pages explain current request channels, document requirements, and the forms the agency accepts. Those details can change without notice, so the agency page — not this guide — controls.",
+        "Texas DSHS controls the application, identification, and record-type rules. Its official pages explain current request channels, document requirements, and the forms the agency accepts. Those details can change without notice on the agency page, which this guide doesn't control.",
         "Confirm the record type and identification requirements before you apply. A certificate that is valid for one purpose may not be accepted for another.",
       ],
       links: [{ label: "Open the official Texas birth-records page", href: TEXAS_BIRTH_URL }],

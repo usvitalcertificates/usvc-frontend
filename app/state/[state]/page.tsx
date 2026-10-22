@@ -102,7 +102,7 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
     },
     {
       q: `Who can receive a certified ${name} record?`,
-      a: "The issuing agency decides eligibility — usually the person named on the record or specific qualifying relatives and representatives. Confirm your eligibility with the official agency resource before you apply.",
+      a: "The issuing agency decides eligibility, usually the person named on the record or specific qualifying relatives and representatives. Confirm your eligibility with the official agency resource before you apply.",
     },
     {
       q: "Do I need to visit an office in person?",
@@ -163,11 +163,11 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
       <section className="page-section">
         <div className="container">
           <p className="state-intro">
-            {name} vital records — birth, death, marriage, and divorce certificates — are issued
-            under {name === "District of Columbia" ? "District" : "state"} rules, so the agency
-            holding your record depends on where the event happened, not where you live now. Below
-            you can start a guided {name} request for any of the four record types with USVC review
-            and online tracking.
+            {name} vital records, including birth, death, marriage, and divorce certificates, are
+            issued under {name === "District of Columbia" ? "District" : "state"} rules, so the
+            agency holding your record depends on where the event happened, not where you live now.
+            Below you can start a guided {name} request for any of the four record types with USVC
+            review and online tracking.
           </p>
           {guide ? (
             <p className="state-guide-callout">

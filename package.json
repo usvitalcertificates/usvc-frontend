@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --test --experimental-strip-types app/openai-analytics-data.test.mjs app/copy-pricing.test.mjs app/public-pricing-copy.test.mjs app/guide-content.test.mjs app/state-inventory.test.mjs app/social-metadata.test.mjs",
+    "test": "node --test --experimental-strip-types app/openai-analytics-data.test.mjs app/copy-pricing.test.mjs app/public-pricing-copy.test.mjs app/public-copy.test.mjs app/guide-content.test.mjs app/state-inventory.test.mjs app/social-metadata.test.mjs",
     "test:seo": "node scripts/verify-seo.mjs",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",

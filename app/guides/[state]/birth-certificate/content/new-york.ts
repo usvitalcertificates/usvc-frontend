@@ -52,7 +52,7 @@ export const NEW_YORK_GUIDE: BirthGuideContent = {
       id: "official-resource",
       heading: "Start with the official New York resource",
       paragraphs: [
-        "The New York State Department of Health controls the application, eligibility, and identification rules for state records. New York City controls records for births in Manhattan, Brooklyn, Queens, the Bronx, and Staten Island. Those details can change without notice, so the issuing agency's page — not this guide — controls.",
+        "The New York State Department of Health controls the application, eligibility, and identification rules for state records. New York City controls records for births in Manhattan, Brooklyn, Queens, the Bronx, and Staten Island. Those details can change without notice on the issuing agency's page, which this guide doesn't control.",
         "Confirm the birth location before you gather documents. A request sent to the wrong office will not produce the certificate you need.",
       ],
       links: [

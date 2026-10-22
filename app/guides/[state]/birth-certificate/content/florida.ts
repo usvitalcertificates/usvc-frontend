@@ -58,7 +58,7 @@ export const FLORIDA_GUIDE: BirthGuideContent = {
       id: "official-resource",
       heading: "Start with the official Florida resource",
       paragraphs: [
-        "The Florida Department of Health controls the application, eligibility, and identification rules. Its official birth-certificate page explains current request channels, certificate types, and the documents the agency accepts. Those details can change without notice, so the agency page — not this guide — controls.",
+        "The Florida Department of Health controls the application, eligibility, and identification rules. Its official birth-certificate page explains current request channels, certificate types, and the documents the agency accepts. Those details can change without notice on the agency page, which this guide doesn't control.",
         "Read the eligibility section before you gather documents. If you are not an eligible requestor, the state may require a different application path or supporting authorization.",
       ],
       links: [
