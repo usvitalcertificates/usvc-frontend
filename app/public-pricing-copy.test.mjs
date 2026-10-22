@@ -1,15 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { URL } from "node:url";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 const PRICE = /\$(?:149|70|79|12)(?:\.00)?(?![0-9])/;
 
+const guideContentDir = "app/guides/[state]/birth-certificate/content";
+const guideContentFiles = readdirSync(new URL(`../${guideContentDir}/`, import.meta.url))
+  .filter((name) => name.endsWith(".ts"))
+  .map((name) => `${guideContentDir}/${name}`);
+
 const publicCopy = [
   "app/state/[state]/page.tsx",
   "app/guides/[state]/birth-certificate/guide-content.ts",
   "app/guides/[state]/birth-certificate/page.tsx",
+  ...guideContentFiles,
   "app/faq/faq-data.ts",
   "app/page.tsx",
   "app/find-your-state/page.tsx",

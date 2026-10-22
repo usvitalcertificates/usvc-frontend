@@ -2,6 +2,14 @@
 
 Updated: 2026-10-22. This is the implementation checklist for the October 21 audit and its Search Console follow-up. `Merged` describes Git status, not proof of production rollout. Only a live deployment check closes a live-site issue.
 
+## Pennsylvania, Illinois and Ohio guide depth — October 22
+
+The second three-state batch now uses the California-depth guide model. Pennsylvania adds the Department of Health eligibility list, photo ID or two alternate documents, online/mail/public-office service, modification and adoption paths, and Department of State apostille guidance. Illinois explains its closed-record eligibility, long/short certified formats, state mail and county-clerk options, photo-ID alternatives, early county records, corrections/new records, adoption files and apostilles. Ohio distinguishes the open-record rule, online abstract, certified record, state/local/pre-1908 paths, correction routes, adoption files and apostilles. No state fees, processing times, or notarization requirements were published; exact USVC prices remain limited to the order form. Guide content stays in per-state files behind the shared types/copy layer. No new URLs; sitemap target stays 268 pages and 10 guides. Formatting, lint, TypeScript, 23/23 unit tests, production build and `npm run test:seo` pass. Branch `feat/pa-il-oh-birth-guides`; no PR, merge or deployment yet.
+
+## Texas, Florida and New York guide depth — October 22
+
+The first three states in the remaining nine-state rollout now use the California-depth guide model: state-specific record types, eligibility, identification, state-versus-local filing, preparation, request sequence, special situations, ten FAQs and official-source citations. Guide content is split into per-state files with shared types and USVC help copy so the next six states can follow the same review pattern. Florida’s source URL was updated to the current Department of Health birth-certificate page. No state fees, processing times, or notarization requirements were published; exact USVC prices remain limited to the order form. No new URLs; sitemap target stays 268 pages and 10 guides. Formatting, lint, TypeScript, 20/20 unit tests, production build and `npm run test:seo` pass. Branch `feat/tx-fl-ny-birth-guides`; no PR, merge or deployment yet.
+
 ## Price disclosure policy — October 22
 
 Exact USVC prices are now limited to the order form. The 52 state-hub cost FAQs and all 10 birth-certificate guides direct readers to the form for current pricing, while retaining the non-numeric explanation that agency and shipping fees are separate. No price amounts appear in public marketing copy, metadata, or FAQ structured data. A regression test verifies that $149/$70/$79 do not return to public copy and that the shared order form still displays the approved prices. No sitemap or URL changes.
@@ -49,7 +57,7 @@ Owner-requested change: replace fee paragraphs only inside the state certificate
 
 ## Latest local validation
 
-Node 24: formatting, lint, TypeScript, production build and **14/14 tests passed**. `npm run test:seo` passed all 268 public pages plus social images, robots/llms links, private/environment noindex, canonical-free 404s with crawler/browser user agents, unavailable notices and legacy redirects. Current branch: `feat/guide-discovery-mobile-loading`; not deployed. Technical cleanup merged through PR 155. Expanded guide-link, font-preload, two-hop graph and image-byte checks pass; see [current report](guide-discovery-mobile-2026-10-21.md). The preceding social/discovery batch is merged through PR 153; production rollout is not asserted. Mobile production measurements describe the live site at measurement time, not deployment of these local fixes. See [mobile performance](mobile-performance-2026-10-21.md).
+Node 24: formatting, lint, TypeScript, production build and **23/23 tests passed**. `npm run test:seo` passed all 268 public pages plus social images, robots/llms links, private/environment noindex, canonical-free 404s with crawler/browser user agents, unavailable notices and legacy redirects. Current branch: `feat/pa-il-oh-birth-guides`; not deployed. Technical cleanup merged through PR 155. Expanded guide-link, font-preload, two-hop graph and image-byte checks pass; see [current report](guide-discovery-mobile-2026-10-21.md). The preceding social/discovery batch is merged through PR 153; production rollout is not asserted. Mobile production measurements describe the live site at measurement time, not deployment of these local fixes. See [mobile performance](mobile-performance-2026-10-21.md).
 
 ## Search Console baseline
 

@@ -1406,7 +1406,7 @@ export function OrderForm({
               placeholder={
                 (values.county ?? draft.county) ? "Select city or town" : `Select ${noun} first`
               }
-              disabled={!values.county && !draft.county}
+              disabled={Boolean(blockedCounty) || !(values.county ?? draft.county)}
               onSelect={(city) => setValues((v) => ({ ...v, city }))}
             />
           </label>
