@@ -1082,7 +1082,7 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
           onClick={() => {
             if (!validateCorrections()) return;
             confirmation.request({
-              title: "Save application corrections?",
+              title: "Save Application Corrections?",
               body: `Order ${order.publicNumber}: save the application changes${form.ssn.trim() ? ", including replacement of the stored SSN" : ""}${form.cardNumber.trim() ? ", including replacement of the stored payment card" : ""}${form.note.trim() ? " and the internal note" : ""}. This does not mark the order GTG.`,
               confirmLabel: "Save corrections",
               run: save,
