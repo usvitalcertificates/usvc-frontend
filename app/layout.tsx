@@ -16,13 +16,14 @@ const GTM_ID = "GTM-KC8LVCXR";
 /**
  * Inter is staff-only in practice (referenced solely by staff.css), but the
  * variable must live on <html> so it scopes the whole staff tree including
- * StaffShell chrome. Font files download only when used, so public pages
- * pay nothing for this.
+ * StaffShell chrome. Disable root preloading: public pages use Times,
+ * while staff styles fetch Inter on demand.
  */
 const flowFont = Inter({
   subsets: ["latin"],
   variable: "--font-flow",
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
