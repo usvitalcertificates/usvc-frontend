@@ -78,6 +78,11 @@ function singleMeta(html, attribute, key) {
   assert(values[0], `${key} is empty`);
   return values[0];
 }
+function assertNoEmDash(text, label) {
+  for (const marker of ["—", "&mdash;", "&#8212;", "&#x2014;", "\\u2014"]) {
+    assert(!text.includes(marker), `${label}: contains em dash (${marker})`);
+  }
+}
 
 async function assertNotFound(path, headers = {}) {
   const response = await request(path, { headers });
@@ -141,6 +146,7 @@ try {
         assert.equal(response.status, 200, url);
         const html = await response.text();
         renderedPages.set(url, html);
+        assertNoEmDash(html, url);
         assert(!/<link\b[^>]*as="font"/.test(html), `${url}: public font preload`);
         const canonical = [...html.matchAll(/<link\b[^>]*rel="canonical"[^>]*href="([^"]+)"/g)];
         assert.deepEqual(
@@ -279,6 +285,7 @@ try {
   assert.equal(llmsResponse.status, 200);
   assert.match(llmsResponse.headers.get("content-type"), /text\/plain; charset=utf-8/);
   const llms = await llmsResponse.text();
+  assertNoEmDash(llms, "/llms.txt");
   assert(llms.startsWith("# US Vital Certificates (USVC)\n"));
   assert(llms.includes("not a government agency"));
   assert.equal((llms.match(/\/guides\//g) || []).length, 13);
@@ -295,6 +302,7 @@ try {
   const noindexOrder = await request("/state/california/order/birth-certificate");
   assert.equal(noindexOrder.status, 200);
   const noindexOrderHtml = await noindexOrder.text();
+  assertNoEmDash(noindexOrderHtml, "order page");
   assert(
     tagValues(noindexOrderHtml, "name", "robots").some(
       (value) => value.includes("noindex") && value.includes("follow"),
@@ -312,6 +320,7 @@ try {
   ]) {
     const response = await request(path);
     const html = await response.text();
+    assertNoEmDash(html, path);
     assert(
       tagValues(html, "name", "robots").some((v) => v.includes("noindex")),
       path,
@@ -354,6 +363,7 @@ try {
       const response = await request(path);
       assert.equal(response.status, 200, path);
       const html = await response.text();
+      assertNoEmDash(html, path);
       assert(
         tagValues(html, "name", "robots").some((value) => value.includes("noindex")),
         path,
