@@ -1,5 +1,7 @@
 "use client";
 
+import { DateInput } from "@/components/DateInput";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Bar,
@@ -275,23 +277,21 @@ export default function OrdersAnalyticsDashboard() {
           <div className="staff-analytics-dates">
             <label>
               From
-              <input
-                type="date"
+              <DateInput
                 value={from}
-                onChange={(event) => {
+                onValueChange={(date) => {
                   setPreset("custom");
-                  setFrom(event.target.value);
+                  setFrom(date);
                 }}
               />
             </label>
             <label>
               To
-              <input
-                type="date"
+              <DateInput
                 value={to}
-                onChange={(event) => {
+                onValueChange={(date) => {
                   setPreset("custom");
-                  setTo(event.target.value);
+                  setTo(date);
                 }}
               />
             </label>

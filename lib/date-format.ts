@@ -42,3 +42,22 @@ export function formatDateTimeUS(value: string | number | Date): string {
   const date = toDate(value);
   return date ? `${DATE_FORMATTER.format(date)}, ${TIME_FORMATTER.format(date)}` : "—";
 }
+
+/** Strict date-entry conversions; wire values remain YYYY-MM-DD. */
+export function parseDateUS(value: string): string | null {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
+  if (!match) return null;
+  const [, month, day, year] = match;
+  const date = new Date(0);
+  date.setFullYear(Number(year), Number(month) - 1, Number(day));
+  return Number(year) > 0 &&
+    date.getFullYear() === Number(year) &&
+    date.getMonth() === Number(month) - 1 &&
+    date.getDate() === Number(day)
+    ? `${year}-${month}-${day}`
+    : null;
+}
+export function dateEntryUS(value: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  return match ? `${match[2]}/${match[3]}/${match[1]}` : value;
+}

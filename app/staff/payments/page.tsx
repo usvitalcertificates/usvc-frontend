@@ -1,5 +1,7 @@
 "use client";
 
+import { DateInput } from "@/components/DateInput";
+
 import { useEffect, useState, type FormEvent } from "react";
 import { staffJson } from "@/lib/staff-client";
 import { EmptyState, PageBand, SkeletonRows } from "@/components/staff/ui";
@@ -121,19 +123,17 @@ function Payments() {
           </label>
           <label>
             From
-            <input
-              type="date"
+            <DateInput
               value={draft.from}
-              onChange={(e) => setDraft((current) => ({ ...current, from: e.target.value }))}
+              onValueChange={(date) => setDraft((current) => ({ ...current, from: date }))}
             />
           </label>
           <label>
             Through
-            <input
-              type="date"
+            <DateInput
               min={draft.from || undefined}
               value={draft.to}
-              onChange={(e) => setDraft((current) => ({ ...current, to: e.target.value }))}
+              onValueChange={(date) => setDraft((current) => ({ ...current, to: date }))}
             />
           </label>
           <button type="submit" className="staff-btn" disabled={loading}>

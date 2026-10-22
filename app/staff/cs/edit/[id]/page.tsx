@@ -1,11 +1,14 @@
 "use client";
 
-import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { staffData, staffId, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { BackLink, PageBand, StatusPill, Toast } from "@/components/staff/ui";
+import { DateInput } from "@/components/DateInput";
+import { ApplicationSections } from "@/components/staff/ApplicationSections";
+import { APPLICATION_LABELS, type ApplicationField } from "@/lib/form-config";
 import { CopyButton } from "@/components/staff/CopyButton";
 
 interface EditOrder {
@@ -74,22 +77,6 @@ interface EditForm {
   note: string;
 }
 
-/** Mirrors backend REQUIRED (markers only — the server re-validates on save).
- *  Conditional rules (e.g. birth maiden-when-Female) surface as server errors. */
-const REQUIRED_SUBJECT: Record<string, string[]> = {
-  BIRTH: ["firstName", "middleName", "lastName", "eventDate", "sex", "stillLiving"],
-  DEATH: ["firstName", "middleName", "lastName", "eventDate", "sex"],
-  MARRIAGE: ["firstName", "lastName", "eventDate", "sex", "maidenLastName"],
-  DIVORCE: ["firstName", "lastName"],
-};
-
-const REQUIRED_FAMILY: Record<string, string[]> = {
-  BIRTH: ["motherFirstName", "motherCurrentLastName", "motherLastName"],
-  DEATH: [],
-  MARRIAGE: ["spouseFirstName", "spouseLastName", "spouseSex", "spouseMaidenLastName"],
-  DIVORCE: ["spouseFirstName", "spouseLastName"],
-};
-
 const ADDR_KEYS: (keyof Addr)[] = [
   "firstName",
   "lastName",
@@ -100,15 +87,6 @@ const ADDR_KEYS: (keyof Addr)[] = [
   "postalCode",
   "country",
 ];
-
-/** firstName → First name, dateOfBirth → Date of birth. */
-function prettyLabel(key: string): string {
-  const spaced = key
-    .replace(/([A-Z])/g, " $1")
-    .replace(/[_-]+/g, " ")
-    .trim();
-  return spaced.charAt(0).toUpperCase() + spaced.slice(1).toLowerCase();
-}
 
 function emptyAddr(): Addr {
   return {
@@ -247,6 +225,7 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
   const [busy, setBusy] = useState(false);
+  const applicationRef = useRef<HTMLDivElement>(null);
   const [gtgOpen, setGtgOpen] = useState(false);
   const [revealedSsn, setRevealedSsn] = useState<string | null>(null);
   const [revealedCard, setRevealedCard] = useState<{
@@ -455,13 +434,19 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
   const notesNewest = [...(order.notes ?? [])].reverse();
   const latestNote = notesNewest[0] ?? null;
   const previousNotes = notesNewest.slice(1, 5);
-  const requiredSubject = REQUIRED_SUBJECT[order.certificate] ?? [];
-  const requiredFamily = REQUIRED_FAMILY[order.certificate] ?? [];
   const errorCount = Object.keys(errors).length;
   const closed = order.status === "SUBMITTED" || order.status === "CANCELLED";
 
   const save = async () => {
     if (!form) return;
+    const invalidDate = applicationRef.current?.querySelector<HTMLInputElement>(
+      ".usvc-date > input:invalid",
+    );
+    if (invalidDate) {
+      invalidDate.reportValidity();
+      invalidDate.focus();
+      return;
+    }
     if (
       (form.cardNumber.trim() || form.cardExpiry.trim() || form.cardCvc.trim()) &&
       (!form.cardNumber.trim() || !form.cardExpiry.trim() || !form.cardCvc.trim())
@@ -564,8 +549,303 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
   };
 
   const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
-  const subjectKeys = Object.keys(form.subject);
-  const familyKeys = Object.keys(form.family);
+
+  const applicationData = {
+    ...order,
+    applicant: form.applicant,
+    subject: form.subject,
+    family: form.family,
+    addresses: Object.fromEntries(
+      Object.entries(form.addresses).map(([kind, addr]) => [
+        kind,
+        { ...order.addresses?.[kind], ...addr },
+      ]),
+    ),
+    geo: { county: form.county, city: form.city },
+    reason: form.reason,
+    reasonOther: form.reasonOther,
+    deliveryMethod: form.deliveryMethod,
+    destinationType: form.destinationType,
+  };
+  const renderApplicationField = (field: ApplicationField) => {
+    const update = (value: string) => {
+      const [group, key, addressKey] = field.path.split(".");
+      if (group === "applicant") setApplicant(key as keyof EditForm["applicant"], value);
+      else if (group === "subject" || group === "family") setRecord(group, key, value);
+      else if (group === "addresses" && addressKey === "addressType") {
+        const destination = value.startsWith("International") ? "international" : "domestic";
+        setTop("destinationType", destination);
+        if (destination === "domestic") setAddr("shipping", "country", "United States");
+        else if (form.addresses.shipping.country === "United States")
+          setAddr("shipping", "country", "");
+      } else if (group === "addresses")
+        setAddr(key as keyof EditForm["addresses"], addressKey as keyof Addr, value);
+      else if (group === "geo") setTop(key as "county" | "city", value);
+      else setTop(group as "reason" | "reasonOther" | "deliveryMethod", value);
+    };
+    const errorKey = field.path.startsWith("geo.") ? field.path.slice(4) : field.path;
+    const options = field.options ?? [];
+    return (
+      <Field label={field.label} required={field.required} error={errors[errorKey]}>
+        {field.locked ? (
+          <p>{field.value || "—"}</p>
+        ) : field.type === "select" ? (
+          <select
+            style={inputStyle}
+            value={field.value}
+            onChange={(event) => update(event.target.value)}
+          >
+            <option value="">Please select…</option>
+            {field.value && !options.includes(field.value) ? (
+              <option value={field.value}>{field.value}</option>
+            ) : null}
+            {options.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        ) : field.type === "date" ? (
+          <DateInput
+            style={inputStyle}
+            value={field.value}
+            onValueChange={update}
+            aria-label={field.label}
+          />
+        ) : (
+          <input
+            style={inputStyle}
+            type={field.path === "applicant.email" ? "email" : "text"}
+            value={field.value}
+            onChange={(event) => update(event.target.value)}
+            maxLength={500}
+            autoComplete="off"
+          />
+        )}
+      </Field>
+    );
+  };
+  const renderSensitive = (field: "ssn" | "card") => (
+    <div className="staff-sensitive-correction">
+      <p>
+        Stored values are encrypted. Leave replacement fields blank to keep them. Reveals are logged
+        and auto-hide in 30 seconds.
+      </p>
+      <div className="staff-sensitive-actions">
+        {field === "ssn" ? (
+          <>
+            {revealedSsn ? (
+              <>
+                <code style={{ fontSize: "0.95rem", fontWeight: 700 }}>{revealedSsn}</code>
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  style={{ minWidth: "150px", height: "36px" }}
+                  onClick={() => setRevealedSsn(null)}
+                >
+                  <EyeOff aria-hidden style={{ width: 15, height: 15 }} /> Hide SSN
+                </button>
+              </>
+            ) : revealFor === "ssn" ? (
+              <>
+                <input
+                  style={{ ...inputStyle, background: "#fff", maxWidth: "280px" }}
+                  value={revealReason}
+                  onChange={(e) => setRevealReason(e.target.value)}
+                  maxLength={500}
+                  autoComplete="off"
+                  placeholder="Reason (required, logged)"
+                  aria-label="Reason for revealing SSN"
+                />
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  disabled={revealBusy}
+                  onClick={() => void doReveal("ssn")}
+                >
+                  {revealBusy ? "Revealing…" : "Confirm reveal"}
+                </button>
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  onClick={() => setRevealFor(null)}
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                className="staff-btn secondary"
+                onClick={() => {
+                  setRevealError("");
+                  setRevealFor("ssn");
+                }}
+              >
+                <Eye aria-hidden style={{ width: 15, height: 15 }} /> Reveal stored SSN
+              </button>
+            )}
+          </>
+        ) : (
+          <>
+            {revealedCard ? (
+              <>
+                <code style={{ fontSize: "0.95rem", fontWeight: 700 }}>
+                  {revealedCard.number} · {revealedCard.expiry} · {revealedCard.securityCode}
+                </code>
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  style={{ minWidth: "150px", height: "36px" }}
+                  onClick={() => setRevealedCard(null)}
+                >
+                  <EyeOff aria-hidden style={{ width: 15, height: 15 }} /> Hide card
+                </button>
+              </>
+            ) : revealFor === "card" ? (
+              <>
+                <input
+                  style={{ ...inputStyle, background: "#fff", maxWidth: "280px" }}
+                  value={revealReason}
+                  onChange={(e) => setRevealReason(e.target.value)}
+                  maxLength={500}
+                  autoComplete="off"
+                  placeholder="Reason (required, logged)"
+                  aria-label="Reason for revealing card"
+                />
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  disabled={revealBusy}
+                  onClick={() => void doReveal("card")}
+                >
+                  {revealBusy ? "Revealing…" : "Confirm reveal"}
+                </button>
+                <button
+                  type="button"
+                  className="staff-btn secondary"
+                  onClick={() => setRevealFor(null)}
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                className="staff-btn secondary"
+                onClick={() => {
+                  setRevealError("");
+                  setRevealFor("card");
+                }}
+              >
+                <Eye aria-hidden style={{ width: 15, height: 15 }} /> Reveal stored card
+              </button>
+            )}
+          </>
+        )}
+      </div>
+      {revealError ? (
+        <p role="alert" className="staff-alert error">
+          {revealError}
+        </p>
+      ) : null}
+      {field === "ssn" ? (
+        <>
+          <Field label={APPLICATION_LABELS.ssn} error={errors["requestorSsn"]}>
+            <input
+              style={{ ...inputStyle, background: "#fff" }}
+              value={form.ssn}
+              onChange={(e) => setTop("ssn", formatSsnInput(e.target.value))}
+              maxLength={11}
+              inputMode="numeric"
+              autoComplete="off"
+              placeholder="XXX-XX-XXXX"
+            />
+            {(() => {
+              const digits = digitsOnly(form.ssn).length;
+              return digits > 0 && digits < 9 ? (
+                <small className="application-error" role="alert" style={{ display: "block" }}>
+                  Enter all 9 digits ({digits}/9).
+                </small>
+              ) : null;
+            })()}
+          </Field>
+        </>
+      ) : (
+        <>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+              gap: "10px",
+            }}
+          >
+            <Field label={APPLICATION_LABELS.cardNumber} error={errors["paymentCard.number"]}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <input
+                  style={{ ...inputStyle, background: "#fff" }}
+                  value={form.cardNumber}
+                  onChange={(e) => setTop("cardNumber", formatCardInput(e.target.value))}
+                  maxLength={19}
+                  inputMode="numeric"
+                  autoComplete="off"
+                  placeholder="4111 1111 1111 1111"
+                />
+                {(() => {
+                  const brand = cardBrandOf(form.cardNumber);
+                  return brand ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={brand === "visa" ? "/assets/visa.svg" : "/assets/mastercard.svg"}
+                      alt={brand === "visa" ? "Visa" : "Mastercard"}
+                      width={36}
+                      height={22}
+                      style={{ flexShrink: 0 }}
+                    />
+                  ) : null;
+                })()}
+              </div>
+              {(() => {
+                const digits = digitsOnly(form.cardNumber).length;
+                return digits > 0 && digits < 16 ? (
+                  <small className="application-error" role="alert" style={{ display: "block" }}>
+                    Enter all 16 digits ({digits}/16).
+                  </small>
+                ) : null;
+              })()}
+            </Field>
+            <Field label={APPLICATION_LABELS.cardExpiry} error={errors["paymentCard.expiry"]}>
+              <input
+                style={{ ...inputStyle, background: "#fff" }}
+                value={form.cardExpiry}
+                onChange={(e) => setTop("cardExpiry", formatExpiryInput(e.target.value))}
+                maxLength={5}
+                inputMode="numeric"
+                autoComplete="off"
+                placeholder="MM/YY"
+              />
+              {!isPlausibleExpiryMonth(form.cardExpiry) ? (
+                <small className="application-error" role="alert" style={{ display: "block" }}>
+                  Use MM/YY with a month from 01 to 12.
+                </small>
+              ) : null}
+            </Field>
+            <Field label={APPLICATION_LABELS.cardCvc} error={errors["paymentCard.securityCode"]}>
+              <input
+                style={{ ...inputStyle, background: "#fff" }}
+                value={form.cardCvc}
+                onChange={(e) => setTop("cardCvc", digitsOnly(e.target.value).slice(0, 3))}
+                maxLength={3}
+                inputMode="numeric"
+                autoComplete="off"
+                placeholder="•••"
+              />
+            </Field>
+          </div>
+        </>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -624,529 +904,13 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
 
       <div className="staff-grid-2">
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <div className="staff-panel">
-            <h2>1 · Requestor &amp; contact</h2>
-            <div className="staff-panel-body" style={{ display: "grid", gap: "10px" }}>
-              <Field label="Relationship" error={errors["applicant.relationship"]} required>
-                <input
-                  style={inputStyle}
-                  value={form.applicant.relationship}
-                  onChange={(e) => setApplicant("relationship", e.target.value)}
-                  maxLength={120}
-                  autoComplete="off"
-                />
-              </Field>
-              {form.applicant.relationship === "Other" ? (
-                <Field
-                  label="Relationship detail"
-                  error={errors["applicant.relationshipOther"]}
-                  required
-                >
-                  <input
-                    style={inputStyle}
-                    value={form.applicant.relationshipOther}
-                    onChange={(e) => setApplicant("relationshipOther", e.target.value)}
-                    maxLength={120}
-                    autoComplete="off"
-                  />
-                </Field>
-              ) : null}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
-                <Field label="First name" error={errors["applicant.firstName"]} required>
-                  <input
-                    style={inputStyle}
-                    value={form.applicant.firstName}
-                    onChange={(e) => setApplicant("firstName", e.target.value)}
-                    maxLength={120}
-                    autoComplete="off"
-                  />
-                </Field>
-                <Field label="Middle name" error={errors["applicant.middleName"]}>
-                  <input
-                    style={inputStyle}
-                    value={form.applicant.middleName}
-                    onChange={(e) => setApplicant("middleName", e.target.value)}
-                    maxLength={120}
-                    autoComplete="off"
-                  />
-                </Field>
-                <Field label="Last name" error={errors["applicant.lastName"]} required>
-                  <input
-                    style={inputStyle}
-                    value={form.applicant.lastName}
-                    onChange={(e) => setApplicant("lastName", e.target.value)}
-                    maxLength={120}
-                    autoComplete="off"
-                  />
-                </Field>
-                <Field label="Suffix" error={errors["applicant.suffix"]}>
-                  <input
-                    style={inputStyle}
-                    value={form.applicant.suffix}
-                    onChange={(e) => setApplicant("suffix", e.target.value)}
-                    maxLength={20}
-                    autoComplete="off"
-                  />
-                </Field>
-              </div>
-              <Field label="Date of birth (YYYY-MM-DD)" error={errors["applicant.dateOfBirth"]}>
-                <input
-                  style={inputStyle}
-                  value={form.applicant.dateOfBirth}
-                  onChange={(e) => setApplicant("dateOfBirth", e.target.value)}
-                  maxLength={20}
-                  autoComplete="off"
-                  placeholder="1990-01-15"
-                />
-              </Field>
-              <Field label="Phone (E.164)" error={errors["applicant.phone"]} required>
-                <input
-                  style={inputStyle}
-                  value={form.applicant.phone}
-                  onChange={(e) => setApplicant("phone", e.target.value)}
-                  maxLength={40}
-                  autoComplete="off"
-                  placeholder="+15551234567"
-                />
-              </Field>
-              <Field label="Email" error={errors["applicant.email"]} required>
-                <input
-                  style={inputStyle}
-                  type="email"
-                  value={form.applicant.email}
-                  onChange={(e) => setApplicant("email", e.target.value)}
-                  maxLength={200}
-                  autoComplete="off"
-                />
-              </Field>
-            </div>
+          <div ref={applicationRef}>
+            <ApplicationSections
+              data={applicationData}
+              renderField={renderApplicationField}
+              renderSensitive={renderSensitive}
+            />
           </div>
-
-          <div className="staff-panel">
-            <h2>2 · Subject ({order.certificate})</h2>
-            <div className="staff-panel-body" style={{ display: "grid", gap: "10px" }}>
-              {subjectKeys.length === 0 ? (
-                <p style={{ color: "var(--muted-text)" }}>No subject fields stored.</p>
-              ) : null}
-              {subjectKeys.map((key) => (
-                <Field
-                  key={key}
-                  label={prettyLabel(key)}
-                  error={errors[`subject.${key}`]}
-                  required={requiredSubject.includes(key)}
-                >
-                  <input
-                    style={inputStyle}
-                    value={form.subject[key] ?? ""}
-                    onChange={(e) => setRecord("subject", key, e.target.value)}
-                    maxLength={500}
-                    autoComplete="off"
-                  />
-                </Field>
-              ))}
-            </div>
-          </div>
-
-          <div className="staff-panel">
-            <h2>3 · Family</h2>
-            <div className="staff-panel-body" style={{ display: "grid", gap: "10px" }}>
-              {familyKeys.length === 0 ? (
-                <p style={{ color: "var(--muted-text)" }}>No family fields stored.</p>
-              ) : null}
-              {familyKeys.map((key) => (
-                <Field
-                  key={key}
-                  label={prettyLabel(key)}
-                  error={errors[`family.${key}`]}
-                  required={requiredFamily.includes(key)}
-                >
-                  <input
-                    style={inputStyle}
-                    value={form.family[key] ?? ""}
-                    onChange={(e) => setRecord("family", key, e.target.value)}
-                    maxLength={500}
-                    autoComplete="off"
-                  />
-                </Field>
-              ))}
-            </div>
-          </div>
-
-          {(["home", "shipping", "billing"] as const).map((kind, i) => (
-            <div className="staff-panel" key={kind}>
-              <h2>
-                {4 + i} · {kind.charAt(0).toUpperCase() + kind.slice(1)} address
-              </h2>
-              <div className="staff-panel-body" style={{ display: "grid", gap: "10px" }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                  <Field label="First name" error={errors[`addresses.${kind}.firstName`]}>
-                    <input
-                      style={inputStyle}
-                      value={form.addresses[kind].firstName}
-                      onChange={(e) => setAddr(kind, "firstName", e.target.value)}
-                      maxLength={120}
-                      autoComplete="off"
-                    />
-                  </Field>
-                  <Field label="Last name" error={errors[`addresses.${kind}.lastName`]}>
-                    <input
-                      style={inputStyle}
-                      value={form.addresses[kind].lastName}
-                      onChange={(e) => setAddr(kind, "lastName", e.target.value)}
-                      maxLength={120}
-                      autoComplete="off"
-                    />
-                  </Field>
-                </div>
-                <Field label="Street address" error={errors[`addresses.${kind}.line1`]}>
-                  <input
-                    style={inputStyle}
-                    value={form.addresses[kind].line1}
-                    onChange={(e) => setAddr(kind, "line1", e.target.value)}
-                    maxLength={200}
-                    autoComplete="off"
-                  />
-                </Field>
-                <Field label="Apt / suite" error={errors[`addresses.${kind}.line2`]}>
-                  <input
-                    style={inputStyle}
-                    value={form.addresses[kind].line2}
-                    onChange={(e) => setAddr(kind, "line2", e.target.value)}
-                    maxLength={200}
-                    autoComplete="off"
-                  />
-                </Field>
-                <div
-                  style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "10px" }}
-                >
-                  <Field label="City" error={errors[`addresses.${kind}.city`]}>
-                    <input
-                      style={inputStyle}
-                      value={form.addresses[kind].city}
-                      onChange={(e) => setAddr(kind, "city", e.target.value)}
-                      maxLength={120}
-                      autoComplete="off"
-                    />
-                  </Field>
-                  <Field label="State" error={errors[`addresses.${kind}.state`]}>
-                    <input
-                      style={inputStyle}
-                      value={form.addresses[kind].state}
-                      onChange={(e) => setAddr(kind, "state", e.target.value)}
-                      maxLength={120}
-                      autoComplete="off"
-                    />
-                  </Field>
-                  <Field label="ZIP" error={errors[`addresses.${kind}.postalCode`]}>
-                    <input
-                      style={inputStyle}
-                      value={form.addresses[kind].postalCode}
-                      onChange={(e) => setAddr(kind, "postalCode", e.target.value)}
-                      maxLength={20}
-                      autoComplete="off"
-                    />
-                  </Field>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          <div className="staff-panel">
-            <h2>7 · County, reason &amp; delivery</h2>
-            <div className="staff-panel-body" style={{ display: "grid", gap: "10px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                <Field label={`County (${order.stateCode})`} error={errors["county"]} required>
-                  <input
-                    style={inputStyle}
-                    value={form.county}
-                    onChange={(e) => setTop("county", e.target.value)}
-                    maxLength={120}
-                    autoComplete="off"
-                  />
-                </Field>
-                <Field label="City" error={errors["city"]}>
-                  <input
-                    style={inputStyle}
-                    value={form.city}
-                    onChange={(e) => setTop("city", e.target.value)}
-                    maxLength={120}
-                    autoComplete="off"
-                  />
-                </Field>
-              </div>
-              <Field label="Reason" error={errors["reason"]} required>
-                <input
-                  style={inputStyle}
-                  value={form.reason}
-                  onChange={(e) => setTop("reason", e.target.value)}
-                  maxLength={200}
-                  autoComplete="off"
-                />
-              </Field>
-              {form.reason === "Other" ? (
-                <Field label="Reason detail" error={errors["reasonOther"]} required>
-                  <input
-                    style={inputStyle}
-                    value={form.reasonOther}
-                    onChange={(e) => setTop("reasonOther", e.target.value)}
-                    maxLength={200}
-                    autoComplete="off"
-                  />
-                </Field>
-              ) : null}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                <Field label="Delivery method" error={errors["deliveryMethod"]}>
-                  <input
-                    style={inputStyle}
-                    value={form.deliveryMethod}
-                    onChange={(e) => setTop("deliveryMethod", e.target.value)}
-                    maxLength={80}
-                    autoComplete="off"
-                  />
-                </Field>
-                <Field label="Destination" error={errors["destinationType"]}>
-                  <select
-                    style={inputStyle}
-                    value={form.destinationType}
-                    onChange={(e) => setTop("destinationType", e.target.value)}
-                  >
-                    <option value="domestic">Domestic</option>
-                    <option value="international">International</option>
-                  </select>
-                </Field>
-              </div>
-            </div>
-          </div>
-
-          <div className="staff-panel" style={{ background: "#fffbeb", borderColor: "#fde68a" }}>
-            <h2 style={{ color: "#78350f" }}>8 · SSN &amp; payment card</h2>
-            <div className="staff-panel-body" style={{ display: "grid", gap: "12px" }}>
-              <p style={{ fontSize: "0.9rem", color: "#92400e", margin: 0 }}>
-                Stored values are encrypted and never shown. Blank keeps them — fill to replace.
-              </p>
-              <div
-                style={{
-                  display: "grid",
-                  gap: "8px",
-                  background: "#fff",
-                  border: "1px solid #fde68a",
-                  borderRadius: "8px",
-                  padding: "10px 12px",
-                }}
-              >
-                <p style={{ fontSize: "0.85rem", color: "#92400e", margin: 0 }}>
-                  Compare before replacing. Reveals are logged and auto-hide in 30 seconds.
-                </p>
-                <div
-                  style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}
-                >
-                  {revealedSsn ? (
-                    <>
-                      <code style={{ fontSize: "0.95rem", fontWeight: 700 }}>{revealedSsn}</code>
-                      <button
-                        type="button"
-                        className="staff-btn secondary"
-                        style={{ minWidth: "150px", height: "36px" }}
-                        onClick={() => setRevealedSsn(null)}
-                      >
-                        <EyeOff aria-hidden style={{ width: 15, height: 15 }} /> Hide SSN
-                      </button>
-                    </>
-                  ) : revealFor === "ssn" ? (
-                    <>
-                      <input
-                        style={{ ...inputStyle, background: "#fff", maxWidth: "280px" }}
-                        value={revealReason}
-                        onChange={(e) => setRevealReason(e.target.value)}
-                        maxLength={500}
-                        autoComplete="off"
-                        placeholder="Reason (required, logged)"
-                        aria-label="Reason for revealing SSN"
-                      />
-                      <button
-                        type="button"
-                        className="staff-btn secondary"
-                        disabled={revealBusy}
-                        onClick={() => void doReveal("ssn")}
-                      >
-                        {revealBusy ? "Revealing…" : "Confirm reveal"}
-                      </button>
-                      <button
-                        type="button"
-                        className="staff-btn secondary"
-                        onClick={() => setRevealFor(null)}
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      type="button"
-                      className="staff-btn secondary"
-                      onClick={() => {
-                        setRevealError("");
-                        setRevealFor("ssn");
-                      }}
-                    >
-                      <Eye aria-hidden style={{ width: 15, height: 15 }} /> Reveal stored SSN
-                    </button>
-                  )}
-                </div>
-                <div
-                  style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}
-                >
-                  {revealedCard ? (
-                    <>
-                      <code style={{ fontSize: "0.95rem", fontWeight: 700 }}>
-                        {revealedCard.number} · {revealedCard.expiry} · {revealedCard.securityCode}
-                      </code>
-                      <button
-                        type="button"
-                        className="staff-btn secondary"
-                        style={{ minWidth: "150px", height: "36px" }}
-                        onClick={() => setRevealedCard(null)}
-                      >
-                        <EyeOff aria-hidden style={{ width: 15, height: 15 }} /> Hide card
-                      </button>
-                    </>
-                  ) : revealFor === "card" ? (
-                    <>
-                      <input
-                        style={{ ...inputStyle, background: "#fff", maxWidth: "280px" }}
-                        value={revealReason}
-                        onChange={(e) => setRevealReason(e.target.value)}
-                        maxLength={500}
-                        autoComplete="off"
-                        placeholder="Reason (required, logged)"
-                        aria-label="Reason for revealing card"
-                      />
-                      <button
-                        type="button"
-                        className="staff-btn secondary"
-                        disabled={revealBusy}
-                        onClick={() => void doReveal("card")}
-                      >
-                        {revealBusy ? "Revealing…" : "Confirm reveal"}
-                      </button>
-                      <button
-                        type="button"
-                        className="staff-btn secondary"
-                        onClick={() => setRevealFor(null)}
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      type="button"
-                      className="staff-btn secondary"
-                      onClick={() => {
-                        setRevealError("");
-                        setRevealFor("card");
-                      }}
-                    >
-                      <Eye aria-hidden style={{ width: 15, height: 15 }} /> Reveal stored card
-                    </button>
-                  )}
-                </div>
-                {revealError ? (
-                  <p role="alert" className="staff-alert error" style={{ margin: 0 }}>
-                    {revealError}
-                  </p>
-                ) : null}
-              </div>
-              <Field label="SSN (stored: •••••, encrypted)" error={errors["requestorSsn"]}>
-                <input
-                  style={{ ...inputStyle, background: "#fff" }}
-                  value={form.ssn}
-                  onChange={(e) => setTop("ssn", formatSsnInput(e.target.value))}
-                  maxLength={11}
-                  inputMode="numeric"
-                  autoComplete="off"
-                  placeholder="XXX-XX-XXXX"
-                />
-                {(() => {
-                  const digits = digitsOnly(form.ssn).length;
-                  return digits > 0 && digits < 9 ? (
-                    <small className="application-error" role="alert" style={{ display: "block" }}>
-                      Enter all 9 digits ({digits}/9).
-                    </small>
-                  ) : null;
-                })()}
-              </Field>
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "10px" }}>
-                <Field
-                  label="Card number (stored: ••••, encrypted)"
-                  error={errors["paymentCard.number"]}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <input
-                      style={{ ...inputStyle, background: "#fff" }}
-                      value={form.cardNumber}
-                      onChange={(e) => setTop("cardNumber", formatCardInput(e.target.value))}
-                      maxLength={19}
-                      inputMode="numeric"
-                      autoComplete="off"
-                      placeholder="4111 1111 1111 1111"
-                    />
-                    {(() => {
-                      const brand = cardBrandOf(form.cardNumber);
-                      return brand ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={brand === "visa" ? "/assets/visa.svg" : "/assets/mastercard.svg"}
-                          alt={brand === "visa" ? "Visa" : "Mastercard"}
-                          width={36}
-                          height={22}
-                          style={{ flexShrink: 0 }}
-                        />
-                      ) : null;
-                    })()}
-                  </div>
-                  {(() => {
-                    const digits = digitsOnly(form.cardNumber).length;
-                    return digits > 0 && digits < 16 ? (
-                      <small
-                        className="application-error"
-                        role="alert"
-                        style={{ display: "block" }}
-                      >
-                        Enter all 16 digits ({digits}/16).
-                      </small>
-                    ) : null;
-                  })()}
-                </Field>
-                <Field label="Expiry MM/YY" error={errors["paymentCard.expiry"]}>
-                  <input
-                    style={{ ...inputStyle, background: "#fff" }}
-                    value={form.cardExpiry}
-                    onChange={(e) => setTop("cardExpiry", formatExpiryInput(e.target.value))}
-                    maxLength={5}
-                    inputMode="numeric"
-                    autoComplete="off"
-                    placeholder="MM/YY"
-                  />
-                  {!isPlausibleExpiryMonth(form.cardExpiry) ? (
-                    <small className="application-error" role="alert" style={{ display: "block" }}>
-                      Use MM/YY with a month from 01 to 12.
-                    </small>
-                  ) : null}
-                </Field>
-                <Field label="CVC" error={errors["paymentCard.securityCode"]}>
-                  <input
-                    style={{ ...inputStyle, background: "#fff" }}
-                    value={form.cardCvc}
-                    onChange={(e) => setTop("cardCvc", digitsOnly(e.target.value).slice(0, 3))}
-                    maxLength={3}
-                    inputMode="numeric"
-                    autoComplete="off"
-                    placeholder="•••"
-                  />
-                </Field>
-              </div>
-            </div>
-          </div>
-
           <div className="staff-panel" style={{ background: "#eef2ff", borderColor: "#c7d2fe" }}>
             <h2 style={{ color: "#312e81" }}>GTG Submit Notes (Optional)</h2>
             <div className="staff-panel-body" style={{ display: "grid", gap: "10px" }}>
