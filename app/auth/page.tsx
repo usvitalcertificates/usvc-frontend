@@ -6,6 +6,7 @@ import { saveStaffTokens } from "@/lib/staff-client";
 
 type Step =
   | { name: "login" }
+  | { name: "prepare"; mfaToken: string }
   | { name: "enroll"; mfaToken: string; qr: string; secret: string }
   | { name: "verify"; mfaToken: string };
 
@@ -36,6 +37,36 @@ function AuthForm() {
     router.replace("/staff");
   };
 
+  const beginMfa = async (data: { mfaToken: string; enroll: boolean }) => {
+    if (!data.enroll) {
+      setStep({ name: "verify", mfaToken: data.mfaToken });
+      return;
+    }
+    // Keep the MFA token if QR loading fails. A retry must never resubmit
+    // the password or consume the single-use setup link a second time.
+    setStep({ name: "prepare", mfaToken: data.mfaToken });
+    const enroll = await post("/auth/mfa/enroll", { mfaToken: data.mfaToken });
+    setStep({
+      name: "enroll",
+      mfaToken: data.mfaToken,
+      qr: enroll.qrDataUrl,
+      secret: enroll.secret,
+    });
+  };
+
+  const retryEnrollment = async () => {
+    if (step.name !== "prepare") return;
+    setBusy(true);
+    setError("");
+    try {
+      await beginMfa({ mfaToken: step.mfaToken, enroll: true });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not load authenticator setup");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const submitLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setBusy(true);
@@ -43,26 +74,13 @@ function AuthForm() {
     try {
       if (setupToken) {
         const data = await post("/auth/setup", { token: setupToken, password });
-        const enroll = await post("/auth/mfa/enroll", { mfaToken: data.mfaToken });
-        setStep({
-          name: "enroll",
-          mfaToken: data.mfaToken,
-          qr: enroll.qrDataUrl,
-          secret: enroll.secret,
-        });
+        setPassword("");
+        window.history.replaceState(null, "", "/auth");
+        await beginMfa(data);
       } else {
         const data = await post("/auth/login", { email, password });
-        if (data.enroll) {
-          const enroll = await post("/auth/mfa/enroll", { mfaToken: data.mfaToken });
-          setStep({
-            name: "enroll",
-            mfaToken: data.mfaToken,
-            qr: enroll.qrDataUrl,
-            secret: enroll.secret,
-          });
-        } else {
-          setStep({ name: "verify", mfaToken: data.mfaToken });
-        }
+        setPassword("");
+        await beginMfa(data);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Sign in failed");
@@ -108,7 +126,8 @@ function AuthForm() {
           <form onSubmit={submitLogin} style={{ marginTop: 0, maxWidth: "none" }}>
             {setupToken ? (
               <p>
-                Create your own password (8+ characters). You will pair your authenticator app next.
+                Choose a password (8+ characters). Next, verify your authenticator or set it up if
+                needed.
               </p>
             ) : (
               <>
@@ -148,6 +167,23 @@ function AuthForm() {
               {busy ? "Please wait…" : "Continue"}
             </button>
           </form>
+        ) : step.name === "prepare" ? (
+          <div>
+            <p>Your password was accepted. Continue with authenticator setup.</p>
+            {error ? (
+              <p role="alert" className="staff-alert error">
+                {error}
+              </p>
+            ) : null}
+            <button
+              type="button"
+              className="staff-btn"
+              disabled={busy}
+              onClick={() => void retryEnrollment()}
+            >
+              {busy ? "Please wait…" : "Retry authenticator setup"}
+            </button>
+          </div>
         ) : (
           <form onSubmit={submitCode} style={{ marginTop: 0, maxWidth: "none" }}>
             {step.name === "enroll" ? (
@@ -200,6 +236,9 @@ function AuthForm() {
             </button>
           </form>
         )}
+        <p>
+          <a href="/auth">Return to staff sign in</a>
+        </p>
         <p
           style={{
             fontSize: "0.9rem",
