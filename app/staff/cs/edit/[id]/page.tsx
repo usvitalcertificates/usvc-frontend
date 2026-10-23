@@ -9,7 +9,12 @@ import { BackLink, PageBand, StatusPill, Toast } from "@/components/staff/ui";
 import { hasUnsavedApplicationChanges } from "@/lib/staff-action-safety";
 import { DateInput } from "@/components/DateInput";
 import { ApplicationSections } from "@/components/staff/ApplicationSections";
-import { APPLICATION_LABELS, type ApplicationField } from "@/lib/form-config";
+import {
+  APPLICATION_LABELS,
+  DELIVERY_METHODS,
+  deliveryMethodLabel,
+  type ApplicationField,
+} from "@/lib/form-config";
 import { useConfirmation } from "@/components/staff/useConfirmation";
 import { CopyButton } from "@/components/staff/CopyButton";
 
@@ -173,7 +178,7 @@ function formFromOrder(order: EditOrder): EditForm {
     city: order.geo?.city ?? "",
     reason: order.reason ?? "",
     reasonOther: order.reasonOther ?? "",
-    deliveryMethod: order.deliveryMethod ?? "regular",
+    deliveryMethod: deliveryMethodLabel(order.deliveryMethod) || DELIVERY_METHODS[0],
     destinationType: order.destinationType === "international" ? "international" : "domestic",
     ssn: "",
     cardNumber: "",

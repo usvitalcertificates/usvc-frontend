@@ -20,6 +20,7 @@ import {
   APPLICATION_ADDRESS_TYPES as ADDRESS_TYPE_OPTIONS,
   APPLICATION_LABELS,
   ADDRESS_LABELS,
+  DELIVERY_METHODS,
   applicationSectionKeys,
   eventLocationLabels,
   applicationReasonLabel,
@@ -893,7 +894,7 @@ export function OrderForm({
 
   const copies = Number(values.copies ?? draft.copies ?? 1);
   const rush = (values.processing ?? draft.processing ?? "standard") === "rush";
-  const delivery = values.delivery ?? draft.delivery ?? "Regular";
+  const delivery = values.delivery ?? draft.delivery ?? DELIVERY_METHODS[0];
   const shippingIntl =
     addressTypeOf(values.shippingType ?? draft.shippingType ?? ADDRESS_TYPE_OPTIONS[0].label) ===
     "international";
@@ -1939,15 +1940,8 @@ export function OrderForm({
             <SearchableSelect
               name="delivery"
               required
-              defaultValue={draft.delivery ?? "Regular"}
-              options={[
-                { value: "Regular", label: "Regular" },
-                { value: "UPS Air", label: "UPS Air" },
-                {
-                  value: "UPS Worldwide Expedited, Up to 5 Business Days",
-                  label: "UPS Worldwide Expedited, Up to 5 Business Days",
-                },
-              ]}
+              defaultValue={draft.delivery ?? DELIVERY_METHODS[0]}
+              options={DELIVERY_METHODS.map((method) => ({ value: method, label: method }))}
               placeholder="Select…"
             />
           </label>

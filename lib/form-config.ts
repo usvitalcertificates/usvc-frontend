@@ -536,6 +536,23 @@ export const ADDRESS_LABELS = {
   postalCode: "Zip/Postal Code",
   country: "Country",
 } as const;
+export const DELIVERY_METHODS = [
+  "Regular",
+  "UPS Air",
+  "UPS Worldwide Expedited, Up to 5 Business Days",
+] as const;
+export function certificateCount(count: number): string {
+  return `${count} ${count === 1 ? "Certificate" : "Certificates"}`;
+}
+export function deliveryMethodLabel(value: string | undefined): string {
+  const entered = (value ?? "").trim();
+  const normalized = entered.toLowerCase();
+  if (normalized === "regular") return "Regular";
+  if (normalized === "ups air") return "UPS Air";
+  if (normalized === "ups worldwide expedited, up to 5 business days")
+    return "UPS Worldwide Expedited, Up to 5 Business Days";
+  return entered;
+}
 export function applicationSectionKeys(config: CertificateFormConfig): ApplicationSectionKey[] {
   return [
     "certificate",
@@ -790,8 +807,12 @@ export function applicationSections(data: ApplicationData, noun = "county"): App
   add("copies", [
     {
       fields: [
-        field("copies", labels.copies, data.copies, { locked: true }),
-        field("deliveryMethod", labels.delivery, data.deliveryMethod),
+        field("copies", labels.copies, certificateCount(data.copies), { locked: true }),
+        field("deliveryMethod", labels.delivery, deliveryMethodLabel(data.deliveryMethod), {
+          type: "select",
+          options: [...DELIVERY_METHODS],
+          required: true,
+        }),
         field("rush", labels.processing, data.rush ? "Rush Processing" : "Standard Processing", {
           locked: true,
         }),
