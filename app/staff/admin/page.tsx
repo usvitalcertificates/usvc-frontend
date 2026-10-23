@@ -59,6 +59,20 @@ export default function StaffAdmin() {
     void loadRoster();
   }, [loadRoster]);
 
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === "visible" && !confirmation.pending && !inviteOpen) {
+        void loadRoster();
+      }
+    };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [loadRoster, confirmation.pending, inviteOpen]);
+
   const invite = async () => {
     if (!isAdmin || !inviteForm.current?.reportValidity()) return false;
     setInviteBusy(true);
@@ -131,7 +145,9 @@ export default function StaffAdmin() {
         } else {
           await staffJson(`/admin/staff/${id}/${action}`, { method: "POST", body: "{}" });
         }
-        setToast("Done.");
+        setToast(
+          `${label.split("?")[0]}: ${staff.find((member) => member.id === id)?.email ?? "Selected account"}.`,
+        );
         await loadRoster();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Action failed");
@@ -233,9 +249,19 @@ export default function StaffAdmin() {
         title="Administration"
         subtitle="Manage staff access, security, and workload from one place."
         actions={
-          <button type="button" className="staff-btn" onClick={() => setInviteOpen(true)}>
-            <Plus aria-hidden style={{ width: 16, height: 16 }} /> Invite staff member
-          </button>
+          <>
+            <button
+              type="button"
+              className="staff-btn secondary"
+              disabled={confirmation.pending || inviteOpen}
+              onClick={() => void loadRoster()}
+            >
+              Refresh staff status
+            </button>
+            <button type="button" className="staff-btn" onClick={() => setInviteOpen(true)}>
+              <Plus aria-hidden style={{ width: 16, height: 16 }} /> Invite staff member
+            </button>
+          </>
         }
       />
       {toast ? <Toast message={toast} onDone={() => setToast("")} /> : null}
