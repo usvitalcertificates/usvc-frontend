@@ -1,5 +1,7 @@
 # Frontend status + remaining work
 
+- Node.js security pin (2026-10-24): the frontend is pinned to Node `24.22.1` in `.nvmrc`, `package.json` engines (`>=24.22.1 <25`) and CI `node-version`, the patched release for CVE-2026-111497 (Brotli decoder remote code execution). Vercel continues to manage the Node 24 runtime patch. No UI, API, data or behavior changes.
+
 - Staff roster row striping (2026-10-23): Administration table alternates white and light-blue rows, including mobile cards; hover/keyboard focus uses the existing staff tint. Limited to the administration roster. Verified in the local browser alongside account-targeting checks.
 
 - Staff password-reset recovery (2026-10-23): after saving a password, auth uses the backend `enroll` response to verify an existing authenticator or load new pairing. Consumed setup tokens are removed from the URL and passwords cleared from component state. QR-loading failures retain the in-memory MFA step so Retry never resubmits the password link; a sign-in link handles used/expired links or lost responses. Staff roster refreshes on returning to the tab and offers explicit Refresh staff status; confirmations suppress background refresh and success messages identify the account. Deploy the backend `enroll` response before this frontend. No production/staging account mutations or emails.
