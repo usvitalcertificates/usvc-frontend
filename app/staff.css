@@ -732,6 +732,16 @@ table.staff-table {
   min-width: 980px;
   table-layout: fixed;
 }
+.staff-admin-table tbody tr:nth-child(odd) {
+  background: var(--flow-surface);
+}
+.staff-admin-table tbody tr:nth-child(even) {
+  background: #edf3fc;
+}
+.staff-admin-table tbody tr:hover,
+.staff-admin-table tbody tr:focus-within {
+  background: var(--flow-tint);
+}
 .staff-admin-table th:nth-child(1) {
   width: 27%;
 }
