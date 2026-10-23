@@ -3,7 +3,7 @@
 import { useLayoutEffect, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Check, ChevronDown, Tag } from "lucide-react";
 import { copyMoney, copyPricing, MAX_COPIES } from "@/lib/copy-pricing";
-import { APPLICATION_LABELS, type CertificateSlug } from "@/lib/form-config";
+import { APPLICATION_LABELS, certificateCount, type CertificateSlug } from "@/lib/form-config";
 
 const examples: Record<CertificateSlug, readonly string[]> = {
   "birth-certificate": [
@@ -58,8 +58,6 @@ const copyGuidance: Record<CertificateSlug, string> = {
     "Name changes, remarriage and benefits updates may require a certified copy of your divorce record. Some organizations keep the copy you submit, so additional copies can help with separate requests.",
 };
 const quantities = Array.from({ length: MAX_COPIES }, (_, i) => i + 1);
-const certificateCount = (count: number) =>
-  `${count} ${count === 1 ? "Certificate" : "Certificates"}`;
 
 export function CopyQuantity({
   copies,
