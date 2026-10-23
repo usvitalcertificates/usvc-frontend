@@ -51,7 +51,7 @@ Checkout: `verify-before-payment` → `createOrder` → `checkout-session` → S
 
 ## Staff portal essentials
 
-Invite-only (member sets 8+ char password via setup link, pairs TOTP). Daily login = email + password + TOTP. 30-min inactivity sign-out; lost device → ADMIN MFA reset (revokes sessions, audited). Queue: searchable/filterable paid-only, masked rows, claim exclusive/atomic (409 if taken). Detail owner-or-ADMIN with stepper (Claimed → Processing → Submitted) and `TO_CS`/`GTG` lane. `ConfirmModal` for destructive actions (never `window.confirm`); lucide icons always paired with text; tables fall back to cards <900px.
+Invite-only (member sets 8+ char password via setup link, pairs TOTP). Daily login = email + password + TOTP. 30-min inactivity sign-out; lost device → ADMIN MFA reset (revokes sessions, audited). Queue: searchable/filterable paid-only, masked rows, claim exclusive/atomic (409 if taken). Detail owner-or-ADMIN with stepper (Claimed → Processing → Submitted) and a tab-driven flow: Summary starts processing, Application handles the optional `TO_CS`/`GTG` lane and hands off, and Notes & Document Upload owns final submission. `ConfirmModal` for destructive actions (never `window.confirm`); lucide icons always paired with text; tables fall back to cards <900px.
 
 ## Deploy + env (names only — never commit values)
 

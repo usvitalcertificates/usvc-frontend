@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { FolderOpen, UserPlus } from "lucide-react";
-import { staffData, staffRole } from "@/lib/staff-client";
+import { staffData, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import {
   EmptyState,
@@ -167,11 +167,23 @@ export function QueueView({
   const claim = async (id: string, publicNumber: string) => {
     setError("");
     try {
-      const { response, data } = await staffData<{ message?: string }>(
+      const { response, data } = await staffData<{ message?: string; status?: string }>(
         `/staff/orders/${id}/claim`,
         { method: "POST" },
       );
       if (!response.ok) throw new Error(data.message || "Could not take ownership of this order");
+      // Claiming a GTG order means resuming it: the CS lane released it back
+      // for fulfillment. Use the same audited transition as the detail page.
+      if (data.status === "GTG") {
+        try {
+          await staffJson(`/orders/${id}/status`, {
+            method: "PATCH",
+            body: JSON.stringify({ status: "IN_REVIEW" }),
+          });
+        } catch {
+          // Ownership is already assigned; the detail page offers Resume.
+        }
+      }
       setClaimed({ number: publicNumber, id });
       await load();
     } catch (e) {
@@ -191,7 +203,7 @@ export function QueueView({
       {claimed ? (
         <TimedActionModal
           key={claimed.id}
-          title="Ownership taken"
+          title="Ownership Taken"
           orderNumber={claimed.number}
           primaryLabel="Open Order"
           primaryHref={`/staff/${claimed.id}`}

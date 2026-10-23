@@ -72,6 +72,20 @@ const original = {
   amountCents: 14900,
   pricing: { serviceCents: 14900, rushCents: 0, totalCents: 14900 },
 };
+const queueOrder = {
+  id: "flow-test",
+  publicNumber: original.publicNumber,
+  certificate: "BIRTH",
+  stateCode: "NY",
+  county: "Albany",
+  requestor: "Sample Applicant",
+  copies: 1,
+  rush: false,
+  status: "GTG",
+  assignedToMe: false,
+  assignedName: null,
+  createdAt: original.createdAt,
+};
 const roster = [
   {
     id: "actor",
@@ -149,7 +163,7 @@ async function until(predicate) {
       if (path === "/staff/orders/flow-test") body = order;
       else if (path === "/admin/staff") body = { staff };
       else if (path.endsWith("/audit")) body = { auditEvents: [] };
-      else if (path === "/staff/orders") body = { orders: [], total: 0, pages: 1 };
+      else if (path === "/staff/orders") body = { orders: [queueOrder], total: 1, pages: 1 };
       else if (path === "/staff/unpaid-orders/flow-test")
         body = {
           order: {
@@ -194,6 +208,11 @@ async function until(predicate) {
       if (path === "/orders/flow-test/status") {
         order.status = payload.status;
         if (payload.status === "GTG" || payload.status === "TO_CS") order.assignedTo = null;
+      }
+      if (path === "/staff/orders/flow-test/claim") {
+        order.assignedTo = "actor";
+        order.assignedName = "Test Actor";
+        body = { ok: true, publicNumber: order.publicNumber, status: "GTG" };
       }
       if (path === "/orders/flow-test/reopen") order.status = payload.status;
       if (path === "/staff/orders/flow-test/correction")
@@ -322,16 +341,26 @@ async function until(predicate) {
   }
   try {
     await detail();
+    await page.getByRole("tab", { name: "Application (Owners only)", exact: true }).click();
+    await page
+      .getByRole("button", { name: "Proceed to Notes & Document Upload", exact: true })
+      .click();
+    await page.waitForFunction(() =>
+      Array.from(document.querySelectorAll('[role="tab"]')).some(
+        (tab) =>
+          tab.getAttribute("aria-selected") === "true" &&
+          tab.textContent?.includes("Notes & Document Upload"),
+      ),
+    );
+    passed.push("Application hand-off to Notes tab");
     const chooseSubmission = async () => {
-      await page.getByRole("button", { name: /^Sent to Government Agency/ }).click();
-      await page
-        .getByRole("button", { name: "Confirm: Send to Government Agency", exact: true })
-        .click();
+      await page.getByRole("tab", { name: "Notes & Document Upload", exact: true }).click();
+      await page.getByRole("button", { name: "Submit to Government Agency", exact: true }).click();
     };
     await exercise(
       "Agency submission: cancel, keyboard trap, duplicate guard, pending dismissal, failure/retry",
       chooseSubmission,
-      "Mark as submitted",
+      "Close This Order",
       "/orders/flow-test/status",
       { failure: true, pending: true },
     );
@@ -341,28 +370,82 @@ async function until(predicate) {
     );
     await detail("PAID");
     await exercise(
-      "Processing status",
-      () => page.getByRole("button", { name: "Confirm: Order Processing", exact: true }).click(),
-      "Change status",
+      "Start order processing",
+      () =>
+        page.getByRole("button", { name: "Start Order Processing", exact: true }).first().click(),
+      "Start Order Processing",
       "/orders/flow-test/status",
+    );
+    assert.equal(writes.at(-1).payload.status, "IN_REVIEW");
+    await page.waitForFunction(() =>
+      Array.from(document.querySelectorAll('[role="tab"]')).some(
+        (tab) =>
+          tab.getAttribute("aria-selected") === "true" &&
+          tab.textContent?.includes("Application (Owners only)"),
+      ),
     );
     await detail();
     const toCs = async () => {
-      await page.getByRole("button", { name: /^To CS/ }).click();
-      await page
-        .getByLabel("Internal note (required for To CS)")
-        .fill("Synthetic CS review required");
-      await page.getByRole("button", { name: "Confirm: To CS", exact: true }).click();
+      await page.getByRole("tab", { name: "Application (Owners only)", exact: true }).click();
+      await page.getByLabel("Note for CS (required)").fill("Synthetic CS review required");
+      await page.getByLabel("Substatus (optional)").selectOption("1st Contact");
+      await page.getByRole("button", { name: "Send to CS", exact: true }).click();
     };
     await exercise("To CS with required note", toCs, "Send To CS", "/orders/flow-test/status");
     assert.equal(writes.at(-1).payload.note, "Synthetic CS review required");
+    assert.equal(writes.at(-1).payload.substatus, "1st Contact");
     await detail("TO_CS");
     await exercise(
       "GTG from order detail",
-      () => page.getByRole("button", { name: "Confirm: GTG", exact: true }).click(),
+      async () => {
+        await page.getByRole("tab", { name: "Application (Owners only)", exact: true }).click();
+        await page.getByRole("button", { name: "Mark GTG", exact: true }).click();
+      },
       "Mark GTG",
       "/orders/flow-test/status",
     );
+    await detail("GTG");
+    await exercise(
+      "Resume after GTG",
+      async () => {
+        await page.getByRole("tab", { name: "Application (Owners only)", exact: true }).click();
+        await page.getByRole("button", { name: "Resume Order Processing", exact: true }).click();
+      },
+      "Resume Order Processing",
+      "/orders/flow-test/status",
+    );
+    order = copy(original);
+    order.status = "GTG";
+    order.assignedTo = null;
+    order.assignedName = null;
+    const claimWritesBefore = count("/staff/orders/flow-test/claim");
+    const statusWritesBefore = count("/orders/flow-test/status");
+    await navigate("/staff");
+    await page
+      .getByRole("button", { name: /Take Ownership/ })
+      .first()
+      .click();
+    await until(
+      () =>
+        count("/staff/orders/flow-test/claim") === claimWritesBefore + 1 &&
+        count("/orders/flow-test/status") === statusWritesBefore + 1,
+    );
+    await page.getByRole("heading", { name: "Ownership Taken", exact: true }).waitFor();
+    assert.equal(order.status, "IN_REVIEW");
+    assert.equal(
+      writes.filter((write) => write.path === "/orders/flow-test/status").at(-1).payload.status,
+      "IN_REVIEW",
+    );
+    await page.getByRole("link", { name: "Open Order", exact: true }).click();
+    await page.getByRole("tab", { name: "Summary", exact: true }).waitFor();
+    await page.getByRole("tab", { name: "Application (Owners only)", exact: true }).click();
+    assert.equal(
+      await page
+        .getByRole("button", { name: "Proceed to Notes & Document Upload", exact: true })
+        .isEnabled(),
+      true,
+    );
+    passed.push("GTG claim auto-resumes and enables Proceed");
     await detail();
     await exercise(
       "Drop ownership",
@@ -625,13 +708,18 @@ async function until(predicate) {
     });
     const limitedPage = await limited.newPage();
     await limitedPage.goto(base + "/staff/flow-test");
-    await limitedPage.getByRole("button", { name: /^Sent to Government Agency/ }).click();
+    await limitedPage.getByRole("tab", { name: "Notes & Document Upload", exact: true }).click();
     assert.equal(
       await limitedPage
-        .getByRole("button", { name: "Confirm: Send to Government Agency", exact: true })
+        .getByRole("button", { name: "Submit to Government Agency", exact: true })
         .isDisabled(),
       true,
     );
+    await limitedPage
+      .getByText("Upload the completion PDF and add at least one internal note above.", {
+        exact: true,
+      })
+      .waitFor();
     await limitedPage.goto(base + "/staff/cs/edit/flow-test");
     await limitedPage
       .getByText("Order editing is restricted to CS and ADMIN roles.", { exact: true })
