@@ -147,7 +147,28 @@ test("copy includes exact labels and US dates, omitting blanks and secrets", () 
   const text = applicationCopyText(sections.flatMap((s) => s.groups.flatMap((g) => g.fields)));
   assert.match(text, /Your date of birth: 12\/31\/1990/);
   assert.match(text, /Subject's Date of Birth: 02\/29\/2000/);
+  assert.match(text, /Number of Certified Copies: 2 Certificates/);
   assert.doesNotMatch(text, /Middle Name|Social Security|Credit Card Number|1990-12-31/);
+});
+test("copies and delivery values match the public picker wording", () => {
+  const fields = (data) =>
+    applicationSections(data).flatMap((s) => s.groups.flatMap((g) => g.fields));
+
+  const single = fields(order("BIRTH", { copies: 1, deliveryMethod: "regular" }));
+  assert.equal(single.find((f) => f.path === "copies").value, "1 Certificate");
+  const delivery = single.find((f) => f.path === "deliveryMethod");
+  assert.equal(delivery.value, "Regular");
+  assert.equal(delivery.type, "select");
+  assert.equal(delivery.required, true);
+  assert.deepEqual(delivery.options, [
+    "Regular",
+    "UPS Air",
+    "UPS Worldwide Expedited, Up to 5 Business Days",
+  ]);
+
+  const multiple = fields(order("DEATH", { copies: 3, deliveryMethod: "UPS Air" }));
+  assert.equal(multiple.find((f) => f.path === "copies").value, "3 Certificates");
+  assert.equal(multiple.find((f) => f.path === "deliveryMethod").value, "UPS Air");
 });
 test("shared public configuration resolves state overrides and conditional fields", () => {
   const config = resolveFormConfig("california", "birth-certificate");
