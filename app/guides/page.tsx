@@ -59,19 +59,19 @@ export default function GuidesIndex() {
             state where the event was recorded.
           </p>
           <div className="certificate-type-grid">
-            {guides.map(([slug, guide]) => (
-              <article className="certificate-type-card" key={slug}>
-                <h2>{guide.state} Vital Records</h2>
+            {GUIDE_CERTIFICATES.map((type) => (
+              <article className="certificate-type-card" key={type} id={`${type}-guides`}>
+                <h2>{type.charAt(0).toUpperCase() + type.slice(1)} Certificate Guides</h2>
                 <div className="patriotic-rule" aria-hidden="true" />
                 <p className="certificate-support-intro">
-                  Choose a record type for {guide.state}. Each guide explains the official
-                  custodian, document choices, request preparation and sources.
+                  Choose your state for official {type}-record offices, document choices and request
+                  instructions.
                 </p>
                 <ul className="guide-link-list">
-                  {GUIDE_CERTIFICATES.map((type) => (
-                    <li key={type}>
+                  {guides.map(([slug, guide]) => (
+                    <li key={slug}>
                       <Link className="guide-link" href={`/guides/${slug}/${type}-certificate`}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)} certificate guide
+                        {guide.state} {type} certificate guide
                       </Link>
                     </li>
                   ))}
