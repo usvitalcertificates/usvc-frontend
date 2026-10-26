@@ -1,15 +1,14 @@
-import { BIRTH_GUIDE_SOURCES, SITE_URL } from "@/lib/seo";
+import { GUIDE_INVENTORY } from "@/lib/guide-inventory";
+import { SITE_URL } from "@/lib/seo";
 
 export const dynamic = "force-static";
 
 /** Optional public-resource directory; never includes application or customer data. */
 export function GET() {
-  const guides = Object.entries(BIRTH_GUIDE_SOURCES)
-    .map(
-      ([slug, guide]) =>
-        `- [${guide.state} birth-certificate guide](${SITE_URL}/guides/${slug}/birth-certificate): A practical guide to requesting a state birth certificate, with a link to the official issuing agency.`,
-    )
-    .join("\n");
+  const guides = GUIDE_INVENTORY.map(
+    (guide) =>
+      `- [${guide.stateName} ${guide.type}-certificate guide](${SITE_URL}${guide.path}): Official record offices, document choices and request preparation.`,
+  ).join("\n");
   const text = `# US Vital Certificates (USVC)
 
 > USVC is an independent application assistance service for US birth, death, marriage and divorce certificate requests. It is not a government agency and is not affiliated with or endorsed by a federal or state office.
@@ -26,9 +25,9 @@ USVC provides guided online requests, application review and processing support.
 - [Editorial policy](${SITE_URL}/editorial): Source standards, review process, corrections and AI disclosure.
 - [Contact support](${SITE_URL}/contact): Public support contact page.
 
-## Official-resource birth guides
+## Official-resource vital-record guides
 
-- [All birth-certificate guides](${SITE_URL}/guides): Directory of state guides with links to official issuing agencies.
+- [All certificate guides](${SITE_URL}/guides): Directory of state guides with links to official issuing agencies.
 
 ${guides}
 

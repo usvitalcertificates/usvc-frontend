@@ -1,12 +1,13 @@
+import { GUIDE_INVENTORY, GUIDE_CERTIFICATES } from "@/lib/guide-inventory";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SeoJsonLd } from "@/app/seo-json-ld";
 import { PageHeader } from "@/app/usvc-ui";
 import { assertSeoLength, BIRTH_GUIDE_SOURCES, SITE_URL, socialMetadata } from "@/lib/seo";
 
-const title = "Birth Certificate Guides by State";
+const title = "Vital Record Guides by State and Certificate Type";
 const description =
-  "Step-by-step birth certificate guides for 13 states: eligibility, ID, online and mail filing, corrections, adoption records, and official sources.";
+  "Birth, death, marriage and divorce guides for 13 states. Find the right record, official office, request steps and source links.";
 
 export const metadata: Metadata = {
   title: assertSeoLength("title", title),
@@ -33,11 +34,11 @@ export default function GuidesIndex() {
     url: `${SITE_URL}/guides`,
     mainEntity: {
       "@type": "ItemList",
-      itemListElement: guides.map(([slug, guide], index) => ({
+      itemListElement: GUIDE_INVENTORY.map((guide, index) => ({
         "@type": "ListItem",
         position: index + 1,
-        name: `${guide.state} Birth Certificate Guide`,
-        url: `${SITE_URL}/guides/${slug}/birth-certificate`,
+        name: `${guide.stateName} ${guide.type} Certificate Guide`,
+        url: `${SITE_URL}${guide.path}`,
       })),
     },
   };
@@ -48,30 +49,33 @@ export default function GuidesIndex() {
       <PageHeader
         eyebrow="Official-resource guides"
         title={title}
-        subtitle="Understand who may request a birth certificate, what to prepare, where to file, and which official agency controls the record."
+        subtitle="Explore 52 guides covering birth, death, marriage and divorce records in the same 13 states."
       />
       <section className="page-section">
         <div className="container">
           <p className="state-intro">
             These guides summarize official state resources. Requirements can change, so each guide
             links to the issuing agency and shows when its sources were checked. Start with the
-            state where the birth occurred.
+            state where the event was recorded.
           </p>
           <div className="certificate-type-grid">
             {guides.map(([slug, guide]) => (
               <article className="certificate-type-card" key={slug}>
-                <h2>{guide.state} Birth Certificates</h2>
+                <h2>{guide.state} Vital Records</h2>
                 <div className="patriotic-rule" aria-hidden="true" />
                 <p className="certificate-support-intro">
-                  Eligibility, identification, filing options, corrections, adoption records, and
-                  official sources for {guide.state}.
+                  Choose a record type for {guide.state}. Each guide explains the official
+                  custodian, document choices, request preparation and sources.
                 </p>
-                <Link
-                  className="button button-secondary"
-                  href={`/guides/${slug}/birth-certificate`}
-                >
-                  Read the {guide.state} guide
-                </Link>
+                <ul className="guide-link-list">
+                  {GUIDE_CERTIFICATES.map((type) => (
+                    <li key={type}>
+                      <Link className="guide-link" href={`/guides/${slug}/${type}-certificate`}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)} certificate guide
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </article>
             ))}
           </div>

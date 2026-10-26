@@ -57,7 +57,7 @@ const columns = [
     title: "Resources",
     links: [
       ["Find Your State", "/find-your-state"],
-      ["Birth Certificate Guides", "/guides"],
+      ["Certificate Guides", "/guides"],
       ["About USVC", "/about"],
       ["FAQ", "/faq"],
       ["Track Order", "/track-order"],
