@@ -5,14 +5,14 @@ import { StateSelector } from "../state-selector";
 import { PageHeader } from "../usvc-ui";
 
 export const metadata = {
-  title: "Find Your State to Start Request",
+  title: "Vital Records by State: Find Your Certificate",
   description:
-    "Choose the state where your vital record was issued to start a guided USVC certificate request.",
+    "Find birth, death, marriage and divorce records by state. Choose where the event occurred to explore certificate options and USVC application help.",
   alternates: { canonical: "https://usvitalcertificates.org/find-your-state" },
   ...socialMetadata({
-    title: "Find Your State to Start Request",
+    title: "Vital Records by State: Find Your Certificate",
     description:
-      "Select your state to see eligibility, fees, and start a guided vital certificate request with USVC.",
+      "Find birth, death, marriage and divorce records by state. Choose where the event occurred to explore certificate options and USVC application help.",
     url: "https://usvitalcertificates.org/find-your-state",
     type: "website",
   }),
@@ -23,7 +23,7 @@ export default function FindState() {
     <main>
       <PageHeader
         eyebrow="Step 1 of your request"
-        title="Find Your State"
+        title="Find Vital Records by State"
         subtitle="Select the state where your vital record was issued to begin."
       />
       <section className="page-section find-state-page">

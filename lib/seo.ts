@@ -67,6 +67,19 @@ export function assertSeoLength(kind: "title" | "description", value: string): s
 }
 
 export const BIRTH_GUIDE_SOURCES: Record<string, { state: string; url: string }> = {
+  arizona: { state: "Arizona", url: "https://www.azdhs.gov/director/vital-records/" },
+  tennessee: { state: "Tennessee", url: "https://www.tn.gov/health/vr" },
+  massachusetts: {
+    state: "Massachusetts",
+    url: "https://www.mass.gov/how-to/order-a-birth-marriage-or-death-certificate",
+  },
+  indiana: { state: "Indiana", url: "https://www.in.gov/health/vital-records/" },
+  missouri: {
+    state: "Missouri",
+    url: "https://health.mo.gov/vital-records-registries/vital-records/order-copy-vital-record",
+  },
+  maryland: { state: "Maryland", url: "https://health.maryland.gov/vsa/Pages/birth.aspx" },
+  colorado: { state: "Colorado", url: "https://www.cdc.gov/nchs/w2w/colorado.htm" },
   california: {
     state: "California",
     url: "https://www.cdph.ca.gov/Programs/CHSI/Pages/Vital-Records-Obtaining-Certified-Copies-of-Birth-Records.aspx",
@@ -199,8 +212,8 @@ export function titleCase(value: string) {
  */
 // All four public page groups received the social metadata update on this date.
 // These describe page modifications, not the date official sources were checked.
-export const SITEMAP_STATIC_LAST_MODIFIED = "2026-10-22";
-export const SITEMAP_STATES_LAST_MODIFIED = "2026-10-21";
+export const SITEMAP_STATIC_LAST_MODIFIED = "2026-10-27";
+export const SITEMAP_STATES_LAST_MODIFIED = "2026-10-27";
 export const SITEMAP_ORDERS_LAST_MODIFIED = "2026-10-21";
 export const SITEMAP_GUIDES_LAST_MODIFIED = "2026-10-27";
 

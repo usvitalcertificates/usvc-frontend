@@ -7,7 +7,7 @@ import { assertSeoLength, BIRTH_GUIDE_SOURCES, SITE_URL, socialMetadata } from "
 
 const title = "Vital Record Guides by State and Certificate Type";
 const description =
-  "Birth, death, marriage and divorce guides for 13 states. Find the right record, official office, request steps and source links.";
+  "Birth, death, marriage and divorce guides for 20 states. Find the right record, official office, request steps and source links.";
 
 export const metadata: Metadata = {
   title: assertSeoLength("title", title),
@@ -49,7 +49,7 @@ export default function GuidesIndex() {
       <PageHeader
         eyebrow="Official-resource guides"
         title={title}
-        subtitle="Explore 52 guides covering birth, death, marriage and divorce records in the same 13 states."
+        subtitle="Explore 80 guides covering birth, death, marriage and divorce records in the same 20 states."
       />
       <section className="page-section">
         <div className="container">

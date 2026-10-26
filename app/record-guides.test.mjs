@@ -10,7 +10,7 @@ const builder = stripTypeScriptTypes(read("app/guides/record-guide-content.ts"))
   /import \{ RECORD_GUIDE_DATA \} from "\.\/record-guide-data";/,
   `const RECORD_GUIDE_DATA = ${JSON.stringify(RECORD_GUIDE_DATA)};`,
 );
-const { getRecordGuideContent, RECORD_GUIDE_TYPES } = await import(
+const { getRecordGuideContent, RECORD_GUIDE_TYPES, buildGuideContent } = await import(
   `data:text/javascript,${encodeURIComponent(builder)}`
 );
 const expected = [
@@ -27,10 +27,17 @@ const expected = [
   "new-jersey",
   "virginia",
   "washington",
+  "arizona",
+  "tennessee",
+  "massachusetts",
+  "indiana",
+  "missouri",
+  "maryland",
+  "colorado",
 ];
-test("exactly 39 new guides cover the existing 13 states", () => {
+test("60 death, marriage and divorce guides cover 20 states", () => {
   assert.deepEqual(Object.keys(RECORD_GUIDE_DATA).sort(), expected.toSorted());
-  assert.equal(expected.length * RECORD_GUIDE_TYPES.length, 39);
+  assert.equal(expected.length * RECORD_GUIDE_TYPES.length, 60);
 });
 for (const state of expected)
   for (const certificate of RECORD_GUIDE_TYPES) {
@@ -49,7 +56,7 @@ for (const state of expected)
       assert.ok(prose.split(/\s+/).length > 1100);
       assert.ok(content.sources.length >= 1);
       for (const source of content.sources)
-        assert.match(new URL(source.href).hostname, /\.gov$|\.courts\.phila\.gov$/);
+        assert.match(new URL(source.href).hostname, /\.gov$|^www\.sec\.state\.ma\.us$/);
       const facts = RECORD_GUIDE_DATA[state].records[certificate.replace("-certificate", "")];
       for (const fact of [facts.authority, facts.record, facts.access, facts.route, facts.detail])
         assert.ok(prose.includes(fact), fact);
@@ -88,4 +95,20 @@ test("CI and commit hooks generate Next route types before checking TypeScript",
   assert.equal(pkg.scripts.typecheck, "next typegen && tsc --noEmit");
   assert.match(read(".github/workflows/ci.yml"), /run: npm run typecheck/);
   assert.match(read(".husky/pre-commit"), /npm run typecheck/);
+});
+
+test("seven additional birth articles use the reviewed state facts", () => {
+  for (const [slug, entry] of Object.entries(RECORD_GUIDE_DATA)) {
+    if (!entry.records.birth) continue;
+    const content = buildGuideContent(slug, entry.name, "birth", entry.records.birth);
+    assert.equal(content.sections.length, 10);
+    assert.equal(content.faqs.length, 10);
+    assert.match(JSON.stringify(content), /parents|Parents/);
+    assert.ok(content.intro.includes(entry.records.birth.route + " " + entry.records.birth.record));
+    assert.doesNotMatch(JSON.stringify(content), /deceased person|Both parties|marriage date/);
+  }
+  assert.match(
+    read("app/guides/[state]/birth-certificate/guide-content.ts"),
+    /getAdditionalBirthGuideContent\(state\)/,
+  );
 });

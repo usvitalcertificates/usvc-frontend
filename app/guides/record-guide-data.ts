@@ -603,4 +603,464 @@ export const RECORD_GUIDE_DATA = {
       },
     },
   },
+
+  arizona: {
+    name: "Arizona",
+    records: {
+      birth: {
+        url: "https://www.azdhs.gov/director/vital-records/",
+        authority: "Arizona Department of Health Services, Bureau of Vital Records",
+        record:
+          "Request an agency-certified birth record; a hospital souvenir or online index is not a certified copy.",
+        access:
+          "Arizona restricts access to recent birth records. Check the eligible-applicant categories and required identity and relationship evidence.",
+        route:
+          "Begin with Arizona Department of Health Services, Bureau of Vital Records and its official birth-record application.",
+        detail:
+          "The state holds records from July 1909 and abstracts of earlier county filings; some county offices also issue certified copies.",
+        extra: [
+          ["CDC: Arizona record offices", "https://www.cdc.gov/nchs/w2w/arizona.htm"],
+          [
+            "Arizona State Library: personal record access",
+            "https://azlibrary.gov/records/public-records",
+          ],
+        ],
+      },
+      death: {
+        url: "https://www.azdhs.gov/director/vital-records/",
+        authority: "Arizona Department of Health Services, Bureau of Vital Records",
+        record:
+          "Request a certified death record and confirm which version the receiving institution needs.",
+        access:
+          "Arizona restricts access to recent death records. Follow the official eligibility and identification instructions for your relationship or interest.",
+        route:
+          "Follow the official death-record instructions from Arizona Department of Health Services, Bureau of Vital Records.",
+        detail:
+          "The state holds death records from July 1909 and abstracts of earlier county filings. Check the county options listed by the state.",
+        extra: [
+          ["CDC: Arizona record offices", "https://www.cdc.gov/nchs/w2w/arizona.htm"],
+          [
+            "Arizona State Library: personal record access",
+            "https://azlibrary.gov/records/public-records",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/arizona.htm",
+        authority: "County Clerk of Superior Court",
+        record:
+          "Obtain a certified copy of the recorded marriage from the county holding the license.",
+        access: "Ask the county clerk about access, identification and certification requirements.",
+        route:
+          "Contact the Clerk of Superior Court in the county where the marriage license was issued.",
+        detail:
+          "Marriage copies follow the county process, rather than the state birth/death application.",
+        extra: [],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/arizona.htm",
+        authority: "County Clerk of Superior Court",
+        record: "Request the decree or final judgment when you need the court’s divorce terms.",
+        access: "Court-file access and certified-copy requirements must be checked with the clerk.",
+        route: "Contact the Clerk of Superior Court in the county where the divorce was granted.",
+        detail:
+          "Identify the court county and case number if known before requesting a certified decree.",
+        extra: [],
+      },
+    },
+  },
+  tennessee: {
+    name: "Tennessee",
+    records: {
+      birth: {
+        url: "https://www.tn.gov/health/vr",
+        authority: "Tennessee Department of Health, Office of Vital Records",
+        record:
+          "Request an agency-certified birth record; a hospital souvenir or online index is not a certified copy.",
+        access:
+          "Use Tennessee’s identification requirements and application to establish your eligibility and any authorization needed.",
+        route:
+          "Begin with Tennessee Department of Health, Office of Vital Records and its official birth-record application.",
+        detail:
+          "Vital Records keeps birth records for 100 years; older records are routed to the Tennessee State Library and Archives.",
+        extra: [
+          [
+            "Tennessee: identification requirements",
+            "https://vitalrecords.tn.gov/hc/en-us/articles/36331554733587-Identification-Requirements",
+          ],
+          ["CDC: Tennessee record offices", "https://www.cdc.gov/nchs/w2w/tennessee.htm"],
+        ],
+      },
+      death: {
+        url: "https://www.tn.gov/health/vr",
+        authority: "Tennessee Department of Health, Office of Vital Records",
+        record:
+          "Request a certified death record and confirm which version the receiving institution needs.",
+        access:
+          "Follow Tennessee’s application and identification requirements; check eligibility before requesting another person’s record.",
+        route:
+          "Follow the official death-record instructions from Tennessee Department of Health, Office of Vital Records.",
+        detail:
+          "Vital Records keeps death records for 50 years; older records are routed to the Tennessee State Library and Archives.",
+        extra: [
+          [
+            "Tennessee: identification requirements",
+            "https://vitalrecords.tn.gov/hc/en-us/articles/36331554733587-Identification-Requirements",
+          ],
+          ["CDC: Tennessee record offices", "https://www.cdc.gov/nchs/w2w/tennessee.htm"],
+        ],
+      },
+      marriage: {
+        url: "https://www.tn.gov/health/vr",
+        authority: "Tennessee Office of Vital Records; county clerk for local records",
+        record:
+          "A state marriage certificate records the event; confirm whether a county-certified license copy is required.",
+        access: "Follow the state’s identification and eligible-applicant requirements.",
+        route:
+          "Start with Tennessee Vital Records for its marriage certificate or ask the issuing county clerk for a local copy.",
+        detail:
+          "The state office keeps marriage records for 50 years; consult the State Library and Archives for older holdings.",
+        extra: [
+          [
+            "Tennessee: identification requirements",
+            "https://vitalrecords.tn.gov/hc/en-us/articles/36331554733587-Identification-Requirements",
+          ],
+          ["CDC: Tennessee record offices", "https://www.cdc.gov/nchs/w2w/tennessee.htm"],
+        ],
+      },
+      divorce: {
+        url: "https://www.tn.gov/health/vr",
+        authority: "Tennessee Office of Vital Records; court clerk for a decree",
+        record: "A divorce certificate is separate from the court’s full decree.",
+        access:
+          "Follow the state’s identification and eligible-applicant requirements; court-file access is a separate matter.",
+        route:
+          "Use Tennessee Vital Records for its divorce certificate and the court that granted the divorce for the decree.",
+        detail:
+          "The state office keeps divorce records for 50 years; older holdings are routed to the State Library and Archives.",
+        extra: [
+          [
+            "Tennessee: identification requirements",
+            "https://vitalrecords.tn.gov/hc/en-us/articles/36331554733587-Identification-Requirements",
+          ],
+          ["CDC: Tennessee record offices", "https://www.cdc.gov/nchs/w2w/tennessee.htm"],
+        ],
+      },
+    },
+  },
+  massachusetts: {
+    name: "Massachusetts",
+    records: {
+      birth: {
+        url: "https://www.mass.gov/how-to/order-a-birth-marriage-or-death-certificate",
+        authority: "Massachusetts Registry of Vital Records and Statistics",
+        record:
+          "Request an agency-certified birth record; a hospital souvenir or online index is not a certified copy.",
+        access:
+          "Provide identification. Some records require evidence of relationship or authority, so check the Registry’s instructions for your record.",
+        route:
+          "Begin with Massachusetts Registry of Vital Records and Statistics and its official birth-record application.",
+        detail:
+          "Records from 1931 through 1935 have transferred to the State Archives. Earlier birth records may also be available from the city or town where the event occurred.",
+        extra: [
+          [
+            "Massachusetts: historical vital records",
+            "https://www.sec.state.ma.us/divisions/archives/collections/vital-records.htm",
+          ],
+        ],
+      },
+      death: {
+        url: "https://www.mass.gov/how-to/order-a-birth-marriage-or-death-certificate",
+        authority: "Massachusetts Registry of Vital Records and Statistics",
+        record:
+          "Request a certified death record and confirm which version the receiving institution needs.",
+        access:
+          "Provide identification and any relationship or authorization documents required by the Registry’s application.",
+        route:
+          "Follow the official death-record instructions from Massachusetts Registry of Vital Records and Statistics.",
+        detail:
+          "Records from 1931 through 1935 have transferred to the State Archives. Earlier death records may also be available from the city or town where the event occurred.",
+        extra: [
+          [
+            "Massachusetts: historical vital records",
+            "https://www.sec.state.ma.us/divisions/archives/collections/vital-records.htm",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://www.mass.gov/how-to/order-a-birth-marriage-or-death-certificate",
+        authority: "Massachusetts Registry of Vital Records and Statistics; city or town clerk",
+        record:
+          "Request a certified record of the completed marriage, rather than an unused license.",
+        access:
+          "Provide identification and check whether the record requires additional relationship or authorization evidence.",
+        route:
+          "Use the Registry’s ordering instructions or ask the city or town holding the marriage record.",
+        detail:
+          "The 1931 through 1935 records have transferred to the State Archives. Earlier marriage records may also be available where the marriage intentions were filed.",
+        extra: [
+          [
+            "Massachusetts: historical vital records",
+            "https://www.sec.state.ma.us/divisions/archives/collections/vital-records.htm",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://www.mass.gov/how-to/get-a-copy-of-your-divorce-record",
+        authority: "Massachusetts Probate and Family Court",
+        record:
+          "Choose a Certificate of Divorce Absolute or a certified judgment according to the receiving organization’s requirements.",
+        access:
+          "Check the court’s copy-request requirements and any restrictions on the requested case documents.",
+        route: "Request the document from the Probate and Family Court that handled the divorce.",
+        detail:
+          "The Registry can help locate the docket number and court; it does not replace the court’s certified divorce document.",
+        extra: [
+          [
+            "Massachusetts: find divorce information",
+            "https://www.mass.gov/how-to/request-divorce-information",
+          ],
+        ],
+      },
+    },
+  },
+  indiana: {
+    name: "Indiana",
+    records: {
+      birth: {
+        url: "https://www.in.gov/health/vital-records/",
+        authority: "Indiana Department of Health, Vital Records",
+        record:
+          "Request an agency-certified birth record; a hospital souvenir or online index is not a certified copy.",
+        access:
+          "Provide acceptable identification and any evidence of relationship or legal interest required by Indiana’s application.",
+        route:
+          "Begin with Indiana Department of Health, Vital Records and its official birth-record application.",
+        detail:
+          "State birth records begin in October 1907. Ask the city or county health department about earlier holdings.",
+        extra: [["CDC: Indiana record offices", "https://www.cdc.gov/nchs/w2w/indiana.htm"]],
+      },
+      death: {
+        url: "https://www.in.gov/health/vital-records/",
+        authority: "Indiana Department of Health, Vital Records",
+        record:
+          "Request a certified death record and confirm which version the receiving institution needs.",
+        access:
+          "Provide acceptable identification and any proof of relationship or legal interest required for the death record.",
+        route:
+          "Follow the official death-record instructions from Indiana Department of Health, Vital Records.",
+        detail:
+          "State death records begin in January 1900. Ask the city or county health department about earlier holdings.",
+        extra: [["CDC: Indiana record offices", "https://www.cdc.gov/nchs/w2w/indiana.htm"]],
+      },
+      marriage: {
+        url: "https://www.in.gov/health/vital-records/marriages",
+        authority: "County Clerk of Circuit Court or Superior Court",
+        record:
+          "A county-certified marriage certificate is different from the state’s Record of Marriage.",
+        access: "Ask the county clerk about its identification, access and certification process.",
+        route:
+          "Request a certified marriage certificate from the clerk in the county where the license was issued.",
+        detail:
+          "Indiana maintains a marriage index from 1958; do not substitute the state record for a county certificate without checking acceptance.",
+        extra: [["CDC: Indiana record offices", "https://www.cdc.gov/nchs/w2w/indiana.htm"]],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/indiana.htm",
+        authority: "County court clerk",
+        record: "Request a certified divorce decree from the court holding the case.",
+        access: "Court records and certified copies follow the clerk’s access rules.",
+        route: "Contact the county clerk where the divorce was granted.",
+        detail:
+          "The state birth/death certificate service does not issue the county court’s divorce decree.",
+        extra: [],
+      },
+    },
+  },
+  missouri: {
+    name: "Missouri",
+    records: {
+      birth: {
+        url: "https://health.mo.gov/vital-records-registries/vital-records/order-copy-vital-record",
+        authority: "Missouri Department of Health and Senior Services, Bureau of Vital Records",
+        record:
+          "Request an agency-certified birth record; a hospital souvenir or online index is not a certified copy.",
+        access:
+          "Applicants must have a direct and tangible interest. Check identity, signature and mail-in notarization requirements.",
+        route:
+          "Begin with Missouri Department of Health and Senior Services, Bureau of Vital Records and its official birth-record application.",
+        detail:
+          "The central registry began January 1, 1910. State and local offices offer different coverage and short-form or long-form options.",
+        extra: [
+          [
+            "Missouri: vital record questions",
+            "https://health.mo.gov/vital-records-registries/vital-records/frequently-asked-questions",
+          ],
+        ],
+      },
+      death: {
+        url: "https://health.mo.gov/vital-records-registries/vital-records/order-copy-vital-record",
+        authority: "Missouri Department of Health and Senior Services, Bureau of Vital Records",
+        record:
+          "Request a certified death record and confirm which version the receiving institution needs.",
+        access:
+          "Applicants must have a direct and tangible interest. Follow the identity and notarization rules for the chosen request channel.",
+        route:
+          "Follow the official death-record instructions from Missouri Department of Health and Senior Services, Bureau of Vital Records.",
+        detail:
+          "The central registry began January 1, 1910. Local short-form death records cover 1980 onward; state records have broader coverage.",
+        extra: [
+          [
+            "Missouri: vital record questions",
+            "https://health.mo.gov/vital-records-registries/vital-records/frequently-asked-questions",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://health.mo.gov/vital-records-registries/vital-records/order-copy-vital-record",
+        authority: "County Recorder of Deeds; Missouri Bureau of Vital Records for a statement",
+        record:
+          "A Certified Statement Relating to Marriage is not the original marriage certificate.",
+        access:
+          "State statements require a qualifying direct and tangible interest; check the county’s rules for its certified copy.",
+        route:
+          "Request the marriage certificate from the Recorder of Deeds in the county where the license was obtained.",
+        detail:
+          "The state’s marriage statements summarize reported events from July 1, 1948; the county holds the actual certificate.",
+        extra: [
+          [
+            "Missouri: vital record questions",
+            "https://health.mo.gov/vital-records-registries/vital-records/frequently-asked-questions",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://health.mo.gov/vital-records-registries/vital-records/order-copy-vital-record",
+        authority: "County Circuit Clerk; Missouri Bureau of Vital Records for a statement",
+        record: "A Certified Statement Relating to Divorce is not the divorce decree.",
+        access:
+          "State statements require a qualifying direct and tangible interest; court copies follow the clerk’s rules.",
+        route:
+          "Request the decree from the Circuit Clerk in the county where the divorce was granted.",
+        detail:
+          "Use the state statement only if its summary is accepted; request the court’s decree when the full judgment is required.",
+        extra: [
+          [
+            "Missouri: vital record questions",
+            "https://health.mo.gov/vital-records-registries/vital-records/frequently-asked-questions",
+          ],
+        ],
+      },
+    },
+  },
+  maryland: {
+    name: "Maryland",
+    records: {
+      birth: {
+        url: "https://health.maryland.gov/vsa/Pages/birth.aspx",
+        authority: "Maryland Department of Health, Division of Vital Records",
+        record:
+          "Request an agency-certified birth record; a hospital souvenir or online index is not a certified copy.",
+        access:
+          "The subject, a named parent and other specifically authorized applicants may apply. Guardians and representatives must supply the required evidence.",
+        route:
+          "Begin with Maryland Department of Health, Division of Vital Records and its official birth-record application.",
+        detail:
+          "Check state and participating local-health-department options. Delayed registration and amendments use separate procedures.",
+        extra: [],
+      },
+      death: {
+        url: "https://health.maryland.gov/vsa/Pages/death.aspx",
+        authority: "Maryland Department of Health, Division of Vital Records",
+        record:
+          "Request a certified death record and confirm which version the receiving institution needs.",
+        access:
+          "Check the death-record application for qualifying relationship, authorization and identity evidence.",
+        route:
+          "Follow the official death-record instructions from Maryland Department of Health, Division of Vital Records.",
+        detail:
+          "Use the Division’s death-record page to confirm coverage and the office holding an older record.",
+        extra: [],
+      },
+      marriage: {
+        url: "https://health.maryland.gov/vsa/Pages/marriage.aspx",
+        authority: "Maryland Division of Vital Records; Circuit Court clerk for local copies",
+        record: "Obtain a certified marriage record from the appropriate state or court custodian.",
+        access:
+          "Check the marriage application for eligible applicants and required identity or authorization evidence.",
+        route:
+          "Start with the Division’s marriage-record instructions or contact the Circuit Court clerk where the license was issued.",
+        detail:
+          "The state marriage certificate service covers marriages from January 1, 2007; ask the court clerk about earlier records.",
+        extra: [],
+      },
+      divorce: {
+        url: "https://health.maryland.gov/vsa/Pages/divorce.aspx",
+        authority: "Maryland Division of Vital Records; Circuit Court for a decree",
+        record: "A Verification of Divorce summarizes the event and is not the actual decree.",
+        access:
+          "Either spouse, an authorized representative or an attorney representing a spouse may apply under the Division’s stated requirements.",
+        route:
+          "Use the Division for a verification and the Circuit Court that granted the divorce for the actual decree.",
+        detail:
+          "Confirm the event date with the Division before ordering an older verification; the court holds the decree.",
+        extra: [],
+      },
+    },
+  },
+  colorado: {
+    name: "Colorado",
+    records: {
+      birth: {
+        url: "https://www.cdc.gov/nchs/w2w/colorado.htm",
+        authority: "Colorado Department of Public Health and Environment, Vital Records",
+        record:
+          "Request an agency-certified birth record; a hospital souvenir or online index is not a certified copy.",
+        access:
+          "Provide identification and check the state’s current eligible-applicant and supporting-document requirements.",
+        route:
+          "Begin with Colorado Department of Public Health and Environment, Vital Records and its official birth-record application.",
+        detail:
+          "State birth holdings begin in 1910, with some earlier county records. Check the issuing office for the specific event.",
+        extra: [],
+      },
+      death: {
+        url: "https://www.cdc.gov/nchs/w2w/colorado.htm",
+        authority: "Colorado Department of Public Health and Environment, Vital Records",
+        record:
+          "Request a certified death record and confirm which version the receiving institution needs.",
+        access:
+          "Provide identification and check eligibility and any supporting evidence required by the issuing office.",
+        route:
+          "Follow the official death-record instructions from Colorado Department of Public Health and Environment, Vital Records.",
+        detail:
+          "State death holdings begin in 1900. Confirm the record and copy type with the issuing office.",
+        extra: [],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/colorado.htm",
+        authority: "County Clerk and Recorder; Colorado Vital Records for index verification",
+        record: "The state index verification is separate from a county-certified marriage copy.",
+        access:
+          "Check eligibility for the state verification and the county’s requirements for a certified marriage copy.",
+        route:
+          "Request the certified marriage copy from the county clerk where the license was issued.",
+        detail:
+          "Colorado’s state health department offers index verification rather than the certified county marriage document.",
+        extra: [],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/colorado.htm",
+        authority: "Clerk of District Court; Colorado Vital Records for index verification",
+        record: "The state index verification does not replace the certified divorce decree.",
+        access:
+          "Court-file access and certified-copy requirements must be checked with the district court clerk.",
+        route:
+          "Request the decree from the Clerk of District Court in the county where the divorce was granted.",
+        detail:
+          "Colorado’s state health department offers index verification; the court holds the certified divorce document.",
+        extra: [],
+      },
+    },
+  },
 } as const;
