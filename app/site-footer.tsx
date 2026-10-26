@@ -1,9 +1,11 @@
 "use client";
 
+import { GUIDE_CERTIFICATES } from "@/lib/guide-inventory";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { BIRTH_GUIDE_SOURCES, INDEXABLE_STATES, SITE_DISCLAIMER, titleCase } from "@/lib/seo";
+import { INDEXABLE_STATES, SITE_DISCLAIMER, titleCase } from "@/lib/seo";
 
 function LinkedinIcon() {
   return (
@@ -57,7 +59,7 @@ const columns = [
     title: "Resources",
     links: [
       ["Find Your State", "/find-your-state"],
-      ["Birth Certificate Guides", "/guides"],
+      ["Certificate Guides", "/guides"],
       ["About USVC", "/about"],
       ["FAQ", "/faq"],
       ["Track Order", "/track-order"],
@@ -105,11 +107,11 @@ export function SiteFooter() {
               </Link>
             ))}
           </p>
-          <h2>Birth certificate guides</h2>
+          <h2>Certificate guides</h2>
           <p>
-            {Object.keys(BIRTH_GUIDE_SOURCES).map((slug) => (
-              <Link key={slug} href={`/guides/${slug}/birth-certificate`}>
-                {BIRTH_GUIDE_SOURCES[slug].state}
+            {GUIDE_CERTIFICATES.map((type) => (
+              <Link key={type} href={`/guides#${type}-guides`}>
+                {type.charAt(0).toUpperCase() + type.slice(1)} certificate guides
               </Link>
             ))}
           </p>

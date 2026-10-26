@@ -10,13 +10,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --test --experimental-strip-types app/staff-action-safety.test.mjs app/county-availability.test.mjs app/application-mirror.test.mjs app/openai-analytics-data.test.mjs app/copy-pricing.test.mjs app/public-pricing-copy.test.mjs app/public-copy.test.mjs app/guide-content.test.mjs app/state-inventory.test.mjs app/social-metadata.test.mjs",
+    "test": "node --test --experimental-strip-types app/staff-action-safety.test.mjs app/county-availability.test.mjs app/application-mirror.test.mjs app/openai-analytics-data.test.mjs app/copy-pricing.test.mjs app/public-pricing-copy.test.mjs app/public-copy.test.mjs app/guide-content.test.mjs app/state-inventory.test.mjs app/social-metadata.test.mjs app/record-guides.test.mjs",
     "test:flow-confirmations": "node scripts/verify-flow-confirmations.cjs",
     "test:seo": "node scripts/verify-seo.mjs",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
