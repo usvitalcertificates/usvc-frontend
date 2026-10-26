@@ -28,14 +28,14 @@ const flowFont = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "USVC - Trusted Help for US Vital Certificates", template: "%s | USVC" },
+  title: { default: "Birth, Death, Marriage & Divorce Certificates | USVC", template: "%s | USVC" },
   description:
-    "Guided help for US birth, death, marriage, and divorce certificates. Clear steps, secure handling, and order tracking.",
+    "Get help requesting birth, death, marriage and divorce certificates. USVC offers guided applications, document review and order tracking.",
   ...socialMetadata({
     url: SITE_URL,
-    title: "USVC - Trusted Help for US Vital Certificates",
+    title: "Birth, Death, Marriage & Divorce Certificates | USVC",
     description:
-      "Guided help for US birth, death, marriage, and divorce certificates. Clear steps, secure handling, and order tracking.",
+      "Get help requesting birth, death, marriage and divorce certificates. USVC offers guided applications, document review and order tracking.",
   }),
 };
 

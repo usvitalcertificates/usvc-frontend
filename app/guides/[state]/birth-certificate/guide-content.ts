@@ -1,3 +1,4 @@
+import { getAdditionalBirthGuideContent } from "../../expanded-birth-guide-content";
 import type { BirthGuideContent } from "./guide-types";
 import { CALIFORNIA_GUIDE } from "./content/california";
 import { FLORIDA_GUIDE } from "./content/florida";
@@ -117,5 +118,7 @@ export function getBirthGuideContent(
   stateName: string,
   officialUrl: string,
 ): BirthGuideContent {
-  return GUIDES[state] ?? genericGuide(stateName, officialUrl);
+  return (
+    GUIDES[state] ?? getAdditionalBirthGuideContent(state) ?? genericGuide(stateName, officialUrl)
+  );
 }

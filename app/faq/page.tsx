@@ -6,14 +6,14 @@ import { FaqAccordion } from "./faq-accordion";
 import { FAQ_ITEMS, faqAnswerToPlainText } from "./faq-data";
 
 export const metadata: Metadata = {
-  title: "Frequently Asked Questions",
+  title: "Vital Certificate FAQs: Fees, Requests & Tracking",
   description:
-    "Answers about USVC fees, processing times, eligibility, shipping, refunds, and how our independent service works.",
+    "Questions about birth, death, marriage or divorce certificates? Learn about USVC fees, eligibility, processing, delivery, refunds and tracking.",
   alternates: { canonical: "https://usvitalcertificates.org/faq" },
   ...socialMetadata({
-    title: "Frequently Asked Questions",
+    title: "Vital Certificate FAQs: Fees, Requests & Tracking",
     description:
-      "USVC fees, timelines, eligibility, shipping, and refunds: clear answers about our certificate help.",
+      "Questions about birth, death, marriage or divorce certificates? Learn about USVC fees, eligibility, processing, delivery, refunds and tracking.",
     url: "https://usvitalcertificates.org/faq",
     type: "website",
   }),
@@ -34,7 +34,7 @@ export default function FaqPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <PageHeader
         eyebrow="Support"
-        title="Frequently Asked Questions"
+        title="Vital Certificate Frequently Asked Questions"
         subtitle="Clear answers about our fees, timelines, eligibility rules, and what USVC does and does not do."
       />
       <section className="page-section">
