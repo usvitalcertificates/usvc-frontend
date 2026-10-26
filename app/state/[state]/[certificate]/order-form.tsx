@@ -1,5 +1,7 @@
 "use client";
 
+import { certificateYearRange, certificateDateBounds } from "@/lib/certificate-years";
+
 import { DateInput } from "@/components/DateInput";
 import { CopyQuantity } from "./copy-quantity";
 import { copyPricing, copyMoney } from "@/lib/copy-pricing";
@@ -25,10 +27,7 @@ import {
   eventLocationLabels,
   applicationReasonLabel,
   visiblePersonFields,
-  BIRTH_MIN_YEAR,
-  DEATH_MIN_YEAR,
-  DIVORCE_MIN_YEAR,
-  MARRIAGE_MIN_YEAR,
+  visibleFamilyFields,
   PROCESSING_CLARIFICATION_NOTE,
   resolveFormConfig,
   SUFFIX_OPTIONS,
@@ -430,8 +429,10 @@ function Field({
   def,
   defaultValue,
   error,
+  bounds,
 }: {
   def: FieldDef;
+  bounds?: { min?: string; max?: string };
   defaultValue?: string;
   error?: string;
 }) {
@@ -455,6 +456,8 @@ function Field({
           required={def.required}
           defaultValue={defaultValue ?? ""}
           aria-label={def.label}
+          min={bounds?.min}
+          max={bounds?.max}
         />
       ) : (
         <input
@@ -890,6 +893,9 @@ export function OrderForm({
     () => counties.find((c) => c.name === values.county)?.cities ?? [],
     [counties, values.county],
   );
+  const eventCounty = values.county ?? draft.county ?? "";
+  const yearRange = certificateYearRange(abbr, certSlug, eventCounty);
+  const eventBounds = certificateDateBounds(abbr, certSlug, eventCounty);
   const selectedCounty = counties.find((c) => c.name === (values.county ?? draft.county));
 
   const copies = Number(values.copies ?? draft.copies ?? 1);
@@ -1064,11 +1070,15 @@ export function OrderForm({
       const subject: Record<string, string> = {};
       for (const field of config.person) subject[field.key] = get(field.key);
       // The maiden field is hidden for a Male subject — never submit a stale value.
-      if (certSlug === "birth-certificate" && get("sex") === "Male")
+      if (certSlug === "birth-certificate" && get("sex") !== "Female")
         subject["subjectMaidenLastName"] = "";
       const family: Record<string, string> = {};
       for (const field of [...config.family, ...(config.familySecond ?? [])])
         family[field.key] = get(field.key);
+      if (spousesTogether) {
+        if (get("sex") !== "Female") subject["maidenLastName"] = "";
+        if (get("spouseSex") !== "Female") family["spouseMaidenLastName"] = "";
+      }
       if (config.familySecondStatus)
         family[config.familySecondStatus.key] = get(config.familySecondStatus.key);
       const address = (prefix: string) => {
@@ -1479,39 +1489,19 @@ export function OrderForm({
               ) : null}
             </label>
           ) : null}
-          {isBirth ? (
+          {yearRange && yearRange.minYear !== 1800 ? (
             <p className="restriction-note">
-              <strong>Year of Birth Restriction:</strong>{" "}
+              <strong>Year of {short.charAt(0).toUpperCase() + short.slice(1)} Restriction:</strong>{" "}
               <em>
-                For the selected county we can only accept orders for births that occurred in the
-                year {BIRTH_MIN_YEAR} or later.
-              </em>
-            </p>
-          ) : null}
-          {isDeath ? (
-            <p className="restriction-note">
-              <strong>Year of Death Restriction:</strong>{" "}
-              <em>
-                For the selected county we can only accept orders for deaths that occurred from{" "}
-                {DEATH_MIN_YEAR} to today.
-              </em>
-            </p>
-          ) : null}
-          {isMarriage ? (
-            <p className="restriction-note">
-              <strong>Year of Marriage Restriction:</strong>{" "}
-              <em>
-                For the selected county we can only accept orders for marriages that occurred from{" "}
-                {MARRIAGE_MIN_YEAR} to today.
-              </em>
-            </p>
-          ) : null}
-          {isDivorce ? (
-            <p className="restriction-note">
-              <strong>Year of Divorce Restriction:</strong>{" "}
-              <em>
-                For the selected county we can only accept orders for divorces that occurred from{" "}
-                {DIVORCE_MIN_YEAR} to today.
+                For the selected county we can only accept orders for{" "}
+                {short === "birth"
+                  ? "births"
+                  : short === "death"
+                    ? "deaths"
+                    : short === "marriage"
+                      ? "marriages"
+                      : "divorces"}{" "}
+                that occurred from {yearRange.minYear} to {yearRange.maxYear ?? "today"}.
               </em>
             </p>
           ) : null}
@@ -1702,29 +1692,66 @@ export function OrderForm({
           )}
           {spousesTogether ? <h3 className="spouse-heading">Spouse 1</h3> : null}
           <div className="application-grid">
-            {visiblePersonFields(config, isBirth, sexValue).map((field) => {
-              return (
-                <Field
-                  key={field.key}
-                  def={field}
-                  defaultValue={draft[field.key]}
-                  error={fieldErrors[`subject.${field.key}`]}
-                />
-              );
-            })}
+            {visiblePersonFields(config, isBirth, sexValue)
+              .filter((field) => !spousesTogether || field.key !== "eventDate")
+              .map((field) => {
+                return (
+                  <Field
+                    key={field.key}
+                    def={field}
+                    bounds={field.key === "eventDate" ? eventBounds : undefined}
+                    defaultValue={draft[field.key]}
+                    error={fieldErrors[`subject.${field.key}`]}
+                  />
+                );
+              })}
           </div>
           {spousesTogether ? (
             <>
               <h3 className="spouse-heading">Spouse 2</h3>
               <div className="application-grid">
-                {(config.family ?? []).map((field) => (
-                  <Field
-                    key={field.key}
-                    def={field}
-                    defaultValue={draft[field.key]}
-                    error={fieldErrors[`family.${field.key}`]}
-                  />
-                ))}
+                {visibleFamilyFields(config, valueOf("spouseSex"))
+                  .filter((field) => !isDivorce || field.key !== "court")
+                  .map((field) => (
+                    <Field
+                      key={field.key}
+                      def={field}
+                      defaultValue={draft[field.key]}
+                      error={fieldErrors[`family.${field.key}`]}
+                    />
+                  ))}
+              </div>
+            </>
+          ) : null}
+          {spousesTogether ? (
+            <>
+              <h3 className="spouse-heading">
+                {isMarriage ? "Marriage Date" : "Divorce Date & Court"}
+              </h3>
+              <div className="application-grid">
+                {config.person
+                  .filter((field) => field.key === "eventDate")
+                  .map((field) => (
+                    <Field
+                      key={field.key}
+                      def={field}
+                      bounds={eventBounds}
+                      defaultValue={draft[field.key]}
+                      error={fieldErrors[`subject.${field.key}`]}
+                    />
+                  ))}
+                {isDivorce
+                  ? config.family
+                      .filter((field) => field.key === "court")
+                      .map((field) => (
+                        <Field
+                          key={field.key}
+                          def={field}
+                          defaultValue={draft[field.key]}
+                          error={fieldErrors[`family.${field.key}`]}
+                        />
+                      ))
+                  : null}
               </div>
             </>
           ) : null}

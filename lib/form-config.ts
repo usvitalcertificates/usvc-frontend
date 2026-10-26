@@ -104,14 +104,6 @@ const BASE_REQUESTOR: RequestorConfig = {
   note: REQUESTOR_SECURITY_NOTE,
 };
 
-/** Earliest birth year accepted on birth orders (USVR parity).
- *  Keep in sync with BIRTH_MIN_DATE in backend src/lib/order-validation.ts. */
-export const BIRTH_MIN_YEAR = 1906;
-
-/** Earliest death year shown on death orders (USVR parity, notice only —
- *  unlike birth, the backend does not reject out-of-window death dates). */
-export const DEATH_MIN_YEAR = 2010;
-
 /** USVR Alabama Death Certificate — exact race list (optional on our form). */
 const DEATH_RACE_OPTIONS = [
   "American Indian/Alaskan Native",
@@ -122,14 +114,6 @@ const DEATH_RACE_OPTIONS = [
   "Mixed",
   "Other",
 ];
-
-/** Earliest marriage year shown on marriage orders (USVR parity, notice only —
- *  unlike birth, the backend does not reject out-of-window marriage dates). */
-export const MARRIAGE_MIN_YEAR = 2010;
-
-/** Earliest divorce year shown on divorce orders (USVR parity, notice only —
- *  unlike birth, the backend does not reject out-of-window divorce dates). */
-export const DIVORCE_MIN_YEAR = 2010;
 
 /** USVR Alabama Death Certificate — exact reason list. */
 const DEATH_REASONS = [
@@ -199,7 +183,7 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       {
         key: "subjectMaidenLastName",
         label: "Maiden Name of Subject",
-        help: "Required when the recorded gender is Female. Hidden when Male.",
+        help: "Required when the recorded gender is Female.",
       },
       { key: "suffix", label: "Suffix", type: "select", options: SUFFIX_OPTIONS },
       {
@@ -337,7 +321,6 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
       { key: "spouseMiddleName", label: "Middle Name of Subject" },
       { key: "spouseLastName", label: "Current Last Name of Subject", required: true },
       { key: "spouseMaidenLastName", label: "Maiden Name of Subject", required: true },
-      { key: "spouseCurrentLastName", label: "Current last name, if different" },
     ],
     relationships: [
       "Self",
@@ -580,11 +563,22 @@ export function eventLocationLabels(config: CertificateFormConfig, noun: string)
     city: `City / town where the ${config.eventLocationLabel} occurred`,
   };
 }
-export function visiblePersonFields(config: CertificateFormConfig, birth: boolean, sex: string) {
-  return config.person
-    .filter((field) => !(birth && field.key === "subjectMaidenLastName" && sex === "Male"))
+/** Maiden names apply independently to the selected female subject/spouse. */
+export function visiblePersonFields(config: CertificateFormConfig, _birth: boolean, sex: string) {
+  return genderFields(config.person, sex);
+}
+export function visibleFamilyFields(config: CertificateFormConfig, sex: string) {
+  return genderFields(config.family, sex);
+}
+function genderFields(fields: FieldDef[], sex: string) {
+  return fields
+    .filter(
+      (field) =>
+        !["subjectMaidenLastName", "maidenLastName", "spouseMaidenLastName"].includes(field.key) ||
+        sex === "Female",
+    )
     .map((field) =>
-      birth && field.key === "subjectMaidenLastName" && sex === "Female"
+      ["subjectMaidenLastName", "maidenLastName", "spouseMaidenLastName"].includes(field.key)
         ? { ...field, required: true }
         : field,
     );
@@ -722,17 +716,53 @@ export function applicationSections(data: ApplicationData, noun = "county"): App
   add("requestor", [{ fields: requestor }]);
   const person = mapped(
     "subject",
-    visiblePersonFields(config, slug === "birth-certificate", data.subject?.sex ?? ""),
+    visiblePersonFields(config, slug === "birth-certificate", data.subject?.sex ?? "").filter(
+      (field) => !config.familyInSubjectSection || field.key !== "eventDate",
+    ),
   );
   add("subject", [
     { title: config.personLegend, fields: person },
     ...(config.familyInSubjectSection
-      ? [{ title: config.familyLegend, fields: mapped("family", config.family) }]
+      ? [
+          {
+            title: config.familyLegend,
+            fields: mapped(
+              "family",
+              visibleFamilyFields(config, data.family?.spouseSex ?? "").filter(
+                (field) => slug !== "divorce-certificate" || field.key !== "court",
+              ),
+            ),
+          },
+        ]
+      : []),
+    ...(config.familyInSubjectSection
+      ? [
+          {
+            title: slug === "marriage-certificate" ? "Marriage Date" : "Divorce Date & Court",
+            fields: [
+              ...mapped(
+                "subject",
+                config.person.filter((field) => field.key === "eventDate"),
+              ),
+              ...(slug === "divorce-certificate"
+                ? mapped(
+                    "family",
+                    config.family.filter((field) => field.key === "court"),
+                  )
+                : []),
+            ],
+          },
+        ]
       : []),
   ]);
   if (keys.includes("family")) {
     const groups: ApplicationGroup[] = config.family.length
-      ? [{ title: config.familyLegend, fields: mapped("family", config.family) }]
+      ? [
+          {
+            title: config.familyLegend,
+            fields: mapped("family", visibleFamilyFields(config, data.family?.spouseSex ?? "")),
+          },
+        ]
       : [];
     if (config.familySecondLegend) {
       const status = config.familySecondStatus;

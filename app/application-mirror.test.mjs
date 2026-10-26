@@ -7,6 +7,7 @@ import {
   resolveFormConfig,
   applicationSectionKeys,
   visiblePersonFields,
+  visibleFamilyFields,
 } from "../lib/form-config.ts";
 import { parseDateUS, dateEntryUS, formatDateUS } from "../lib/date-format.ts";
 
@@ -81,21 +82,31 @@ for (const [type, title, family] of [
     );
   });
 }
-test("spouses share the event section; missing legacy fields remain available", () => {
+test("spouses share the event section; maiden names wait for a female selection", () => {
   for (const type of ["MARRIAGE", "DIVORCE"]) {
     const section = applicationSections(order(type, { subject: {}, family: {} })).find(
       (s) => s.key === "subject",
     );
     assert.deepEqual(
       section.groups.map((g) => g.title),
-      ["Spouse 1", "Spouse 2"],
+      ["Spouse 1", "Spouse 2", type === "MARRIAGE" ? "Marriage Date" : "Divorce Date & Court"],
     );
     assert.equal(
-      section.groups[1].fields.find((f) => f.path === "family.spouseMaidenLastName").required,
-      true,
+      section.groups[1].fields.find((f) => f.path === "family.spouseMaidenLastName"),
+      undefined,
     );
+    if (type === "DIVORCE") {
+      assert.equal(
+        section.groups[1].fields.some((f) => f.path === "family.court"),
+        false,
+      );
+      assert.equal(
+        section.groups[2].fields.find((f) => f.path === "family.court").required,
+        undefined,
+      );
+    }
     assert.equal(
-      section.groups[0].fields.find((f) => f.path === "subject.eventDate").required,
+      section.groups[2].fields.find((f) => f.path === "subject.eventDate").required,
       true,
     );
   }
@@ -223,3 +234,37 @@ test("maiden-name labels and order match public configuration and Flow", () => {
     }
   }
 });
+
+for (const type of ["marriage-certificate", "divorce-certificate"]) {
+  test(`${type} maiden fields are female-only for each spouse independently`, () => {
+    const config = resolveFormConfig("california", type);
+    for (const sex of ["", "Male", "Female"]) {
+      const subject = visiblePersonFields(config, false, sex).find(
+        (f) => f.key === "maidenLastName",
+      );
+      const spouse = visibleFamilyFields(config, sex).find((f) => f.key === "spouseMaidenLastName");
+      assert.equal(Boolean(subject), sex === "Female");
+      assert.equal(Boolean(spouse), sex === "Female");
+      if (sex === "Female") {
+        assert.equal(subject.required, true);
+        assert.equal(spouse.required, true);
+      }
+    }
+    assert.equal(
+      config.family.some((f) => f.key === "spouseCurrentLastName"),
+      false,
+    );
+    const data = order(type === "marriage-certificate" ? "MARRIAGE" : "DIVORCE", {
+      subject: { sex: "Male", maidenLastName: "Old" },
+      family: { spouseSex: "Female", spouseMaidenLastName: "Example" },
+    });
+    const all = applicationSections(data)
+      .flatMap((s) => s.groups)
+      .flatMap((g) => g.fields);
+    assert.equal(
+      all.some((f) => f.path === "subject.maidenLastName"),
+      false,
+    );
+    assert.equal(all.find((f) => f.path === "family.spouseMaidenLastName").required, true);
+  });
+}
