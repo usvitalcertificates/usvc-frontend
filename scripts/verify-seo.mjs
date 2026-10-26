@@ -118,8 +118,8 @@ try {
   assert.match(sitemapResponse.headers.get("content-type"), /xml/);
   const xml = await sitemapResponse.text();
   const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(([, url]) => decode(url));
-  assert.equal(urls.length, 113);
-  assert.equal(new Set(urls).size, 113);
+  assert.equal(urls.length, 141);
+  assert.equal(new Set(urls).size, 141);
   assert(urls.every((url) => new URL(url).origin === site));
   assert(urls.includes(`${site}/guides`));
   assert(
@@ -184,11 +184,26 @@ try {
       }
     }),
   );
+  const expectedTitles = new Map([
+    ["/", "Birth, Death, Marriage & Divorce Certificates | USVC"],
+    ["/faq", "Vital Certificate FAQs: Fees, Requests & Tracking | USVC"],
+    ["/find-your-state", "Vital Records by State: Find Your Certificate | USVC"],
+    ["/state/florida", "Florida Birth, Death, Marriage & Divorce Records | USVC"],
+  ]);
+  for (const [path, expectedTitle] of expectedTitles) {
+    const html = renderedPages.get(path === "/" ? site : site + path);
+    assert.equal(decode(html.match(/<title>(.*?)<\/title>/)?.[1] || ""), expectedTitle);
+    const description = singleMeta(html, "name", "description");
+    assert.ok(description.length >= 25 && description.length <= 150, path);
+    assert.equal(singleMeta(html, "property", "og:description"), description);
+    assert.equal(singleMeta(html, "name", "twitter:description"), description);
+    assert.equal((html.match(/<h1\b/g) || []).length, 1, path);
+  }
   const guideStates = urls.flatMap((url) => {
     const match = new URL(url).pathname.match(/^\/guides\/([^/]+)\/birth-certificate$/);
     return match ? [match[1]] : [];
   });
-  assert.equal(guideStates.length, 13);
+  assert.equal(guideStates.length, 20);
   const guideIndexUrl = `${site}/guides`;
   const guideIndex = renderedPages.get(guideIndexUrl);
   assert(guideIndex, "Guide directory must be in the sitemap");
@@ -199,8 +214,8 @@ try {
         /href="\/guides\/[^"/]+\/(?:birth|death|marriage|divorce)-certificate"/g,
       ) || []
     ).length,
-    52,
-    "Guide directory must link all 52 guides",
+    80,
+    "Guide directory must link all 80 guides",
   );
   for (const type of ["birth", "death", "marriage", "divorce"]) {
     assert(guideIndexMain.includes(`id="${type}-guides"`), `${type}: missing footer destination`);
@@ -315,7 +330,7 @@ try {
   assertNoEmDash(llms, "/llms.txt");
   assert(llms.startsWith("# US Vital Certificates (USVC)\n"));
   assert(llms.includes("not a government agency"));
-  assert.equal((llms.match(/\/guides\//g) || []).length, 52);
+  assert.equal((llms.match(/\/guides\//g) || []).length, 80);
   const links = [...llms.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((m) => m[1]);
   assert(links.length > 13);
   for (const link of links) {

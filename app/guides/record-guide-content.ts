@@ -20,36 +20,62 @@ export function getRecordGuideContent(
   const entry = RECORD_GUIDE_DATA[state as keyof typeof RECORD_GUIDE_DATA];
   const kind = certificate.replace("-certificate", "") as "death" | "marriage" | "divorce";
   const record = entry.records[kind];
-  const name = entry.name;
+  return buildGuideContent(state, entry.name, kind, record);
+}
+
+type GuideRecord = {
+  url: string;
+  authority: string;
+  record: string;
+  access: string;
+  route: string;
+  detail: string;
+  extra: readonly (readonly [string, string])[];
+};
+export function buildGuideContent(
+  state: string,
+  name: string,
+  kind: "birth" | "death" | "marriage" | "divorce",
+  record: GuideRecord,
+): BirthGuideContent {
   const title = kind.charAt(0).toUpperCase() + kind.slice(1);
   const official = `[official ${name} ${kind}-record resource](${record.url})`;
   const source = { label: `${name}: official ${kind}-record resource`, href: record.url };
   const extras = record.extra.map(([label, href]) => ({ label, href }));
   const details =
-    kind === "death"
+    kind === "birth"
       ? [
-          "The deceased person’s full recorded name, including known name variations.",
-          "Date and place of death, including the city and county.",
-          "Your relationship or documented reason for requesting the record.",
-          "The certificate version the receiving institution needs, including whether cause of death is required.",
+          "The subject’s full name at birth and any recorded name changes.",
+          "Date of birth and city or county of birth.",
+          "Parents’ names as requested by the application, including prior surnames.",
+          "Your identity, relationship and any authorization required by the issuing office.",
         ]
-      : [
-          "Both parties’ names as recorded at the time of the event, including prior surnames if relevant.",
-          `The ${kind} date and the county holding the ${kind === "marriage" ? "license" : "court case"}.`,
-          kind === "divorce"
-            ? "The case or docket number, if known, and whether you need the decree or an event certificate."
-            : "The license location and whether the record is public or has a special confidential status.",
-          "The exact document requested by the organization that will receive it.",
-        ];
+      : kind === "death"
+        ? [
+            "The deceased person’s full recorded name, including known name variations.",
+            "Date and place of death, including the city and county.",
+            "Your relationship or documented reason for requesting the record.",
+            "The certificate version the receiving institution needs, including whether cause of death is required.",
+          ]
+        : [
+            "Both parties’ names as recorded at the time of the event, including prior surnames if relevant.",
+            `The ${kind} date and the county holding the ${kind === "marriage" ? "license" : "court case"}.`,
+            kind === "divorce"
+              ? "The case or docket number, if known, and whether you need the decree or an event certificate."
+              : "The license location and whether the record is public or has a special confidential status.",
+            "The exact document requested by the organization that will receive it.",
+          ];
   const distinction =
-    kind === "death"
-      ? "An obituary, burial entry or online index can help identify an event, but it is not a certified death certificate. Before ordering multiple copies, ask each institution whether it needs an original certified copy or can return the copy after review. Keep documents containing medical details and identifiers secure."
-      : kind === "marriage"
-        ? "A marriage license authorizes a ceremony; a recorded marriage document provides evidence of the completed event. A state verification or an online index may confirm only selected facts. Ask the receiving organization for its exact document requirements before choosing between a county copy and a state product."
-        : "A divorce certificate or verification generally describes the event. A decree or final judgment is the court document containing the decision and, where applicable, its terms. If an organization asks for the judgment, do not substitute an index result or a brief certificate without first checking with that organization.";
+    kind === "birth"
+      ? "A hospital souvenir, baptismal record or online index is not an agency-certified birth certificate. Ask the receiving organization whether it requires a copy showing parent information. Adoption, parentage changes and access to an original pre-adoption record follow separate agency procedures; a routine copy order does not change the registered record."
+      : kind === "death"
+        ? "An obituary, burial entry or online index can help identify an event, but it is not a certified death certificate. Before ordering multiple copies, ask each institution whether it needs an original certified copy or can return the copy after review. Keep documents containing medical details and identifiers secure."
+        : kind === "marriage"
+          ? "A marriage license authorizes a ceremony; a recorded marriage document provides evidence of the completed event. A state verification or an online index may confirm only selected facts. Ask the receiving organization for its exact document requirements before choosing between a county copy and a state product."
+          : "A divorce certificate or verification generally describes the event. A decree or final judgment is the court document containing the decision and, where applicable, its terms. If an organization asks for the judgment, do not substitute an index result or a brief certificate without first checking with that organization.";
   return {
     stateName: name,
-    metaTitle: `${name} ${title} Certificate Guide: Records and Requests`,
+    metaTitle: `${name} ${title} Certificate: How to Request a Copy`,
     metaDescription: `Find the right ${name} ${kind} record: official offices, copy types, eligibility checks, request steps, corrections, and sources.`,
     subtitle: `Find the right ${name} record office, choose the document you need, and prepare a complete ${kind}-record request.`,
     intro: [
@@ -189,11 +215,13 @@ export function getRecordGuideContent(
       },
       {
         question:
-          kind === "divorce"
-            ? "Is a divorce certificate the same as the decree?"
-            : kind === "marriage"
-              ? "Is a marriage certificate the same as a license or verification?"
-              : "Is a death certificate the same as an obituary or index entry?",
+          kind === "birth"
+            ? "Is a hospital birth record the same as a certified birth certificate?"
+            : kind === "divorce"
+              ? "Is a divorce certificate the same as the decree?"
+              : kind === "marriage"
+                ? "Is a marriage certificate the same as a license or verification?"
+                : "Is a death certificate the same as an obituary or index entry?",
         answer: record.record + " Ask the receiving organization which document it requires.",
       },
       {
@@ -204,9 +232,11 @@ export function getRecordGuideContent(
       {
         question: "What information should I gather before applying?",
         answer:
-          kind === "death"
-            ? "Prepare the deceased person’s recorded name, date and place of death, your relationship or request purpose, and the copy type needed. Add evidence only as the chosen office requires."
-            : `Prepare both parties’ recorded names, the ${kind} date and the license or court county. For a court request, include the case number if known and specify the exact document you need.`,
+          kind === "birth"
+            ? "Prepare the recorded name at birth, date and place of birth, parents’ names and evidence of your identity and eligibility. Check separate instructions for adoption or delayed registration."
+            : kind === "death"
+              ? "Prepare the deceased person’s recorded name, date and place of death, your relationship or request purpose, and the copy type needed. Add evidence only as the chosen office requires."
+              : `Prepare both parties’ recorded names, the ${kind} date and the license or court county. For a court request, include the case number if known and specify the exact document you need.`,
       },
       {
         question: "Can I order while living outside the state?",
@@ -235,7 +265,7 @@ export function getRecordGuideContent(
     ],
     sources: [source, ...extras],
     sourceChecked: "10/27/2026",
-    ctaLabel: `Ask About Your ${name} Request`,
+    ctaLabel: kind === "birth" ? `Start Your ${name} Request` : `Ask About Your ${name} Request`,
     ctaNote:
       "Confirm the record type and service before ordering. Agency and shipping charges are separate from any USVC processing fee.",
   };

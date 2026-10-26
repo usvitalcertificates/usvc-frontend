@@ -60,13 +60,10 @@ export async function generateMetadata({
   const found = STATES.find(({ slug }) => slug === state);
   if (!found) return {};
   const name = found.name;
-  const title = assertSeoLength(
-    "title",
-    `${name} Vital Records: birth, death, marriage, divorce help`,
-  );
+  const title = assertSeoLength("title", `${name} Birth, Death, Marriage & Divorce Records`);
   const description = assertSeoLength(
     "description",
-    `${name} birth, death, marriage, divorce guide: eligibility, fees, and how to request with USVC help.`,
+    `Find ${name} birth, death, marriage and divorce records. Explore certificate options, official sources and USVC application assistance.`,
   );
   const unavailable = isStateUnsupported(state);
   return {
@@ -158,7 +155,7 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
 
       <PageHeader
         eyebrow="Available Certificates"
-        title={`Your ${name} Vital Records Request, Simplified.`}
+        title={`${name} Vital Records & Certificates`}
         subtitle={`Request assistance with your ${name} birth, death, marriage, or divorce certificate application.`}
       />
       <section className="page-section">
