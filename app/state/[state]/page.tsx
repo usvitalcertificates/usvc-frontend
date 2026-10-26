@@ -1,3 +1,4 @@
+import { GUIDE_CERTIFICATES } from "@/lib/guide-inventory";
 import type { Metadata } from "next";
 import { Check, ChevronRight, Lock } from "lucide-react";
 import Image from "next/image";
@@ -171,10 +172,15 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
           </p>
           {guide ? (
             <p className="state-guide-callout">
-              Need the detailed process? Read the{" "}
-              <Link className="guide-link" href={`/guides/${state}/birth-certificate`}>
-                {name} birth certificate guide
-              </Link>
+              Need the detailed process? Read the {name} guides:{" "}
+              {GUIDE_CERTIFICATES.map((type, index) => (
+                <span key={type}>
+                  {index ? ", " : ""}
+                  <Link className="guide-link" href={`/guides/${state}/${type}-certificate`}>
+                    {name} {type} certificate guide
+                  </Link>
+                </span>
+              ))}
               .
             </p>
           ) : null}

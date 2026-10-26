@@ -1,6 +1,6 @@
+import { GUIDE_INVENTORY } from "@/lib/guide-inventory";
 import type { MetadataRoute } from "next";
 import {
-  BIRTH_GUIDE_SOURCES,
   INDEXABLE_STATES,
   SITEMAP_GUIDES_LAST_MODIFIED,
   SITEMAP_STATES_LAST_MODIFIED,
@@ -22,8 +22,8 @@ const STATIC_PATHS = [
 ];
 
 /**
- * Single-file sitemap at /sitemap.xml (P0 SEO). 74 indexable URLs:
- * 50 state hubs, 13 guides, the guide directory and 10 static pages.
+ * Single-file sitemap at /sitemap.xml (P0 SEO). 113 indexable URLs:
+ * 50 state hubs, 52 guides, the guide directory and 10 static pages.
  * Order pages are noindex, follow and deliberately excluded so crawl
  * priority stays on hubs and guides.
  * Stable per-section <lastmod> (no `new Date()` churn) so Google
@@ -49,8 +49,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),
-    ...Object.keys(BIRTH_GUIDE_SOURCES).map((state) => ({
-      url: `${SITE_URL}/guides/${state}/birth-certificate`,
+    ...GUIDE_INVENTORY.map((guide) => ({
+      url: `${SITE_URL}${guide.path}`,
       lastModified: SITEMAP_GUIDES_LAST_MODIFIED,
       changeFrequency: "monthly" as const,
       priority: 0.8,

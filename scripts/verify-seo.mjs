@@ -118,8 +118,8 @@ try {
   assert.match(sitemapResponse.headers.get("content-type"), /xml/);
   const xml = await sitemapResponse.text();
   const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(([, url]) => decode(url));
-  assert.equal(urls.length, 74);
-  assert.equal(new Set(urls).size, 74);
+  assert.equal(urls.length, 113);
+  assert.equal(new Set(urls).size, 113);
   assert(urls.every((url) => new URL(url).origin === site));
   assert(urls.includes(`${site}/guides`));
   assert(
@@ -194,18 +194,24 @@ try {
   assert(guideIndex, "Guide directory must be in the sitemap");
   const guideIndexMain = guideIndex.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1] || "";
   assert.equal(
-    (guideIndexMain.match(/href="\/guides\/[^"/]+\/birth-certificate"/g) || []).length,
-    13,
-    "Guide directory must link all 13 guides",
+    (
+      guideIndexMain.match(
+        /href="\/guides\/[^"/]+\/(?:birth|death|marriage|divorce)-certificate"/g,
+      ) || []
+    ).length,
+    52,
+    "Guide directory must link all 52 guides",
   );
   for (const url of urls.filter((url) => /^\/state\/[^/]+$/.test(new URL(url).pathname))) {
     const state = new URL(url).pathname.split("/").at(-1);
     const html = renderedPages.get(url);
     const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1] || "";
     const guideLinks = [
-      ...main.matchAll(/<a\b[^>]*href="\/guides\/[^"/]+\/birth-certificate"[^>]*>[\s\S]*?<\/a>/g),
+      ...main.matchAll(
+        /<a\b[^>]*href="\/guides\/[^"/]+\/(?:birth|death|marriage|divorce)-certificate"[^>]*>[\s\S]*?<\/a>/g,
+      ),
     ];
-    assert.equal(guideLinks.length, guideStates.includes(state) ? 1 : 0, url);
+    assert.equal(guideLinks.length, guideStates.includes(state) ? 4 : 0, url);
     if (guideLinks.length) {
       assert(guideLinks[0][0].includes(`href="/guides/${state}/birth-certificate"`), url);
       const gridIndex = main.indexOf('class="certificate-type-grid"');
@@ -214,6 +220,22 @@ try {
         main.indexOf(guideLinks[0][0]) < gridIndex,
         `${url}: guide link must appear above the certificate grid`,
       );
+    }
+  }
+
+  for (const url of urls.filter((url) => /\/guides\/[^/]+\//.test(new URL(url).pathname))) {
+    const html = renderedPages.get(url);
+    const [, , state, certificate] = new URL(url).pathname.split("/");
+    const type = certificate.replace("-certificate", "");
+    assert(html.includes(`${type} certificate guide`), url);
+    assert(html.includes("Official sources"), url);
+    for (const sibling of ["birth", "death", "marriage", "divorce"].filter(
+      (value) => value !== type,
+    ))
+      assert(html.includes(`href="/guides/${state}/${sibling}-certificate"`), url);
+    if (type !== "birth") {
+      assert(html.includes("10/27/2026"), url);
+      assert(!html.includes("Source unavailable"), url);
     }
   }
 
@@ -288,7 +310,7 @@ try {
   assertNoEmDash(llms, "/llms.txt");
   assert(llms.startsWith("# US Vital Certificates (USVC)\n"));
   assert(llms.includes("not a government agency"));
-  assert.equal((llms.match(/\/guides\//g) || []).length, 13);
+  assert.equal((llms.match(/\/guides\//g) || []).length, 52);
   const links = [...llms.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((m) => m[1]);
   assert(links.length > 13);
   for (const link of links) {
@@ -349,6 +371,9 @@ try {
     "/state/not-a-state",
     "/state/California",
     "/guides/not-a-state/birth-certificate",
+    "/guides/alabama/death-certificate",
+    "/guides/california/not-a-certificate",
+    "/guides/California/divorce-certificate",
     "/guides/California/birth-certificate",
     "/state/california/order/not-a-certificate",
     "/state/california/not-a-certificate",
