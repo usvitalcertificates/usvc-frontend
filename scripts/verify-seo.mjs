@@ -202,6 +202,11 @@ try {
     52,
     "Guide directory must link all 52 guides",
   );
+  for (const type of ["birth", "death", "marriage", "divorce"]) {
+    assert(guideIndexMain.includes(`id="${type}-guides"`), `${type}: missing footer destination`);
+    const footer = renderedPages.get(site).match(/<footer\b[\s\S]*?<\/footer>/)?.[0] || "";
+    assert(footer.includes(`href="/guides#${type}-guides"`), `${type}: missing footer link`);
+  }
   for (const url of urls.filter((url) => /^\/state\/[^/]+$/.test(new URL(url).pathname))) {
     const state = new URL(url).pathname.split("/").at(-1);
     const html = renderedPages.get(url);
