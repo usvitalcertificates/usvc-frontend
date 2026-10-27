@@ -201,6 +201,12 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
         required: true,
         options: YES_NO,
       },
+      {
+        key: "facility",
+        label: "Facility or place of birth, if known",
+        help: "Hospital, care facility, residence, or other location.",
+        wide: true,
+      },
     ],
     familyLegend: "Mother / parent listed on the record",
     familyNote: MOTHER_NOTE,
