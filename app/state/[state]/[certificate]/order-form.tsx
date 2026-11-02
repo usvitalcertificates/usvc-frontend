@@ -2285,15 +2285,15 @@ export function OrderForm({
                   <>
                     <div>
                       <span>
-                        Additional certificates<small>$70.00 × {copies - 1}</small>
+                        Additional certificates<small>$64.00 × {copies - 1}</small>
                       </span>
-                      <b>{copyMoney((copies - 1) * 7000)}</b>
+                      <b>{copyMoney((copies - 1) * 6400)}</b>
                     </div>
                     <div className="copy-summary-savings">
                       <span>
                         You save
                         <small>
-                          $79.00 OFF × {copies - 1} additional{" "}
+                          $85.00 OFF × {copies - 1} additional{" "}
                           {copies === 2 ? "certificate" : "certificates"}
                         </small>
                       </span>
