@@ -1,5 +1,7 @@
 # Frontend status + remaining work
 
+- Offer capitalization (2026-11-02): the additional-copy banner now reads “FLAT $85.00 OFF” in uppercase.
+
 - Additional-copy discount update (2026-11-02): increased savings from $79 to $85 per additional copy, reducing each additional copy to $64. First copy remains $149; nine copies total $661 ($673 with rush). Updated pricing, form copy and regression expectations. Existing saved payment amounts remain unchanged. Validation: 118 tests passed; build, lint and formatting checks passed.
 
 - Birth facility field (2026-10-27): added optional full-width “Facility or place of birth, if known” with “Hospital, care facility, residence, or other location.” helper text at the end of section 3. Shared configuration includes it in public/resumed applications, staff application views and corrections, using `subject.facility` with existing submission/storage handling. Death is unchanged; no backend schema change or migration. Verification: formatting, lint, TypeScript, 118/118 unit tests and production build passed. Not deployed.

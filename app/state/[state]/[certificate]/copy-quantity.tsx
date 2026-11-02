@@ -165,7 +165,7 @@ export function CopyQuantity({
         </span>
         <div>
           <p className="copy-offer-title">
-            <strong>Flat $85.00 OFF</strong> <span>each additional official copy</span>
+            <strong>FLAT $85.00 OFF</strong> <span>each additional official copy</span>
           </p>
         </div>
       </div>
