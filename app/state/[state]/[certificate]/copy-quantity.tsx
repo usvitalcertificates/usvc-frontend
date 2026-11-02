@@ -165,7 +165,7 @@ export function CopyQuantity({
         </span>
         <div>
           <p className="copy-offer-title">
-            <strong>Flat $79.00 OFF</strong> <span>each additional official copy</span>
+            <strong>Flat $85.00 OFF</strong> <span>each additional official copy</span>
           </p>
         </div>
       </div>
@@ -268,7 +268,7 @@ export function CopyQuantity({
         </p>
       ) : null}
       <p className="copy-fee-note">
-        First certificate $149.00 · Additional certificates $70.00 each. Agency and shipping fees
+        First certificate $149.00 · Additional certificates $64.00 each. Agency and shipping fees
         are separate.
       </p>
       <div className="copy-reasons">
