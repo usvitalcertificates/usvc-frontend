@@ -13,3 +13,16 @@ export function isStateUnsupported(slugOrCode: string): boolean {
   if (UNSUPPORTED_STATE_SLUGS.has(value)) return true;
   return UNSUPPORTED_STATE_CODES.has(value.toUpperCase());
 }
+
+export const CALIFORNIA_DIVORCE_UNAVAILABLE_TITLE =
+  "California Divorce Certificate is not available";
+export const CALIFORNIA_DIVORCE_UNAVAILABLE_MESSAGE =
+  "California Divorce Certificate is not available through our online service.";
+
+/** New public applications only; existing applications may still resume. */
+export function isCertificateUnavailable(state: string, certificate: string): boolean {
+  return (
+    ["ca", "california"].includes(state.trim().toLowerCase()) &&
+    ["divorce", "divorce-certificate"].includes(certificate.trim().toLowerCase())
+  );
+}

@@ -1,5 +1,7 @@
 # Frontend status + remaining work
 
+- California divorce availability (2026-11-02): new requests are unavailable statewide. California's Divorce card is disabled and its application URL shows an explicit all-counties notice. New-order verification and creation return 422 before order/payment work; authenticated recovery and existing checkout retain their current rules. Existing orders are not migrated. Validation: 119 tests passed; desktop/mobile browser checks, production build, lint and formatting passed. Not deployed.
+
 - Offer capitalization (2026-11-02): the additional-copy banner now reads “FLAT $85.00 OFF” in uppercase.
 
 - Additional-copy discount update (2026-11-02): increased savings from $79 to $85 per additional copy, reducing each additional copy to $64. First copy remains $149; nine copies total $661 ($673 with rush). Updated pricing, form copy and regression expectations. Existing saved payment amounts remain unchanged. Validation: 118 tests passed; build, lint and formatting checks passed.

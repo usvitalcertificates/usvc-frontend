@@ -12,7 +12,13 @@ import {
   socialMetadata,
   titleCase,
 } from "@/lib/seo";
-import { isStateUnsupported, STATE_UNAVAILABLE_MESSAGE } from "@/lib/state-availability";
+import {
+  isCertificateUnavailable,
+  CALIFORNIA_DIVORCE_UNAVAILABLE_MESSAGE,
+  CALIFORNIA_DIVORCE_UNAVAILABLE_TITLE,
+  isStateUnsupported,
+  STATE_UNAVAILABLE_MESSAGE,
+} from "@/lib/state-availability";
 import { OrderForm } from "../../[certificate]/order-form";
 import { PageHeader } from "../../../../usvc-ui";
 
@@ -42,10 +48,16 @@ export async function generateMetadata({
   const type = certificate
     .replace("-certificate", "")
     .replace(/^./, (letter) => letter.toUpperCase());
-  const title = assertSeoLength("title", `${name} ${type} Certificate Application`);
+  const unavailable = isCertificateUnavailable(state, certificate);
+  const title = assertSeoLength(
+    "title",
+    unavailable ? CALIFORNIA_DIVORCE_UNAVAILABLE_TITLE : `${name} ${type} Certificate Application`,
+  );
   const description = assertSeoLength(
     "description",
-    `Start a guided ${name} ${type.toLowerCase()} certificate request with USVC review and tracking.`,
+    unavailable
+      ? `${CALIFORNIA_DIVORCE_UNAVAILABLE_MESSAGE} This applies to all counties in California.`
+      : `Start a guided ${name} ${type.toLowerCase()} certificate request with USVC review and tracking.`,
   );
   const url = `https://usvitalcertificates.org/state/${state}/order/${certificate}`;
   // Order pages are transactional templates. Keep them crawlable for
@@ -79,6 +91,35 @@ export default async function CertificateOrderPage({
   const { state, certificate } = await params;
   const type = labels[certificate];
   if (!type || !isKnownStateSlug(state)) notFound();
+  if (isCertificateUnavailable(state, certificate)) {
+    return (
+      <main>
+        <PageHeader
+          eyebrow="California · Divorce Certificate"
+          title={CALIFORNIA_DIVORCE_UNAVAILABLE_TITLE}
+          subtitle="This applies to all counties in California."
+        />
+        <section className="page-section">
+          <div className="container">
+            <div className="notice" role="status">
+              <p>
+                <strong>Sorry, this Divorce Certificate is unavailable.</strong>
+              </p>
+              <p>
+                The Divorce Certificate you are requesting is not available through our online
+                service.
+              </p>
+            </div>
+            <p>
+              <Link href="/state/california">California certificate options</Link>
+              {" · "}
+              <Link href="/contact">Contact Support</Link>
+            </p>
+          </div>
+        </section>
+      </main>
+    );
+  }
   const details = CERTIFICATE_DETAILS[certificate];
   const stateName = titleCase(state);
   const url = `${SITE_URL}/state/${state}/order/${certificate}`;
