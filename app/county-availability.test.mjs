@@ -41,3 +41,14 @@ test("California restrictions retain the same counties and certificate scope", (
   for (const county of counties) assert.equal(isCountyTemporarilyUnavailable("CA", county), true);
   assert.equal(isCountyTemporarilyUnavailable("CA", "Los Angeles"), false);
 });
+
+test("California divorce is unavailable statewide without disabling other products or states", async () => {
+  const { isCertificateUnavailable } = await import("../lib/state-availability.ts");
+  for (const state of ["CA", "california"])
+    for (const certificate of ["DIVORCE", "divorce-certificate"])
+      assert.equal(isCertificateUnavailable(state, certificate), true);
+  for (const certificate of ["birth-certificate", "death-certificate", "marriage-certificate"])
+    assert.equal(isCertificateUnavailable("california", certificate), false);
+  for (const state of ["alabama", "new-york", "texas"])
+    assert.equal(isCertificateUnavailable(state, "divorce-certificate"), false);
+});

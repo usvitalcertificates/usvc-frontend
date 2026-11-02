@@ -12,7 +12,12 @@ import {
   SITE_URL,
   socialMetadata,
 } from "@/lib/seo";
-import { isStateUnsupported, STATE_UNAVAILABLE_MESSAGE } from "@/lib/state-availability";
+import {
+  isCertificateUnavailable,
+  CALIFORNIA_DIVORCE_UNAVAILABLE_MESSAGE,
+  isStateUnsupported,
+  STATE_UNAVAILABLE_MESSAGE,
+} from "@/lib/state-availability";
 import { STATES } from "@/lib/states";
 import { PageHeader } from "../../usvc-ui";
 
@@ -86,13 +91,14 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
   if (!found) notFound();
   const name = found.name;
   const unavailable = isStateUnsupported(state);
+  const divorceUnavailable = isCertificateUnavailable(state, "divorce-certificate");
   const guide = BIRTH_GUIDE_SOURCES[state];
   const url = `${SITE_URL}/state/${state}`;
   const certUses = CERTIFICATES.map((cert) => CERTIFICATE_DETAILS[cert.slug].uses);
   const faqs = [
     {
       q: `How do I request a ${name} vital record with USVC?`,
-      a: `Choose one of the four certificate types above, complete the guided ${name} application (most people finish in about 10 minutes), and submit payment. We review your information for missing details, file it with the issuing agency, and you track the request online.`,
+      a: `Choose ${divorceUnavailable ? "an available certificate type" : "one of the four certificate types"} above, complete the guided ${name} application (most people finish in about 10 minutes), and submit payment. We review your information for missing details, file it with the issuing agency, and you track the request online.`,
     },
     {
       q: `How much does a ${name} request cost through USVC?`,
@@ -156,7 +162,11 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
       <PageHeader
         eyebrow="Available Certificates"
         title={`${name} Vital Records & Certificates`}
-        subtitle={`Request assistance with your ${name} birth, death, marriage, or divorce certificate application.`}
+        subtitle={
+          divorceUnavailable
+            ? "Request assistance with your California birth, death, or marriage certificate application. Divorce certificates are not available through our online service."
+            : `Request assistance with your ${name} birth, death, marriage, or divorce certificate application.`
+        }
       />
       <section className="page-section">
         <div className="container">
@@ -164,8 +174,9 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
             {name} vital records, including birth, death, marriage, and divorce certificates, are
             issued under {name === "District of Columbia" ? "District" : "state"} rules, so the
             agency holding your record depends on where the event happened, not where you live now.
-            Below you can start a guided {name} request for any of the four record types with USVC
-            review and online tracking.
+            {divorceUnavailable
+              ? "Below you can start a guided California birth, death, or marriage request with USVC review and online tracking. Divorce certificates are not available through our online service in any California county."
+              : `Below you can start a guided ${name} request for any of the four record types with USVC review and online tracking.`}
           </p>
           {guide ? (
             <p className="state-guide-callout">
@@ -195,20 +206,26 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
                 </h2>
                 <div className="patriotic-rule" aria-hidden="true" />
                 <p className="certificate-support-intro">
-                  Request your official {name} {cert.name} in less than 10 minutes.
+                  {isCertificateUnavailable(state, cert.slug)
+                    ? CALIFORNIA_DIVORCE_UNAVAILABLE_MESSAGE
+                    : `Request your official ${name} ${cert.name} in less than 10 minutes.`}
                 </p>
-                <ul className="certificate-support-points">
-                  <li>Full-Service Support from Start to Finish</li>
-                  <li>100% Protected and Secure</li>
-                </ul>
-                {unavailable ? (
+                {!isCertificateUnavailable(state, cert.slug) ? (
+                  <ul className="certificate-support-points">
+                    <li>Full-Service Support from Start to Finish</li>
+                    <li>100% Protected and Secure</li>
+                  </ul>
+                ) : null}
+                {unavailable || isCertificateUnavailable(state, cert.slug) ? (
                   <button
                     type="button"
                     className="button button-primary"
                     disabled
                     aria-disabled="true"
                   >
-                    Not available yet
+                    {isCertificateUnavailable(state, cert.slug)
+                      ? "Not available"
+                      : "Not available yet"}
                   </button>
                 ) : (
                   <Link
