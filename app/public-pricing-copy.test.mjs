@@ -4,7 +4,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { URL } from "node:url";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
-const PRICE = /\$(?:149|70|79|12)(?:\.00)?(?![0-9])/;
+const PRICE = /\$(?:149|64|85|70|79|12)(?:\.00)?(?![0-9])/;
 
 const guideContentDir = "app/guides/[state]/birth-certificate/content";
 const guideContentFiles = readdirSync(new URL(`../${guideContentDir}/`, import.meta.url))
