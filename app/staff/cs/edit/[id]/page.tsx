@@ -7,6 +7,7 @@ import { staffData, staffId, staffJson, staffRole } from "@/lib/staff-client";
 import { useInactivitySignout, useRequireStaffAuth } from "@/lib/staff-auth-hook";
 import { BackLink, PageBand, StatusPill, Toast } from "@/components/staff/ui";
 import { hasUnsavedApplicationChanges } from "@/lib/staff-action-safety";
+import { RadioField } from "@/components/RadioField";
 import { DateInput } from "@/components/DateInput";
 import { ApplicationSections } from "@/components/staff/ApplicationSections";
 import {
@@ -602,6 +603,20 @@ export default function CsEditOrder({ params }: { params: Promise<{ id: string }
     };
     const errorKey = field.path.startsWith("geo.") ? field.path.slice(4) : field.path;
     const options = field.options ?? [];
+    if (field.type === "radio" && !field.locked)
+      return (
+        <RadioField
+          id={`edit-${field.key}`}
+          name={field.path}
+          label={field.label}
+          options={options}
+          required={field.key === "parentsMarriedAtBirth" ? false : field.required}
+          help={field.help}
+          error={errors[errorKey]}
+          value={field.value}
+          onChange={update}
+        />
+      );
     return (
       <Field label={field.label} required={field.required} error={errors[errorKey]}>
         {field.locked ? (

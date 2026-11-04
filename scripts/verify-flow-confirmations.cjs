@@ -44,6 +44,7 @@ const original = {
     sex: "Male",
     eventDate: "2000-01-01",
     stillLiving: "Yes",
+    parentsMarriedAtBirth: "Yes",
   },
   family: {
     fatherStatus: "Unknown",
@@ -507,6 +508,20 @@ async function until(predicate) {
       "/orders/flow-test/document",
     );
     await cs();
+    const parentsMarriage = page.getByRole("group", {
+      name: "Were parents married at the time of birth?",
+    });
+    await parentsMarriage.getByRole("radio", { name: "No", exact: true }).check();
+    assert.equal(
+      await parentsMarriage.getByRole("radio", { name: "No", exact: true }).isChecked(),
+      true,
+    );
+    assert.equal(
+      await parentsMarriage
+        .getByRole("radio", { name: "No", exact: true })
+        .evaluate((input) => input.required),
+      false,
+    );
     await page.getByLabel("First Name of Requestor", { exact: false }).fill("Corrected");
     assert.equal(
       await page.getByRole("button", { name: "Mark GTG", exact: true }).isDisabled(),
@@ -550,6 +565,8 @@ async function until(predicate) {
       await page.getByRole("button", { name: "Mark GTG", exact: true }).isEnabled(),
       true,
     );
+    assert.equal(order.subject.parentsMarriedAtBirth, "No");
+    passed.push("CS saves corrected parents marriage answer");
     await page.getByLabel("Note", { exact: true }).fill("Synthetic optional GTG note");
     assert.equal(
       await page.getByRole("button", { name: "Mark GTG", exact: true }).isEnabled(),
