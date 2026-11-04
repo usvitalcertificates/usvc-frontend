@@ -2,6 +2,7 @@
 
 import { certificateYearRange, certificateDateBounds } from "@/lib/certificate-years";
 
+import { RadioField } from "@/components/RadioField";
 import { DateInput } from "@/components/DateInput";
 import { CopyQuantity } from "./copy-quantity";
 import { copyPricing, copyMoney } from "@/lib/copy-pricing";
@@ -111,6 +112,7 @@ const stateCodes: Record<string, string> = {
 
 const DRAFT_EXCLUDED = new Set([
   "requestorSsn",
+  "parentsMarriedAtBirth",
   "confirmEmail",
   "cardNumber",
   "cardExpiry",
@@ -437,6 +439,21 @@ function Field({
   error?: string;
 }) {
   const id = `field-${def.key}`;
+  if (def.type === "radio")
+    return (
+      <div className="application-radio-field">
+        <RadioField
+          id={id}
+          name={def.key}
+          label={def.label}
+          options={def.options ?? []}
+          required={def.required}
+          help={def.help}
+          error={error}
+          defaultValue={defaultValue}
+        />
+      </div>
+    );
   return (
     <label className={`application-field${def.wide ? " wide" : ""}`} htmlFor={id}>
       {def.label} {def.required ? <span>*</span> : null}
@@ -1032,6 +1049,13 @@ export function OrderForm({
       (formRef.current?.querySelector('[name="email"]') as HTMLInputElement | null)?.focus?.({
         preventScroll: true,
       });
+      return;
+    }
+    if (certSlug === "birth-certificate" && !["Yes", "No"].includes(get("parentsMarriedAtBirth"))) {
+      const message = "Please select Yes or No.";
+      setError(message);
+      setFieldErrors({ "subject.parentsMarriedAtBirth": message });
+      form.querySelector<HTMLInputElement>('[name="parentsMarriedAtBirth"]')?.focus();
       return;
     }
     if (!editingOnly && !get("signature")) {
@@ -1695,6 +1719,26 @@ export function OrderForm({
             {visiblePersonFields(config, isBirth, sexValue)
               .filter((field) => !spousesTogether || field.key !== "eventDate")
               .map((field) => {
+                if (isBirth && field.key === "parentsMarriedAtBirth") return null;
+                if (isBirth && field.key === "stillLiving") {
+                  const marriageQuestion = config.person.find(
+                    (item) => item.key === "parentsMarriedAtBirth",
+                  )!;
+                  return (
+                    <div key={field.key} className="application-grid application-field-pair">
+                      <Field
+                        def={field}
+                        defaultValue={draft[field.key]}
+                        error={fieldErrors[`subject.${field.key}`]}
+                      />
+                      <Field
+                        def={marriageQuestion}
+                        defaultValue={draft.parentsMarriedAtBirth}
+                        error={fieldErrors["subject.parentsMarriedAtBirth"]}
+                      />
+                    </div>
+                  );
+                }
                 return (
                   <Field
                     key={field.key}
@@ -2332,6 +2376,12 @@ export function OrderForm({
         >
           <div className="verify-panel">
             <h3>Verify Order</h3>
+            {isBirth ? (
+              <p>
+                Were parents married at the time of birth?{" "}
+                <strong>{valueOf("parentsMarriedAtBirth") || "Not provided"}</strong>
+              </p>
+            ) : null}
             <ol className="verify-list">
               <li>
                 <span>
