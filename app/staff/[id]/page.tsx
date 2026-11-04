@@ -852,7 +852,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 <p style={{ color: "var(--flow-secondary)", marginBottom: 0 }}>
                   {isAdmin
                     ? "Submitted by mistake? Use the super-admin correction below to reopen it."
-                    : "No further actions — the submission record above is final."}
+                    : "You can replace the completion PDF and add internal notes in Notes & Document Upload."}
                 </p>
               ) : null}
             </div>
@@ -1091,38 +1091,36 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                 <p style={{ fontSize: "0.9rem", color: "var(--muted-text)", marginTop: 0 }}>
                   Notes are internal only and never shown to the customer.
                 </p>
-                {!closed ? (
-                  <>
-                    <textarea
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      rows={3}
-                      maxLength={2000}
-                      aria-label="New internal note"
-                    />
-                    {sensitiveWarning ? (
-                      <p role="alert" className="staff-alert error">
-                        {sensitiveWarning}
-                      </p>
-                    ) : null}
-                    <button
-                      type="button"
-                      className="staff-btn"
-                      disabled={busy || !note.trim()}
-                      onClick={() =>
-                        void postAction(
-                          `/staff/orders/${id}/notes`,
-                          { body: note.trim() },
-                          "POST",
-                          "Note added.",
-                        )
-                      }
-                      style={{ marginTop: "8px" }}
-                    >
-                      Submit
-                    </button>
-                  </>
-                ) : null}
+                <>
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    rows={3}
+                    maxLength={2000}
+                    aria-label="New internal note"
+                  />
+                  {sensitiveWarning ? (
+                    <p role="alert" className="staff-alert error">
+                      {sensitiveWarning}
+                    </p>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="staff-btn"
+                    disabled={busy || !note.trim()}
+                    onClick={() =>
+                      void postAction(
+                        `/staff/orders/${id}/notes`,
+                        { body: note.trim() },
+                        "POST",
+                        "Note added.",
+                      )
+                    }
+                    style={{ marginTop: "8px" }}
+                  >
+                    Submit
+                  </button>
+                </>
                 <ul className="staff-timeline" style={{ marginTop: "18px" }}>
                   {order.status === "TO_CS" && order.substatus ? (
                     <li className="cat-status">
@@ -1188,7 +1186,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     <span className="staff-sr-only"> (required)</span>
                   </h2>
 
-                  <p>Attach the final PDF before sending this order to the agency.</p>
+                  <p>Attach the completion PDF. You can replace it even after submission.</p>
                 </div>
 
                 <span className="staff-required-badge">
@@ -1251,32 +1249,30 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                         Download
                       </button>
 
-                      {!closed ? (
-                        <>
-                          <button
-                            type="button"
-                            className="staff-doc-textbtn"
-                            title="Replace PDF"
-                            disabled={docBusy}
-                            onClick={() => fileRef.current?.click()}
-                          >
-                            Replace
-                          </button>
+                      <>
+                        <button
+                          type="button"
+                          className="staff-doc-textbtn"
+                          title="Replace PDF"
+                          disabled={docBusy}
+                          onClick={() => fileRef.current?.click()}
+                        >
+                          Replace
+                        </button>
 
-                          <button
-                            type="button"
-                            className="staff-doc-textbtn danger"
-                            title="Delete PDF"
-                            disabled={docBusy}
-                            onClick={() => setDocDeleteOpen(true)}
-                          >
-                            Delete
-                          </button>
-                        </>
-                      ) : null}
+                        <button
+                          type="button"
+                          className="staff-doc-textbtn danger"
+                          title={closed ? "PDFs cannot be deleted after submission." : "Delete PDF"}
+                          disabled={docBusy || closed}
+                          onClick={() => setDocDeleteOpen(true)}
+                        >
+                          Delete
+                        </button>
+                      </>
                     </div>
                   </div>
-                ) : !closed ? (
+                ) : (
                   <button
                     type="button"
                     className="staff-doc-drop"
@@ -1291,8 +1287,6 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                       <span>PDF only · up to 10 MB</span>
                     </span>
                   </button>
-                ) : (
-                  <p style={{ color: "var(--flow-secondary)" }}>No document attached.</p>
                 )}
               </div>
             </div>

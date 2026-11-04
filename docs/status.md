@@ -193,3 +193,5 @@ Limits: display totals non-authoritative (backend recalculates). Per-state fee/r
 - [ ] Saved queue filters, CSV export, print-friendly order sheet
 - [ ] Agency-payment confirmation display per order (needs backend field)
 - [ ] Gate GA4/GTM script loading on non-staff pages like the OpenAI pixel — weigh GTM preview/debug impact first
+
+- Submitted-order corrections (2026-11-04): assigned staff and Admin can replace the completion PDF and append internal notes without reopening, changing submission milestones, or sending another submission notification. Submitted PDF deletion is disabled in the portal and rejected by the API (including Admin). Replacement stores and links the new PDF before removing the old file; conditional document writes protect concurrent changes. One current PDF remains; no version history.
