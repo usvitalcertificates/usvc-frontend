@@ -31,8 +31,8 @@ export function FinishOrderPanel({
             <h2>Order closed</h2>
             <p>
               Sent to the Government Agency
-              {submittedAt ? ` on ${formatDateTimeUS(submittedAt)}` : ""}. This order is now
-              read-only.
+              {submittedAt ? ` on ${formatDateTimeUS(submittedAt)}` : ""}. You can still replace the
+              completion PDF and add internal notes.
             </p>
           </div>
         </div>
