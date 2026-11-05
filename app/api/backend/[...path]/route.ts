@@ -1,10 +1,18 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 const API_URL = process.env.API_URL ?? "http://localhost:4000";
 
 async function proxy(request: NextRequest, context: RouteContext<"/api/backend/[...path]">) {
   const { path } = await context.params;
-  const target = new URL(path.join("/"), `${API_URL.replace(/\/$/, "")}/`);
+  if (path.some((segment) => segment === "." || segment === "..")) {
+    return Response.json({ message: "Invalid path." }, { status: 400 });
+  }
+  const base = new URL(`${API_URL.replace(/\/$/, "")}/`);
+  // Route params are decoded by Next: encode each segment as path data, never a URL.
+  const target = new URL(`./${path.map(encodeURIComponent).join("/")}`, base);
+  if (target.origin !== base.origin) {
+    return Response.json({ message: "Invalid path." }, { status: 400 });
+  }
   target.search = request.nextUrl.search;
 
   const headers = new Headers();
@@ -41,6 +49,7 @@ async function proxy(request: NextRequest, context: RouteContext<"/api/backend/[
       // @ts-expect-error Next's fetch runtime accepts duplex while the DOM type omits it.
       duplex: "half",
       cache: "no-store",
+      redirect: "error",
     });
   } catch {
     return Response.json(

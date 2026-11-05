@@ -1,5 +1,7 @@
 # Frontend status + remaining work
 
+- API proxy destination restriction (2026-11-05): encode decoded route segments as path data, reject dot traversal with generic 400, enforce the configured backend origin and refuse upstream redirects (existing generic 502). Query strings, methods, streaming bodies, staff authorization, recovery cookies and response headers are preserved. Backend route inspection found no redirect dependencies. Regression coverage includes crafted destinations, traversal, normal order/tracking/staff/recovery requests and a local upstream redirect. No backend changes or production deployment. Verification: Node 24.22.1, 133/133 frontend tests (12 proxy regressions), formatting check, lint and production build pass. The real-fetch local redirect test confirms its destination receives no requests.
+
 - California divorce availability (2026-11-02): new requests are unavailable statewide. California's Divorce card is disabled and its application URL shows an explicit all-counties notice. New-order verification and creation return 422 before order/payment work; authenticated recovery and existing checkout retain their current rules. Existing orders are not migrated. Validation: 119 tests passed; desktop/mobile browser checks, production build, lint and formatting passed. Not deployed.
 
 - Offer capitalization (2026-11-02): the additional-copy banner now reads “FLAT $85.00 OFF” in uppercase.
