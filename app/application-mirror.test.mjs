@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   applicationSections,
   applicationCopyText,
+  applicationFieldText,
   applicationReasonLabel,
   resolveFormConfig,
   applicationSectionKeys,
@@ -268,3 +269,42 @@ for (const type of ["marriage-certificate", "divorce-certificate"]) {
     assert.equal(all.find((f) => f.path === "family.spouseMaidenLastName").required, true);
   });
 }
+
+test("birth forms require explicit parents marriage radios for every jurisdiction", () => {
+  for (const state of ["south-carolina", "alabama", "california", "new-york"]) {
+    const fields = resolveFormConfig(state, "birth-certificate").person;
+    const index = fields.findIndex((field) => field.key === "stillLiving");
+    const marriage = fields[index + 1];
+    assert.equal(marriage.key, "parentsMarriedAtBirth");
+    assert.equal(marriage.label, "Were parents married at the time of birth?");
+    assert.equal(marriage.help, "(This question is necessary to accommodate SC paternity laws.)");
+    assert.equal(marriage.type, "radio");
+    assert.equal(marriage.required, true);
+    assert.deepEqual(marriage.options, ["Yes", "No"]);
+  }
+  for (const certificate of ["death-certificate", "marriage-certificate", "divorce-certificate"]) {
+    assert.equal(
+      resolveFormConfig("south-carolina", certificate).person.some(
+        (field) => field.key === "parentsMarriedAtBirth",
+      ),
+      false,
+    );
+  }
+});
+
+test("staff birth views preserve Yes and No and display missing legacy answers", () => {
+  for (const answer of [undefined, "Yes", "No"]) {
+    const fields = applicationSections(
+      order("BIRTH", { subject: { parentsMarriedAtBirth: answer } }),
+    ).flatMap((section) => section.groups.flatMap((group) => group.fields));
+    const marriage = fields.find((field) => field.path === "subject.parentsMarriedAtBirth");
+    assert.equal(marriage.value, answer ?? "");
+    assert.equal(applicationFieldText(marriage), answer ?? "Not provided");
+    if (answer)
+      assert.ok(
+        applicationCopyText(fields).includes(
+          `Were parents married at the time of birth?: ${answer}`,
+        ),
+      );
+  }
+});

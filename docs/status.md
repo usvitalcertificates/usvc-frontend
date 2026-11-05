@@ -1,5 +1,7 @@
 # Frontend status + remaining work
 
+- API proxy destination restriction (2026-11-05): encode decoded route segments as path data, reject dot traversal with generic 400, enforce the configured backend origin and refuse upstream redirects (existing generic 502). Query strings, methods, streaming bodies, staff authorization, recovery cookies and response headers are preserved. Backend route inspection found no redirect dependencies. Regression coverage includes crafted destinations, traversal, normal order/tracking/staff/recovery requests and a local upstream redirect. No backend changes or production deployment. Verification: Node 24.22.1, 133/133 frontend tests (12 proxy regressions), formatting check, lint and production build pass. The real-fetch local redirect test confirms its destination receives no requests.
+
 - California divorce availability (2026-11-02): new requests are unavailable statewide. California's Divorce card is disabled and its application URL shows an explicit all-counties notice. New-order verification and creation return 422 before order/payment work; authenticated recovery and existing checkout retain their current rules. Existing orders are not migrated. Validation: 119 tests passed; desktop/mobile browser checks, production build, lint and formatting passed. Not deployed.
 
 - Offer capitalization (2026-11-02): the additional-copy banner now reads “FLAT $85.00 OFF” in uppercase.
@@ -195,3 +197,7 @@ Limits: display totals non-authoritative (backend recalculates). Per-state fee/r
 - [ ] Gate GA4/GTM script loading on non-staff pages like the OpenAI pixel — weigh GTM preview/debug impact first
 
 - Submitted-order corrections (2026-11-04): assigned staff and Admin can replace the completion PDF and append internal notes without reopening, changing submission milestones, or sending another submission notification. Submitted PDF deletion is disabled in the portal and rejected by the API (including Admin). Replacement stores and links the new PDF before removing the old file; conditional document writes protect concurrent changes. One current PDF remains; no version history.
+
+- Birth parents’ marriage question (2026-11-05): public birth forms for every state require an explicit Yes/No answer to “Were parents married at the time of birth?” with the SC paternity explanation, stored in subject.parentsMarriedAtBirth. Public submission and pre-payment verification reject missing/invalid answers; staff corrections allow missing legacy answers but reject invalid supplied values. Staff views display unanswered fields as Not provided. No backfill or inferred answers.
+
+- Birth-question verification: Node 24 production build, lint, formatting and 121 frontend tests pass. Synthetic public browser checks cover SC/AL desktop and mobile, required unselected radios, keyboard selection, review values, birth-only visibility and no overflow. Staff browser regression passes 29 protected mutation scenarios including CS saving a changed marriage answer. The marriage answer is excluded from public browser draft storage.

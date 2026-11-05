@@ -4,7 +4,7 @@
 
 export type CertificateSlug =
   "birth-certificate" | "death-certificate" | "marriage-certificate" | "divorce-certificate";
-export type FieldType = "text" | "date" | "select";
+export type FieldType = "text" | "date" | "select" | "radio";
 
 export interface FieldDef {
   key: string;
@@ -198,6 +198,14 @@ export const CERTIFICATE_FORM_CONFIG: Record<CertificateSlug, CertificateFormCon
         key: "stillLiving",
         label: "Is subject still living?",
         type: "select",
+        required: true,
+        options: YES_NO,
+      },
+      {
+        key: "parentsMarriedAtBirth",
+        label: "Were parents married at the time of birth?",
+        help: "(This question is necessary to accommodate SC paternity laws.)",
+        type: "radio",
         required: true,
         options: YES_NO,
       },
@@ -624,6 +632,7 @@ export interface ApplicationSection {
   groups: ApplicationGroup[];
 }
 export function applicationFieldText(field: ApplicationField): string {
+  if (field.path === "subject.parentsMarriedAtBirth" && !field.value.trim()) return "Not provided";
   return field.type === "date"
     ? field.value.replace(/^(\d{4})-(\d{2})-(\d{2})$/, "$2/$3/$1")
     : field.value;

@@ -80,9 +80,7 @@ export function ApplicationSections({
                                     position="left"
                                   />
                                 ) : null}
-                                <span>
-                                  {field.value.trim() ? applicationFieldText(field) : "—"}
-                                </span>
+                                <span>{applicationFieldText(field) || "—"}</span>
                               </dd>
                             </div>
                           ))}

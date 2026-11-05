@@ -1031,6 +1031,13 @@ div.application-field > span {
   font-weight: 700;
   line-height: 1.4;
 }
+.application-radio-field {
+  margin: 12px 0 4px;
+}
+.application-field-pair {
+  grid-column: 1 / -1;
+  color: var(--navy);
+}
 .application-field.wide {
   grid-column: 1 / -1;
 }
