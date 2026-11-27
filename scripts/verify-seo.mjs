@@ -249,6 +249,15 @@ try {
     const type = certificate.replace("-certificate", "");
     assert(html.includes(`${type} certificate guide`), url);
     assert(html.includes("Official sources"), url);
+    // Each state guide links to its record type's cross-state topic guides.
+    const relatedTopics =
+      {
+        birth: ["abstract-birth-certificate", "apostille-birth-certificate"],
+        death: ["how-to-get-death-certificate", "death-certificate-cost"],
+        marriage: ["replace-marriage-certificate"],
+      }[type] ?? [];
+    for (const slug of relatedTopics)
+      assert(html.includes(`href="/guides/${slug}"`), `${url}: missing related topic ${slug}`);
     for (const sibling of ["birth", "death", "marriage", "divorce"].filter(
       (value) => value !== type,
     ))
