@@ -7,8 +7,16 @@ import { SeoJsonLd } from "@/app/seo-json-ld";
 import { PageHeader } from "@/app/usvc-ui";
 import { ORGANIZATION_ID, SITEMAP_GUIDES_LAST_MODIFIED, SITE_URL, socialMetadata } from "@/lib/seo";
 import type { BirthGuideContent } from "./[state]/birth-certificate/guide-types";
+import { TOPIC_GUIDES } from "./topic-guides";
 
 const LINK_RE = /\[([^\]]+)\]\(([^)]+)\)/g;
+
+/** Cross-state topic guides relevant to each record type (internal linking). */
+const RELATED_TOPICS: Record<string, string[]> = {
+  birth: ["abstract-birth-certificate", "apostille-birth-certificate"],
+  death: ["how-to-get-death-certificate", "death-certificate-cost"],
+  marriage: ["replace-marriage-certificate"],
+};
 
 function GuideLink({ href, children }: { href: string; children: ReactNode }) {
   if (href.startsWith("/")) {
@@ -248,6 +256,20 @@ export function GuidePage({
                 ))}
             </ul>
           </nav>
+          {RELATED_TOPICS[recordType]?.length ? (
+            <nav className="guide-related" aria-label="Related questions">
+              <h2>Related questions</h2>
+              <ul className="guide-link-list">
+                {RELATED_TOPICS[recordType].map((slug) => (
+                  <li key={slug}>
+                    <Link className="guide-link" href={`/guides/${slug}`}>
+                      {TOPIC_GUIDES[slug]?.h1}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
           <p className="guide-related">
             Prefer to compare record types first? See{" "}
             <Link className="guide-link" href={`/state/${state}`}>
