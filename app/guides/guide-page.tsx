@@ -13,9 +13,10 @@ const LINK_RE = /\[([^\]]+)\]\(([^)]+)\)/g;
 
 /** Cross-state topic guides relevant to each record type (internal linking). */
 const RELATED_TOPICS: Record<string, string[]> = {
-  birth: ["abstract-birth-certificate", "apostille-birth-certificate"],
+  birth: ["abstract-birth-certificate", "apostille-birth-certificate", "replace-birth-certificate"],
   death: ["how-to-get-death-certificate", "death-certificate-cost"],
   marriage: ["replace-marriage-certificate"],
+  divorce: ["copy-of-divorce-decree"],
 };
 
 function GuideLink({ href, children }: { href: string; children: ReactNode }) {

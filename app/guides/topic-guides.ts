@@ -606,6 +606,273 @@ export const TOPIC_GUIDES: Record<string, TopicGuide> = {
       { label: "How to get a death certificate", href: "/guides/how-to-get-death-certificate" },
     ],
   },
+  "copy-of-divorce-decree": {
+    slug: "copy-of-divorce-decree",
+    metaTitle: "How to Get a Copy of a Divorce Decree",
+    metaDescription:
+      "How to get a certified copy of a divorce decree from the court that granted it, and when a state divorce certificate or verification is enough.",
+    h1: "How to Get a Copy of Your Divorce Decree",
+    subtitle:
+      "Find the court that holds your decree, choose a certified or plain copy, and know when a divorce certificate will do instead.",
+    breadcrumb: "Copy of a divorce decree",
+    intro: [
+      "A divorce decree is the court order that ended a marriage. Copies come from the clerk of the court in the county or city where the divorce was granted, not from where you live now.",
+      "Some states also issue a divorce certificate or verification through their vital records office. It proves that a divorce occurred, but it does not contain the terms of the decree.",
+    ],
+    quickFacts: [
+      {
+        label: "Who holds the decree",
+        value: "The clerk of the court where the divorce was granted",
+      },
+      { label: "Certified copy", value: "Dated, signed and stamped by the court clerk" },
+      {
+        label: "Divorce certificate",
+        value: "Issued by some states; proves the divorce, not its terms",
+      },
+      {
+        label: "Have ready",
+        value: "Both names, the county, the year and the case number if known",
+      },
+      { label: "Best first step", value: "Identify the county where the divorce was finalized" },
+    ],
+    sections: [
+      {
+        id: "steps",
+        heading: "Steps to get a copy of a divorce decree",
+        bullets: [
+          "Identify the county, or city, and state where the divorce was granted.",
+          "Find the clerk of that court; the office name varies by state, such as Clerk of Court, District Clerk, County Clerk or Prothonotary.",
+          "Gather both parties’ names, the approximate date and the case number if you have it.",
+          "Ask whether you need a certified copy, a plain copy, or an exemplified copy for use in another state.",
+          "Request the copy from the court by its listed methods; some courts offer online case search or requests.",
+        ],
+      },
+      {
+        id: "decree-vs-certificate",
+        heading: "Divorce decree vs divorce certificate",
+        paragraphs: [
+          "The decree sets out the terms of the divorce, such as property, support and custody arrangements. A divorce certificate, issued by some state vital records offices, shows the names and the date and place of the divorce. It may be enough to change your name or remarry, but not to prove the terms.",
+          "Not every state issues divorce certificates, and some issue only a verification letter that is not a legal substitute for the decree. Our state guides explain what each state offers.",
+        ],
+      },
+      {
+        id: "certified-copies",
+        heading: "Certified, plain and exemplified copies",
+        paragraphs: [
+          "A certified copy is dated, signed and stamped by the clerk to confirm it is a true copy of the court record. An exemplified copy adds a further authentication and may be needed to record the decree in another state. Plain copies are for reference only.",
+        ],
+      },
+      {
+        id: "state-guides",
+        heading: "State divorce record guides",
+        paragraphs: ["Each guide explains which court or office holds divorce records."],
+        links: [
+          { label: "Texas divorce certificate guide", href: "/guides/texas/divorce-certificate" },
+          {
+            label: "Florida divorce certificate guide",
+            href: "/guides/florida/divorce-certificate",
+          },
+          {
+            label: "New York divorce certificate guide",
+            href: "/guides/new-york/divorce-certificate",
+          },
+          {
+            label: "California divorce certificate guide",
+            href: "/guides/california/divorce-certificate",
+          },
+          { label: "All state certificate guides", href: "/guides" },
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "Where do I get a copy of my divorce decree?",
+        answer:
+          "From the clerk of the court in the county or city where the divorce was granted. The clerk can tell you how to order, what it costs and what information you need.",
+      },
+      {
+        question: "Is a divorce certificate the same as a divorce decree?",
+        answer:
+          "No. A divorce certificate, issued by some states, proves that a divorce occurred. The decree is the court order with the terms of the divorce.",
+      },
+      {
+        question: "Can I get my divorce decree online?",
+        answer:
+          "Some courts offer online case search or online copy requests, but many still use mail or in-person requests. Check the court that granted the divorce.",
+      },
+      {
+        question: "Who can get a copy of a divorce decree?",
+        answer:
+          "It depends on the state and court. In some states divorce records are not open to the public, and copies are limited to the parties or their attorneys.",
+      },
+      {
+        question: "Can USVC help me get divorce records?",
+        answer:
+          "Yes, in states where we accept divorce certificate requests. USVC is an independent service, not a government agency. You can also contact the court or vital records office directly.",
+      },
+    ],
+    sources: [
+      {
+        label: "USA.gov: divorce decrees and certificates",
+        href: "https://www.usa.gov/divorce-decree",
+      },
+      CDC_W2W,
+      {
+        label: "Utah State Courts: divorce records and certified copies",
+        href: "https://www.utcourts.gov/en/self-help/case-categories/family/divorce.html",
+      },
+      {
+        label: "Florida Department of Health: divorce certificates",
+        href: "https://www.floridahealth.gov/certificates-records/divorce-certificates/",
+      },
+      {
+        label: "Texas DSHS: marriage and divorce records",
+        href: "https://www.dshs.texas.gov/vital-statistics/marriage-divorce-records",
+      },
+    ],
+    sourceChecked: "11/28/2026",
+    related: [
+      {
+        label: "How to replace a lost marriage certificate",
+        href: "/guides/replace-marriage-certificate",
+      },
+      {
+        label: "How to replace a lost birth certificate",
+        href: "/guides/replace-birth-certificate",
+      },
+    ],
+  },
+  "replace-birth-certificate": {
+    slug: "replace-birth-certificate",
+    metaTitle: "How to Replace a Lost Birth Certificate",
+    metaDescription:
+      "Lost your birth certificate? How to order a new certified copy from the state where you were born, who can order, and what ID you need.",
+    h1: "How to Replace a Lost Birth Certificate",
+    subtitle:
+      "Order a new certified copy from the vital records office of the state where you were born.",
+    breadcrumb: "Replace a birth certificate",
+    intro: [
+      "To replace a lost, damaged or stolen birth certificate, you order a new certified copy from the vital records office of the state or territory where you were born. The federal government does not issue birth certificates.",
+      "A new copy is issued from the same registered record. Correcting an error or reflecting a legal name change is a separate amendment process with its own application.",
+    ],
+    quickFacts: [
+      { label: "Where to order", value: "The vital records office of your birth state" },
+      {
+        label: "Who can order",
+        value: "Commonly you, your parents named on the record, or a legal representative",
+      },
+      { label: "ID", value: "Valid photo ID; some states accept alternatives if you have none" },
+      {
+        label: "Have ready",
+        value: "Full name at birth, date and city or county of birth, parents’ names",
+      },
+      { label: "Best first step", value: "Check your birth state’s eligibility and ID rules" },
+    ],
+    sections: [
+      {
+        id: "steps",
+        heading: "Steps to replace a birth certificate",
+        bullets: [
+          "Identify the state or territory where you were born, not where you live now.",
+          "Check that office’s eligibility rules; many states limit certified copies to the person named, parents and legal representatives.",
+          "Gather the details: full name at birth, date of birth, city or county of birth and parents’ names.",
+          "Prepare valid photo ID; if you have none, ask whether the state accepts a sworn statement or a parent’s ID.",
+          "Order the certified copy from the official office, or use a guided service.",
+        ],
+      },
+      {
+        id: "no-id",
+        heading: "If you have lost your ID too",
+        paragraphs: [
+          "Many states accept alternatives when you have no photo ID, such as a sworn statement of identity or a notarized letter with a copy of a parent’s photo ID. Check your birth state’s current rules before applying.",
+        ],
+      },
+      {
+        id: "corrections",
+        heading: "Corrections and name changes are separate",
+        paragraphs: [
+          "If the certificate has an error or you need it to reflect a legal name change, apply for an amendment through the birth state’s vital records office. This usually requires a separate form and supporting documents such as a certified court order.",
+        ],
+      },
+      {
+        id: "stolen",
+        heading: "If your birth certificate was stolen",
+        paragraphs: [
+          "If you think your identity is being misused, report it to the Federal Trade Commission at IdentityTheft.gov and consider fraud alerts or a credit freeze with the credit bureaus.",
+        ],
+      },
+      {
+        id: "state-guides",
+        heading: "State birth certificate guides",
+        paragraphs: ["Each guide links to the official office and its eligibility rules."],
+        links: [
+          { label: "Texas birth certificate guide", href: "/guides/texas/birth-certificate" },
+          { label: "New York birth certificate guide", href: "/guides/new-york/birth-certificate" },
+          { label: "Florida birth certificate guide", href: "/guides/florida/birth-certificate" },
+          {
+            label: "California birth certificate guide",
+            href: "/guides/california/birth-certificate",
+          },
+          { label: "All state certificate guides", href: "/guides" },
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "Where do I get a replacement birth certificate?",
+        answer:
+          "From the vital records office of the state or territory where you were born. The federal government does not issue birth certificates.",
+      },
+      {
+        question: "Can I replace my birth certificate if I live in another state now?",
+        answer:
+          "Yes. You still order from the state where you were born, usually online or by mail.",
+      },
+      {
+        question: "What if I don’t have a photo ID?",
+        answer:
+          "Many states accept alternatives, such as a sworn statement of identity or a notarized letter with a parent’s photo ID. Check your birth state’s rules.",
+      },
+      {
+        question: "Does ordering a new copy fix mistakes on my birth certificate?",
+        answer:
+          "No. A new copy shows the same registered information. To correct an error, apply for an amendment with the birth state’s vital records office.",
+      },
+      {
+        question: "Can USVC help me replace my birth certificate?",
+        answer:
+          "Yes, in states where we accept birth certificate requests. USVC is an independent service, not a government agency. You can also apply directly with the official office.",
+      },
+    ],
+    sources: [
+      {
+        label: "USA.gov: replace a birth certificate",
+        href: "https://www.usa.gov/birth-certificate",
+      },
+      {
+        label: "USA.gov: replace lost or stolen vital documents",
+        href: "https://www.usa.gov/replace-vital-documents",
+      },
+      CDC_W2W,
+      {
+        label: "Florida Department of Health: birth certificates",
+        href: "https://www.floridahealth.gov/certificates-records/birth-certificates/",
+      },
+      {
+        label: "Florida Department of Health: amendments and corrections",
+        href: "https://www.floridahealth.gov/certificates-records/amendments-and-corrections/",
+      },
+      { label: "USA.gov: identity theft", href: "https://www.usa.gov/identity-theft" },
+    ],
+    sourceChecked: "11/28/2026",
+    related: [
+      {
+        label: "Abstract vs certified birth certificate",
+        href: "/guides/abstract-birth-certificate",
+      },
+      { label: "Apostille for a birth certificate", href: "/guides/apostille-birth-certificate" },
+    ],
+  },
 };
 
 export const TOPIC_GUIDE_SLUGS = Object.keys(TOPIC_GUIDES);
