@@ -1063,4 +1063,311 @@ export const RECORD_GUIDE_DATA = {
       },
     },
   },
+  nevada: {
+    name: "Nevada",
+    records: {
+      birth: {
+        url: "https://www.dpbh.nv.gov/Programs/VitalRecords/",
+        authority: "Nevada Division of Public and Behavioral Health, Office of Vital Records",
+        record:
+          "Request a certified copy of the birth certificate from the state or the local health district for the county of birth.",
+        access:
+          "Check that you have a direct and tangible interest, such as being the registrant or a direct family member, and review the state’s proof of relationship and identification lists.",
+        route:
+          "Apply to the Office of Vital Records in Carson City, or for Clark County births to the Southern Nevada Health District.",
+        detail:
+          "The state holds birth records filed from July 1, 1911; earlier records are usually with the county recorder where the birth occurred.",
+        sourceChecked: "11/27/2026",
+        extra: [["CDC: Nevada record offices", "https://www.cdc.gov/nchs/w2w/nevada.htm"]],
+      },
+      death: {
+        url: "https://www.dpbh.nv.gov/Programs/VitalRecords/",
+        authority: "Nevada Division of Public and Behavioral Health, Office of Vital Records",
+        record:
+          "Request a certified copy of the death certificate from the state or the local health district for the county of death.",
+        access:
+          "Check that you have a direct and tangible interest, such as being a direct family member or legal representative, and review the state’s proof of relationship and identification lists.",
+        route:
+          "Apply to the Office of Vital Records in Carson City, or for Clark County deaths to the Southern Nevada Health District.",
+        detail:
+          "The state holds death records filed from July 1, 1911; earlier records are usually with the county recorder where the death occurred.",
+        sourceChecked: "11/27/2026",
+        extra: [["CDC: Nevada record offices", "https://www.cdc.gov/nchs/w2w/nevada.htm"]],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/nevada.htm",
+        authority: "County office in the county where the marriage license was issued",
+        record:
+          "Obtain a certified copy of the recorded marriage certificate from the county that issued the license.",
+        access:
+          "Ask the county office about access, identification and certification requirements.",
+        route:
+          "Contact the county where the license was purchased; in Clark County, that is the County Clerk.",
+        detail:
+          "The state Office of Vital Records only searches and verifies marriage events and does not issue certified marriage copies.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "Clark County Clerk: proof of marriage",
+            "https://www.clarkcountynv.gov/government/elected_officials/county_clerk/what-is-proof-of-marriage",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/nevada.htm",
+        authority: "District court clerk in the county where the divorce was granted",
+        record:
+          "Request a certified copy of the divorce decree from the court that granted the divorce.",
+        access: "Ask the court clerk about access, identification and certification requirements.",
+        route:
+          "Contact the court clerk in the county where the divorce was granted; in Clark County, that is the Eighth Judicial District Court (Family Court).",
+        detail:
+          "Nevada’s state office does not issue divorce certificates; it only searches and verifies divorce events.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "Clark County Recorder: divorce records",
+            "https://www.clarkcountynv.gov/government/elected_officials/county_recorder/divorce-records",
+          ],
+        ],
+      },
+    },
+  },
+  oklahoma: {
+    name: "Oklahoma",
+    records: {
+      birth: {
+        url: "https://oklahoma.gov/health/services/birth-and-death-certificates/birth-certificates.html",
+        authority: "Oklahoma State Department of Health, Vital Records Service",
+        record:
+          "Request a certified copy of the birth certificate from the state Vital Records Service.",
+        access:
+          "Check eligibility first: the person named on the record, or a parent if that person is a minor, may order directly, while others need signed authorization or proof of legal relationship.",
+        route: "Order from OSDH Vital Records using its listed online, phone or mail options.",
+        detail:
+          "Oklahoma began filing birth records in October 1908, though filing was not mandatory until 1917.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "OSDH: acceptable identification",
+            "https://oklahoma.gov/health/services/birth-and-death-certificates/acceptable-identification.html",
+          ],
+          [
+            "OSDH: Vital Records forms",
+            "https://oklahoma.gov/health/services/birth-and-death-certificates/vital-records-forms.html",
+          ],
+        ],
+      },
+      death: {
+        url: "https://oklahoma.gov/health/services/birth-and-death-certificates/death-certificates.html",
+        authority: "Oklahoma State Department of Health, Vital Records Service",
+        record:
+          "Request a certified copy of the death certificate from the state Vital Records Service.",
+        access:
+          "Check that you qualify, for example as a close family member, legal guardian, estate representative with a court order or funeral director, and have acceptable ID ready.",
+        route: "Order from OSDH Vital Records using its listed online, phone or mail options.",
+        detail: "The state office holds death records filed from October 1908 onward.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "OSDH: Vital Records FAQs",
+            "https://oklahoma.gov/health/services/birth-and-death-certificates/faqs.html",
+          ],
+          ["CDC: Oklahoma record offices", "https://www.cdc.gov/nchs/w2w/oklahoma.htm"],
+        ],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/oklahoma.htm",
+        authority: "Court Clerk of the county where the license was issued",
+        record:
+          "Obtain a certified copy of the recorded marriage license from the county court clerk that issued it.",
+        access:
+          "Ask the county court clerk about access, identification and certification requirements.",
+        route:
+          "Contact the Court Clerk in the county where the marriage license was issued, not the state Vital Records office.",
+        detail:
+          "OSDH Vital Records holds only birth and death records and refers marriage requests to the county court clerk.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "OSDH: Vital Records main page",
+            "https://oklahoma.gov/health/services/birth-and-death-certificates.html",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/oklahoma.htm",
+        authority: "Court Clerk of the county where the divorce was granted",
+        record:
+          "Request a certified copy of the divorce decree from the court clerk that holds the case file.",
+        access:
+          "Ask the court clerk about access, identification and certification requirements for the case file.",
+        route: "Contact the Court Clerk in the county where the divorce was granted.",
+        detail:
+          "Oklahoma has no state divorce certificate; the decree stays with the county court that granted it.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "OSDH: Vital Records main page",
+            "https://oklahoma.gov/health/services/birth-and-death-certificates.html",
+          ],
+        ],
+      },
+    },
+  },
+  delaware: {
+    name: "Delaware",
+    records: {
+      birth: {
+        url: "https://delaware.gov/guides/certificates/",
+        authority: "Delaware Division of Public Health, Office of Vital Statistics",
+        record:
+          "Request a certified birth certificate from the Office of Vital Statistics; older public birth records are copied by the Delaware Public Archives.",
+        access:
+          "Check that you are the registrant, a qualifying family member, guardian or authorized representative, or can show a legal need, and have photo ID ready.",
+        route:
+          "Send recent birth requests to the state Office of Vital Statistics; Delaware does not use county birth offices.",
+        detail:
+          "Birth records become public after 72 years, and those older records are requested from the Delaware Public Archives.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          ["CDC: Delaware record offices", "https://www.cdc.gov/nchs/w2w/delaware.htm"],
+          [
+            "Delaware Public Archives: vital statistics records",
+            "https://archives.delaware.gov/digital-archives/guide-to-vital-statistics-records/",
+          ],
+        ],
+      },
+      death: {
+        url: "https://delaware.gov/guides/certificates/",
+        authority: "Delaware Division of Public Health, Office of Vital Statistics",
+        record:
+          "Request a certified death certificate from the Office of Vital Statistics; older public death records are copied by the Delaware Public Archives.",
+        access:
+          "Check that you are a qualifying family member, guardian or authorized representative, or can show the record is needed to protect personal or property rights.",
+        route:
+          "Send recent death requests to the state Office of Vital Statistics rather than a county office.",
+        detail:
+          "Death records become public after 40 years, and those older records are requested from the Delaware Public Archives.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          ["CDC: Delaware record offices", "https://www.cdc.gov/nchs/w2w/delaware.htm"],
+          [
+            "Delaware Public Archives: vital statistics records",
+            "https://archives.delaware.gov/digital-archives/guide-to-vital-statistics-records/",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://delaware.gov/guides/certificates/",
+        authority: "Delaware Division of Public Health, Office of Vital Statistics",
+        record:
+          "Request a certified marriage certificate from the Office of Vital Statistics, which receives a record of marriages performed in Delaware.",
+        access:
+          "Check the Office of Vital Statistics eligibility and photo ID requirements before applying.",
+        route: "Send marriage requests to the state Office of Vital Statistics.",
+        detail:
+          "Marriage records become public after 50 years, and those older records are requested from the Delaware Public Archives.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          ["CDC: Delaware record offices", "https://www.cdc.gov/nchs/w2w/delaware.htm"],
+          ["Delaware Public Archives: FAQs", "https://archives.delaware.gov/faqs/"],
+        ],
+      },
+      divorce: {
+        url: "https://courts.delaware.gov/family/divorce/decree_copies.aspx",
+        authority:
+          "Delaware Family Court Records Department in the county that granted the divorce",
+        record:
+          "Request a certified copy of the divorce decree from Family Court; the state vital records office does not issue divorce copies.",
+        access:
+          "Check the court’s identification rules: photo ID for in-person requests or a notarized signature on mailed requests.",
+        route:
+          "Contact the Family Court Records Department in New Castle, Kent or Sussex County, whichever granted the divorce.",
+        detail:
+          "Older divorces may be held by the Superior Court Prothonotary or the Delaware Public Archives, depending on county and year.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "Delaware.gov: certificates by type and year",
+            "https://delaware.gov/guides/certificates/",
+          ],
+          [
+            "Delaware Family Court: records access",
+            "https://www.courts.delaware.gov/family/fcrecordaccess.aspx",
+          ],
+        ],
+      },
+    },
+  },
+  nebraska: {
+    name: "Nebraska",
+    records: {
+      birth: {
+        url: "https://dhhs.ne.gov/Pages/vital-records.aspx",
+        authority: "Nebraska Department of Health and Human Services, Office of Vital Records",
+        record:
+          "Request a certified copy of the birth certificate from the state vital records office.",
+        access:
+          "Check the state’s current eligibility and identification requirements before you apply.",
+        route:
+          "Send the request to Nebraska Vital Records in Lincoln, which handles birth records statewide.",
+        detail: "The state office holds Nebraska birth records from late 1904 onward.",
+        sourceChecked: "11/27/2026",
+        extra: [["CDC: Nebraska record offices", "https://www.cdc.gov/nchs/w2w/nebraska.htm"]],
+      },
+      death: {
+        url: "https://dhhs.ne.gov/Pages/vital-records.aspx",
+        authority: "Nebraska Department of Health and Human Services, Office of Vital Records",
+        record:
+          "Request a certified copy of the death certificate from the state vital records office.",
+        access:
+          "Check the state’s current eligibility, relationship and identification requirements before you apply.",
+        route:
+          "Send the request to Nebraska Vital Records in Lincoln, which handles death records statewide.",
+        detail: "The state office holds Nebraska death records from late 1904 onward.",
+        sourceChecked: "11/27/2026",
+        extra: [["CDC: Nebraska record offices", "https://www.cdc.gov/nchs/w2w/nebraska.htm"]],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/nebraska.htm",
+        authority: "Nebraska Office of Vital Records or the county that issued the license",
+        record:
+          "Request a certified copy of the recorded marriage from the state office or the issuing county.",
+        access:
+          "Check the eligibility and ID rules of the office you apply to before sending a request.",
+        route:
+          "Contact the county that issued the license, or Nebraska Vital Records in Lincoln for a statewide record.",
+        detail:
+          "The state office holds marriage records from January 1909, while a county can copy only licenses it issued.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "Saunders County Clerk: marriage licenses (county example)",
+            "https://saunderscounty.ne.gov/county-clerk/marriage-licenses/",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://nebraskajudicial.gov/self-help/families-children/simple-divorce-no-children",
+        authority: "Clerk of the District Court in the county where the divorce was granted",
+        record:
+          "Request a certified copy of the decree from the district court when you need the court’s divorce terms.",
+        access:
+          "Ask the clerk of the district court about access, identification and certification requirements.",
+        route:
+          "Contact the Clerk of the District Court in the county where the divorce was granted.",
+        detail:
+          "The state vital records office also keeps divorce records from January 1909, but the full decree stays with the district court.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "Nebraska Judicial Branch: district court clerks",
+            "https://nebraskajudicial.gov/courts/district-court/clerks-contact-information",
+          ],
+          ["CDC: Nebraska record offices", "https://www.cdc.gov/nchs/w2w/nebraska.htm"],
+        ],
+      },
+    },
+  },
 } as const;

@@ -16,9 +16,9 @@ const APOSTILLE_URL = "https://www.sos.ca.gov/notary/request-apostille";
 
 export const CALIFORNIA_GUIDE: BirthGuideContent = {
   stateName: "California",
-  metaTitle: "California Birth Certificate Guide: Steps and Requirements",
+  metaTitle: "California Birth Certificate: How to Get a Copy",
   metaDescription:
-    "How California birth certificate requests work: authorized vs informational copies, state or county filing, documents to prepare, and USVC help.",
+    "How to get a California birth certificate: authorized vs informational copies, who may order, state or county offices, what to prepare, USVC help.",
   subtitle:
     "Understand the request path, choose the right office, prepare the details the agency asks for, and find the official California resources.",
   intro: [

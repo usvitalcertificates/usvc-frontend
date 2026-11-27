@@ -14,9 +14,9 @@ const NJ_APOSTILLE_URL = "https://www.nj.gov/treasury/revenue/apostilles.shtml";
 
 export const NEW_JERSEY_GUIDE: BirthGuideContent = {
   stateName: "New Jersey",
-  metaTitle: "New Jersey Birth Certificate Guide: Eligibility and ID",
+  metaTitle: "New Jersey Birth Certificate: How to Get a Copy",
   metaDescription:
-    "How New Jersey birth certificate requests work: who may order, relationship proof, photo ID, state and local filing, corrections, USVC help.",
+    "How to get a New Jersey birth certificate: who may order, relationship proof, photo ID, state or local offices, corrections, and USVC help.",
   subtitle:
     "Confirm the relationship and identification rules for a New Jersey birth record, then choose the state, local, or online filing path that fits.",
   intro: [

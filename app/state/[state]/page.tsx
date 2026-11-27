@@ -65,12 +65,23 @@ export async function generateMetadata({
   const found = STATES.find(({ slug }) => slug === state);
   if (!found) return {};
   const name = found.name;
-  const title = assertSeoLength("title", `${name} Birth, Death, Marriage & Divorce Records`);
+  const unavailable = isStateUnsupported(state);
+  const types = isCertificateUnavailable(state, "divorce-certificate")
+    ? "birth, death or marriage"
+    : "birth, death, marriage or divorce";
+  // Searchers phrase these as "{state} vital records"; lead with that wording.
+  const title = assertSeoLength(
+    "title",
+    unavailable
+      ? `${name} Birth, Death, Marriage & Divorce Records`
+      : `${name} Vital Records: Order Certified Copies`,
+  );
   const description = assertSeoLength(
     "description",
-    `Find ${name} birth, death, marriage and divorce records. Explore certificate options, official sources and USVC application assistance.`,
+    unavailable
+      ? `Find ${name} birth, death, marriage and divorce records. Explore certificate options, official sources and USVC application assistance.`
+      : `Order ${name} ${types} certificates online with guided review, or find the official vital records office.`,
   );
-  const unavailable = isStateUnsupported(state);
   return {
     title,
     description,
@@ -191,7 +202,23 @@ export default async function StatePage({ params }: { params: Promise<{ state: s
               ))}
               .
             </p>
-          ) : null}
+          ) : (
+            <p className="state-guide-callout">
+              Comparing record offices? Browse our{" "}
+              <Link className="guide-link" href="/guides">
+                vital record guides by state
+              </Link>
+              , or read{" "}
+              <Link className="guide-link" href="/guides/replace-marriage-certificate">
+                how to replace a lost marriage certificate
+              </Link>{" "}
+              and{" "}
+              <Link className="guide-link" href="/guides/abstract-birth-certificate">
+                abstract vs certified birth certificates
+              </Link>
+              .
+            </p>
+          )}
           {unavailable ? (
             <p className="notice" role="status">
               {STATE_UNAVAILABLE_MESSAGE} See{" "}

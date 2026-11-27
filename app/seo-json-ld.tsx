@@ -9,6 +9,18 @@ export function SeoJsonLd({ value }: { value: Record<string, unknown> }) {
   );
 }
 
+/** Homepage-only: ties the brand name ("US Vital Certificates", "USVC") to the domain. */
+export const websiteLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${SITE_URL}/#website`,
+  name: "US Vital Certificates",
+  alternateName: ["USVC", "usvitalcertificates.org"],
+  url: SITE_URL,
+  inLanguage: "en-US",
+  publisher: { "@id": ORGANIZATION_ID },
+};
+
 export const organizationLd = {
   "@context": "https://schema.org",
   "@type": "Organization",

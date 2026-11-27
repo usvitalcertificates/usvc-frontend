@@ -13,9 +13,9 @@ const VA_AUTH_URL = "https://www.commonwealth.virginia.gov/official-documents/au
 
 export const VIRGINIA_GUIDE: BirthGuideContent = {
   stateName: "Virginia",
-  metaTitle: "Virginia Birth Certificate Guide: Eligibility and ID",
+  metaTitle: "Virginia Birth Certificate: How to Get a Copy",
   metaDescription:
-    "How Virginia birth certificate requests work: immediate-family eligibility, photo ID, online, mail, walk-in, amendments, adoption records, USVC help.",
+    "How to get a Virginia birth certificate: immediate-family eligibility, photo ID, online, mail or walk-in requests, amendments, and USVC help.",
   subtitle:
     "Confirm who may receive a Virginia birth record, prepare the right identification, and choose an online, mail, or walk-in filing path.",
   intro: [

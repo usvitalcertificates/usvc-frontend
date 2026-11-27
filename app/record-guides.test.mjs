@@ -34,10 +34,16 @@ const expected = [
   "missouri",
   "maryland",
   "colorado",
+  "nevada",
+  "oklahoma",
+  "delaware",
+  "nebraska",
 ];
-test("60 death, marriage and divorce guides cover 20 states", () => {
+// States researched in the November 27 batch carry their own source-check date.
+const NOVEMBER_STATES = new Set(["nevada", "oklahoma", "delaware", "nebraska"]);
+test("72 death, marriage and divorce guides cover 24 states", () => {
   assert.deepEqual(Object.keys(RECORD_GUIDE_DATA).sort(), expected.toSorted());
-  assert.equal(expected.length * RECORD_GUIDE_TYPES.length, 60);
+  assert.equal(expected.length * RECORD_GUIDE_TYPES.length, 72);
 });
 for (const state of expected)
   for (const certificate of RECORD_GUIDE_TYPES) {
@@ -46,7 +52,7 @@ for (const state of expected)
       assert.ok(content);
       assert.ok(content.metaTitle.length >= 25 && content.metaTitle.length <= 150);
       assert.ok(content.metaDescription.length >= 25 && content.metaDescription.length <= 150);
-      assert.equal(content.sourceChecked, "10/27/2026");
+      assert.equal(content.sourceChecked, NOVEMBER_STATES.has(state) ? "11/27/2026" : "10/27/2026");
       assert.equal(content.sections.length, 10);
       assert.equal(new Set(content.sections.map((s) => s.id)).size, 10);
       assert.ok(content.faqs.length >= 9);

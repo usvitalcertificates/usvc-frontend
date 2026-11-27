@@ -118,8 +118,8 @@ try {
   assert.match(sitemapResponse.headers.get("content-type"), /xml/);
   const xml = await sitemapResponse.text();
   const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(([, url]) => decode(url));
-  assert.equal(urls.length, 141);
-  assert.equal(new Set(urls).size, 141);
+  assert.equal(urls.length, 160);
+  assert.equal(new Set(urls).size, 160);
   assert(urls.every((url) => new URL(url).origin === site));
   assert(urls.includes(`${site}/guides`));
   assert(
@@ -188,7 +188,7 @@ try {
     ["/", "Birth, Death, Marriage & Divorce Certificates | USVC"],
     ["/faq", "Vital Certificate FAQs: Fees, Requests & Tracking | USVC"],
     ["/find-your-state", "Vital Records by State: Find Your Certificate | USVC"],
-    ["/state/florida", "Florida Birth, Death, Marriage & Divorce Records | USVC"],
+    ["/state/florida", "Florida Vital Records: Order Certified Copies | USVC"],
   ]);
   for (const [path, expectedTitle] of expectedTitles) {
     const html = renderedPages.get(path === "/" ? site : site + path);
@@ -203,7 +203,7 @@ try {
     const match = new URL(url).pathname.match(/^\/guides\/([^/]+)\/birth-certificate$/);
     return match ? [match[1]] : [];
   });
-  assert.equal(guideStates.length, 20);
+  assert.equal(guideStates.length, 24);
   const guideIndexUrl = `${site}/guides`;
   const guideIndex = renderedPages.get(guideIndexUrl);
   assert(guideIndex, "Guide directory must be in the sitemap");
@@ -214,8 +214,8 @@ try {
         /href="\/guides\/[^"/]+\/(?:birth|death|marriage|divorce)-certificate"/g,
       ) || []
     ).length,
-    80,
-    "Guide directory must link all 80 guides",
+    96,
+    "Guide directory must link all 96 guides",
   );
   for (const type of ["birth", "death", "marriage", "divorce"]) {
     assert(guideIndexMain.includes(`id="${type}-guides"`), `${type}: missing footer destination`);
@@ -254,7 +254,8 @@ try {
     ))
       assert(html.includes(`href="/guides/${state}/${sibling}-certificate"`), url);
     if (type !== "birth") {
-      assert(html.includes("10/27/2026"), url);
+      // October 27 research batch, or the November 27 batch (NE, NV, OK, DE).
+      assert(html.includes("10/27/2026") || html.includes("11/27/2026"), url);
       assert(!html.includes("Source unavailable"), url);
     }
   }
@@ -330,7 +331,7 @@ try {
   assertNoEmDash(llms, "/llms.txt");
   assert(llms.startsWith("# US Vital Certificates (USVC)\n"));
   assert(llms.includes("not a government agency"));
-  assert.equal((llms.match(/\/guides\//g) || []).length, 80);
+  assert.equal((llms.match(/\/guides\//g) || []).length, 99);
   const links = [...llms.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((m) => m[1]);
   assert(links.length > 13);
   for (const link of links) {

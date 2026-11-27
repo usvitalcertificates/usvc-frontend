@@ -18,9 +18,9 @@ const MI_VITAL_URL = "https://www.michigan.gov/mdhhs/doing-business/vitalrecords
 
 export const MICHIGAN_GUIDE: BirthGuideContent = {
   stateName: "Michigan",
-  metaTitle: "Michigan Birth Certificate Guide: Eligibility and ID",
+  metaTitle: "Michigan Birth Certificate: How to Get a Copy",
   metaDescription:
-    "How Michigan birth certificate requests work: who may order, photo ID tiers, online, mail, county, corrections, USVC help.",
+    "How to get a Michigan birth certificate: who may order, photo ID tiers, online, mail or county requests, corrections, and how USVC can help.",
   subtitle:
     "Confirm who may receive a Michigan birth record, prepare the right identification, and choose a state, county, mail, or online path.",
   intro: [

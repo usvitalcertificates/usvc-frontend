@@ -13,9 +13,9 @@ const GA_FAQ_URL = "https://georgia.gov/faqs-about-certificates";
 
 export const GEORGIA_GUIDE: BirthGuideContent = {
   stateName: "Georgia",
-  metaTitle: "Georgia Birth Certificate Guide: Eligibility and ID",
+  metaTitle: "Georgia Birth Certificate: How to Get a Copy",
   metaDescription:
-    "How Georgia birth certificate requests work: who may order, physical photo ID, online, mail, county offices, corrections, USVC help.",
+    "How to get a Georgia birth certificate: who may order, photo ID rules, online, mail or county office requests, corrections, and USVC help.",
   subtitle:
     "Confirm who may receive a Georgia birth record, prepare the right relationship documents, and choose a state or county filing path.",
   intro: [

@@ -14,9 +14,9 @@ const PA_ONLINE_URL = "https://mycertificates.health.pa.gov/";
 
 export const PENNSYLVANIA_GUIDE: BirthGuideContent = {
   stateName: "Pennsylvania",
-  metaTitle: "Pennsylvania Birth Certificate Guide: ID and Ordering",
+  metaTitle: "Pennsylvania Birth Certificate: How to Get a Copy",
   metaDescription:
-    "How Pennsylvania birth certificate requests work: who may order, photo ID or alternatives, online, mail, in-person offices, corrections, USVC help.",
+    "How to get a Pennsylvania birth certificate: who may order, photo ID or alternatives, online, mail or in-person offices, and USVC help.",
   subtitle:
     "Confirm who may order a Pennsylvania birth record, prepare acceptable identification, and choose the right official filing path.",
   intro: [

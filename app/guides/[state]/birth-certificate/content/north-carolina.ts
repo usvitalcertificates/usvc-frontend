@@ -12,9 +12,9 @@ const NC_HOME_URL = "https://vitalrecords.nc.gov/";
 
 export const NORTH_CAROLINA_GUIDE: BirthGuideContent = {
   stateName: "North Carolina",
-  metaTitle: "North Carolina Birth Certificate Guide: ID and Ordering",
+  metaTitle: "North Carolina Birth Certificate: How to Get a Copy",
   metaDescription:
-    "How North Carolina birth certificate requests work: who may order, photo ID or alternatives, state, county, corrections, USVC help.",
+    "How to get a North Carolina birth certificate: who may order, photo ID or alternatives, state or county offices, corrections, and USVC help.",
   subtitle:
     "Confirm who may receive a North Carolina birth record, prepare identity and relationship proof, and choose the right state or county office.",
   intro: [

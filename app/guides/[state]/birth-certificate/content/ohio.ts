@@ -17,9 +17,9 @@ const OH_LAW_URL = "https://codes.ohio.gov/ohio-revised-code/section-3705.23";
 
 export const OHIO_GUIDE: BirthGuideContent = {
   stateName: "Ohio",
-  metaTitle: "Ohio Birth Certificate Guide: Abstract or Certified",
+  metaTitle: "Ohio Birth Certificate Copy: Certified vs. Abstract",
   metaDescription:
-    "How Ohio birth certificate requests work: abstract vs certified copies, state or local filing, mail and online limits, corrections, and USVC help.",
+    "How to get an Ohio birth certificate: certified copy vs abstract, state or local offices, mail and online options, corrections, and USVC help.",
   subtitle:
     "Understand Ohio's open-record rule, choose between an online abstract and a certified copy, and use the right state or local filing path.",
   intro: [
