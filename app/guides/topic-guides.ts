@@ -355,6 +355,257 @@ export const TOPIC_GUIDES: Record<string, TopicGuide> = {
       },
     ],
   },
+  "how-to-get-death-certificate": {
+    slug: "how-to-get-death-certificate",
+    metaTitle: "How to Get a Death Certificate: Who Can Order",
+    metaDescription:
+      "How to get a certified death certificate: which office holds it, who can order, what information and ID you need, and when a funeral home can help.",
+    h1: "How to Get a Death Certificate",
+    subtitle:
+      "Find the right office, confirm you are eligible, and prepare the details you need to request certified copies.",
+    breadcrumb: "How to get a death certificate",
+    intro: [
+      "Death certificates are issued by the vital records office of the state, or in some places the city or county, where the death occurred. The federal government does not issue death certificates.",
+      "Most states limit certified copies, especially copies showing the cause of death, to close family members, legal representatives and people who can document a legal interest. Shortly after a death, the funeral director handling arrangements can often order copies for the family.",
+    ],
+    quickFacts: [
+      { label: "Where to order", value: "The vital records office where the death occurred" },
+      {
+        label: "Who can order",
+        value:
+          "Commonly immediate family, legal representatives and people with a documented interest",
+      },
+      {
+        label: "Soon after a death",
+        value: "In many places the funeral director can order copies",
+      },
+      {
+        label: "Have ready",
+        value: "Full name, date and place of death, your relationship and photo ID",
+      },
+      {
+        label: "Best first step",
+        value: "Identify the state, and county if needed, where the death occurred",
+      },
+    ],
+    sections: [
+      {
+        id: "steps",
+        heading: "Steps to get a death certificate",
+        bullets: [
+          "Identify the state, and county if needed, where the death occurred, not where the person lived.",
+          "Check that office’s eligibility rules for the version you need, especially if the cause of death must be shown.",
+          "Gather the details: the person’s full name, date and place of death, date of birth if known, your relationship and the purpose of the request.",
+          "Prepare a valid photo ID and any documents that prove your relationship or legal interest.",
+          "Decide how many certified copies you need, then request them from the official office or use a guided service.",
+        ],
+      },
+      {
+        id: "who-can-order",
+        heading: "Who can order a certified copy",
+        paragraphs: [
+          "Eligibility is set by each state. A common pattern is the spouse, parent, adult child, sibling, grandparent or grandchild of the person who died, plus legal custodians and estate representatives. Others may need a court order or a document such as a will or insurance policy showing their interest.",
+          "Some states issue copies without the cause of death to a wider group of applicants, while copies showing the cause of death stay restricted.",
+        ],
+      },
+      {
+        id: "funeral-home",
+        heading: "Ordering through the funeral home",
+        paragraphs: [
+          "In many places the funeral director registers the death and can order certified copies for eligible family members during a period after the death. This is often the quickest route for the first copies. Later copies are ordered from the vital records office.",
+        ],
+      },
+      {
+        id: "state-guides",
+        heading: "State death certificate guides",
+        paragraphs: ["Each guide links to the official office and its eligibility rules."],
+        links: [
+          { label: "Texas death certificate guide", href: "/guides/texas/death-certificate" },
+          { label: "Florida death certificate guide", href: "/guides/florida/death-certificate" },
+          { label: "New York death certificate guide", href: "/guides/new-york/death-certificate" },
+          { label: "Ohio death certificate guide", href: "/guides/ohio/death-certificate" },
+          { label: "All state certificate guides", href: "/guides" },
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "Where do I get a death certificate?",
+        answer:
+          "From the vital records office of the state where the death occurred, or the local office that holds the record. The federal government does not issue death certificates.",
+      },
+      {
+        question: "Who is allowed to get a death certificate?",
+        answer:
+          "It depends on the state. Commonly, immediate family members, legal representatives and people with a documented legal interest can order certified copies. Copies showing the cause of death are usually the most restricted.",
+      },
+      {
+        question: "Can the funeral home order death certificates for me?",
+        answer:
+          "Often, yes. In many places the funeral director who handled the arrangements can order copies for eligible family members for a period after the death.",
+      },
+      {
+        question: "What information do I need?",
+        answer:
+          "Typically the person’s full name, date and place of death, your relationship to them, the reason for the request and a valid photo ID.",
+      },
+      {
+        question: "Can USVC help me get a death certificate?",
+        answer:
+          "Yes, in states where we accept death certificate requests. USVC is an independent service, not a government agency. You can also apply directly with the official office.",
+      },
+    ],
+    sources: [
+      CDC_W2W,
+      {
+        label: "CDC: guidelines for requesting vital records",
+        href: "https://www.cdc.gov/nchs/w2w/guidelines.htm",
+      },
+      {
+        label: "Minnesota Department of Health: death certificates",
+        href: "https://www.health.state.mn.us/people/vitalrecords/deathreg/index.html",
+      },
+      {
+        label: "Florida Department of Health: death certificates",
+        href: "https://www.floridahealth.gov/certificates/certificates/death/",
+      },
+      {
+        label: "NYC Health: death certificates",
+        href: "https://www.nyc.gov/site/doh/services/birth-death-records-death.page",
+      },
+    ],
+    sourceChecked: CHECKED,
+    related: [
+      { label: "Death certificate cost", href: "/guides/death-certificate-cost" },
+      { label: "Apostille for a birth certificate", href: "/guides/apostille-birth-certificate" },
+    ],
+  },
+  "apostille-birth-certificate": {
+    slug: "apostille-birth-certificate",
+    metaTitle: "Apostille for a Birth Certificate: How It Works",
+    metaDescription:
+      "How to get an apostille on a US birth certificate: which state office issues it, what copy you need, and what to do for non-Hague countries.",
+    h1: "How to Get an Apostille for a Birth Certificate",
+    subtitle:
+      "Understand who issues the apostille, what kind of birth certificate it can be attached to, and when extra steps apply.",
+    breadcrumb: "Apostille for a birth certificate",
+    intro: [
+      "An apostille is a certificate that authenticates a public document, such as a birth certificate, for use in another country that is a party to the 1961 Hague Apostille Convention. It replaces the longer legalization process.",
+      "For a US birth certificate, the apostille comes from the state that issued the certificate, usually its Secretary of State, not from the U.S. Department of State. The apostille is attached to a certified copy of the birth certificate.",
+    ],
+    quickFacts: [
+      { label: "What it does", value: "Authenticates the official’s signature for use abroad" },
+      {
+        label: "Who issues it",
+        value: "The state where the birth certificate was issued, usually the Secretary of State",
+      },
+      { label: "Document needed", value: "A certified copy of the birth certificate" },
+      {
+        label: "Non-Hague countries",
+        value: "Extra federal or embassy certification may be required",
+      },
+      {
+        label: "Best first step",
+        value: "Ask the receiving country which document and certificate version it accepts",
+      },
+    ],
+    sections: [
+      {
+        id: "steps",
+        heading: "Steps to get an apostille",
+        bullets: [
+          "Confirm whether the destination country is a party to the Hague Apostille Convention.",
+          "Get a certified copy of the birth certificate from the vital records office of the state where the birth occurred.",
+          "Check the issuing state’s Secretary of State rules on which officials’ signatures it can apostille; some local certificates need an extra county certification first.",
+          "Submit the certified copy to that state’s apostille office.",
+          "For a non-Hague country, ask whether a U.S. Department of State authentication or embassy legalization is also needed.",
+        ],
+      },
+      {
+        id: "which-state",
+        heading: "The issuing state must apostille it",
+        paragraphs: [
+          "State-issued documents are authenticated by officials of the state that issued them. A birth certificate from one state cannot be apostilled by another state’s Secretary of State. The U.S. Department of State authenticates federal documents, not state birth certificates.",
+          "An apostille confirms the official signature and seal. It does not verify the accuracy of the information in the record.",
+        ],
+      },
+      {
+        id: "which-copy",
+        heading: "Which birth certificate copy to use",
+        paragraphs: [
+          "Apostille offices generally require original certified copies, not photocopies. Some states only apostille signatures of certain officials, such as the State Registrar or county recorder, so a certificate signed by another local official may need extra certification or a new copy. Some states also advise a full long form copy for use abroad.",
+        ],
+        links: [
+          {
+            label: "Oregon birth certificate guide (long form for use abroad)",
+            href: "/guides/oregon/birth-certificate",
+          },
+          {
+            label: "Washington birth certificate guide",
+            href: "/guides/washington/birth-certificate",
+          },
+          { label: "Ohio birth certificate guide", href: "/guides/ohio/birth-certificate" },
+          {
+            label: "Abstract vs certified birth certificate",
+            href: "/guides/abstract-birth-certificate",
+          },
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "Who issues an apostille for a US birth certificate?",
+        answer:
+          "The state that issued the birth certificate, usually through its Secretary of State. The U.S. Department of State handles federal documents.",
+      },
+      {
+        question: "Can I get an apostille on a photocopy?",
+        answer:
+          "Generally, no. State apostille offices such as Washington’s require an original certified copy issued by the vital records office or another authorized official.",
+      },
+      {
+        question: "What if the country is not part of the Hague Convention?",
+        answer:
+          "You may need additional certification from the U.S. Department of State, the destination country’s embassy, or both. Ask the receiving authority what it requires.",
+      },
+      {
+        question: "Does an apostille confirm the information on my birth certificate?",
+        answer:
+          "No. It authenticates the signature and seal of the official who certified the document, not the accuracy of its contents.",
+      },
+      {
+        question: "Can USVC get the apostille for me?",
+        answer:
+          "USVC helps you request the certified birth certificate. The apostille itself is issued by the state’s apostille office after you submit the certified copy.",
+      },
+    ],
+    sources: [
+      {
+        label: "HCCH: Apostille Section",
+        href: "https://www.hcch.net/en/instruments/conventions/specialised-sections/apostille",
+      },
+      {
+        label: "U.S. Department of State: Foreign Affairs Manual, 7 FAM 870",
+        href: "https://fam.state.gov/fam/07fam/07fam0870.html",
+      },
+      {
+        label: "Washington Secretary of State: apostille FAQ",
+        href: "https://www.sos.wa.gov/corporations-charities/apostilles-program/apostille-frequently-asked-questions",
+      },
+      {
+        label: "California Secretary of State: apostille FAQs",
+        href: "https://www.sos.ca.gov/notary/apostille-faqs",
+      },
+    ],
+    sourceChecked: CHECKED,
+    related: [
+      {
+        label: "Abstract vs certified birth certificate",
+        href: "/guides/abstract-birth-certificate",
+      },
+      { label: "How to get a death certificate", href: "/guides/how-to-get-death-certificate" },
+    ],
+  },
 };
 
 export const TOPIC_GUIDE_SLUGS = Object.keys(TOPIC_GUIDES);

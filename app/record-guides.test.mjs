@@ -38,12 +38,29 @@ const expected = [
   "oklahoma",
   "delaware",
   "nebraska",
+  "idaho",
+  "oregon",
+  "west-virginia",
+  "iowa",
+  "hawaii",
+  "north-dakota",
 ];
 // States researched in the November 27 batch carry their own source-check date.
-const NOVEMBER_STATES = new Set(["nevada", "oklahoma", "delaware", "nebraska"]);
-test("72 death, marriage and divorce guides cover 24 states", () => {
+const NOVEMBER_STATES = new Set([
+  "nevada",
+  "oklahoma",
+  "delaware",
+  "nebraska",
+  "idaho",
+  "oregon",
+  "west-virginia",
+  "iowa",
+  "hawaii",
+  "north-dakota",
+]);
+test("90 death, marriage and divorce guides cover 30 states", () => {
   assert.deepEqual(Object.keys(RECORD_GUIDE_DATA).sort(), expected.toSorted());
-  assert.equal(expected.length * RECORD_GUIDE_TYPES.length, 72);
+  assert.equal(expected.length * RECORD_GUIDE_TYPES.length, 90);
 });
 for (const state of expected)
   for (const certificate of RECORD_GUIDE_TYPES) {

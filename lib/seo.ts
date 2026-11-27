@@ -87,6 +87,18 @@ export const BIRTH_GUIDE_SOURCES: Record<string, { state: string; url: string }>
   },
   delaware: { state: "Delaware", url: "https://delaware.gov/guides/certificates/" },
   nebraska: { state: "Nebraska", url: "https://dhhs.ne.gov/Pages/vital-records.aspx" },
+  idaho: {
+    state: "Idaho",
+    url: "https://healthandwelfare.idaho.gov/services-programs/birth-marriage-death-records",
+  },
+  oregon: {
+    state: "Oregon",
+    url: "https://www.oregon.gov/oha/ph/birthdeathcertificates/getvitalrecords/pages/index.aspx",
+  },
+  "west-virginia": { state: "West Virginia", url: "https://dhhr.wv.gov/HSC/VR/Pages/default.aspx" },
+  iowa: { state: "Iowa", url: "https://hhs.iowa.gov/family-community/vital-records" },
+  hawaii: { state: "Hawaii", url: "https://vitrec.ehawaii.gov/vitalrecords/" },
+  "north-dakota": { state: "North Dakota", url: "https://www.hhs.nd.gov/vital" },
   california: {
     state: "California",
     url: "https://www.cdph.ca.gov/Programs/CHSI/Pages/Vital-Records-Obtaining-Certified-Copies-of-Birth-Records.aspx",
