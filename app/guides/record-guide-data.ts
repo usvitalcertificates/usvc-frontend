@@ -1800,4 +1800,421 @@ export const RECORD_GUIDE_DATA = {
       },
     },
   },
+  "south-carolina": {
+    name: "South Carolina",
+    records: {
+      birth: {
+        url: "https://www.cdc.gov/nchs/w2w/south_carolina.htm",
+        authority: "South Carolina Department of Public Health, Office of Vital Records",
+        record:
+          "Request a certified copy of the birth certificate from the state vital records office.",
+        access:
+          "Check the office’s current eligibility rules and include a copy of valid photo identification.",
+        route: "Send the request to the state Office of Vital Records.",
+        detail: "The state office holds birth records from January 1915 onward.",
+        sourceChecked: "11/28/2026",
+        extra: [],
+      },
+      death: {
+        url: "https://www.cdc.gov/nchs/w2w/south_carolina.htm",
+        authority: "South Carolina Department of Public Health, Office of Vital Records",
+        record:
+          "Request a certified copy of the death certificate from the state vital records office.",
+        access:
+          "Check the office’s current eligibility rules and include a copy of valid photo identification.",
+        route: "Send the request to the state Office of Vital Records.",
+        detail: "The state office holds death records from January 1915 onward.",
+        sourceChecked: "11/28/2026",
+        extra: [],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/south_carolina.htm",
+        authority: "State Office of Vital Records or the county Probate Judge",
+        record:
+          "Request a certified copy of the marriage record from the office that holds that year.",
+        access:
+          "Check the office’s current eligibility and identification requirements before you apply.",
+        route:
+          "Send requests for marriages from July 1950 to the state office, and earlier ones to the county Probate Judge.",
+        detail:
+          "The state holds marriages from July 1950; earlier records stay with the Probate Judge in the county that issued the license.",
+        sourceChecked: "11/28/2026",
+        extra: [],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/south_carolina.htm",
+        authority:
+          "State Office of Vital Records for divorce reports; the county Clerk of Court for decrees",
+        record: "Decide whether you need the state divorce report or the court’s divorce decree.",
+        access:
+          "Check the office’s current eligibility and identification requirements before you apply.",
+        route:
+          "Get the decree from the Clerk of Court in the county where the divorce was finalized.",
+        detail:
+          "The state holds divorce reports from July 1962 but does not hold copies of divorce decrees.",
+        sourceChecked: "11/28/2026",
+        extra: [],
+      },
+    },
+  },
+  louisiana: {
+    name: "Louisiana",
+    records: {
+      birth: {
+        url: "https://www.cdc.gov/nchs/w2w/louisiana.htm",
+        authority: "Louisiana Department of Health, Center of Vital Records and Statistics",
+        record:
+          "Request a certified copy of the birth certificate from the state vital records office.",
+        access:
+          "Louisiana birth records are confidential, so check who is eligible and include a copy of valid photo ID.",
+        route:
+          "Send recent requests to the state vital records office, and requests for births over 100 years old to the State Archives.",
+        detail:
+          "The state office keeps birth records for 100 years; older births are held by the Louisiana State Archives.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Louisiana State Archives: historical birth records",
+            "https://www.sos.la.gov/archives/historical-birth-records",
+          ],
+        ],
+      },
+      death: {
+        url: "https://www.cdc.gov/nchs/w2w/louisiana.htm",
+        authority: "Louisiana Department of Health, Center of Vital Records and Statistics",
+        record:
+          "Request a certified copy of the death certificate from the state vital records office.",
+        access:
+          "Louisiana death records are confidential, so check who is eligible and include a copy of valid photo ID.",
+        route:
+          "Send recent requests to the state vital records office, and requests for deaths over 50 years old to the State Archives.",
+        detail:
+          "The state office keeps death records for 50 years; older deaths are held by the Louisiana State Archives.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Louisiana State Archives: historical death records",
+            "https://www.sos.la.gov/archives/historical-death-records",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/louisiana.htm",
+        authority: "Parish Clerk of Court, or the state vital records office for Orleans Parish",
+        record:
+          "Request a certified copy of the marriage record from the office that holds the license.",
+        access:
+          "Check the office’s current eligibility and identification requirements before you apply.",
+        route:
+          "Contact the Clerk of Court in the issuing parish, or the state office for licenses issued in Orleans Parish.",
+        detail:
+          "The state office holds only Orleans Parish marriages for 50 years; older Orleans licenses are at the State Archives.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Louisiana State Archives: vital records index",
+            "https://www.sos.la.gov/archives/vital-records-index",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/louisiana.htm",
+        authority: "Parish Clerk of Court",
+        record: "Request a certified copy of the divorce judgment from the court record.",
+        access: "Ask the parish clerk about access, identification and certification requirements.",
+        route: "Contact the Clerk of Court in the parish where the divorce was granted.",
+        detail: "Divorce copies come from the parish court, not the state vital records office.",
+        sourceChecked: "11/28/2026",
+        extra: [],
+      },
+    },
+  },
+  "south-dakota": {
+    name: "South Dakota",
+    records: {
+      birth: {
+        url: "https://doh.sd.gov/licensing-and-records/vital-records/order-vital-records/",
+        authority: "South Dakota Department of Health, Vital Records Office",
+        record:
+          "Request a certified birth certificate; plain informational copies cannot be used for legal purposes.",
+        access:
+          "Check that you are an eligible requester and include a copy of a government-issued photo ID.",
+        route:
+          "Apply to the state Vital Records Office in Pierre or at any South Dakota Register of Deeds office.",
+        detail: "State and county offices hold birth records filed after 1905.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "South Dakota DOH: eligibility and identification",
+            "https://doh.sd.gov/licensing-and-records/vital-records/order-vital-records/eligibility-identification/",
+          ],
+          [
+            "South Dakota DOH: genealogy resources",
+            "https://doh.sd.gov/licensing-and-records/vital-records/genealogy-resources/",
+          ],
+        ],
+      },
+      death: {
+        url: "https://doh.sd.gov/licensing-and-records/vital-records/order-vital-records/",
+        authority: "South Dakota Department of Health, Vital Records Office",
+        record:
+          "Request a certified death certificate when the copy is needed for legal or estate purposes.",
+        access:
+          "Check the eligibility rules and send a photo ID copy or a notarized signature with mail requests.",
+        route:
+          "Apply to the state Vital Records Office in Pierre or at any South Dakota Register of Deeds office.",
+        detail: "State and county offices hold death records filed after 1905.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          ["CDC: South Dakota record offices", "https://www.cdc.gov/nchs/w2w/south_dakota.htm"],
+        ],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/south_dakota.htm",
+        authority:
+          "South Dakota Department of Health, Vital Records Office, and county Register of Deeds",
+        record:
+          "Request a certified marriage certificate for a marriage that took place in South Dakota.",
+        access:
+          "Check the office’s eligibility and photo identification requirements before you apply.",
+        route:
+          "Order from the state Vital Records Office or the Register of Deeds in the county where the marriage occurred.",
+        detail: "Tribal marriage records are available only directly from the tribe.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "South Dakota DOH: find a Register of Deeds office",
+            "https://doh.sd.gov/licensing-and-records/find-a-register-of-deeds-office/",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://doh.sd.gov/licensing-and-records/vital-records/order-vital-records/",
+        authority:
+          "South Dakota Department of Health, Vital Records Office, and county Clerk of Courts",
+        record:
+          "Decide whether you need the state divorce certificate or a copy of the court’s divorce decree.",
+        access:
+          "Check the state’s eligibility and photo ID rules, or ask the Clerk of Courts about decree copies.",
+        route:
+          "Order divorce certificates from the state office only, and decrees from the Clerk of Courts in the county where the divorce was filed.",
+        detail: "Tribal divorce records are available only directly from the tribe.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "South Dakota Unified Judicial System: court case FAQ",
+            "https://ujs.sd.gov/faq/court-cases/",
+          ],
+        ],
+      },
+    },
+  },
+  alaska: {
+    name: "Alaska",
+    records: {
+      birth: {
+        url: "https://www.cdc.gov/nchs/w2w/alaska.htm",
+        authority: "Alaska Department of Health, Health Analytics and Vital Records Section",
+        record:
+          "Request a certified birth certificate; the heirloom version is a separate keepsake design.",
+        access:
+          "Check the current eligibility rules and include a signed, readable copy of your photo ID.",
+        route: "Send the request to the Health Analytics and Vital Records Section in Juneau.",
+        detail: "Records go back to the 1890s, but many births before 1930 were never registered.",
+        sourceChecked: "11/28/2026",
+        extra: [],
+      },
+      death: {
+        url: "https://www.cdc.gov/nchs/w2w/alaska.htm",
+        authority: "Alaska Department of Health, Health Analytics and Vital Records Section",
+        record: "Request a certified death certificate for a death that occurred in Alaska.",
+        access:
+          "Check the current eligibility rules and include a signed, readable copy of your photo ID.",
+        route: "Send the request to the Health Analytics and Vital Records Section in Juneau.",
+        detail: "Records go back to the 1890s, but many deaths before 1930 were never registered.",
+        sourceChecked: "11/28/2026",
+        extra: [],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/alaska.htm",
+        authority: "Alaska Department of Health, Health Analytics and Vital Records Section",
+        record:
+          "Request a certified marriage certificate; the heirloom version is a separate keepsake design.",
+        access:
+          "Check the current eligibility rules and include a signed, readable copy of your photo ID.",
+        route:
+          "Send the request to the state Health Analytics and Vital Records Section in Juneau.",
+        detail:
+          "Records go back to the 1890s, but many marriages before 1930 were never registered.",
+        sourceChecked: "11/28/2026",
+        extra: [],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/alaska.htm",
+        authority: "Alaska Department of Health, Health Analytics and Vital Records Section",
+        record:
+          "Decide whether you need the state divorce certificate or a copy of the court’s decree.",
+        access:
+          "Check the current eligibility rules and include a signed, readable copy of your photo ID.",
+        route:
+          "Request the divorce certificate from the state office, and ask the court that granted the divorce about decree copies.",
+        detail: "The state office holds divorce records from 1950 onward.",
+        sourceChecked: "11/28/2026",
+        extra: [],
+      },
+    },
+  },
+  arkansas: {
+    name: "Arkansas",
+    records: {
+      birth: {
+        url: "https://healthy.arkansas.gov/programs-services/certificates-records/order-birth-records/",
+        authority: "Arkansas Department of Health, Vital Records",
+        record:
+          "Request a certified copy of the Arkansas birth certificate from the state Vital Records office.",
+        access:
+          "Check the state’s eligible individuals list and acceptable photo ID requirements before applying.",
+        route:
+          "Apply to Arkansas Department of Health Vital Records online, by phone, by mail, or in person in Little Rock.",
+        detail: "Genealogy requests for births before 1935 are handled as non-routine requests.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Arkansas: eligible individuals for birth and death certificates",
+            "https://healthy.arkansas.gov/wp-content/uploads/Eligible_Individuals_for_Birth_and_or_Death_Certificates.pdf",
+          ],
+          [
+            "Arkansas: acceptable ID requirements",
+            "https://healthy.arkansas.gov/wp-content/uploads/RESOURCE_-_ID_Requirements_-_ENGLISH.pdf",
+          ],
+        ],
+      },
+      death: {
+        url: "https://healthy.arkansas.gov/programs-services/certificates-records/order-death-records/",
+        authority: "Arkansas Department of Health, Vital Records",
+        record:
+          "Request a certified copy of the Arkansas death certificate from the state Vital Records office.",
+        access:
+          "Check the eligible relatives list, which also covers informants, funeral homes and documented beneficiaries.",
+        route:
+          "Apply to Arkansas Department of Health Vital Records online, by phone, by mail, or in person in Little Rock.",
+        detail:
+          "The state holds only a limited number of records for deaths before February 1, 1914.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Arkansas: death certificate application",
+            "https://healthy.arkansas.gov/wp-content/uploads/Application_DC_Vital_Records.pdf",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://healthy.arkansas.gov/programs-services/certificates-records/order-marriage-records/",
+        authority: "Arkansas Department of Health, Vital Records",
+        record: "Request a certified marriage coupon, the state’s record of an Arkansas marriage.",
+        access: "Check the eligibility list for marriage coupons and provide acceptable photo ID.",
+        route:
+          "Apply to state Vital Records and name the county where the marriage license was issued.",
+        detail:
+          "State marriage records start with the year 1917 and cover only Arkansas marriages.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Arkansas: marriage coupon application",
+            "https://healthy.arkansas.gov/wp-content/uploads/Application_MC_Vital_Records.pdf",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://healthy.arkansas.gov/programs-services/certificates-records/order-divorce-records/",
+        authority: "Arkansas Department of Health, Vital Records",
+        record:
+          "Request a certified divorce coupon from the state, or the full decree from the courthouse that holds the case.",
+        access: "Check the eligibility list for divorce coupons and provide acceptable photo ID.",
+        route:
+          "Apply to state Vital Records for the coupon, or to the courthouse in the county that granted the divorce for the decree.",
+        detail:
+          "State divorce records start with 1923 and cover only divorces granted in Arkansas.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Arkansas: divorce coupon application",
+            "https://healthy.arkansas.gov/wp-content/uploads/Application_DV_Vital_Records.pdf",
+          ],
+          [
+            "Arkansas Secretary of State: where certified copies are issued",
+            "https://www.sos.arkansas.gov/frequently-asked-questions/46",
+          ],
+        ],
+      },
+    },
+  },
+  utah: {
+    name: "Utah",
+    records: {
+      birth: {
+        url: "https://vitalrecords.utah.gov/certificates/order-a-vital-record-certificate",
+        authority: "Utah Office of Vital Records and Statistics",
+        record:
+          "Request a certified Utah birth certificate from the state or a local health department.",
+        access:
+          "Check that you are the registrant, immediate family, guardian or legal representative, and have valid ID.",
+        route:
+          "Order online through the state, by mail to Vital Records, or in person at most local health departments.",
+        detail: "The state holds birth records from 1905 to the present.",
+        sourceChecked: "11/28/2026",
+        extra: [],
+      },
+      death: {
+        url: "https://vitalrecords.utah.gov/death",
+        authority: "Utah Office of Vital Records and Statistics",
+        record:
+          "Request a certified Utah death certificate from the state or a local health department.",
+        access:
+          "Check that you have a direct, tangible and legitimate interest, such as immediate family or a legal representative.",
+        route:
+          "Order online through the state, by mail to Vital Records, or in person at most local health departments.",
+        detail: "The state holds records of Utah deaths from 1905 to the present.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Utah Vital Records: how to order a certificate",
+            "https://vitalrecords.utah.gov/certificates/order-a-vital-record-certificate",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://vitalrecords.utah.gov/certificates/order-a-vital-record-certificate",
+        authority: "Utah Office of Vital Records and Statistics or the county clerk",
+        record:
+          "Request a marriage certificate from the state for 1978 to 2010, otherwise from the county clerk.",
+        access:
+          "Check the state’s eligibility and proof of relationship rules, or ask the county clerk about its requirements.",
+        route:
+          "Contact the county clerk where the marriage occurred for marriages before 1978 or after 2010.",
+        detail: "The state holds marriage records only from 1978 to 2010.",
+        sourceChecked: "11/28/2026",
+        extra: [],
+      },
+      divorce: {
+        url: "https://www.utcourts.gov/en/self-help/case-categories/family/divorce.html",
+        authority:
+          "District court that handled the case; Utah Vital Records for a limited range of years",
+        record:
+          "Request a certified copy of the decree from the court, or a state divorce certificate for the years the state holds.",
+        access:
+          "Ask the court clerk about copy requirements, or check the state’s eligibility and proof of relationship rules.",
+        route: "Contact the district court that finalized the divorce.",
+        detail:
+          "The state issues divorce certificates only for a limited range of years beginning in 1978; check its current range.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Utah Vital Records: how to order a certificate",
+            "https://vitalrecords.utah.gov/certificates/order-a-vital-record-certificate",
+          ],
+        ],
+      },
+    },
+  },
 } as const;

@@ -2,6 +2,10 @@
 
 Updated: 2026-10-22. This is the implementation checklist for the October 21 audit and its Search Console follow-up. `Merged` describes Git status, not proof of production rollout. Only a live deployment check closes a live-site issue.
 
+## Content batch 6: six states and two topic guides — November 28
+
+Next guide-less hubs by GSC impressions: South Carolina, Louisiana, South Dakota, Alaska, Arkansas, Utah. Topics: divorce decree copies (72 queries, 337 impressions) and replacing a lost birth certificate. Before release, manually confirm dph.sc.gov, ldh.la.gov and health.alaska.gov (blocked during research). A research agent reported a Utah Vital Records homepage notice that third-party vendors are not authorized to order records for someone else; not confirmed, but it may affect whether USVC should accept Utah orders (owner decision). After release, request indexing for the 26 new URLs.
+
 ## Content batch 4: six states and two topic guides — November 27
 
 Selection from GSC (90 days): guide-less hubs by impressions Idaho 279, Oregon 240, West Virginia 217, Iowa 207, Hawaii 162, North Dakota 152; topic demand “how to get a death certificate” (27 queries, ~200 impressions) and “apostille birth certificate” (~117). Added 24 state guides and 2 topic guides. Before release, manually confirm health.hawaii.gov (unreachable during research) for Hawaii eligibility and the reported 2026 divorce-record change. After release, request indexing for the 26 new URLs (GSC allows ~10 per day) and compare at +14/+28 days. Remaining from batch 3: request indexing for Oklahoma marriage/divorce, Nevada and Delaware guides.

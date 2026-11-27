@@ -99,6 +99,21 @@ export const BIRTH_GUIDE_SOURCES: Record<string, { state: string; url: string }>
   iowa: { state: "Iowa", url: "https://hhs.iowa.gov/family-community/vital-records" },
   hawaii: { state: "Hawaii", url: "https://vitrec.ehawaii.gov/vitalrecords/" },
   "north-dakota": { state: "North Dakota", url: "https://www.hhs.nd.gov/vital" },
+  "south-carolina": {
+    state: "South Carolina",
+    url: "https://www.cdc.gov/nchs/w2w/south_carolina.htm",
+  },
+  louisiana: { state: "Louisiana", url: "https://www.cdc.gov/nchs/w2w/louisiana.htm" },
+  "south-dakota": {
+    state: "South Dakota",
+    url: "https://doh.sd.gov/licensing-and-records/vital-records/",
+  },
+  alaska: { state: "Alaska", url: "https://www.cdc.gov/nchs/w2w/alaska.htm" },
+  arkansas: {
+    state: "Arkansas",
+    url: "https://healthy.arkansas.gov/programs-services/certificates-records/",
+  },
+  utah: { state: "Utah", url: "https://vitalrecords.utah.gov/" },
   california: {
     state: "California",
     url: "https://www.cdph.ca.gov/Programs/CHSI/Pages/Vital-Records-Obtaining-Certified-Copies-of-Birth-Records.aspx",
