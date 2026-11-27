@@ -2,6 +2,10 @@
 
 Updated: 2026-10-22. This is the implementation checklist for the October 21 audit and its Search Console follow-up. `Merged` describes Git status, not proof of production rollout. Only a live deployment check closes a live-site issue.
 
+## Content batch 4: six states and two topic guides — November 27
+
+Selection from GSC (90 days): guide-less hubs by impressions Idaho 279, Oregon 240, West Virginia 217, Iowa 207, Hawaii 162, North Dakota 152; topic demand “how to get a death certificate” (27 queries, ~200 impressions) and “apostille birth certificate” (~117). Added 24 state guides and 2 topic guides. Before release, manually confirm health.hawaii.gov (unreachable during research) for Hawaii eligibility and the reported 2026 divorce-record change. After release, request indexing for the 26 new URLs (GSC allows ~10 per day) and compare at +14/+28 days. Remaining from batch 3: request indexing for Oklahoma marriage/divorce, Nevada and Delaware guides.
+
 ## New state guides and topic guides — November 27
 
 Owner approved content expansion. GSC demand without a guide: “nebraska vital records” (127 impressions, `/state/nebraska` 417 impressions at ~27), Oklahoma/Nevada hubs (~140/126 impressions), “delaware birth certificate” (50). Topic demand: “death certificate cost” (50), “abstract birth certificate” (64), “duplicate marriage certificate” (70) and “certified copy of marriage certificate” (74). Added 16 state guides (NE, OK, NV, DE) and 3 topic guides. Before release, manually confirm the Nebraska DHHS and Delaware DHSS pages (unreachable during research). After release, request indexing for the 19 new URLs in GSC and compare impressions/position at +14 and +28 days.
