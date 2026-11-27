@@ -24,8 +24,8 @@ const STATIC_PATHS = [
 ];
 
 /**
- * Single-file sitemap at /sitemap.xml (P0 SEO). 186 indexable URLs:
- * 50 state hubs, 120 state guides, 5 topic guides, the guide directory and
+ * Single-file sitemap at /sitemap.xml (P0 SEO). 212 indexable URLs:
+ * 50 state hubs, 144 state guides, 7 topic guides, the guide directory and
  * 10 static pages.
  * Order pages are noindex, follow and deliberately excluded so crawl
  * priority stays on hubs and guides.

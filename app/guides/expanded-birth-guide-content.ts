@@ -18,6 +18,12 @@ const ADDITIONAL_BIRTH_STATES = [
   "iowa",
   "hawaii",
   "north-dakota",
+  "south-carolina",
+  "louisiana",
+  "south-dakota",
+  "alaska",
+  "arkansas",
+  "utah",
 ] as const;
 export function getAdditionalBirthGuideContent(state: string) {
   const slug = ADDITIONAL_BIRTH_STATES.find((candidate) => candidate === state);
