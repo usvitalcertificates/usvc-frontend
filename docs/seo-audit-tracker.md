@@ -2,6 +2,10 @@
 
 Updated: 2026-10-22. This is the implementation checklist for the October 21 audit and its Search Console follow-up. `Merged` describes Git status, not proof of production rollout. Only a live deployment check closes a live-site issue.
 
+## Content batch 7: seven jurisdictions and two topic guides — November 28
+
+Connecticut (91 hub impressions), Puerto Rico (79), New Mexico (74), Mississippi (61), New Hampshire (60), Rhode Island (46), Kansas (37). Topics: birth certificate correction/amendment (NY-heavy queries) and marriage license vs certificate (32 queries). Before release, manually confirm salud.pr.gov, sos.nh.gov, health.ri.gov, kdhe.ks.gov and nmhealth.org (blocked or non-.gov during research). After release, request indexing for the 30 new URLs. Seven low-demand jurisdictions remain without guides.
+
 ## Content batch 6: six states and two topic guides — November 28
 
 Next guide-less hubs by GSC impressions: South Carolina, Louisiana, South Dakota, Alaska, Arkansas, Utah. Topics: divorce decree copies (72 queries, 337 impressions) and replacing a lost birth certificate. Before release, manually confirm dph.sc.gov, ldh.la.gov and health.alaska.gov (blocked during research). A research agent reported a Utah Vital Records homepage notice that third-party vendors are not authorized to order records for someone else; not confirmed, but it may affect whether USVC should accept Utah orders (owner decision). After release, request indexing for the 26 new URLs.

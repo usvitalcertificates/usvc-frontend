@@ -118,8 +118,8 @@ try {
   assert.match(sitemapResponse.headers.get("content-type"), /xml/);
   const xml = await sitemapResponse.text();
   const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(([, url]) => decode(url));
-  assert.equal(urls.length, 212);
-  assert.equal(new Set(urls).size, 212);
+  assert.equal(urls.length, 242);
+  assert.equal(new Set(urls).size, 242);
   assert(urls.every((url) => new URL(url).origin === site));
   assert(urls.includes(`${site}/guides`));
   assert(
@@ -203,7 +203,7 @@ try {
     const match = new URL(url).pathname.match(/^\/guides\/([^/]+)\/birth-certificate$/);
     return match ? [match[1]] : [];
   });
-  assert.equal(guideStates.length, 36);
+  assert.equal(guideStates.length, 43);
   const guideIndexUrl = `${site}/guides`;
   const guideIndex = renderedPages.get(guideIndexUrl);
   assert(guideIndex, "Guide directory must be in the sitemap");
@@ -214,8 +214,8 @@ try {
         /href="\/guides\/[^"/]+\/(?:birth|death|marriage|divorce)-certificate"/g,
       ) || []
     ).length,
-    144,
-    "Guide directory must link all 144 guides",
+    172,
+    "Guide directory must link all 172 guides",
   );
   for (const type of ["birth", "death", "marriage", "divorce"]) {
     assert(guideIndexMain.includes(`id="${type}-guides"`), `${type}: missing footer destination`);
@@ -256,9 +256,10 @@ try {
           "abstract-birth-certificate",
           "apostille-birth-certificate",
           "replace-birth-certificate",
+          "birth-certificate-correction",
         ],
         death: ["how-to-get-death-certificate", "death-certificate-cost"],
-        marriage: ["replace-marriage-certificate"],
+        marriage: ["replace-marriage-certificate", "marriage-license-vs-certificate"],
         divorce: ["copy-of-divorce-decree"],
       }[type] ?? [];
     for (const slug of relatedTopics)
@@ -348,7 +349,7 @@ try {
   assertNoEmDash(llms, "/llms.txt");
   assert(llms.startsWith("# US Vital Certificates (USVC)\n"));
   assert(llms.includes("not a government agency"));
-  assert.equal((llms.match(/\/guides\//g) || []).length, 151);
+  assert.equal((llms.match(/\/guides\//g) || []).length, 181);
   const links = [...llms.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((m) => m[1]);
   assert(links.length > 13);
   for (const link of links) {

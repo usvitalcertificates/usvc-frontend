@@ -873,6 +873,240 @@ export const TOPIC_GUIDES: Record<string, TopicGuide> = {
       { label: "Apostille for a birth certificate", href: "/guides/apostille-birth-certificate" },
     ],
   },
+  "birth-certificate-correction": {
+    slug: "birth-certificate-correction",
+    metaTitle: "How to Correct or Amend a Birth Certificate",
+    metaDescription:
+      "How to correct an error or amend a birth certificate after a legal name change, including New York State vs New York City rules.",
+    h1: "How to Correct or Amend a Birth Certificate",
+    subtitle:
+      "Fix a recording error or update a birth record after a court order, through the office where the birth was registered.",
+    breadcrumb: "Correct a birth certificate",
+    intro: [
+      "Changes to a birth certificate are made by the vital records office of the state where the birth was registered, or New York City’s Health Department for births in the five boroughs. A local clerk or the state where you live now usually cannot change it.",
+      "States distinguish between a correction, which fixes an error made when the record was filed, and an amendment, which reflects a later change such as a court-ordered name change, adoption or parentage. Each needs its own application and supporting documents.",
+    ],
+    quickFacts: [
+      {
+        label: "Who makes the change",
+        value: "The vital records office where the birth was registered",
+      },
+      { label: "Correction", value: "Fixes an error made when the record was filed" },
+      { label: "Amendment", value: "Reflects a later change, such as a court-ordered name change" },
+      {
+        label: "Evidence",
+        value: "Original or certified documents; photocopies are usually refused",
+      },
+      {
+        label: "Best first step",
+        value: "Find the exact correction or amendment form for your birth state",
+      },
+    ],
+    sections: [
+      {
+        id: "steps",
+        heading: "Steps to correct a birth certificate",
+        bullets: [
+          "Identify where the birth was registered: the state, or New York City for births in the five boroughs.",
+          "Decide whether you need a correction of an original error or an amendment for a later change.",
+          "Get that office’s application form and its list of required supporting documents.",
+          "Gather original or certified documents that prove the correct information; for a name change, a certified court order.",
+          "Submit the application with photo ID, then order new certified copies once the change is recorded.",
+        ],
+      },
+      {
+        id: "recent-births",
+        heading: "Errors found soon after birth",
+        paragraphs: [
+          "For a birth in the last year, New York State and New York City both say the fastest route may be through the hospital where the child was born. Other states have similar early-correction processes, so check with the birth state.",
+        ],
+      },
+      {
+        id: "name-change",
+        heading: "Legal name changes",
+        paragraphs: [
+          "Changing a name on a birth certificate generally requires a certified court order for the name change. A name change by marriage does not change the birth certificate in New York State; you use the marriage record instead.",
+        ],
+      },
+      {
+        id: "new-york",
+        heading: "New York State vs New York City",
+        paragraphs: [
+          "New York City’s Health Department handles birth records for the Bronx, Brooklyn, Manhattan, Queens and Staten Island. The New York State Department of Health handles births elsewhere in the state and cannot change New York City records. Local registrars in New York cannot amend birth certificates.",
+        ],
+        links: [
+          { label: "New York birth certificate guide", href: "/guides/new-york/birth-certificate" },
+          { label: "Texas birth certificate guide", href: "/guides/texas/birth-certificate" },
+          { label: "All state certificate guides", href: "/guides" },
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "Who can correct my birth certificate?",
+        answer:
+          "Only the vital records office where the birth was registered, such as the state health department or, for births in the five boroughs, the New York City Health Department.",
+      },
+      {
+        question: "What is the difference between a correction and an amendment?",
+        answer:
+          "A correction fixes an error made when the record was filed. An amendment reflects a later change, such as a court-ordered name change, an adoption or a parentage order.",
+      },
+      {
+        question: "Do I need a court order to change my name on my birth certificate?",
+        answer:
+          "Usually, yes. States such as New York and Texas require a certified copy of the court order for a legal name change.",
+      },
+      {
+        question: "Can I send photocopies of my documents?",
+        answer:
+          "Generally no. Offices such as New York State and New York City require original documents or certified copies and refuse photocopies and notarized copies.",
+      },
+      {
+        question: "Can USVC correct my birth certificate?",
+        answer:
+          "No. Corrections and amendments are decided by the vital records office. USVC can help you request new certified copies after the change is recorded.",
+      },
+    ],
+    sources: [
+      CDC_W2W,
+      {
+        label: "New York State DOH: corrections and amendments",
+        href: "https://www.health.ny.gov/vital_records/amend_corr.htm",
+      },
+      {
+        label: "New York State DOH: amending a birth certificate",
+        href: "https://www.health.ny.gov/vital_records/amend_birth.htm",
+      },
+      {
+        label: "NYC Health: birth certificate corrections",
+        href: "https://www.nyc.gov/site/doh/services/birth-death-records-corrections-birth.page",
+      },
+      {
+        label: "Texas DSHS: supporting documentation for record changes",
+        href: "https://www.dshs.texas.gov/vital-statistics/requirements-requesting-changing-vital-records/supporting-documentation-record-changes",
+      },
+    ],
+    sourceChecked: "11/28/2026",
+    related: [
+      {
+        label: "How to replace a lost birth certificate",
+        href: "/guides/replace-birth-certificate",
+      },
+      {
+        label: "Abstract vs certified birth certificate",
+        href: "/guides/abstract-birth-certificate",
+      },
+    ],
+  },
+  "marriage-license-vs-certificate": {
+    slug: "marriage-license-vs-certificate",
+    metaTitle: "Marriage License vs Marriage Certificate",
+    metaDescription:
+      "The difference between a marriage license and a marriage certificate, and how to get a certified copy of your recorded marriage.",
+    h1: "Marriage License vs Marriage Certificate",
+    subtitle:
+      "A license lets you marry; the recorded certificate proves you did. Here is how to get the copy you need.",
+    breadcrumb: "Marriage license vs certificate",
+    intro: [
+      "A marriage license is the permission to marry, issued before the ceremony. After the ceremony, the officiant returns the completed license to be recorded, and that recorded marriage is what proves you are married.",
+      "For legal purposes, such as a name change or benefits, you usually need a certified copy of the recorded marriage. It is not sent automatically in every state; you may need to request it after the license is registered.",
+    ],
+    quickFacts: [
+      { label: "Marriage license", value: "Permission to marry, issued before the ceremony" },
+      {
+        label: "Marriage certificate",
+        value: "Proof that the marriage took place and was recorded",
+      },
+      { label: "Licenses expire", value: "Commonly within 30 days to a year if unused" },
+      {
+        label: "Where to get copies",
+        value: "The office that issued the license, and in many states the state office",
+      },
+      {
+        label: "Have ready",
+        value: "Names at marriage, date, and the city or county of the license",
+      },
+    ],
+    sections: [
+      {
+        id: "difference",
+        heading: "What each document does",
+        bullets: [
+          "The license authorizes the marriage and is valid only for a limited time and, often, only in the issuing state.",
+          "After the ceremony, the completed license is returned and registered by the issuing office.",
+          "A certified copy of the registered marriage is what agencies accept as proof of marriage.",
+        ],
+      },
+      {
+        id: "where-to-get",
+        heading: "Where to get a certified copy",
+        paragraphs: [
+          "Copies come from the office that issued the license, such as a county or city clerk. In many states the state vital records office also keeps marriage records. Some states, such as Texas, issue certified copies only through the county clerk, while New York City marriages are handled by the Office of the City Clerk rather than the state.",
+        ],
+        links: [
+          {
+            label: "New York marriage certificate guide",
+            href: "/guides/new-york/marriage-certificate",
+          },
+          { label: "Texas marriage certificate guide", href: "/guides/texas/marriage-certificate" },
+          { label: "All state certificate guides", href: "/guides" },
+        ],
+      },
+      {
+        id: "what-you-need",
+        heading: "What to have ready",
+        paragraphs: [
+          "Have both names as recorded on the license, including birth names, the date of marriage, the city or county where the license was issued, and a valid photo ID. Some offices limit recent records to the spouses or people with their authorization.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "Is a marriage license the same as a marriage certificate?",
+        answer:
+          "No. A marriage license legally allows you to marry. A marriage certificate, or certified copy of the recorded marriage, proves you got married.",
+      },
+      {
+        question: "Does a marriage license expire?",
+        answer:
+          "Yes. Most licenses expire within 30 days to a year depending on the state. New York State licenses, for example, are valid for 60 days.",
+      },
+      {
+        question: "Where do I get a copy of my marriage certificate?",
+        answer:
+          "From the office that issued your license, or in many states the state vital records office. Contact the state where you were married, not where you live now.",
+      },
+      {
+        question: "Can USVC help me get a marriage certificate?",
+        answer:
+          "Yes, in states where we accept marriage certificate requests. USVC is an independent service, not a government agency. You can also apply directly with the official office.",
+      },
+    ],
+    sources: [
+      { label: "USA.gov: marriage certificates", href: "https://www.usa.gov/marriage-certificate" },
+      {
+        label: "New York State DOH: getting married in New York",
+        href: "https://www.health.ny.gov/publications/4210/",
+      },
+      {
+        label: "Texas DSHS: marriage and divorce FAQs",
+        href: "https://www.dshs.texas.gov/vital-statistics/frequently-asked-questions/marriage-divorce-faqs",
+      },
+      {
+        label: "Sonoma County: marriage certificates",
+        href: "https://sonomacounty.gov/administrative-support-and-fiscal-services/clerk-recorder-assessor/clerk-recorder/vital-records/marriage-certificates",
+      },
+    ],
+    sourceChecked: "11/28/2026",
+    related: [
+      {
+        label: "How to replace a lost marriage certificate",
+        href: "/guides/replace-marriage-certificate",
+      },
+      { label: "How to get a copy of a divorce decree", href: "/guides/copy-of-divorce-decree" },
+    ],
+  },
 };
 
 export const TOPIC_GUIDE_SLUGS = Object.keys(TOPIC_GUIDES);
