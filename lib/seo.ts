@@ -80,6 +80,13 @@ export const BIRTH_GUIDE_SOURCES: Record<string, { state: string; url: string }>
   },
   maryland: { state: "Maryland", url: "https://health.maryland.gov/vsa/Pages/birth.aspx" },
   colorado: { state: "Colorado", url: "https://www.cdc.gov/nchs/w2w/colorado.htm" },
+  nevada: { state: "Nevada", url: "https://www.dpbh.nv.gov/Programs/VitalRecords/" },
+  oklahoma: {
+    state: "Oklahoma",
+    url: "https://oklahoma.gov/health/services/birth-and-death-certificates.html",
+  },
+  delaware: { state: "Delaware", url: "https://delaware.gov/guides/certificates/" },
+  nebraska: { state: "Nebraska", url: "https://dhhs.ne.gov/Pages/vital-records.aspx" },
   california: {
     state: "California",
     url: "https://www.cdph.ca.gov/Programs/CHSI/Pages/Vital-Records-Obtaining-Certified-Copies-of-Birth-Records.aspx",
@@ -210,12 +217,13 @@ export function titleCase(value: string) {
  * `<lastmod>` churn daily, so Google ignores it for recrawl priority.
  * Update these only when that section's content actually changes.
  */
-// All four public page groups received the social metadata update on this date.
-// These describe page modifications, not the date official sources were checked.
+// Static pages: social metadata update (2026-10-27). State hubs and guides:
+// search title/description rewrite (2026-11-27). These describe page modifications, not the date official sources were checked.
 export const SITEMAP_STATIC_LAST_MODIFIED = "2026-10-27";
-export const SITEMAP_STATES_LAST_MODIFIED = "2026-10-27";
+export const SITEMAP_STATES_LAST_MODIFIED = "2026-11-27";
 export const SITEMAP_ORDERS_LAST_MODIFIED = "2026-10-21";
-export const SITEMAP_GUIDES_LAST_MODIFIED = "2026-10-27";
+export const SITEMAP_GUIDES_LAST_MODIFIED = "2026-11-27";
+export const SITEMAP_TOPICS_LAST_MODIFIED = "2026-11-27";
 
 /**
  * P1 SEO: cert-type content slots so the 200 order pages and 50 state

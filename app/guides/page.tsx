@@ -2,12 +2,13 @@ import { GUIDE_INVENTORY, GUIDE_CERTIFICATES } from "@/lib/guide-inventory";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SeoJsonLd } from "@/app/seo-json-ld";
+import { TOPIC_GUIDES } from "./topic-guides";
 import { PageHeader } from "@/app/usvc-ui";
 import { assertSeoLength, BIRTH_GUIDE_SOURCES, SITE_URL, socialMetadata } from "@/lib/seo";
 
 const title = "Vital Record Guides by State and Certificate Type";
-const description =
-  "Birth, death, marriage and divorce guides for 20 states. Find the right record, official office, request steps and source links.";
+const stateCount = Object.keys(BIRTH_GUIDE_SOURCES).length;
+const description = `Birth, death, marriage and divorce guides for ${stateCount} states. Find the right record, official office, request steps and source links.`;
 
 export const metadata: Metadata = {
   title: assertSeoLength("title", title),
@@ -49,7 +50,7 @@ export default function GuidesIndex() {
       <PageHeader
         eyebrow="Official-resource guides"
         title={title}
-        subtitle="Explore 80 guides covering birth, death, marriage and divorce records in the same 20 states."
+        subtitle={`Explore ${GUIDE_INVENTORY.length} guides covering birth, death, marriage and divorce records in ${stateCount} states.`}
       />
       <section className="page-section">
         <div className="container">
@@ -79,6 +80,18 @@ export default function GuidesIndex() {
               </article>
             ))}
           </div>
+          <section className="guide-section" id="common-questions">
+            <h2>Common vital-record questions</h2>
+            <ul className="guide-link-list">
+              {Object.values(TOPIC_GUIDES).map((topic) => (
+                <li key={topic.slug}>
+                  <Link className="guide-link" href={`/guides/${topic.slug}`}>
+                    {topic.h1}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
           <p className="state-help">
             Need a different record type?{" "}
             <Link className="howto-link" href="/certificates">

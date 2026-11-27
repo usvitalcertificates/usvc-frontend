@@ -18,9 +18,9 @@ const IL_RECORDS_HOME_URL =
 
 export const ILLINOIS_GUIDE: BirthGuideContent = {
   stateName: "Illinois",
-  metaTitle: "Illinois Birth Certificate Guide: Eligibility and ID",
+  metaTitle: "Illinois Birth Certificate: How to Get a Copy",
   metaDescription:
-    "How Illinois birth certificate requests work: who may order, photo ID or alternatives, county clerks, state mail filing, corrections, and USVC help.",
+    "How to get an Illinois birth certificate: who may order, photo ID or alternatives, county clerk or state requests, corrections, and USVC help.",
   subtitle:
     "Confirm that you are entitled to an Illinois birth record, choose the right certified copy, and prepare identification for the state or county process.",
   intro: [

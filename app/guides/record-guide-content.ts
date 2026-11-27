@@ -31,7 +31,24 @@ type GuideRecord = {
   route: string;
   detail: string;
   extra: readonly (readonly [string, string])[];
+  /** Defaults to the October 27 research batch. */
+  sourceChecked?: string;
 };
+/** Search-snippet copy: leads with the "how to get a copy" intent searchers use. */
+function guideMetaDescription(
+  name: string,
+  kind: "birth" | "death" | "marriage" | "divorce",
+): string {
+  const article = /^[AEIOU]/.test(name) ? "an" : "a";
+  if (kind === "birth")
+    return `How to get ${article} ${name} birth certificate: which office holds it, who may order, ID to prepare, certified copy types, and USVC help.`;
+  if (kind === "death")
+    return `How to get ${article} ${name} death certificate: who may order, which office holds it, what to prepare, certified copies, and USVC help.`;
+  if (kind === "marriage")
+    return `How to get a certified copy of ${article} ${name} marriage certificate: county vs state records, what to prepare, and USVC help.`;
+  return `How to get ${article} ${name} divorce certificate or decree: which office holds it, who may order, what to prepare, and USVC help.`;
+}
+
 export function buildGuideContent(
   state: string,
   name: string,
@@ -75,8 +92,8 @@ export function buildGuideContent(
           : "A divorce certificate or verification generally describes the event. A decree or final judgment is the court document containing the decision and, where applicable, its terms. If an organization asks for the judgment, do not substitute an index result or a brief certificate without first checking with that organization.";
   return {
     stateName: name,
-    metaTitle: `${name} ${title} Certificate: How to Request a Copy`,
-    metaDescription: `Find the right ${name} ${kind} record: official offices, copy types, eligibility checks, request steps, corrections, and sources.`,
+    metaTitle: `${name} ${title} Certificate: How to Get a Copy`,
+    metaDescription: guideMetaDescription(name, kind),
     subtitle: `Find the right ${name} record office, choose the document you need, and prepare a complete ${kind}-record request.`,
     intro: [
       `${record.route} ${record.record}`,
@@ -264,7 +281,7 @@ export function buildGuideContent(
       },
     ],
     sources: [source, ...extras],
-    sourceChecked: "10/27/2026",
+    sourceChecked: record.sourceChecked ?? "10/27/2026",
     ctaLabel: kind === "birth" ? `Start Your ${name} Request` : `Ask About Your ${name} Request`,
     ctaNote:
       "Confirm the record type and service before ordering. Agency and shipping charges are separate from any USVC processing fee.",

@@ -19,9 +19,9 @@ const WA_SOS_URL =
 
 export const WASHINGTON_GUIDE: BirthGuideContent = {
   stateName: "Washington",
-  metaTitle: "Washington Birth Certificate Guide: Eligibility and ID",
+  metaTitle: "Washington Birth Certificate: How to Get a Copy",
   metaDescription:
-    "How Washington birth certificate requests work: who may order, relationship proof, ID, online, mail, county, corrections, USVC help.",
+    "How to get a Washington birth certificate: who may order, relationship proof, ID, online, mail or county requests, corrections, USVC help.",
   subtitle:
     "Confirm who may receive a Washington birth record, prepare identity and relationship documents, and choose the state or local filing path.",
   intro: [

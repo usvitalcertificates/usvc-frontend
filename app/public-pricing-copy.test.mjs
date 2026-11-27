@@ -19,11 +19,22 @@ const publicCopy = [
   "app/faq/faq-data.ts",
   "app/page.tsx",
   "app/find-your-state/page.tsx",
+  "app/guides/topic-guides.ts",
+  "app/guides/topic-page.tsx",
+  "app/guides/record-guide-content.ts",
+  "app/guides/record-guide-data.ts",
+  "app/guides/page.tsx",
 ];
 
 test("public marketing copy does not publish USVC prices", () => {
   for (const file of publicCopy) {
     assert.doesNotMatch(read(file), PRICE, `${file} must not contain a public price`);
+    // Computed prices bypass the literal check, so public copy may not use the price helpers.
+    assert.doesNotMatch(
+      read(file),
+      /FIRST_COPY_CENTS|ADDITIONAL_COPY_CENTS|copyPricing\(|copyMoney/,
+      `${file} must not render prices`,
+    );
   }
 });
 

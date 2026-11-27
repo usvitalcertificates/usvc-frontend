@@ -1,5 +1,6 @@
 import { GUIDE_INVENTORY } from "@/lib/guide-inventory";
 import { SITE_URL } from "@/lib/seo";
+import { TOPIC_GUIDES } from "../guides/topic-guides";
 
 export const dynamic = "force-static";
 
@@ -9,6 +10,9 @@ export function GET() {
     (guide) =>
       `- [${guide.stateName} ${guide.type}-certificate guide](${SITE_URL}${guide.path}): Official record offices, document choices and request preparation.`,
   ).join("\n");
+  const topics = Object.values(TOPIC_GUIDES)
+    .map((topic) => `- [${topic.h1}](${SITE_URL}/guides/${topic.slug}): ${topic.metaDescription}`)
+    .join("\n");
   const text = `# US Vital Certificates (USVC)
 
 > USVC is an independent application assistance service for US birth, death, marriage and divorce certificate requests. It is not a government agency and is not affiliated with or endorsed by a federal or state office.
@@ -30,6 +34,10 @@ USVC provides guided online requests, application review and processing support.
 - [All certificate guides](${SITE_URL}/guides): Directory of state guides with links to official issuing agencies.
 
 ${guides}
+
+## Common vital-record questions
+
+${topics}
 
 ## Policies
 
