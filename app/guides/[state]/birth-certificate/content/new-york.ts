@@ -12,9 +12,9 @@ const NEW_YORK_VITAL_RECORDS_URL = "https://www.health.ny.gov/vital_records/";
 
 export const NEW_YORK_GUIDE: BirthGuideContent = {
   stateName: "New York",
-  metaTitle: "New York Birth Certificate Guide: State vs. NYC",
+  metaTitle: "New York & NYC Birth Certificate: How to Get a Copy",
   metaDescription:
-    "How New York birth certificate requests work: state vs New York City records, who may order, identification, filing options, and USVC help.",
+    "How to get a New York State or NYC birth certificate: which office holds the record, who may order, ID needed, filing options, and USVC help.",
   subtitle:
     "Find out whether the state or New York City holds the record, confirm who may order it, and prepare the identification the agency requires.",
   intro: [

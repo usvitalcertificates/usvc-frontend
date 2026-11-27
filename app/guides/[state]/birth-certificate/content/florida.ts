@@ -17,9 +17,9 @@ const STATE_DEPT_BIRTH_URL =
 
 export const FLORIDA_GUIDE: BirthGuideContent = {
   stateName: "Florida",
-  metaTitle: "Florida Birth Certificate Guide: Eligibility and Ordering",
+  metaTitle: "Florida Birth Certificate: How to Get a Copy",
   metaDescription:
-    "How Florida birth certificate requests work: who may order, photo ID, state or county filing, certificate types, corrections, and USVC help.",
+    "How to get a Florida birth certificate: who may order, photo ID, state or county offices, certificate types, corrections, and how USVC can help.",
   subtitle:
     "Confirm your eligibility, choose the right Florida certificate type, prepare photo identification, and use the official state and county resources.",
   intro: [

@@ -15,9 +15,9 @@ const TEXAS_FEES_URL = "https://www.dshs.texas.gov/vital-statistics/costs-fees";
 
 export const TEXAS_GUIDE: BirthGuideContent = {
   stateName: "Texas",
-  metaTitle: "Texas Birth Certificate Guide: Forms, ID, and Steps",
+  metaTitle: "Texas Birth Certificate: Long or Short Form Copy",
   metaDescription:
-    "How Texas birth certificate requests work: long and short forms, who may order, acceptable ID, state or local filing, corrections, and USVC help.",
+    "How to get a Texas birth certificate: long vs short form, who may order, acceptable ID, state or local offices, corrections, and USVC help.",
   subtitle:
     "Choose the right Texas record type, confirm who may order it, prepare acceptable identification, and use the official DSHS resources.",
   intro: [

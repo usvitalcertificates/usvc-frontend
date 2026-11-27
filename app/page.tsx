@@ -18,6 +18,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { TOPIC_GUIDES } from "./guides/topic-guides";
+import { SeoJsonLd, websiteLd } from "./seo-json-ld";
 import { StateSelector } from "./state-selector";
 import { BIRTH_GUIDE_SOURCES, SITE_URL } from "@/lib/seo";
 
@@ -123,6 +125,7 @@ function SectionHeading({
 export default function Home() {
   return (
     <main>
+      <SeoJsonLd value={websiteLd} />
       <section className="hero-background">
         <Image
           className="hero-bg-image"
@@ -264,6 +267,17 @@ export default function Home() {
                 </span>
               ))}
               .
+            </p>
+            <p className="state-help">
+              Common questions:{" "}
+              {Object.values(TOPIC_GUIDES).map((topic, index) => (
+                <span key={topic.slug}>
+                  {index > 0 ? ", " : null}
+                  <Link className="howto-link" href={`/guides/${topic.slug}`}>
+                    {topic.h1}
+                  </Link>
+                </span>
+              ))}
             </p>
           </div>
         </div>
