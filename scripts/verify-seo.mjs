@@ -118,8 +118,8 @@ try {
   assert.match(sitemapResponse.headers.get("content-type"), /xml/);
   const xml = await sitemapResponse.text();
   const urls = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(([, url]) => decode(url));
-  assert.equal(urls.length, 160);
-  assert.equal(new Set(urls).size, 160);
+  assert.equal(urls.length, 186);
+  assert.equal(new Set(urls).size, 186);
   assert(urls.every((url) => new URL(url).origin === site));
   assert(urls.includes(`${site}/guides`));
   assert(
@@ -203,7 +203,7 @@ try {
     const match = new URL(url).pathname.match(/^\/guides\/([^/]+)\/birth-certificate$/);
     return match ? [match[1]] : [];
   });
-  assert.equal(guideStates.length, 24);
+  assert.equal(guideStates.length, 30);
   const guideIndexUrl = `${site}/guides`;
   const guideIndex = renderedPages.get(guideIndexUrl);
   assert(guideIndex, "Guide directory must be in the sitemap");
@@ -214,8 +214,8 @@ try {
         /href="\/guides\/[^"/]+\/(?:birth|death|marriage|divorce)-certificate"/g,
       ) || []
     ).length,
-    96,
-    "Guide directory must link all 96 guides",
+    120,
+    "Guide directory must link all 120 guides",
   );
   for (const type of ["birth", "death", "marriage", "divorce"]) {
     assert(guideIndexMain.includes(`id="${type}-guides"`), `${type}: missing footer destination`);
@@ -254,7 +254,7 @@ try {
     ))
       assert(html.includes(`href="/guides/${state}/${sibling}-certificate"`), url);
     if (type !== "birth") {
-      // October 27 research batch, or the November 27 batch (NE, NV, OK, DE).
+      // October 27 research batch, or the November 27 batches (NE, NV, OK, DE, ID, OR, WV, IA, HI, ND).
       assert(html.includes("10/27/2026") || html.includes("11/27/2026"), url);
       assert(!html.includes("Source unavailable"), url);
     }
@@ -331,7 +331,7 @@ try {
   assertNoEmDash(llms, "/llms.txt");
   assert(llms.startsWith("# US Vital Certificates (USVC)\n"));
   assert(llms.includes("not a government agency"));
-  assert.equal((llms.match(/\/guides\//g) || []).length, 99);
+  assert.equal((llms.match(/\/guides\//g) || []).length, 125);
   const links = [...llms.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((m) => m[1]);
   assert(links.length > 13);
   for (const link of links) {

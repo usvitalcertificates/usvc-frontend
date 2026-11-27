@@ -93,8 +93,11 @@ test("SEO inventory contains canonical application and pilot guide coverage", ()
     "delaware",
     "florida",
     "georgia",
+    "hawaii",
+    "idaho",
     "illinois",
     "indiana",
+    "iowa",
     "maryland",
     "massachusetts",
     "michigan",
@@ -104,13 +107,16 @@ test("SEO inventory contains canonical application and pilot guide coverage", ()
     "new-jersey",
     "new-york",
     "north-carolina",
+    "north-dakota",
     "ohio",
     "oklahoma",
+    "oregon",
     "pennsylvania",
     "tennessee",
     "texas",
     "virginia",
     "washington",
+    "west-virginia",
   ]);
   for (const guide of Object.values(BIRTH_GUIDE_SOURCES)) assert.match(guide.url, /^https:\/\//);
 });

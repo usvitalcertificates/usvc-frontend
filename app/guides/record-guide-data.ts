@@ -1370,4 +1370,434 @@ export const RECORD_GUIDE_DATA = {
       },
     },
   },
+  idaho: {
+    name: "Idaho",
+    records: {
+      birth: {
+        url: "https://healthandwelfare.idaho.gov/services-programs/birth-marriage-death-records/ordering-birth-certificate",
+        authority:
+          "Idaho Bureau of Vital Records and Health Statistics, Department of Health and Welfare",
+        record: "Request a certified copy of the birth certificate filed with the state.",
+        access:
+          "Check that you have a direct and tangible interest in the record and include a copy of acceptable photo ID showing your signature and expiration date.",
+        route:
+          "Send the request to the state vital records bureau online or by mail; it does not take birth orders in person.",
+        detail: "The state holds birth certificates filed from July 1911 to the present.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "Idaho DHW: about birth records",
+            "https://healthandwelfare.idaho.gov/services-programs/birth-marriage-death-records/about-birth-records",
+          ],
+          ["CDC: Idaho record offices", "https://www.cdc.gov/nchs/w2w/idaho.htm"],
+        ],
+      },
+      death: {
+        url: "https://healthandwelfare.idaho.gov/services-programs/birth-marriage-death-records/ordering-death-stillbirth-and-miscarriage",
+        authority:
+          "Idaho Bureau of Vital Records and Health Statistics, Department of Health and Welfare",
+        record: "Request a certified copy of the death certificate filed with the state.",
+        access:
+          "Check that you are immediate family or a legal representative and include a copy of acceptable photo ID.",
+        route: "Send the request to the state vital records bureau online or by mail.",
+        detail:
+          "The state holds death certificates filed since July 1911, and they stay confidential for 50 years.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "Idaho DHW: about death records",
+            "https://healthandwelfare.idaho.gov/services-programs/birth-marriage-death-records/about-death-stillbirth-and-miscarriage-records",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://healthandwelfare.idaho.gov/services-programs/birth-marriage-death-records/ordering-marriage-and-divorce-certficiate",
+        authority:
+          "Idaho Bureau of Vital Records and Health Statistics, Department of Health and Welfare",
+        record: "Request a certified copy of the marriage certificate filed after the ceremony.",
+        access:
+          "Check that you are immediate family or a legal representative and include a copy of acceptable photo ID.",
+        route:
+          "Order from the state vital records bureau, or ask the County Recorder where the license was issued about older records.",
+        detail: "The state issues marriage certificates filed from May 1947 to the present.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "Idaho DHW: about marriage and divorce records",
+            "https://healthandwelfare.idaho.gov/services-programs/birth-marriage-death-records/about-marriage-and-divorce-records",
+          ],
+          ["CDC: Idaho record offices", "https://www.cdc.gov/nchs/w2w/idaho.htm"],
+        ],
+      },
+      divorce: {
+        url: "https://healthandwelfare.idaho.gov/services-programs/birth-marriage-death-records/about-marriage-and-divorce-records",
+        authority:
+          "Idaho Bureau of Vital Records and Health Statistics for certificates; the county where the divorce was granted for the decree",
+        record:
+          "Decide whether you need the state divorce certificate or the full court decree; the certificate only shows that a divorce occurred.",
+        access:
+          "Check that you are immediate family or a legal representative and include a copy of acceptable photo ID.",
+        route:
+          "Order the certificate from the state bureau, and contact the county where the divorce was granted for the decree.",
+        detail: "The state issues divorce certificates filed from May 1947 to the present.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "Idaho DHW: ordering a marriage or divorce certificate",
+            "https://healthandwelfare.idaho.gov/services-programs/birth-marriage-death-records/ordering-marriage-and-divorce-certficiate",
+          ],
+        ],
+      },
+    },
+  },
+  oregon: {
+    name: "Oregon",
+    records: {
+      birth: {
+        url: "https://www.oregon.gov/oha/PH/BIRTHDEATHCERTIFICATES/Pages/OrderBirthCertificate.aspx",
+        authority: "Oregon Health Authority, Center for Health Statistics (Oregon Vital Records)",
+        record:
+          "Choose a short form computer-issued copy or a full image long form copy, which the state advises for apostille or use abroad.",
+        access:
+          "Check that you are an eligible relative or representative and have the required ID; birth records are restricted for 100 years.",
+        route:
+          "Order from Oregon Vital Records, or from the county vital records office if the birth was within the last six months.",
+        detail:
+          "Oregon Vital Records holds birth records from 1903, while older public records sit with the Oregon State Archives.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "Oregon Vital Records: eligibility",
+            "https://www.oregon.gov/oha/PH/BIRTHDEATHCERTIFICATES/Pages/Eligibility.aspx",
+          ],
+          [
+            "Oregon State Archives: vital records",
+            "https://sos.oregon.gov/archives/records/pages/aids-vitalrecords.aspx",
+          ],
+        ],
+      },
+      death: {
+        url: "https://www.oregon.gov/oha/PH/BIRTHDEATHCERTIFICATES/Pages/OrderDeathCertificate.aspx",
+        authority: "Oregon Health Authority, Center for Health Statistics (Oregon Vital Records)",
+        record:
+          "Choose a short form without cause of death or a long form with cause of death, depending on who will receive it.",
+        access:
+          "Check that you are an eligible relative, representative, funeral contact or property right holder and have acceptable unexpired ID.",
+        route:
+          "Order from Oregon Vital Records, or from the county vital records office if the death was within the last six months.",
+        detail:
+          "Long form copies cover deaths from 1903, and short form copies cover deaths from 1978.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "Oregon Vital Records: eligibility",
+            "https://www.oregon.gov/oha/PH/BIRTHDEATHCERTIFICATES/Pages/Eligibility.aspx",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://www.oregon.gov/oha/PH/BIRTHDEATHCERTIFICATES/Pages/OrderMarriageCertificate.aspx",
+        authority:
+          "Oregon Vital Records for certified certificates; County Clerk for county marriage records",
+        record:
+          "Request the state certified marriage certificate; a county commemorative certificate is not a legal document.",
+        access:
+          "Check that you are a named party, eligible relative or authorized representative and have acceptable unexpired ID.",
+        route:
+          "Order the official certificate from Oregon Vital Records, or contact the County Clerk where the license was issued for the county record.",
+        detail:
+          "Oregon restricts marriage records for 50 years; older public records are held by the Oregon State Archives.",
+        sourceChecked: "11/27/2026",
+        extra: [["CDC: Oregon record offices", "https://www.cdc.gov/nchs/w2w/oregon.htm"]],
+      },
+      divorce: {
+        url: "https://www.oregon.gov/oha/PH/BIRTHDEATHCERTIFICATES/Pages/OrderDivorceDissolutionofDomesticPartnership.aspx",
+        authority: "Oregon Vital Records for certificates; the county circuit court for decrees",
+        record:
+          "Decide whether you need the state dissolution certificate as proof of divorce or the full decree from the court.",
+        access:
+          "Check that you are a named party, eligible relative or authorized representative and have acceptable unexpired ID.",
+        route:
+          "Order the certificate from Oregon Vital Records, and request the decree from the circuit court in the county that granted the divorce.",
+        detail: "Oregon Vital Records holds divorce records from 1925.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "Oregon Judicial Department: find a court record",
+            "https://www.courts.oregon.gov/how/Pages/find.aspx",
+          ],
+          ["CDC: Oregon record offices", "https://www.cdc.gov/nchs/w2w/oregon.htm"],
+        ],
+      },
+    },
+  },
+  "west-virginia": {
+    name: "West Virginia",
+    records: {
+      birth: {
+        url: "https://dhhr.wv.gov/HSC/VR/CR/Pages/default.aspx",
+        authority: "West Virginia Vital Registration Office, Health Statistics Center",
+        record:
+          "Request a certified copy of the birth certificate from the state Vital Registration Office.",
+        access:
+          "Check the office’s current eligibility rules and provide an accepted photo ID or the listed alternative documents.",
+        route:
+          "Send the application with a copy of your ID to the Vital Registration Office in Charleston.",
+        detail: "The state holds births from 1917; check the county clerk for earlier births.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "West Virginia: certificate request forms",
+            "https://dhhr.wv.gov/HSC/forms/Pages/Certificate-Request-Forms.aspx",
+          ],
+          ["CDC: West Virginia record offices", "https://www.cdc.gov/nchs/w2w/west_virginia.htm"],
+        ],
+      },
+      death: {
+        url: "https://dhhr.wv.gov/HSC/VR/CR/Pages/default.aspx",
+        authority: "West Virginia Vital Registration Office, Health Statistics Center",
+        record:
+          "Request a certified copy of the death certificate from the state Vital Registration Office.",
+        access:
+          "Check the office’s current eligibility rules and provide an accepted photo ID or the listed alternative documents.",
+        route:
+          "Send the application to the Vital Registration Office, or to the county clerk for deaths before 1917.",
+        detail:
+          "The state holds deaths from January 1917 and fills orders even when the cause of death is pending.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "West Virginia: change to the certified death certificate process",
+            "https://health.wv.gov/article/west-virginia-department-health-announces-change-certified-death-certificate-process",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/west_virginia.htm",
+        authority: "West Virginia Vital Registration Office or the county clerk",
+        record:
+          "Request a certified copy of the marriage certificate from the state or the county that issued the license.",
+        access:
+          "Check the office’s current eligibility rules; third parties need a signed permission statement.",
+        route:
+          "Use the state office for marriages from 1964, or the county clerk where the license was issued.",
+        detail:
+          "The state issues certified marriage copies only from 1964, so earlier marriages go to the county.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "West Virginia: certificate request forms",
+            "https://dhhr.wv.gov/HSC/forms/Pages/Certificate-Request-Forms.aspx",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/west_virginia.htm",
+        authority: "Clerk of the Circuit Court in the county that granted the divorce",
+        record:
+          "Request a certified copy of the divorce decree; the state does not issue certified divorce copies.",
+        access:
+          "Ask the circuit clerk about access, identification and certification requirements.",
+        route:
+          "Contact the Clerk of the Circuit Court in the county where the divorce was granted.",
+        detail:
+          "The state office keeps only divorce indexes, while the decree stays with the circuit court.",
+        sourceChecked: "11/27/2026",
+        extra: [],
+      },
+    },
+  },
+  iowa: {
+    name: "Iowa",
+    records: {
+      birth: {
+        url: "https://hhs.iowa.gov/family-community/vital-records/how-request-certified-record",
+        authority: "Iowa HHS Bureau of Health Statistics, Vital Records",
+        record: "Request a certified copy of the birth record from Iowa HHS or a county recorder.",
+        access:
+          "Check that you have a direct and tangible interest and include a government photo ID with a notarized mail application.",
+        route:
+          "Send the request to Iowa HHS in Des Moines, or to a county recorder for births from 1986.",
+        detail:
+          "The state holds records from July 1, 1880, and county recorders issue births from 1986 onward.",
+        sourceChecked: "11/27/2026",
+        extra: [["CDC: Iowa record offices", "https://www.cdc.gov/nchs/w2w/iowa.htm"]],
+      },
+      death: {
+        url: "https://hhs.iowa.gov/family-community/vital-records/how-request-certified-record",
+        authority: "Iowa HHS Bureau of Health Statistics, Vital Records",
+        record: "Request a certified copy of the death record from Iowa HHS or a county recorder.",
+        access:
+          "Check the current entitlement rules and include a government photo ID with a notarized mail application.",
+        route: "Send the request to Iowa HHS, or to a county recorder for deaths from 1954.",
+        detail:
+          "For deaths before 1954, use the county of residence or the county where the death occurred.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "State Historical Society of Iowa: vital records",
+            "https://history.iowa.gov/vital-records",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://hhs.iowa.gov/family-community/vital-records/how-request-certified-record",
+        authority: "Iowa HHS Bureau of Health Statistics or the county recorder",
+        record:
+          "Request a certified copy of the marriage record from Iowa HHS or a county recorder.",
+        access:
+          "Check that you have a direct and tangible interest and include a government photo ID with a notarized mail application.",
+        route: "Send the request to Iowa HHS, or to a county recorder for marriages from 1954.",
+        detail:
+          "For marriages before 1954, use the county where the marriage application was made.",
+        sourceChecked: "11/27/2026",
+        extra: [],
+      },
+      divorce: {
+        url: "https://www.iowacourts.gov/for-the-public/public-records-requests",
+        authority: "Clerk of District Court in the county where the case was filed",
+        record:
+          "Request a certified copy of the dissolution of marriage decree from the district court clerk.",
+        access:
+          "Ask the clerk of court about access, identification and certification requirements.",
+        route: "Contact the clerk of court office in the county where the divorce case is on file.",
+        detail:
+          "District court case records are available through the clerk of court in the filing county.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          [
+            "State Historical Society of Iowa: vital records",
+            "https://history.iowa.gov/vital-records",
+          ],
+        ],
+      },
+    },
+  },
+  hawaii: {
+    name: "Hawaii",
+    records: {
+      birth: {
+        url: "https://vitrec.ehawaii.gov/vitalrecords/",
+        authority: "Hawaii State Department of Health, Office of Health Status Monitoring",
+        record:
+          "Request a certified copy of the birth certificate for a birth that occurred in Hawaii.",
+        access:
+          "Check that you qualify under state law; online orders are limited to your own record or an immediate family member’s.",
+        route:
+          "Order from the Department of Health through its online vital records ordering system, or by mail or in person.",
+        detail: "The online system covers birth certificates from July 1909 to the present.",
+        sourceChecked: "11/27/2026",
+        extra: [["CDC: Hawaii record offices", "https://www.cdc.gov/nchs/w2w/hawaii.htm"]],
+      },
+      death: {
+        url: "https://www.cdc.gov/nchs/w2w/hawaii.htm",
+        authority: "Hawaii State Department of Health, Vital Records Section",
+        record:
+          "Request a certified copy of the death certificate for a death that occurred in Hawaii.",
+        access:
+          "Check the office’s current eligibility and identification requirements before you apply.",
+        route:
+          "Send the request to the Department of Health Vital Records Section by mail or in person, not through the online portal.",
+        detail:
+          "The state’s online ordering system handles birth and marriage records, so death certificates follow the mail or in-person process.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          ["Hawaii vital records ordering: about", "https://vitrec.ehawaii.gov/vitalrecords/about"],
+        ],
+      },
+      marriage: {
+        url: "https://vitrec.ehawaii.gov/vitalrecords/",
+        authority: "Hawaii State Department of Health, Office of Health Status Monitoring",
+        record: "Request a certified copy of the marriage or civil union certificate.",
+        access:
+          "Check that you qualify under state law; online orders are limited to your own record or an immediate family member’s.",
+        route: "Order from the state Department of Health, not a county office.",
+        detail:
+          "The online system covers marriage and civil union certificates from July 1909 to the present.",
+        sourceChecked: "11/27/2026",
+        extra: [["CDC: Hawaii record offices", "https://www.cdc.gov/nchs/w2w/hawaii.htm"]],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/hawaii.htm",
+        authority:
+          "Hawaii State Judiciary, Family Court of the circuit where the divorce was granted",
+        record: "Request a certified copy of the divorce decree from the court that granted it.",
+        access: "Ask the court about access, identification and certification requirements.",
+        route: "Contact the court in the circuit where the divorce was granted.",
+        detail:
+          "Divorce copies follow the court process, rather than the state birth, death and marriage ordering system.",
+        sourceChecked: "11/27/2026",
+        extra: [],
+      },
+    },
+  },
+  "north-dakota": {
+    name: "North Dakota",
+    records: {
+      birth: {
+        url: "https://www.hhs.nd.gov/vital/birth",
+        authority: "North Dakota Department of Health and Human Services, Vital Records",
+        record:
+          "Request a certified copy of the birth record; the office does not issue uncertified copies.",
+        access:
+          "Check that you are the registrant aged 16 or older, a parent named on the record, or have a court order or authorization, and include an unexpired photo ID.",
+        route:
+          "Order from the state Vital Records office online, by mail, or by appointment in person.",
+        detail:
+          "The state holds birth records from 1870, though records from 1870 to 1920 are incomplete.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          ["North Dakota: birth records by mail", "https://www.hhs.nd.gov/vital/birthbymail"],
+          ["CDC: North Dakota record offices", "https://www.cdc.gov/nchs/w2w/north_dakota.htm"],
+        ],
+      },
+      death: {
+        url: "https://www.hhs.nd.gov/vital/death",
+        authority: "North Dakota Department of Health and Human Services, Vital Records",
+        record:
+          "Choose between a complete record with cause of death, a facts of death record, or an informational record.",
+        access:
+          "Check which record type you qualify for; complete records are limited to relatives, authorized representatives, funeral directors and court orders.",
+        route:
+          "Order from the state Vital Records office online, by mail, or by appointment in person.",
+        detail:
+          "The state holds death records from July 1893, though records from 1894 to 1920 are incomplete.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          ["CDC: North Dakota record offices", "https://www.cdc.gov/nchs/w2w/north_dakota.htm"],
+        ],
+      },
+      marriage: {
+        url: "https://www.hhs.nd.gov/vital/marriage",
+        authority: "County office where the marriage license was purchased and filed",
+        record:
+          "Obtain a certified copy of the marriage record from the county that issued the license.",
+        access:
+          "Ask the county office about access, identification and certification requirements.",
+        route:
+          "Contact the county office where the license was filed, which may be the recorder, clerk of court or another county office.",
+        detail: "The state stopped issuing certified marriage copies on January 1, 2008.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          ["CDC: North Dakota record offices", "https://www.cdc.gov/nchs/w2w/north_dakota.htm"],
+        ],
+      },
+      divorce: {
+        url: "https://www.hhs.nd.gov/vital/divorce",
+        authority: "Clerk of court or county recorder in the county where the divorce was granted",
+        record:
+          "Request a certified copy of the divorce or annulment record from the county that granted it.",
+        access:
+          "Ask the county office about access, identification and certification requirements.",
+        route:
+          "Contact the county clerk or recorder in the county where the divorce or annulment was granted.",
+        detail:
+          "The state does not issue divorce copies, but Vital Records can help identify the right county.",
+        sourceChecked: "11/27/2026",
+        extra: [
+          ["CDC: North Dakota record offices", "https://www.cdc.gov/nchs/w2w/north_dakota.htm"],
+        ],
+      },
+    },
+  },
 } as const;
