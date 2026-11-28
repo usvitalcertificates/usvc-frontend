@@ -50,6 +50,13 @@ const expected = [
   "alaska",
   "arkansas",
   "utah",
+  "connecticut",
+  "puerto-rico",
+  "new-mexico",
+  "mississippi",
+  "new-hampshire",
+  "rhode-island",
+  "kansas",
 ];
 // States researched in the November batches carry their own source-check date.
 const NOVEMBER_28_STATES = new Set([
@@ -59,6 +66,13 @@ const NOVEMBER_28_STATES = new Set([
   "alaska",
   "arkansas",
   "utah",
+  "connecticut",
+  "puerto-rico",
+  "new-mexico",
+  "mississippi",
+  "new-hampshire",
+  "rhode-island",
+  "kansas",
 ]);
 const NOVEMBER_STATES = new Set([
   "nevada",
@@ -72,9 +86,9 @@ const NOVEMBER_STATES = new Set([
   "hawaii",
   "north-dakota",
 ]);
-test("108 death, marriage and divorce guides cover 36 states", () => {
+test("129 death, marriage and divorce guides cover 43 states", () => {
   assert.deepEqual(Object.keys(RECORD_GUIDE_DATA).sort(), expected.toSorted());
-  assert.equal(expected.length * RECORD_GUIDE_TYPES.length, 108);
+  assert.equal(expected.length * RECORD_GUIDE_TYPES.length, 129);
 });
 for (const state of expected)
   for (const certificate of RECORD_GUIDE_TYPES) {

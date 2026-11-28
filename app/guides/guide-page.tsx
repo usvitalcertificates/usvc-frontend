@@ -13,9 +13,14 @@ const LINK_RE = /\[([^\]]+)\]\(([^)]+)\)/g;
 
 /** Cross-state topic guides relevant to each record type (internal linking). */
 const RELATED_TOPICS: Record<string, string[]> = {
-  birth: ["abstract-birth-certificate", "apostille-birth-certificate", "replace-birth-certificate"],
+  birth: [
+    "abstract-birth-certificate",
+    "apostille-birth-certificate",
+    "replace-birth-certificate",
+    "birth-certificate-correction",
+  ],
   death: ["how-to-get-death-certificate", "death-certificate-cost"],
-  marriage: ["replace-marriage-certificate"],
+  marriage: ["replace-marriage-certificate", "marriage-license-vs-certificate"],
   divorce: ["copy-of-divorce-decree"],
 };
 

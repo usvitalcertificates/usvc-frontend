@@ -114,6 +114,22 @@ export const BIRTH_GUIDE_SOURCES: Record<string, { state: string; url: string }>
     url: "https://healthy.arkansas.gov/programs-services/certificates-records/",
   },
   utah: { state: "Utah", url: "https://vitalrecords.utah.gov/" },
+  connecticut: {
+    state: "Connecticut",
+    url: "https://portal.ct.gov/dph/vital-records/how-to-obtain-a-record",
+  },
+  "puerto-rico": { state: "Puerto Rico", url: "https://www.cdc.gov/nchs/w2w/puerto_rico.htm" },
+  "new-mexico": { state: "New Mexico", url: "https://www.cdc.gov/nchs/w2w/new_mexico.htm" },
+  mississippi: {
+    state: "Mississippi",
+    url: "https://msdh.ms.gov/programs-services/public-health-services/vital-records",
+  },
+  "new-hampshire": {
+    state: "New Hampshire",
+    url: "https://www.cdc.gov/nchs/w2w/new_hampshire.htm",
+  },
+  "rhode-island": { state: "Rhode Island", url: "https://www.cdc.gov/nchs/w2w/rhode_island.htm" },
+  kansas: { state: "Kansas", url: "https://www.cdc.gov/nchs/w2w/kansas.htm" },
   california: {
     state: "California",
     url: "https://www.cdph.ca.gov/Programs/CHSI/Pages/Vital-Records-Obtaining-Certified-Copies-of-Birth-Records.aspx",

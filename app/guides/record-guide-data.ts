@@ -2217,4 +2217,533 @@ export const RECORD_GUIDE_DATA = {
       },
     },
   },
+  connecticut: {
+    name: "Connecticut",
+    records: {
+      birth: {
+        url: "https://portal.ct.gov/dph/vital-records/birth-certificates",
+        authority:
+          "Town vital records offices and the Connecticut Department of Public Health State Vital Records Office",
+        record:
+          "Request a certified copy of the birth certificate; birth records are confidential and not open to the general public.",
+        access:
+          "Check that you are an eligible requester, such as the registrant, a parent, a spouse or another listed relative, and include government photo ID plus any required proof of relationship.",
+        route:
+          "Send the request to the town where the birth occurred, the town where the mother lived at the time of birth, or the State Vital Records Office.",
+        detail:
+          "Births on or after January 1, 2003 can be requested from any Connecticut town vital records office.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Connecticut DPH: how to obtain a record",
+            "https://portal.ct.gov/dph/vital-records/how-to-obtain-a-record",
+          ],
+          [
+            "Connecticut DPH: town and state office contacts",
+            "https://portal.ct.gov/dph/vital-records/contact-us",
+          ],
+        ],
+      },
+      death: {
+        url: "https://portal.ct.gov/dph/vital-records/death-certificates",
+        authority:
+          "The town vital records office where the death occurred and the State Vital Records Office",
+        record:
+          "Request a certified copy of the death certificate, noting whether you need the version showing the decedent’s Social Security number.",
+        access:
+          "Check whether you qualify for the Social Security number version, which is limited to the spouse or next of kin with proof of identity and relationship.",
+        route:
+          "Send the town application to the town where the death occurred, or the state application to the State Vital Records Office.",
+        detail:
+          "Anyone at least 18 years old may request a certified copy without the Social Security number.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Connecticut DPH: town and state office contacts",
+            "https://portal.ct.gov/dph/vital-records/contact-us",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://portal.ct.gov/dph/vital-records/marriage-and-civil-union-certificates",
+        authority: "Town vital records offices and the State Vital Records Office",
+        record:
+          "Request a certified copy of the marriage or civil union certificate, noting whether you need the version with Social Security numbers.",
+        access:
+          "Check the identification rules; only the parties to the marriage may receive a copy that shows Social Security numbers.",
+        route:
+          "Send the request to the town where the marriage occurred, the town where either party lived at the time, or the State Vital Records Office.",
+        detail:
+          "Anyone at least 18 years old may request a certified copy without the Social Security numbers.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Connecticut DPH: town and state office contacts",
+            "https://portal.ct.gov/dph/vital-records/contact-us",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://portal.ct.gov/dph/vital-records/divorce",
+        authority: "The Connecticut Superior Court that granted the divorce",
+        record: "Request a copy of the divorce decree, which the court calls the Judgment File.",
+        access:
+          "Check the clerk’s current requirements and have the case name and docket number ready.",
+        route:
+          "Send the request to the Judicial District Clerk’s Office at the court location where the divorce was granted.",
+        detail:
+          "The State Vital Records Office does not keep copies of divorce or dissolution of civil union decrees.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          ["Connecticut Judicial Branch: family FAQ", "https://www.jud.ct.gov/faq/family.htm"],
+        ],
+      },
+    },
+  },
+  "new-hampshire": {
+    name: "New Hampshire",
+    records: {
+      birth: {
+        url: "https://www.cdc.gov/nchs/w2w/new_hampshire.htm",
+        authority: "New Hampshire Division of Vital Records Administration and city or town clerks",
+        record:
+          "Request a certified copy of the birth record, printed on State of New Hampshire paper.",
+        access:
+          "Check that you are immediate family or have a direct and tangible interest in the record, and include a copy of your photo ID.",
+        route:
+          "Send the request to the Division of Vital Records Administration in Concord or to a city or town clerk.",
+        detail:
+          "Clerks with statewide access can issue births from 1935 onward, except 1949 and 1950.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          ["Concord City Clerk: vital records", "https://concordnh.gov/995/Vital-Records"],
+          [
+            "Salem Town Clerk: certified vital records",
+            "https://salemnh.gov/465/Certified-Vital-Records",
+          ],
+        ],
+      },
+      death: {
+        url: "https://www.cdc.gov/nchs/w2w/new_hampshire.htm",
+        authority: "New Hampshire Division of Vital Records Administration and city or town clerks",
+        record: "Request a certified copy of the death record.",
+        access:
+          "Check that you are immediate family or have a direct and tangible interest in the record, and include a copy of your photo ID.",
+        route:
+          "Send the request to the Division of Vital Records Administration or to a city or town clerk.",
+        detail:
+          "Clerks with statewide access can issue deaths from 1965 onward; earlier deaths come from the town where they occurred or the state.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Salem Town Clerk: certified vital records",
+            "https://salemnh.gov/465/Certified-Vital-Records",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/new_hampshire.htm",
+        authority: "New Hampshire Division of Vital Records Administration and city or town clerks",
+        record: "Request a certified copy of the marriage record.",
+        access:
+          "Check that you are immediate family or have a direct and tangible interest in the record, and include a copy of your photo ID.",
+        route:
+          "Send the request to the Division of Vital Records Administration or to a city or town clerk, such as the one that issued the license.",
+        detail: "Clerks with statewide access can issue marriages from 1960 onward.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Salem Town Clerk: certified vital records",
+            "https://salemnh.gov/465/Certified-Vital-Records",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/new_hampshire.htm",
+        authority:
+          "New Hampshire vital records offices for divorce records; the court that granted the divorce for the decree",
+        record:
+          "Decide whether you need a certified divorce record from vital records or a certified copy of the decree from the court.",
+        access:
+          "Check that you are a party, immediate family or have a direct and tangible interest, and include a copy of your photo ID.",
+        route:
+          "Send the request to the Division of Vital Records Administration, a city or town clerk, or the court that granted the divorce.",
+        detail:
+          "Clerks with statewide access can issue divorce records from 1979 onward; earlier records come from the court.",
+        sourceChecked: "11/28/2026",
+        extra: [["Concord City Clerk: vital records", "https://concordnh.gov/995/Vital-Records"]],
+      },
+    },
+  },
+  "puerto-rico": {
+    name: "Puerto Rico",
+    records: {
+      birth: {
+        url: "https://www.cdc.gov/nchs/w2w/puerto_rico.htm",
+        authority: "Puerto Rico Department of Health, Demographic Registry",
+        record:
+          "Request a certified copy issued on or after July 1, 2010; Law 191 of 2009 invalidated earlier Puerto Rico birth certificate copies.",
+        access:
+          "Check that you are the registrant age 18 or older, a listed parent, an adult child, an attorney, a guardian or an heir, and include a copy of valid photo ID.",
+        route: "Send mail requests to the Department of Health Demographic Registry in San Juan.",
+        detail:
+          "The central registry holds records from 1931 onward; local registry offices may hold earlier ones.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          ["SSA: Puerto Rico birth certificates", "https://secure.ssa.gov/POMS.NSF/lnx/0200301065"],
+          ["PRFAA: help with vital documents", "https://www.prfaa.pr.gov/services/"],
+        ],
+      },
+      death: {
+        url: "https://www.cdc.gov/nchs/w2w/puerto_rico.htm",
+        authority: "Puerto Rico Department of Health, Demographic Registry",
+        record: "Request a certified copy of the death certificate from the Demographic Registry.",
+        access:
+          "Check that you are the listed spouse, a listed parent, an adult child, an attorney or an heir, and include a copy of valid photo ID.",
+        route: "Send mail requests to the Department of Health Demographic Registry in San Juan.",
+        detail: "The registry holds death records for deaths from 1931 onward.",
+        sourceChecked: "11/28/2026",
+        extra: [["PRFAA: help with vital documents", "https://www.prfaa.pr.gov/services/"]],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/puerto_rico.htm",
+        authority: "Puerto Rico Department of Health, Demographic Registry",
+        record:
+          "Request a certified copy of the marriage certificate from the Demographic Registry.",
+        access:
+          "Check that you are a spouse, a parent of a spouse, a legal representative, a guardian or an heir, and include a copy of valid photo ID.",
+        route: "Send mail requests to the Department of Health Demographic Registry in San Juan.",
+        detail: "The registry holds marriage records for marriages from 1931 onward.",
+        sourceChecked: "11/28/2026",
+        extra: [["PRFAA: help with vital documents", "https://www.prfaa.pr.gov/services/"]],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/puerto_rico.htm",
+        authority:
+          "Demographic Registry for divorce certifications; the Superior Court that granted the divorce for the decree",
+        record:
+          "A divorce certification is an abstract of the final court ruling, not the divorce decree itself.",
+        access: "Check that you are a spouse, a legal representative or an heir before you apply.",
+        route:
+          "Ask the Demographic Registry for a certification, or contact the Superior Court where the divorce was granted for the decree.",
+        detail: "The registry can certify a divorce only if the court’s decree was sent to it.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          ["SSA: Puerto Rico divorce records", "https://secure.ssa.gov/poms.nsf/lnx/0200308220"],
+        ],
+      },
+    },
+  },
+  "new-mexico": {
+    name: "New Mexico",
+    records: {
+      birth: {
+        url: "https://www.cdc.gov/nchs/w2w/new_mexico.htm",
+        authority: "New Mexico Department of Health, Bureau of Vital Records and Health Statistics",
+        record:
+          "Request a certified copy of the New Mexico birth certificate from the state vital records office.",
+        access:
+          "Check that you are the registrant, immediate family, a legal guardian or representative, or can show a direct and tangible interest.",
+        route: "Send mail requests to New Mexico Vital Records in Santa Fe.",
+        detail: "The state office has records since 1920 and delayed records since 1880.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "New Mexico vital records rule, 7.2.2 NMAC",
+            "https://www.srca.nm.gov/nmac/nmregister/xxx/7.2.2.html",
+          ],
+        ],
+      },
+      death: {
+        url: "https://www.cdc.gov/nchs/w2w/new_mexico.htm",
+        authority: "New Mexico Department of Health, Bureau of Vital Records and Health Statistics",
+        record:
+          "Request a certified copy of the New Mexico death certificate from the state vital records office.",
+        access:
+          "Check that you are immediate family, a legal representative, or can show a direct and tangible interest.",
+        route: "Send mail requests to New Mexico Vital Records in Santa Fe.",
+        detail:
+          "Death records in the state registrar’s custody become public 50 years after the death.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "New Mexico vital records rule, 7.2.2 NMAC",
+            "https://www.srca.nm.gov/nmac/nmregister/xxx/7.2.2.html",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/new_mexico.htm",
+        authority: "The county clerk in the county that issued the marriage license",
+        record: "Request a certified copy of the recorded marriage record from that county clerk.",
+        access: "Check the county clerk’s current eligibility and identification requirements.",
+        route: "Contact the county clerk in the county where the marriage license was issued.",
+        detail: "Marriage records are kept by county clerks, not the state vital records office.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Santa Fe County Clerk: marriage records (example)",
+            "https://www.santafecountynm.gov/clerk/divisions/marriagelicenses",
+          ],
+          ["SSA: New Mexico record offices", "https://secure.ssa.gov/poms.nsf/lnx/0200308061"],
+        ],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/new_mexico.htm",
+        authority:
+          "The district court clerk in the judicial district where the divorce was granted",
+        record: "Request a certified copy of the divorce record from the court’s case file.",
+        access:
+          "Check the court clerk’s current requirements for requesting and certifying case records.",
+        route: "Contact the district court clerk where the divorce was granted.",
+        detail: "Divorce records are kept by district courts, not the state vital records office.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          ["SSA: New Mexico record offices", "https://secure.ssa.gov/poms.nsf/lnx/0200308061"],
+        ],
+      },
+    },
+  },
+  mississippi: {
+    name: "Mississippi",
+    records: {
+      birth: {
+        url: "https://msdh.ms.gov/programs-services/public-health-services/vital-records/birth-certificates",
+        authority: "Mississippi State Department of Health, Office of Vital Records",
+        record:
+          "Request a certified long form birth certificate; the office no longer issues short form or abstract copies.",
+        access:
+          "Check that you have a legitimate and tangible interest, such as being the registrant, a parent or a close relative, and include a copy of valid photo ID.",
+        route:
+          "Mail the signed application to Mississippi Vital Records in Jackson, or apply in person at the Ridgeland office.",
+        detail:
+          "The state office holds Mississippi birth records filed from November 1912 to the present.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Mississippi Vital Records: birth certificate application instructions",
+            "https://msdh.ms.gov/programs-services/public-health-services/vital-records/birth-certificates/birth-certificate-application-instructions",
+          ],
+          [
+            "Mississippi Vital Records: questions and answers",
+            "https://msdh.ms.gov/programs-services/public-health-services/vital-records",
+          ],
+        ],
+      },
+      death: {
+        url: "https://msdh.ms.gov/programs-services/public-health-services/vital-records/death-certificates",
+        authority: "Mississippi State Department of Health, Office of Vital Records",
+        record:
+          "Request a certified copy of the death certificate, and check names and dates on it when it arrives.",
+        access:
+          "Check that you are the spouse, parent, grandparent, sibling, child, grandchild, guardian or legal representative, and include a copy of valid photo ID.",
+        route:
+          "Mail the signed application to Mississippi Vital Records in Jackson, or apply in person at the Ridgeland office.",
+        detail:
+          "The state office holds Mississippi death records filed from November 1912 to the present.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Mississippi Vital Records: death certificate application instructions",
+            "https://msdh.ms.gov/programs-services/public-health-services/vital-records/death-certificates/death-certificate-application-instructions",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://msdh.ms.gov/programs-services/public-health-services/vital-records/marriage-records",
+        authority:
+          "Mississippi State Department of Health and the circuit clerk in the county where the license was issued",
+        record:
+          "Request a certified copy of the marriage record, or ask the state office to search for the county that issued the license.",
+        access:
+          "Check that you are the person named or an eligible relative, guardian or legal representative, and include a copy of valid photo ID.",
+        route:
+          "Mail the signed application to Mississippi Vital Records, or contact the circuit clerk in the county that issued the license.",
+        detail:
+          "Marriages from July 1, 1938 through December 31, 1941 are held only by the circuit clerk in the county that issued the license.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Mississippi Vital Records: marriage record application instructions",
+            "https://msdh.ms.gov/programs-services/public-health-services/vital-records/marriage-records/marriage-record-application-instructions",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://msdh.ms.gov/programs-services/public-health-services/vital-records/divorce-records",
+        authority: "The chancery clerk in the county where the divorce was granted",
+        record:
+          "Request a certified copy of the divorce decree; the state Vital Records office does not issue divorce certificates.",
+        access:
+          "Check the chancery clerk’s current eligibility and identification requirements before you request a copy.",
+        route: "Contact the chancery clerk’s office in the county that granted the divorce.",
+        detail:
+          "If you do not know the county, the state Vital Records office can search its divorce index to find the county, book and page.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          ["CDC: Mississippi record offices", "https://www.cdc.gov/nchs/w2w/mississippi.htm"],
+        ],
+      },
+    },
+  },
+  "rhode-island": {
+    name: "Rhode Island",
+    records: {
+      birth: {
+        url: "https://www.cdc.gov/nchs/w2w/rhode_island.htm",
+        authority: "Rhode Island Department of Health, Center for Vital Records",
+        record:
+          "Request a certified birth certificate; adult adoptees can ask the state for a non-certified copy of their original birth record.",
+        access:
+          "Check that you are eligible to order the record, and include a copy of valid government photo ID or two pieces of mail showing your name and address.",
+        route:
+          "Send the request to the Center for Vital Records in Cranston, or for births from 1960 on, ask any city or town hall.",
+        detail:
+          "The Rhode Island State Archives can certify state birth records from 1853 through 1925.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Rhode Island State Archives: vital records",
+            "https://www.sos.ri.gov/divisions/state-archives/VitalRecords",
+          ],
+          ["Providence Office of Vital Records", "https://www.providenceri.gov/vital-records/"],
+        ],
+      },
+      death: {
+        url: "https://www.cdc.gov/nchs/w2w/rhode_island.htm",
+        authority: "Rhode Island Department of Health, Center for Vital Records",
+        record: "Request a certified copy of the death certificate.",
+        access:
+          "Check that you are eligible to order the record, and include a copy of valid government photo ID or two pieces of mail showing your name and address.",
+        route:
+          "Send the request to the Center for Vital Records in Cranston, or to the city or town clerk where the death occurred.",
+        detail:
+          "The state holds death records for 50 years; older records are with the city or town clerk or the Rhode Island State Archives.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Rhode Island State Archives: vital records",
+            "https://www.sos.ri.gov/divisions/state-archives/VitalRecords",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/rhode_island.htm",
+        authority: "Rhode Island Department of Health, Center for Vital Records",
+        record: "Request a certified copy of the marriage or civil union record.",
+        access:
+          "Check that you are eligible to order the record, and include a copy of valid government photo ID or two pieces of mail showing your name and address.",
+        route:
+          "Send the request to the Center for Vital Records in Cranston, or to a city or town vital records office.",
+        detail:
+          "The state holds marriage records for 100 years, and the State Archives can certify marriages from 1853 through 1925.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Rhode Island State Archives: vital records",
+            "https://www.sos.ri.gov/divisions/state-archives/VitalRecords",
+          ],
+          ["Providence Office of Vital Records", "https://www.providenceri.gov/vital-records/"],
+        ],
+      },
+      divorce: {
+        url: "https://www.courts.ri.gov/Courts/FamilyCourt/Pages/default.aspx",
+        authority: "Rhode Island Family Court, Domestic Relations Clerk’s Office",
+        record:
+          "Request a certified copy of the divorce decree from the Family Court; the state health department does not issue divorce certificates.",
+        access:
+          "Check the court’s current eligibility and identification requirements before you request a copy.",
+        route: "Contact the Clerk of Family Court in Providence.",
+        detail:
+          "Older Family Court domestic case files may be stored at the Judicial Records Center in Pawtucket.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Rhode Island Judiciary: Judicial Records Center list of records",
+            "https://www.courts.ri.gov/programs-services/Pages/List-of-Records.aspx",
+          ],
+          ["CDC: Rhode Island record offices", "https://www.cdc.gov/nchs/w2w/rhode_island.htm"],
+        ],
+      },
+    },
+  },
+  kansas: {
+    name: "Kansas",
+    records: {
+      birth: {
+        url: "https://www.cdc.gov/nchs/w2w/kansas.htm",
+        authority: "Kansas Department of Health and Environment, Office of Vital Statistics",
+        record:
+          "Request a certified copy of the birth certificate from the state Office of Vital Statistics.",
+        access:
+          "Mail requests need a copy of a photo ID and a handwritten signature; check the office’s current eligibility rules.",
+        route: "Send the request to the Office of Vital Statistics in Topeka.",
+        detail:
+          "The state office has birth records from July 1911; earlier records may be held by the county clerk where the birth occurred.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Kansas Historical Society: vital records in Kansas",
+            "https://www.kansashistory.gov/p/genealogy-vital-records-in-kansas/11313",
+          ],
+        ],
+      },
+      death: {
+        url: "https://www.cdc.gov/nchs/w2w/kansas.htm",
+        authority: "Kansas Department of Health and Environment, Office of Vital Statistics",
+        record:
+          "Request a certified copy of the death certificate from the state Office of Vital Statistics.",
+        access:
+          "Mail requests need a copy of a photo ID and a handwritten signature; check the office’s current eligibility rules.",
+        route: "Send the request to the Office of Vital Statistics in Topeka.",
+        detail:
+          "The state office has death records from July 1911; earlier records may be held by the county clerk where the death occurred.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Kansas Historical Society: vital records in Kansas",
+            "https://www.kansashistory.gov/p/genealogy-vital-records-in-kansas/11313",
+          ],
+        ],
+      },
+      marriage: {
+        url: "https://www.cdc.gov/nchs/w2w/kansas.htm",
+        authority: "Kansas Department of Health and Environment, Office of Vital Statistics",
+        record:
+          "Request a certified copy of the marriage record from the state Office of Vital Statistics.",
+        access:
+          "Check the office’s current eligibility and identification requirements before you send a request.",
+        route: "Send the request to the Office of Vital Statistics in Topeka.",
+        detail:
+          "The state has marriage records from May 1913; earlier marriages were recorded by the district court in the county where they took place.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Kansas Historical Society: vital records in Kansas",
+            "https://www.kansashistory.gov/p/genealogy-vital-records-in-kansas/11313",
+          ],
+        ],
+      },
+      divorce: {
+        url: "https://www.cdc.gov/nchs/w2w/kansas.htm",
+        authority:
+          "Kansas Office of Vital Statistics for state divorce records; the district court for decrees",
+        record:
+          "Decide whether you need the state divorce record or the full decree from the district court that granted the divorce.",
+        access:
+          "Check the office’s current eligibility and identification requirements before you send a request.",
+        route:
+          "Send state divorce record requests to the Office of Vital Statistics, and ask the district court clerk about decree copies.",
+        detail:
+          "The state holds divorce records from July 1951; earlier divorces were recorded in the district court at the county seat.",
+        sourceChecked: "11/28/2026",
+        extra: [
+          [
+            "Kansas Historical Society: vital records in Kansas",
+            "https://www.kansashistory.gov/p/genealogy-vital-records-in-kansas/11313",
+          ],
+        ],
+      },
+    },
+  },
 } as const;
